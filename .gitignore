@@ -1,0 +1,14 @@
+test-data
+
+*~
+
+.classpath
+.project
+.settings
+target
+secure.properties
+dependency-reduced-pom.xml
+log4j2.out.xml
+myparameters
+
+Scratch.java
