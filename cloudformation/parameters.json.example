@@ -1,0 +1,158 @@
+[
+  {
+    "ParameterKey": "EnvironmentParameter",
+    "ParameterValue": "dev"
+  }, 
+  {
+    "ParameterKey": "KeypairParameter",
+    "ParameterValue": "mypublickey-id_rsa"
+  },
+  {
+    "ParameterKey": "DownloadVerifyLambdaCodeObjectParameter",
+    "ParameterValue": "download-verify-lambda.zip"
+  },
+  {
+    "ParameterKey": "DownloadVerifyAWSDataToolsJARLocationParameter",
+    "ParameterValue": "aws_data_tools-1.0.0.jar"
+  },
+  {
+    "ParameterKey": "DownloadVerifySchemaJARLocationParameter",
+    "ParameterValue": "canvas_data_schema_bindings-1.3.0.jar"
+  },
+  {
+    "ParameterKey": "DownloadVerifyPythonScriptLocationParameter",
+    "ParameterValue": "download_and_verify.py"
+  },
+  {
+    "ParameterKey": "DownloadVerifySecurePropertiesLocationParameter",
+    "ParameterValue": "secure.properties"
+  },
+  {
+    "ParameterKey": "DownloadVerifyCanvasDataSchemaVersion",
+    "ParameterValue": "1.3.0"
+  },
+  {
+    "ParameterKey": "HiveScriptsLocationParameter",
+    "ParameterValue": "/hive-scripts"
+  },
+  {
+    "ParameterKey": "HadoopJARLocationParameter",
+    "ParameterValue": "myhadoopscript.jar"
+  },
+  {
+    "ParameterKey": "CodeS3BucketParameter",
+    "ParameterValue": "my-bucket"
+  },
+  {
+    "ParameterKey": "DataPipelineInitLambdaCodeObjectParameter",
+    "ParameterValue": "data-pipeline-init-lambda.zip"
+  },
+  {
+    "ParameterKey": "SuccessSNSEmailParameter",
+    "ParameterValue": "success@example.com"
+  },
+  {
+    "ParameterKey": "FailureSNSEmailParameter",
+    "ParameterValue": "failure@example.com"
+  },
+  {
+    "ParameterKey": "RedshiftNodeTypeParameter",
+    "ParameterValue": "dc1.large"
+  },
+  {
+    "ParameterKey": "RedshiftMasterUserNameParameter",
+    "ParameterValue": "mydatabaseadminuser"
+  },
+  {
+    "ParameterKey": "RedshiftMasterUserPasswordParameter",
+    "ParameterValue": "changeM3!"
+  },
+  {
+    "ParameterKey": "RedshiftAllowVersionUpgradeParameter",
+    "ParameterValue": "true"
+  },
+  {
+    "ParameterKey": "RedshiftAutomatedSnapshotRetentionPeriodParameter",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "RedshiftClusterTypeParameter",
+    "ParameterValue": "single-node"
+  },
+  {
+    "ParameterKey": "RedshiftClusterVersionParameter",
+    "ParameterValue": "1.0"
+  },
+  {
+    "ParameterKey": "RedshiftPortParameter",
+    "ParameterValue": "5439"
+  },
+  {
+    "ParameterKey": "RedshiftPreferredMaintenanceWindowParameter",
+    "ParameterValue": "thu:07:00-thu:07:30"
+  },
+  {
+    "ParameterKey": "RedshiftDataSubnet1Parameter",
+    "ParameterValue": "subnet-12345678"
+  },
+  {
+    "ParameterKey": "RedshiftDataSubnet2Parameter",
+    "ParameterValue": "subnet-23456789"
+  },
+  {
+    "ParameterKey": "VPCIDParameter",
+    "ParameterValue": "vpc-34567890"
+  },
+  {
+    "ParameterKey": "PublicSubnetParameter",
+    "ParameterValue": "subnet-45678901"
+  },
+  {
+    "ParameterKey": "PublicSubnetCidrParameter",
+    "ParameterValue": "10.0.0.0/24"
+  },
+  {
+    "ParameterKey": "PrivateSubnetParameter",
+    "ParameterValue": "subnet-56789012"
+  },
+  {
+    "ParameterKey": "PrivateSubnetCidrParameter",
+    "ParameterValue": "10.0.1.0/24"
+  },
+  {
+    "ParameterKey": "VPNCidrParameter",
+    "ParameterValue": "10.0.2.0/24"
+  },
+  {
+    "ParameterKey": "DownloadVerifyAMIIdParameter",
+    "ParameterValue": "ami-66b6c60c"
+  },
+  {
+    "ParameterKey": "DownloadVerifyInstanceTypeParameter",
+    "ParameterValue": "i2.8xlarge"
+  },
+  {
+    "ParameterKey": "EMRMasterInstanceTypeParameter",
+    "ParameterValue": "m3.xlarge"
+  },
+  {
+    "ParameterKey": "EMRCoreInstanceTypeParameter",
+    "ParameterValue": "m3.xlarge"
+  },
+  {
+    "ParameterKey": "EMRCoreInstanceCountParameter",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "EMRTaskInstanceTypeParameter",
+    "ParameterValue": "m3.xlarge"
+  },
+  {
+    "ParameterKey": "EMRTaskInstanceCountParameter",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "EMRReleaseLabelParameter",
+    "ParameterValue": "emr-4.2.0"
+  }
+]

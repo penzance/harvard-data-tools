@@ -1,0 +1,2866 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "This CloudFormation template creates the environment-specific shared infrastructure (S3 buckets, Lambda functions, Data Pipeline, Redshift Data Warehouse).",
+    "Parameters": {
+        "EnvironmentParameter": {
+            "Type": "String",
+            "Description": "Environment name",
+            "Default": "dev"
+        },
+        "KeypairParameter": {
+            "Type": "String",
+            "Description": "Keypair to install on DownloadVerify EC2 and EMR EC2s",
+            "Default": "mypublickey-id_rsa"
+        },
+        "DownloadVerifyLambdaCodeObjectParameter": {
+            "Type": "String",
+            "Description": "Name of ZIP file in the CodeS3Bucket containing the DowloadVerifyLambda function code",
+            "Default": "download-verify-lambda.zip"
+        },
+        "DownloadVerifyAWSDataToolsJARLocationParameter": {
+            "Type": "String",
+            "Description": "Name of JAR file in the CodeS3Bucket containing the DownloadVerifyAWSDataTools JAR code",
+            "Default": "aws_data_tools-1.0.0.jar"
+        },
+        "DownloadVerifySchemaJARLocationParameter": {
+            "Type": "String",
+            "Description": "Prefix of JAR file (up until the version number) in the CodeS3Bucket containing the DownloadVerifySchema JAR code",
+            "Default": "canvas_data_schema_bindings"
+        },
+        "DownloadVerifyPythonScriptLocationParameter": {
+            "Type": "String",
+            "Description": "Name of Python file in the CodeS3Bucket containing the DownloadVerify Python script",
+            "Default": "download_and_verify.py"
+        },
+        "DownloadVerifySecurePropertiesLocationParameter": {
+            "Type": "String",
+            "Description": "Name of secure settings file for use by DownloadVerify Python script (NOTE: Name must remain secure.properties for now)",
+            "Default": "secure.properties"
+        },
+        "DownloadVerifyCanvasDataSchemaVersion": {
+            "Type": "String",
+            "Description": "Canvas Data Schema Version",
+            "Default": "1.3.0"
+        },
+        "HiveCreateScriptLocationParameter": {
+            "Type": "String",
+            "Description": "Prefix of the .q file (up until the version number) in the CodeS3Bucket containing the Hive Create script",
+            "Default": "create_tables"
+        },
+        "HiveCopyScriptLocationParameter": {
+            "Type": "String",
+            "Description": "Prefix of the .q file (up until the version number) in the CodeS3Bucket containing the Hive Copy script",
+            "Default": "copy_tables"
+        },
+        "HiveQueryScriptLocationParameter": {
+            "Type": "String",
+            "Description": "Name of the .q file in the CodeS3Bucket containing the Hive Query script",
+            "Default": "hive_queries.q"
+        },
+        "HadoopJARLocationParameter": {
+            "Type": "String",
+            "Description": "Name of JAR file in the CodeS3Bucket containing the Hadoop JAR code",
+            "Default": "myhadoopscript.jar"
+        },
+        "CodeS3BucketParameter": {
+            "Type": "String",
+            "Description": "Name of S3 bucket containing various Lambda, JAR and Hadoop code files",
+            "Default": "my-bucket"
+        },
+        "DataPipelineInitLambdaCodeObjectParameter": {
+            "Type": "String",
+            "Description": "Name of ZIP file in the CodeS3Bucket containing the DataPipelineInitLambda function code",
+            "Default": "data-pipeline-init-lambda.zip"
+        },
+        "S3toRedshiftLoaderParameter": {
+            "Type": "String",
+            "Description": "Prefix of the SQL file (up until the version number) in the CodeS3Bucket containing the Redshift SQL code to move data from S3 to Redshift after Data Pipeline processing",
+            "Default": "s3_to_redshift_loader"
+        },
+        "SuccessSNSEmailParameter": {
+            "Type": "String",
+            "Description": "Email address to receive success messages",
+            "Default": "success@example.com"
+        },
+        "FailureSNSEmailParameter": {
+            "Type": "String",
+            "Description": "Email address to receive failure messages",
+            "Default": "failure@example.com"
+        },
+        "RedshiftNodeTypeParameter": {
+            "Type": "String",
+            "Description": "Redshift node type",
+            "Default": "dc1.large"
+        },
+        "RedshiftMasterUserNameParameter": {
+            "Type": "String",
+            "Description": "Redshift master user (and default db) name",
+            "Default": "mydatabaseadminuser"
+        },
+        "RedshiftMasterUserPasswordParameter": {
+            "Type": "String",
+            "Description": "Redshift master user password",
+            "Default": "changeM3!"
+        },
+        "RedshiftAllowVersionUpgradeParameter": {
+            "Type": "String",
+            "Description": "Redshift AllowVersionUpgrade value",
+            "Default": "true"
+        },
+        "RedshiftAutomatedSnapshotRetentionPeriodParameter": {
+            "Type": "Number",
+            "Description": "Redshift AutomatedSnapshotRetentionPeriod value (in days)",
+            "Default": "1"
+        },
+        "RedshiftClusterTypeParameter": {
+            "Type": "String",
+            "Description": "Redshift ClusterType value",
+            "Default": "single-node"
+        },
+        "RedshiftClusterVersionParameter": {
+            "Type": "String",
+            "Description": "Redshift ClusterVersion value",
+            "Default": "1.0"
+        },
+        "RedshiftPortParameter": {
+            "Type": "Number",
+            "Description": "Redshift Port value",
+            "Default": "5439"
+        },
+        "RedshiftPreferredMaintenanceWindowParameter": {
+            "Type": "String",
+            "Description": "Redshift PreferredMaintenanceWindow value",
+            "Default": "thu:07:00-thu:07:30"
+        },
+        "RedshiftDataSubnet1Parameter": {
+            "Type": "String",
+            "Description": "Redshift data subnet 1",
+            "Default": "subnet-12345678"
+        },
+        "RedshiftDataSubnet2Parameter": {
+            "Type": "String",
+            "Description": "Redshift data subnet 2",
+            "Default": "subnet-23456789"
+        },
+        "VPCIDParameter": {
+            "Type": "String",
+            "Description": "VPC ID",
+            "Default": "vpc-34567890"
+        },
+        "PublicSubnetParameter": {
+            "Type": "String",
+            "Description": "Public subnet for the EMR Cluster",
+            "Default": "subnet-45678901"
+        },
+        "PublicSubnetCidrParameter": {
+            "Type": "String",
+            "Description": "Public subnet CIDR block for the EMR Cluster",
+            "Default": "10.0.0.0/24"
+        },
+        "PrivateSubnetParameter": {
+            "Type": "String",
+            "Description": "Private subnet for the DownloadVerify EC2 and the EMR Cluster",
+            "Default": "subnet-56789012"
+        },
+        "PrivateSubnetCidrParameter": {
+            "Type": "String",
+            "Description": "Private subnet CIDR block for the DownloadVerify EC2 and the EMRCluster",
+            "Default": "10.0.1.0/24"
+        },
+        "VPNCidrParameter": {
+            "Type": "String",
+            "Description": "CIDR block for our internal VPN (to allow access to Redshift from our VPN)",
+            "Default": "10.0.2.0/24"
+        },
+        "DownloadVerifyAMIIdParameter": {
+            "Type": "String",
+            "Description": "AMI Id to use for the DownloadVerify Instance(s) (NOTE: Should be instance store AMI, not EBS, for maximum speed)",
+            "Default": "ami-66b6c60c"
+        },
+        "DownloadVerifyInstanceTypeParameter": {
+            "Type": "String",
+            "Description": "Instance type for DownloadVerify Instance(s)",
+            "Default": "i2.8xlarge"
+        },
+        "EMRMasterInstanceTypeParameter": {
+            "Type": "String",
+            "Description": "Instance type for the Master EMR Instance",
+            "Default": "m3.xlarge"
+        },
+        "EMRCoreInstanceTypeParameter": {
+            "Type": "String",
+            "Description": "Instance type for Core EMR Instance(s)",
+            "Default": "m3.xlarge"
+        },
+        "EMRCoreInstanceCountParameter": {
+            "Type": "String",
+            "Description": "Number of Core EMR Instances",
+            "Default": "1"
+        },
+        "EMRTaskInstanceTypeParameter": {
+            "Type": "String",
+            "Description": "Instance type for Task EMR Instance(s)",
+            "Default": "m3.xlarge"
+        },
+        "EMRTaskInstanceCountParameter": {
+            "Type": "String",
+            "Description": "Number of Task EMR Instances",
+            "Default": "1"
+        },
+        "EMRReleaseLabelParameter": {
+            "Type": "String",
+            "Description": "EMR release label to be used",
+            "Default": "emr-4.3.0"
+        }
+    },
+    "Mappings": {},
+    "Conditions": {},
+    "Resources": {
+        "DownloadVerifyLambdaRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    {
+                                        "Ref": "AWS::StackName"
+                                    },
+                                    "-",
+                                    {
+                                        "Ref": "EnvironmentParameter"
+                                    },
+                                    "-DownloadVerifyLambdaRole-policy"
+                                ]
+                            ]
+                        },
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Sid": "Stmt1449002131000",
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "cloudformation:Describe*",
+                                        "autoscaling:UpdateAutoScalingGroup",
+                                        "autoscaling:SetDesiredCapacity"
+                                    ],
+                                    "Resource": [
+                                        "*"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "PolicyName": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    {
+                                        "Ref": "AWS::StackName"
+                                    },
+                                    "-",
+                                    {
+                                        "Ref": "EnvironmentParameter"
+                                    },
+                                    "-enable-log-access"
+                                ]
+                            ]
+                        },
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "logs:CreateLogGroup",
+                                        "logs:CreateLogStream",
+                                        "logs:PutLogEvents"
+                                    ],
+                                    "Resource": "arn:aws:logs:*:*:*"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "DownloadVerifyResourceRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "ec2.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    {
+                                        "Ref": "AWS::StackName"
+                                    },
+                                    "-",
+                                    {
+                                        "Ref": "EnvironmentParameter"
+                                    },
+                                    "-DownloadVerifyResourceRole-policy"
+                                ]
+                            ]
+                        },
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "ec2:DescribeTags",
+                                        "autoscaling:UpdateAutoScalingGroup",
+                                        "lambda:Invoke*",
+                                        "dynamodb:*",
+                                        "s3:Get*",
+                                        "s3:List*",
+                                        "s3:Put*",
+                                        "sns:Publish",
+                                        "logs:CreateLogGroup",
+                                        "logs:CreateLogStream",
+                                        "logs:PutLogEvents",
+                                        "logs:DescribeLogStreams"
+                                    ],
+                                    "Resource": [
+                                        "*"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "DownloadVerifyResourceInstanceProfile": {
+            "Type": "AWS::IAM::InstanceProfile",
+            "Properties": {
+                "Path": "/",
+                "Roles": [
+                    {
+                        "Ref": "DownloadVerifyResourceRole"
+                    }
+                ]
+            }
+        },
+        "DataPipelineInitLambdaRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    {
+                                        "Ref": "AWS::StackName"
+                                    },
+                                    "-",
+                                    {
+                                        "Ref": "EnvironmentParameter"
+                                    },
+                                    "-DataPipelineInitLambdaRole-policy"
+                                ]
+                            ]
+                        },
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Sid": "Stmt1449002131000",
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "cloudformation:Describe*",
+                                        "datapipeline:*",
+                                        "iam:PassRole"
+                                    ],
+                                    "Resource": [
+                                        "*"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "PolicyName": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    {
+                                        "Ref": "AWS::StackName"
+                                    },
+                                    "-",
+                                    {
+                                        "Ref": "EnvironmentParameter"
+                                    },
+                                    "-enable-log-access"
+                                ]
+                            ]
+                        },
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "logs:CreateLogGroup",
+                                        "logs:CreateLogStream",
+                                        "logs:PutLogEvents"
+                                    ],
+                                    "Resource": "arn:aws:logs:*:*:*"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "DataPipelineResourceRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "ec2.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    {
+                                        "Ref": "AWS::StackName"
+                                    },
+                                    "-",
+                                    {
+                                        "Ref": "EnvironmentParameter"
+                                    },
+                                    "-DataPipelineResourceRole-policy"
+                                ]
+                            ]
+                        },
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "cloudwatch:*",
+                                        "datapipeline:*",
+                                        "dynamodb:*",
+                                        "ec2:Describe*",
+                                        "elasticmapreduce:AddJobFlowSteps",
+                                        "elasticmapreduce:Describe*",
+                                        "elasticmapreduce:ListInstance*",
+                                        "rds:Describe*",
+                                        "redshift:DescribeClusters",
+                                        "redshift:DescribeClusterSecurityGroups",
+                                        "s3:*",
+                                        "sdb:*",
+                                        "sns:*",
+                                        "sqs:*"
+                                    ],
+                                    "Resource": [
+                                        "*"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "DataPipelineResourceInstanceProfile": {
+            "Type": "AWS::IAM::InstanceProfile",
+            "Properties": {
+                "Path": "/",
+                "Roles": [
+                    {
+                        "Ref": "DataPipelineResourceRole"
+                    }
+                ]
+            }
+        },
+        "DataPipelineRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "elasticmapreduce.amazonaws.com",
+                                    "datapipeline.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    {
+                                        "Ref": "AWS::StackName"
+                                    },
+                                    "-",
+                                    {
+                                        "Ref": "EnvironmentParameter"
+                                    },
+                                    "-DataPipelineRole-policy"
+                                ]
+                            ]
+                        },
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "cloudwatch:*",
+                                        "datapipeline:DescribeObjects",
+                                        "datapipeline:EvaluateExpression",
+                                        "dynamodb:BatchGetItem",
+                                        "dynamodb:DescribeTable",
+                                        "dynamodb:GetItem",
+                                        "dynamodb:Query",
+                                        "dynamodb:Scan",
+                                        "dynamodb:UpdateTable",
+                                        "ec2:AuthorizeSecurityGroupIngress",
+                                        "ec2:CancelSpotInstanceRequests",
+                                        "ec2:CreateSecurityGroup",
+                                        "ec2:CreateTags",
+                                        "ec2:DeleteTags",
+                                        "ec2:Describe*",
+                                        "ec2:ModifyImageAttribute",
+                                        "ec2:ModifyInstanceAttribute",
+                                        "ec2:RequestSpotInstances",
+                                        "ec2:RunInstances",
+                                        "ec2:StartInstances",
+                                        "ec2:StopInstances",
+                                        "ec2:TerminateInstances",
+                                        "ec2:*",
+                                        "elasticmapreduce:*",
+                                        "iam:GetInstanceProfile",
+                                        "iam:GetRole",
+                                        "iam:GetRolePolicy",
+                                        "iam:ListAttachedRolePolicies",
+                                        "iam:ListRolePolicies",
+                                        "iam:ListInstanceProfiles",
+                                        "iam:PassRole",
+                                        "rds:DescribeDBInstances",
+                                        "rds:DescribeDBSecurityGroups",
+                                        "redshift:DescribeClusters",
+                                        "redshift:DescribeClusterSecurityGroups",
+                                        "s3:CreateBucket",
+                                        "s3:DeleteObject",
+                                        "s3:Get*",
+                                        "s3:List*",
+                                        "s3:Put*",
+                                        "sdb:BatchPutAttributes",
+                                        "sdb:Select*",
+                                        "sns:GetTopicAttributes",
+                                        "sns:ListTopics",
+                                        "sns:Publish",
+                                        "sns:Subscribe",
+                                        "sns:Unsubscribe",
+                                        "sqs:CreateQueue",
+                                        "sqs:Delete*",
+                                        "sqs:GetQueue*",
+                                        "sqs:PurgeQueue",
+                                        "sqs:ReceiveMessage"
+                                    ],
+                                    "Resource": [
+                                        "*"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "S3toRedshiftLoadUser": {
+            "Type": "AWS::IAM::User",
+            "Properties": {
+                "Policies": [
+                    {
+                        "PolicyName": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    {
+                                        "Ref": "AWS::StackName"
+                                    },
+                                    "-",
+                                    {
+                                        "Ref": "EnvironmentParameter"
+                                    },
+                                    "-S3toRedshiftLoad-policy"
+                                ]
+                            ]
+                        },
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:Get*",
+                                        "s3:List*"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    "arn:aws:s3:::",
+                                                    {
+                                                        "Ref": "IntermediateS3Bucket"
+                                                    }
+                                                ]
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    "arn:aws:s3:::",
+                                                    {
+                                                        "Ref": "IntermediateS3Bucket"
+                                                    },
+                                                    "/*"
+                                                ]
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "S3toRedshiftLoadAccessKey": {
+            "Type": "AWS::IAM::AccessKey",
+            "Properties": {
+                "Status": "Active",
+                "UserName": {
+                    "Ref": "S3toRedshiftLoadUser"
+                }
+            }
+        },
+        "DownloadVerifyLC": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "Properties": {
+                "ImageId": {
+                    "Ref": "DownloadVerifyAMIIdParameter"
+                },
+                "InstanceType": {
+                    "Ref": "DownloadVerifyInstanceTypeParameter"
+                },
+                "IamInstanceProfile": {
+                    "Ref": "DownloadVerifyResourceInstanceProfile"
+                },
+                "InstanceMonitoring": "False",
+                "KeyName": {
+                    "Ref": "KeypairParameter"
+                },
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#!/bin/bash\n",
+                                "\n",
+                                "# setup CloudWatch logging\n",
+                                "yum install -y awslogs\n",
+                                "aws s3 cp s3://",
+                                {
+                                    "Ref": "CodeS3BucketParameter"
+                                },
+                                "/awslogs.conf /etc/awslogs/.\n",
+                                "service awslogs start\n",
+                                "\n",
+                                "# copy DownloadVerifyAWSDataToolsJAR, DownloadVerifySchema, DownloadVerifyPythonScript and\n",
+                                "# DownloadVerifySecureProperties from S3 to the local FS\n",
+                                "aws s3 cp s3://",
+                                {
+                                    "Ref": "CodeS3BucketParameter"
+                                },
+                                "/",
+                                {
+                                    "Ref": "DownloadVerifyAWSDataToolsJARLocationParameter"
+                                },
+                                " /root/.\n",
+                                "aws s3 cp s3://",
+                                {
+                                    "Ref": "CodeS3BucketParameter"
+                                },
+                                "/",
+                                {
+                                    "Ref": "DownloadVerifySchemaJARLocationParameter"
+                                },
+                                "-",
+                                {
+                                    "Ref": "DownloadVerifyCanvasDataSchemaVersion"
+                                },
+                                ".jar /root/.\n",
+                                "aws s3 cp s3://",
+                                {
+                                    "Ref": "CodeS3BucketParameter"
+                                },
+                                "/",
+                                {
+                                    "Ref": "DownloadVerifyPythonScriptLocationParameter"
+                                },
+                                " /root/.\n",
+                                "aws s3 cp s3://",
+                                {
+                                    "Ref": "CodeS3BucketParameter"
+                                },
+                                "/",
+                                {
+                                    "Ref": "DownloadVerifySecurePropertiesLocationParameter"
+                                },
+                                " /root/.\n",
+                                "\n",
+                                "# setup some environment variables\n",
+                                "export CANVAS_DATA_SCHEMA_VERSION=",
+                                {
+                                    "Ref": "DownloadVerifyCanvasDataSchemaVersion"
+                                },
+                                "\n",
+                                "export AWS_DATA_TOOLS_JAR=/root/",
+                                {
+                                    "Ref": "DownloadVerifyAWSDataToolsJARLocationParameter"
+                                },
+                                "\n",
+                                "export CANVAS_BINDINGS_JAR=/root/",
+                                {
+                                    "Ref": "DownloadVerifySchemaJARLocationParameter"
+                                },
+                                "-",
+                                {
+                                    "Ref": "DownloadVerifyCanvasDataSchemaVersion"
+                                },
+                                ".jar\n",
+                                "export SECURE_PROPERTIES_LOCATION=/root\n",
+                                "export CANVAS_DATA_RESULT_FILE=/root/the_result.json\n",
+                                "\n",
+                                "# Run the Python/JAR download and verify scripts\n",
+                                "python /root/",
+                                {
+                                    "Ref": "DownloadVerifyPythonScriptLocationParameter"
+                                },
+                                " > /var/log/download-and-verify-output.log\n",
+                                "if [ $? -ne 0 ]; then\n",
+                                "  # do something useful to indicate failure\n",
+                                "  aws sns publish --topic-arn \"",
+                                {
+                                    "Ref": "FailureSNS"
+                                },
+                                "\" --message file:///var/log/download-and-verify-output.log --subject \"$(curl http://169.254.169.254/latest/meta-data/instance-id): Download and verify failed\" --region us-east-1\n",
+                                "\n",
+                                "# Reduce max instances for this machine's ASG to 0, thus terminating the machine\n",
+                                "asg=$(aws ec2 describe-tags --filters \"Name=resource-id,Values=$(curl http://169.254.169.254/latest/meta-data/instance-id)\" \"Name=key,Values=aws:autoscaling:groupName\" --query 'Tags[*].[Value]' --output text --region us-east-1); aws autoscaling update-auto-scaling-group --auto-scaling-group-name $asg --max-size 0 --region us-east-1\n",
+                                "\n",
+                                "  exit\n",
+                                "fi\n",
+                                "\n",
+                                "# Create a SQLActivity script for the upcoming Data Pipeline that is customized for this data set\n",
+                                "# NOTE: It would have been preferrable to have a generic script which accepts scriptArguments,\n",
+                                "#       but after much troubleshooting, that appeared to be impossible, so this approach was created.\n",
+                                "\n",
+                                "# First, grab the generic script\n",
+                                "aws s3 cp s3://",
+                                {
+                                    "Ref": "CodeS3BucketParameter"
+                                },
+                                "/",
+                                {
+                                    "Ref": "S3toRedshiftLoaderParameter"
+                                },
+                                "_",
+                                {
+                                    "Ref": "DownloadVerifyCanvasDataSchemaVersion"
+                                },
+                                ".sql /root/s3_to_redshift_loader.sql\n",
+                                "\n",
+                                "# Credit for the following grep magic goes to http://stackoverflow.com/a/20488535\n",
+                                "# Get the path to the data files in the intermediate S3 bucket, assign to env variable\n",
+                                "DATASETPATH=$(grep -Po '(?<=\"AWS_KEY\" : \")[^\"]*' /root/the_result.json)\n",
+                                "# Get the data set number, assign to env variable\n",
+                                "DATASETNUM=$(grep -Po '(?<=\"DUMP_SEQUENCE\" : \")[^\"]*' /root/the_result.json)\n",
+                                "\n",
+                                "# Replace <intermediates3bucketandpath> placeholder with real intermediate bucket name and path\n",
+                                "sed -i \"s@<intermediates3bucketandpath>@s3://",
+                                {
+                                    "Ref": "IntermediateS3Bucket"
+                                },
+                                "/$DATASETPATH@g\" /root/s3_to_redshift_loader.sql\n",
+                                "\n",
+                                "# Replace <awskeyandsecret> placeholder with real creds\n",
+                                "sed -i \"s@<awskeyandsecret>@aws_access_key_id=",
+                                {
+                                    "Ref": "S3toRedshiftLoadAccessKey"
+                                },
+                                ";aws_secret_access_key=",
+                                {
+                                    "Fn::GetAtt": [
+                                        "S3toRedshiftLoadAccessKey",
+                                        "SecretAccessKey"
+                                    ]
+                                },
+                                "@g\" /root/s3_to_redshift_loader.sql\n",
+                                "\n",
+                                "# Copy modified file to code S3 bucket, name it with data set number.\n",
+                                "aws s3 cp /root/s3_to_redshift_loader.sql s3://",
+                                {
+                                    "Ref": "CodeS3BucketParameter"
+                                },
+                                "/$DATASETNUM.sql\n",
+                                "\n",
+                                "# Send an email that we completed download and verify\n",
+                                "aws sns publish --topic-arn \"",
+                                {
+                                    "Ref": "SuccessSNS"
+                                },
+                                "\" --message file:///root/the_result.json --subject \"Download and verify succeeded\" --region us-east-1\n",
+                                "\n",
+                                "# Invoke the Lambda function to kickoff the Data Pipeline\n",
+                                "aws lambda invoke --function-name ",
+                                {
+                                    "Ref": "DataPipelineInitLambda"
+                                },
+                                " --payload file:///root/the_result.json myoutfile --region us-east-1\n",
+                                "\n",
+                                "# Reduce max instances for this machine's ASG to 0, thus terminating the machine\n",
+                                "asg=$(aws ec2 describe-tags --filters \"Name=resource-id,Values=$(curl http://169.254.169.254/latest/meta-data/instance-id)\" \"Name=key,Values=aws:autoscaling:groupName\" --query 'Tags[*].[Value]' --output text --region us-east-1); aws autoscaling update-auto-scaling-group --auto-scaling-group-name $asg --max-size 0 --region us-east-1\n"
+                            ]
+                        ]
+                    }
+                }
+            }
+        },
+        "DownloadVerifyASG": {
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "Properties": {
+                "LaunchConfigurationName": {
+                    "Ref": "DownloadVerifyLC"
+                },
+                "MinSize": "0",
+                "MaxSize": "0",
+                "DesiredCapacity": "0",
+                "VPCZoneIdentifier": [
+                    {
+                        "Ref": "PrivateSubnetParameter"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "PropagateAtLaunch": "True",
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    {
+                                        "Ref": "AWS::StackName"
+                                    },
+                                    "-",
+                                    {
+                                        "Ref": "EnvironmentParameter"
+                                    },
+                                    "-DownloadVerify"
+                                ]
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "DownloadVerifyLambda": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "Code": {
+                    "S3Bucket": {
+                        "Ref": "CodeS3BucketParameter"
+                    },
+                    "S3Key": {
+                        "Ref": "DownloadVerifyLambdaCodeObjectParameter"
+                    }
+                },
+                "Description": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "Function to kick off download and verify for ",
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "-",
+                            {
+                                "Ref": "EnvironmentParameter"
+                            }
+                        ]
+                    ]
+                },
+                "Handler": "index.handler",
+                "Role": {
+                    "Fn::GetAtt": [
+                        "DownloadVerifyLambdaRole",
+                        "Arn"
+                    ]
+                },
+                "Runtime": "nodejs",
+                "Timeout": 10
+            }
+        },
+        "DataPipelineInitLambda": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "Code": {
+                    "S3Bucket": {
+                        "Ref": "CodeS3BucketParameter"
+                    },
+                    "S3Key": {
+                        "Ref": "DataPipelineInitLambdaCodeObjectParameter"
+                    }
+                },
+                "Description": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "Function to kick off Data Pipeline for ",
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "-",
+                            {
+                                "Ref": "EnvironmentParameter"
+                            }
+                        ]
+                    ]
+                },
+                "Handler": "index.handler",
+                "Role": {
+                    "Fn::GetAtt": [
+                        "DataPipelineInitLambdaRole",
+                        "Arn"
+                    ]
+                },
+                "Runtime": "nodejs",
+                "Timeout": 10
+            }
+        },
+        "DataPipelineInitLambdaInvokePermission": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+                "FunctionName": {
+                    "Fn::GetAtt": [
+                        "DataPipelineInitLambda",
+                        "Arn"
+                    ]
+                },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "ec2.amazonaws.com",
+                "SourceArn": "arn:aws:ec2:::*"
+            }
+        },
+        "IncomingS3Bucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "Tags": [
+                    {
+                        "Key": "StackName",
+                        "Value": {
+                            "Ref": "AWS::StackName"
+                        }
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": {
+                            "Ref": "EnvironmentParameter"
+                        }
+                    }
+                ]
+            }
+        },
+        "IntermediateS3Bucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "Tags": [
+                    {
+                        "Key": "StackName",
+                        "Value": {
+                            "Ref": "AWS::StackName"
+                        }
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": {
+                            "Ref": "EnvironmentParameter"
+                        }
+                    }
+                ]
+            }
+        },
+        "ArchivalS3Bucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "Tags": [
+                    {
+                        "Key": "StackName",
+                        "Value": {
+                            "Ref": "AWS::StackName"
+                        }
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": {
+                            "Ref": "EnvironmentParameter"
+                        }
+                    }
+                ]
+            }
+        },
+        "LoggingS3Bucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "Tags": [
+                    {
+                        "Key": "StackName",
+                        "Value": {
+                            "Ref": "AWS::StackName"
+                        }
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": {
+                            "Ref": "EnvironmentParameter"
+                        }
+                    }
+                ]
+            }
+        },
+        "RedshiftVPCSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "EnvironmentParameter"
+                            },
+                            " Redshift VPC Security Group"
+                        ]
+                    ]
+                },
+                "VpcId": {
+                    "Ref": "VPCIDParameter"
+                },
+                "SecurityGroupIngress": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "5439",
+                        "ToPort": "5439",
+                        "CidrIp": {
+                            "Ref": "PublicSubnetCidrParameter"
+                        }
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "5439",
+                        "ToPort": "5439",
+                        "CidrIp": {
+                            "Ref": "PrivateSubnetCidrParameter"
+                        }
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "5439",
+                        "ToPort": "5439",
+                        "CidrIp": {
+                            "Ref": "VPNCidrParameter"
+                        }
+                    }
+                ],
+                "SecurityGroupEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "CidrIp": "0.0.0.0/0"
+                    }
+                ]
+            }
+        },
+        "RedshiftCluster": {
+            "Type": "AWS::Redshift::Cluster",
+            "Properties": {
+                "AllowVersionUpgrade": {
+                    "Ref": "RedshiftAllowVersionUpgradeParameter"
+                },
+                "AutomatedSnapshotRetentionPeriod": {
+                    "Ref": "RedshiftAutomatedSnapshotRetentionPeriodParameter"
+                },
+                "ClusterType": {
+                    "Ref": "RedshiftClusterTypeParameter"
+                },
+                "ClusterVersion": {
+                    "Ref": "RedshiftClusterVersionParameter"
+                },
+                "DBName": {
+                    "Ref": "RedshiftMasterUserNameParameter"
+                },
+                "MasterUsername": {
+                    "Ref": "RedshiftMasterUserNameParameter"
+                },
+                "MasterUserPassword": {
+                    "Ref": "RedshiftMasterUserPasswordParameter"
+                },
+                "NodeType": {
+                    "Ref": "RedshiftNodeTypeParameter"
+                },
+                "Port": {
+                    "Ref": "RedshiftPortParameter"
+                },
+                "PreferredMaintenanceWindow": {
+                    "Ref": "RedshiftPreferredMaintenanceWindowParameter"
+                },
+                "ClusterSubnetGroupName": {
+                    "Ref": "RedshiftClusterSubnetGroup"
+                },
+                "ClusterParameterGroupName": {
+                    "Ref": "RedshiftClusterParameterGroup"
+                },
+                "PubliclyAccessible": "False",
+                "VpcSecurityGroupIds": [
+                    {
+                        "Ref": "RedshiftVPCSecurityGroup"
+                    }
+                ]
+            }
+        },
+        "RedshiftClusterSubnetGroup": {
+            "Type": "AWS::Redshift::ClusterSubnetGroup",
+            "Properties": {
+                "Description": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "EnvironmentParameter"
+                            },
+                            " Redshift Cluster Subnet Group"
+                        ]
+                    ]
+                },
+                "SubnetIds": [
+                    {
+                        "Ref": "RedshiftDataSubnet1Parameter"
+                    },
+                    {
+                        "Ref": "RedshiftDataSubnet2Parameter"
+                    }
+                ]
+            }
+        },
+        "RedshiftClusterParameterGroup": {
+            "Type": "AWS::Redshift::ClusterParameterGroup",
+            "Properties": {
+                "Description": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "EnvironmentParameter"
+                            },
+                            " Redshift Cluster Parameter Group"
+                        ]
+                    ]
+                },
+                "ParameterGroupFamily": "redshift-1.0",
+                "Parameters": [
+                    {
+                        "ParameterName": "datestyle",
+                        "ParameterValue": "ISO, MDY"
+                    },
+                    {
+                        "ParameterName": "enable_user_activity_logging",
+                        "ParameterValue": "false"
+                    },
+                    {
+                        "ParameterName": "extra_float_digits",
+                        "ParameterValue": "0"
+                    },
+                    {
+                        "ParameterName": "require_ssl",
+                        "ParameterValue": "false"
+                    },
+                    {
+                        "ParameterName": "search_path",
+                        "ParameterValue": "$user, public"
+                    },
+                    {
+                        "ParameterName": "statement_timeout",
+                        "ParameterValue": "0"
+                    },
+                    {
+                        "ParameterName": "wlm_json_configuration",
+                        "ParameterValue": "[{\"query_concurrency\":5}]"
+                    }
+                ]
+            }
+        },
+        "SuccessSNS": {
+            "Type": "AWS::SNS::Topic",
+            "Properties": {
+                "DisplayName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            {
+                                "Ref": "EnvironmentParameter"
+                            },
+                            "success"
+                        ]
+                    ]
+                },
+                "Subscription": [
+                    {
+                        "Endpoint": {
+                            "Ref": "SuccessSNSEmailParameter"
+                        },
+                        "Protocol": "email"
+                    }
+                ]
+            }
+        },
+        "FailureSNS": {
+            "Type": "AWS::SNS::Topic",
+            "Properties": {
+                "DisplayName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            {
+                                "Ref": "EnvironmentParameter"
+                            },
+                            "failure"
+                        ]
+                    ]
+                },
+                "Subscription": [
+                    {
+                        "Endpoint": {
+                            "Ref": "FailureSNSEmailParameter"
+                        },
+                        "Protocol": "email"
+                    }
+                ]
+            }
+        },
+        "Pipeline": {
+            "Type": "AWS::DataPipeline::Pipeline",
+            "Properties": {
+                "Activate": "False",
+                "Description": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "Data Pipeline for ",
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "-",
+                            {
+                                "Ref": "EnvironmentParameter"
+                            }
+                        ]
+                    ]
+                },
+                "Name": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            {
+                                "Ref": "EnvironmentParameter"
+                            },
+                            "datapipeline"
+                        ]
+                    ]
+                },
+                "PipelineObjects": [
+                    {
+                        "Id": "Default",
+                        "Name": "Default",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "Default"
+                            },
+                            {
+                                "Key": "scheduleType",
+                                "StringValue": "cron"
+                            },
+                            {
+                                "Key": "failureAndRerunMode",
+                                "StringValue": "CASCADE"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "resourceRole",
+                                "StringValue": {
+                                    "Ref": "DataPipelineResourceInstanceProfile"
+                                }
+                            },
+                            {
+                                "Key": "pipelineLogUri",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "s3://",
+                                            {
+                                                "Ref": "LoggingS3Bucket"
+                                            }
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "DefaultSchedule",
+                        "Name": "RunOnce",
+                        "Fields": [
+                            {
+                                "Key": "occurrences",
+                                "StringValue": "1"
+                            },
+                            {
+                                "Key": "startAt",
+                                "StringValue": "FIRST_ACTIVATION_DATE_TIME"
+                            },
+                            {
+                                "Key": "type",
+                                "StringValue": "Schedule"
+                            },
+                            {
+                                "Key": "period",
+                                "StringValue": "1 Day"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "EmrConfig",
+                        "Name": "EmrConfig",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "EmrConfiguration"
+                            },
+                            {
+                                "Key": "classification",
+                                "StringValue": "hive-site"
+                            },
+                            {
+                                "Key": "property",
+                                "RefValue": "EmrHiveParallel"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "EmrHiveParallel",
+                        "Name": "EmrHiveParallel",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "Property"
+                            },
+                            {
+                                "Key": "key",
+                                "StringValue": "hive.exec.parallel"
+                            },
+                            {
+                                "Key": "value",
+                                "StringValue": "true"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "EmrCluster",
+                        "Name": "EmrCluster",
+                        "Fields": [
+                            {
+                                "Key": "masterInstanceType",
+                                "StringValue": {
+                                    "Ref": "EMRMasterInstanceTypeParameter"
+                                }
+                            },
+                            {
+                                "Key": "coreInstanceType",
+                                "StringValue": {
+                                    "Ref": "EMRCoreInstanceTypeParameter"
+                                }
+                            },
+                            {
+                                "Key": "coreInstanceCount",
+                                "StringValue": {
+                                    "Ref": "EMRCoreInstanceCountParameter"
+                                }
+                            },
+                            {
+                                "Key": "taskInstanceType",
+                                "StringValue": {
+                                    "Ref": "EMRTaskInstanceTypeParameter"
+                                }
+                            },
+                            {
+                                "Key": "taskInstanceCount",
+                                "StringValue": {
+                                    "Ref": "EMRTaskInstanceCountParameter"
+                                }
+                            },
+                            {
+                                "Key": "type",
+                                "StringValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "subnetId",
+                                "StringValue": {
+                                    "Ref": "PublicSubnetParameter"
+                                }
+                            },
+                            {
+                                "Key": "keyPair",
+                                "StringValue": {
+                                    "Ref": "KeypairParameter"
+                                }
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "releaseLabel",
+                                "StringValue": {
+                                    "Ref": "EMRReleaseLabelParameter"
+                                }
+                            },
+                            {
+                                "Key": "configuration",
+                                "RefValue": "EmrConfig"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "InputOutputDataFormat",
+                        "Name": "InputOutputDataFormat",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "TSV"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "MoveDataToHDFS",
+                        "Name": "MoveDataToHDFS",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "ShellCommandActivity"
+                            },
+                            {
+                                "Key": "command",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "s3-dist-cp --src=s3://",
+                                            {
+                                                "Ref": "IncomingS3Bucket"
+                                            },
+                                            "/dataset-path-placeholder --dest=hdfs:///currentdataset"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendMoveDataToHDFSSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendMoveDataToHDFSFailureSNSMessage"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendMoveDataToHDFSSuccessSNSMessage",
+                        "Name": "SendMoveDataToHDFSSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Move Data to HDFS succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendMoveDataToHDFSFailureSNSMessage",
+                        "Name": "SendMoveDataToHDFSFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Move Data to HDFS failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "RunCreateHiveScript",
+                        "Name": "RunCreateHiveScript",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "HiveActivity"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "stage",
+                                "StringValue": "false"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "MoveDataToHDFS"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendCreateSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendCreateFailureSNSMessage"
+                            },
+                            {
+                                "Key": "scriptVariable",
+                                "StringValue": "INPUT=hdfs:///currentdataset"
+                            },
+                            {
+                                "Key": "scriptVariable",
+                                "StringValue": "OUTPUT=hdfs:///output/currentdataset"
+                            },
+                            {
+                                "Key": "scriptUri",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "s3://",
+                                            {
+                                                "Ref": "CodeS3BucketParameter"
+                                            },
+                                            "/",
+                                            {
+                                                "Ref": "HiveCreateScriptLocationParameter"
+                                            },
+                                            "_",
+                                            {
+                                                "Ref": "DownloadVerifyCanvasDataSchemaVersion"
+                                            },
+                                            ".q"
+                                        ]
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendCreateSuccessSNSMessage",
+                        "Name": "SendCreateSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Hive Create Tables succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendCreateFailureSNSMessage",
+                        "Name": "SendCreateFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Hive Create Tables failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "RunCopyHiveQueryScript",
+                        "Name": "RunCopyHiveQueryScript",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "HiveActivity"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "stage",
+                                "StringValue": "false"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunCreateHiveScript"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendCopyHiveSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendCopyHiveFailureSNSMessage"
+                            },
+                            {
+                                "Key": "scriptUri",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "s3://",
+                                            {
+                                                "Ref": "CodeS3BucketParameter"
+                                            },
+                                            "/",
+                                            {
+                                                "Ref": "HiveCopyScriptLocationParameter"
+                                            },
+                                            "_",
+                                            {
+                                                "Ref": "DownloadVerifyCanvasDataSchemaVersion"
+                                            },
+                                            ".q"
+                                        ]
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendCopyHiveSuccessSNSMessage",
+                        "Name": "SendCopyHiveSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Copy script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendCopyHiveFailureSNSMessage",
+                        "Name": "SendCopyHiveFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Copy script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "RunHiveQueryScript",
+                        "Name": "RunHiveQueryScript",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "HiveActivity"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "stage",
+                                "StringValue": "false"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunCreateHiveScript"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendHiveSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendHiveFailureSNSMessage"
+                            },
+                            {
+                                "Key": "scriptUri",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "s3://",
+                                            {
+                                                "Ref": "CodeS3BucketParameter"
+                                            },
+                                            "/",
+                                            {
+                                                "Ref": "HiveQueryScriptLocationParameter"
+                                            }
+                                        ]
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendHiveSuccessSNSMessage",
+                        "Name": "SendHiveSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Hive script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendHiveFailureSNSMessage",
+                        "Name": "SendHiveFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Hive script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "RunHadoopJAR",
+                        "Name": "RunHadoopJAR",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "EmrActivity"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunCreateHiveScript"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendHadoopSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendHadoopFailureSNSMessage"
+                            },
+                            {
+                                "Key": "step",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "s3://",
+                                            {
+                                                "Ref": "CodeS3BucketParameter"
+                                            },
+                                            "/",
+                                            {
+                                                "Ref": "HadoopJARLocationParameter"
+                                            },
+                                            ",edu.harvard.data.hadoop.requests.CanvasDataHadoop,/currentdataset,/output/currentdataset"
+                                        ]
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendHadoopSuccessSNSMessage",
+                        "Name": "SendHadoopSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Hadoop script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendHadoopFailureSNSMessage",
+                        "Name": "SendHadoopFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Hadoop script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "MoveDataFromHDFS",
+                        "Name": "MoveDataFromHDFS",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "ShellCommandActivity"
+                            },
+                            {
+                                "Key": "command",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "s3-dist-cp --src=hdfs:///output/currentdataset --dest=s3://",
+                                            {
+                                                "Ref": "IntermediateS3Bucket"
+                                            },
+                                            "/dataset-path-placeholder"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunCopyHiveQueryScript"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunHiveQueryScript"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunHadoopJAR"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendMoveDataFromHDFSSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendMoveDataFromHDFSFailureSNSMessage"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendMoveDataFromHDFSSuccessSNSMessage",
+                        "Name": "SendMoveDataFromHDFSSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Move Data from HDFS succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendMoveDataFromHDFSFailureSNSMessage",
+                        "Name": "SendMoveDataFromHDFSFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Move Data from HDFS failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "MoveDatasetToArchives",
+                        "Name": "MoveDatasetToArchives",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "ShellCommandActivity"
+                            },
+                            {
+                                "Key": "command",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "aws s3 mv s3://",
+                                            {
+                                                "Ref": "IncomingS3Bucket"
+                                            },
+                                            "/dataset-path-placeholder s3://",
+                                            {
+                                                "Ref": "ArchivalS3Bucket"
+                                            },
+                                            "/dataset-path-placeholder --recursive"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendMoveDatasetSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendMoveDatasetFailureSNSMessage"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "S3toRedshiftLoad"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendMoveDatasetSuccessSNSMessage",
+                        "Name": "SendMoveDatasetSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Move data to archives succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendMoveDatasetFailureSNSMessage",
+                        "Name": "SendMoveDatasetFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Datatset dataset-id-placeholder - Move dataset to archives failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "DeleteS3toRedshiftLoadScript",
+                        "Name": "DeleteS3toRedshiftLoadScript",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "ShellCommandActivity"
+                            },
+                            {
+                                "Key": "command",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "aws s3 rm s3://",
+                                            {
+                                                "Ref": "CodeS3BucketParameter"
+                                            },
+                                            "/dataset-id-placeholder.sql"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "MoveDatasetToArchives"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "DeletePipeline",
+                        "Name": "DeletePipeline",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "ShellCommandActivity"
+                            },
+                            {
+                                "Key": "command",
+                                "StringValue": "dpid=$(aws ec2 describe-tags --filters \"Name=resource-id,Values=$(curl http://169.254.169.254/latest/meta-data/instance-id)\" \"Name=key,Values=datapipeline-id\" --query 'Tags[*].[Value]' --output text --region us-east-1); aws datapipeline delete-pipeline --pipeline-id $dpid --region us-east-1"
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "DeleteS3toRedshiftLoadScript"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "RedshiftDatabase",
+                        "Name": "RedshiftDatabase",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "RedshiftDatabase"
+                            },
+                            {
+                                "Key": "clusterId",
+                                "StringValue": {
+                                    "Ref": "RedshiftCluster"
+                                }
+                            },
+                            {
+                                "Key": "username",
+                                "StringValue": {
+                                    "Ref": "RedshiftMasterUserNameParameter"
+                                }
+                            },
+                            {
+                                "Key": "*password",
+                                "StringValue": {
+                                    "Ref": "RedshiftMasterUserPasswordParameter"
+                                }
+                            },
+                            {
+                                "Key": "databaseName",
+                                "StringValue": {
+                                    "Ref": "RedshiftMasterUserNameParameter"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "S3toRedshiftLoad",
+                        "Name": "S3toRedshiftLoad",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SqlActivity"
+                            },
+                            {
+                                "Key": "database",
+                                "RefValue": "RedshiftDatabase"
+                            },
+                            {
+                                "Key": "scriptUri",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "s3://",
+                                            {
+                                                "Ref": "CodeS3BucketParameter"
+                                            },
+                                            "/dataset-id-placeholder.sql"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "MoveDataFromHDFS"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendLoadRedshiftSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendLoadRedshiftFailureSNSMessage"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendLoadRedshiftSuccessSNSMessage",
+                        "Name": "SendLoadRedshiftSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Redshift load succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendLoadRedshiftFailureSNSMessage",
+                        "Name": "SendLoadRedshiftFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Redshift load failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "DumpStatusDynamoDBTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+                "AttributeDefinitions": [
+                    {
+                        "AttributeName": "id",
+                        "AttributeType": "S"
+                    }
+                ],
+                "KeySchema": [
+                    {
+                        "KeyType": "HASH",
+                        "AttributeName": "id"
+                    }
+                ],
+                "ProvisionedThroughput": {
+                    "ReadCapacityUnits": "5",
+                    "WriteCapacityUnits": "5"
+                },
+                "TableName": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "-",
+                            {
+                                "Ref": "EnvironmentParameter"
+                            },
+                            "-dump-status"
+                        ]
+                    ]
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "IncomingS3Bucket": {
+            "Description": "Incoming S3 Bucket",
+            "Value": {
+                "Ref": "IncomingS3Bucket"
+            }
+        },
+        "ArchivalS3Bucket": {
+            "Description": "Archival S3 Bucket",
+            "Value": {
+                "Ref": "ArchivalS3Bucket"
+            }
+        },
+        "DataPipelineInitLambdaRole": {
+            "Description": "DataPipelineInitLambda IAM Role",
+            "Value": {
+                "Ref": "DataPipelineInitLambdaRole"
+            }
+        },
+        "DataPipelineId": {
+            "Description": "Data Pipeline Id",
+            "Value": {
+                "Ref": "Pipeline"
+            }
+        },
+        "DownloadVerifyASGName": {
+            "Description": "DownloadVerifyASG Name",
+            "Value": {
+                "Ref": "DownloadVerifyASG"
+            }
+        },
+        "DownloadVerifyLambdaFunction": {
+            "Description": "DownloadVerifyLambda Function",
+            "Value": {
+                "Ref": "DownloadVerifyLambda"
+            }
+        },
+        "DataPipelineInitLambdaFunction": {
+            "Description": "DataPipelineInitLambda Function",
+            "Value": {
+                "Ref": "DataPipelineInitLambda"
+            }
+        },
+        "DatabaseInstance": {
+            "Description": "Redshift Database",
+            "Value": {
+                "Ref": "RedshiftCluster"
+            }
+        },
+        "DumpStatusDynamoTable": {
+            "Description": "DumpStatus DynamoDB Table",
+            "Value": {
+                "Ref": "DumpStatusDynamoDBTable"
+            }
+        }
+    }
+}
