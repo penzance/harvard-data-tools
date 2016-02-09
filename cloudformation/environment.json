@@ -745,6 +745,15 @@
                             [
                                 "#!/bin/bash\n",
                                 "\n",
+                                "# add github.com to known_hosts and run ansible-pull\n",
+                                "ssh-keyscan github.com >> /root/.ssh/known_hosts\n",
+                                "\n",
+                                "# install jdk and git\n",
+                                "yum install -y java-devel git-core\n",
+                                "\n",
+                                "# clone our repo\n",
+                                "git clone -b master https://github.com/penzance/harvard-data-tools.git /root/harvard-data-tools\n",
+                                "\n",
                                 "# setup CloudWatch logging\n",
                                 "yum install -y awslogs\n",
                                 "aws s3 cp s3://",
@@ -1538,6 +1547,18 @@
                                 "StringValue": {
                                     "Ref": "EMRReleaseLabelParameter"
                                 }
+                            },
+                            {
+                                "Key": "bootstrapAction",
+                                "StringValue": "ssh-keyscan github.com >> /root/.ssh/known_hosts"
+                            },
+                            {
+                                "Key": "bootstrapAction",
+                                "StringValue": "yum install -y java-devel git-core"
+                            },
+                            {
+                                "Key": "bootstrapAction",
+                                "StringValue": "git clone -b master https://github.com/penzance/harvard-data-tools.git /root/harvard-data-tools"
                             },
                             {
                                 "Key": "configuration",
