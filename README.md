@@ -1,4 +1,4 @@
-# canvas-data
+# harvard-data-tools
 
 ## Assumptions
 
