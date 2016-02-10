@@ -44,8 +44,10 @@ public class HiveQueryManifestGenerator {
 
   private void generateHiveManifest(final PrintStream out, final SchemaPhase phase,
       final File queryDir) {
-    for (final String fileName : queryDir.list()) {
-      out.println("source FILE ${" + CanvasDataGenerator.HDFS_HIVE_QUERY_DIR + "}/" + fileName + ";");
+    if (queryDir.exists() && queryDir.isDirectory()) {
+      for (final String fileName : queryDir.list()) {
+        out.println("source FILE ${" + CanvasDataGenerator.HDFS_HIVE_QUERY_DIR + "}/" + fileName + ";");
+      }
     }
   }
 
