@@ -5,14 +5,12 @@ import sys
 
 CURRENT_SCHEMA = os.environ['CANVAS_DATA_SCHEMA_VERSION']
 AWS_DATA_TOOLS_JAR_FILE = os.environ['AWS_DATA_TOOLS_JAR']
-CANVAS_BINDINGS_JAR_FILE = os.environ['CANVAS_BINDINGS_JAR']
 SECURE_PROPERTIES_LOCATION = os.environ['SECURE_PROPERTIES_LOCATION']
 RESULT_METADATA = os.environ['CANVAS_DATA_RESULT_FILE']
 
 MAIN_CLASS = 'edu.harvard.canvas_data.aws_data_tools.cli.CanvasDataCli'
-CLASSPATH = "{0}:{1}:{2}".format(
+CLASSPATH = "{0}:{1}".format(
         AWS_DATA_TOOLS_JAR_FILE,
-        CANVAS_BINDINGS_JAR_FILE,
         SECURE_PROPERTIES_LOCATION
     )
 
