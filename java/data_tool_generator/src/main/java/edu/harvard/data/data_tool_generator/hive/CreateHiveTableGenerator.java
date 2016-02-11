@@ -41,14 +41,14 @@ public class CreateHiveTableGenerator {
       final SchemaTransformer transformer) {
     log.info("Creating Hive create_tables.q file");
 
-    generateCreateStatements(out, transformer.getPhase(0), "phase_1_in_", true);
-    generateCreateStatements(out, transformer.getPhase(1), "phase_1_out_", false);
-    generateCreateStatements(out, transformer.getPhase(1), "phase_2_in_", true);
-    generateCreateStatements(out, transformer.getPhase(2), "phase_2_out_", false);
+    generateCreateStatements(out, transformer.getPhase(0), "phase_1_in_", true, "SEQUENCEFILE");
+    generateCreateStatements(out, transformer.getPhase(1), "phase_1_out_", false, "TEXTFILE");
+    generateCreateStatements(out, transformer.getPhase(1), "phase_2_in_", true, "TEXTFILE");
+    generateCreateStatements(out, transformer.getPhase(2), "phase_2_out_", false, "TEXTFILE");
   }
 
   private void generateCreateStatements(final PrintStream out, final SchemaPhase phaseInput,
-      final String prefix, final boolean ignoreOwner) {
+      final String prefix, final boolean ignoreOwner, final String format) {
     if (phaseInput != null) {
       final Map<String, CanvasDataSchemaTable> inTables = phaseInput.getSchema().getSchema();
       final List<String> inTableKeys = new ArrayList<String>(inTables.keySet());
@@ -59,7 +59,7 @@ public class CreateHiveTableGenerator {
         if (ignoreOwner || table.getOwner() == null || table.getOwner().equals("hive")) {
           final String tableName = prefix + table.getTableName();
           dropTable(out, tableName);
-          createTable(out, tableName, table, phaseInput.getHDFSDir());
+          createTable(out, tableName, table, format, phaseInput.getHDFSDir());
         }
       }
     }
@@ -70,12 +70,12 @@ public class CreateHiveTableGenerator {
   }
 
   private void createTable(final PrintStream out, final String tableName,
-      final CanvasDataSchemaTable table, final String locationVar) {
+      final CanvasDataSchemaTable table, final String format, final String locationVar) {
     out.println("CREATE EXTERNAL TABLE " + tableName + " (");
     listFields(out, table);
     out.println(")");
     out.println("  ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' LINES TERMINATED By '\\n'");
-    out.println("  STORED AS TEXTFILE");
+    out.println("  STORED AS " + format);
     out.println("  LOCATION '${" + locationVar + "}/" + table.getTableName() + "/';");
     out.println();
   }
