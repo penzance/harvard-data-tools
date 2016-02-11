@@ -39,7 +39,7 @@ aws s3 cp s3://<code_s3_bucket>/secure.properties /home/hadoop/.
 python /home/hadoop/harvard-data-tools/python/generate_tools.py
 
 #copy appropriate files to temp S3 bucket here
-aws s3 cp /home/hadoop/create_tables.q s3://<code_s3_bucket>/.
+aws s3 cp /home/hadoop/create_tables.q s3://<new_code_s3_bucket>/create_tables.q
 
 #copy_unmodified_files_phase_1.sh
 #canvas_data_hadoop.jar
