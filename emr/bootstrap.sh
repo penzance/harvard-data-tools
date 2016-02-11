@@ -33,9 +33,19 @@ sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
 sudo yum install -y apache-maven
 
 # copy DownloadVerifySecureProperties from S3 to the local FS
-aws s3 cp s3://<code_s3_bucket/secure.properties /home/hadoop/.
+aws s3 cp s3://<code_s3_bucket>/secure.properties /home/hadoop/.
 
 # generate the tools
 python /home/hadoop/harvard-data-tools/python/generate_tools.py
 
 #copy appropriate files to temp S3 bucket here
+aws s3 cp /home/hadoop/create_tables.q s3://<code_s3_bucket>/.
+
+#copy_unmodified_files_phase_1.sh
+#canvas_data_hadoop.jar
+#canvas_phase_1_hive.q
+
+#canvas_phase_2_hive.q
+#copy_unmodified_files_phase_2.sh
+
+#s3_to_redshift_loader.sql
