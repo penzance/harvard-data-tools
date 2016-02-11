@@ -41,9 +41,7 @@ python /home/hadoop/harvard-data-tools/python/generate_tools.py
 #copy appropriate files to temp S3 bucket here
 aws s3 cp /home/hadoop/create_tables.q s3://<new_code_s3_bucket>/create_tables.q
 
-aws s3 cp /home/hadoop/copy_unmodified_files_phase_1.sh s3://<new_code_s3_bucket>/copy_unmodified_files_phase_1.sh
 aws s3 cp /home/hadoop/canvas_data_hadoop.jar s3://<new_code_s3_bucket>/canvas_data_hadoop.jar
 aws s3 cp /home/hadoop/canvas_phase_1_hive.q s3://<new_code_s3_bucket>/canvas_phase_1_hive.q
 
 aws s3 cp /home/hadoop/canvas_phase_2_hive.q s3://<new_code_s3_bucket>/canvas_phase_2_hive.q
-aws s3 cp /home/hadoop/copy_unmodified_files_phase_2.sh s3://<new_code_s3_bucket>/copy_unmodified_files_phase_2.sh
