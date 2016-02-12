@@ -17,16 +17,6 @@
             "Description": "Name of ZIP file in the CodeS3Bucket containing the DowloadVerifyLambda function code",
             "Default": "download-verify-lambda.zip"
         },
-        "DownloadVerifyAWSDataToolsJARLocationParameter": {
-            "Type": "String",
-            "Description": "Name of JAR file in the CodeS3Bucket containing the DownloadVerifyAWSDataTools JAR code",
-            "Default": "aws_data_tools-1.0.0.jar"
-        },
-        "DownloadVerifySchemaJARLocationParameter": {
-            "Type": "String",
-            "Description": "Prefix of JAR file (up until the version number) in the CodeS3Bucket containing the DownloadVerifySchema JAR code",
-            "Default": "canvas_data_schema_bindings"
-        },
         "DownloadVerifyPythonScriptLocationParameter": {
             "Type": "String",
             "Description": "Name of Python file in the CodeS3Bucket containing the DownloadVerify Python script",
@@ -745,6 +735,28 @@
                             [
                                 "#!/bin/bash\n",
                                 "\n",
+                                "# - HARVARD_DATA_TOOLS_BASE: the directory where the harvard-data-tools\n",
+                                "#     repository has been checked out. Point to the root of the repository, e.g.\n",
+                                "#     /tmp/code/harvard-data-tools\n",
+                                "export HARVARD_DATA_TOOLS_BASE=/root/harvard-data-tools\n",
+                                "\n",
+                                "# - SECURE_PROPERTIES_LOCATION: a directory containing the secure.properties\n",
+                                "#     file modelled after the template in:\n",
+                                "#     java/aws_data_tools/src/main/resources/secure.properties.example\n",
+                                "export SECURE_PROPERTIES_LOCATION=/root\n",
+                                "\n",
+                                "# - HARVARD_DATA_GENERATED_OUTPUT: the directory where generated scripts and\n",
+                                "#     .jar files should be stored.\n",
+                                "export HARVARD_DATA_GENERATED_OUTPUT=/root\n",
+                                "\n",
+                                "# - CANVAS_DATA_SCHEMA_VERSION: The version of the Canvas Data schema for which\n",
+                                "#     files will be generated. Format as a string, e.g. 1.2.0\n",
+                                "export CANVAS_DATA_SCHEMA_VERSION=",
+                                {
+                                    "Ref": "DownloadVerifyCanvasDataSchemaVersion"
+                                },
+                                "\n",
+                                "\n",
                                 "# add github.com to known_hosts and run ansible-pull\n",
                                 "ssh-keyscan github.com >> /root/.ssh/known_hosts\n",
                                 "\n",
@@ -756,46 +768,20 @@
                                 "\n",
                                 "# setup CloudWatch logging\n",
                                 "yum install -y awslogs\n",
-                                "aws s3 cp s3://",
+                                "#aws s3 cp s3://",
                                 {
                                     "Ref": "CodeS3BucketParameter"
                                 },
                                 "/awslogs.conf /etc/awslogs/.\n",
+                                "\\cp /root/harvard-data-tools/cloudwatch/awslogs.conf /etc/awslogs/.\n",
                                 "service awslogs start\n",
                                 "\n",
-                                "# copy DownloadVerifyAWSDataToolsJAR, DownloadVerifySchema, DownloadVerifyPythonScript and\n",
-                                "# DownloadVerifySecureProperties from S3 to the local FS\n",
-                                "aws s3 cp s3://",
-                                {
-                                    "Ref": "CodeS3BucketParameter"
-                                },
-                                "/",
-                                {
-                                    "Ref": "DownloadVerifyAWSDataToolsJARLocationParameter"
-                                },
-                                " /root/.\n",
-                                "aws s3 cp s3://",
-                                {
-                                    "Ref": "CodeS3BucketParameter"
-                                },
-                                "/",
-                                {
-                                    "Ref": "DownloadVerifySchemaJARLocationParameter"
-                                },
-                                "-",
-                                {
-                                    "Ref": "DownloadVerifyCanvasDataSchemaVersion"
-                                },
-                                ".jar /root/.\n",
-                                "aws s3 cp s3://",
-                                {
-                                    "Ref": "CodeS3BucketParameter"
-                                },
-                                "/",
-                                {
-                                    "Ref": "DownloadVerifyPythonScriptLocationParameter"
-                                },
-                                " /root/.\n",
+                                "#Install maven via instructions at https://gist.github.com/sebsto/19b99f1fa1f32cae5d00\n",
+                                "wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo\n",
+                                "sed -i s/\\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo\n",
+                                "yum install -y apache-maven\n",
+                                "\n",
+                                "# copy DownloadVerifySecureProperties from S3 to the local FS\n",
                                 "aws s3 cp s3://",
                                 {
                                     "Ref": "CodeS3BucketParameter"
@@ -806,35 +792,15 @@
                                 },
                                 " /root/.\n",
                                 "\n",
+                                "# generate the tools\n",
+                                "python /root/harvard-data-tools/python/generate_tools.py\n",
+                                "\n",
                                 "# setup some environment variables\n",
-                                "export CANVAS_DATA_SCHEMA_VERSION=",
-                                {
-                                    "Ref": "DownloadVerifyCanvasDataSchemaVersion"
-                                },
-                                "\n",
-                                "export AWS_DATA_TOOLS_JAR=/root/",
-                                {
-                                    "Ref": "DownloadVerifyAWSDataToolsJARLocationParameter"
-                                },
-                                "\n",
-                                "export CANVAS_BINDINGS_JAR=/root/",
-                                {
-                                    "Ref": "DownloadVerifySchemaJARLocationParameter"
-                                },
-                                "-",
-                                {
-                                    "Ref": "DownloadVerifyCanvasDataSchemaVersion"
-                                },
-                                ".jar\n",
-                                "export SECURE_PROPERTIES_LOCATION=/root\n",
+                                "export AWS_DATA_TOOLS_JAR=/root/aws_data_tools.jar\n",
                                 "export CANVAS_DATA_RESULT_FILE=/root/the_result.json\n",
                                 "\n",
                                 "# Run the Python/JAR download and verify scripts\n",
-                                "python /root/",
-                                {
-                                    "Ref": "DownloadVerifyPythonScriptLocationParameter"
-                                },
-                                " > /var/log/download-and-verify-output.log\n",
+                                "python /root/harvard-data-tools/python/download_and_verify.py > /var/log/download-and-verify-output.log\n",
                                 "if [ $? -ne 0 ]; then\n",
                                 "  # do something useful to indicate failure\n",
                                 "  aws sns publish --topic-arn \"",
@@ -852,21 +818,6 @@
                                 "# Create a SQLActivity script for the upcoming Data Pipeline that is customized for this data set\n",
                                 "# NOTE: It would have been preferrable to have a generic script which accepts scriptArguments,\n",
                                 "#       but after much troubleshooting, that appeared to be impossible, so this approach was created.\n",
-                                "\n",
-                                "# First, grab the generic script\n",
-                                "aws s3 cp s3://",
-                                {
-                                    "Ref": "CodeS3BucketParameter"
-                                },
-                                "/",
-                                {
-                                    "Ref": "S3toRedshiftLoaderParameter"
-                                },
-                                "_",
-                                {
-                                    "Ref": "DownloadVerifyCanvasDataSchemaVersion"
-                                },
-                                ".sql /root/s3_to_redshift_loader.sql\n",
                                 "\n",
                                 "# Credit for the following grep magic goes to http://stackoverflow.com/a/20488535\n",
                                 "# Get the path to the data files in the intermediate S3 bucket, assign to env variable\n",
@@ -898,7 +849,7 @@
                                 "# Copy modified file to code S3 bucket, name it with data set number.\n",
                                 "aws s3 cp /root/s3_to_redshift_loader.sql s3://",
                                 {
-                                    "Ref": "CodeS3BucketParameter"
+                                    "Ref": "NewCodeS3Bucket"
                                 },
                                 "/$DATASETNUM.sql\n",
                                 "\n",
@@ -908,6 +859,31 @@
                                     "Ref": "SuccessSNS"
                                 },
                                 "\" --message file:///root/the_result.json --subject \"Download and verify succeeded\" --region us-east-1\n",
+                                "\n",
+                                "# Setup the EMR bootstrap script before launching the Data Pipeline\n",
+                                "sed -i \"s@<canvas_data_schema_version>@",
+								{
+									"Ref": "DownloadVerifyCanvasDataSchemaVersion"
+								},
+                                "@g\" /root/harvard-data-tools/emr/bootstrap.sh\n",
+                                "\n",
+                                "sed -i \"s@<code_s3_bucket>@",
+                                {
+                                    "Ref": "CodeS3BucketParameter"
+                                },
+                                "@g\" /root/harvard-data-tools/emr/bootstrap.sh\n",
+                                "\n",
+                                "sed -i \"s@<new_code_s3_bucket>@",
+                                {
+                                    "Ref": "NewCodeS3Bucket"
+                                },
+                                "@g\" /root/harvard-data-tools/emr/bootstrap.sh\n",
+                                "\n",
+                                "aws s3 cp /root/harvard-data-tools/emr/bootstrap.sh s3://",
+                                {
+                                    "Ref": "NewCodeS3Bucket"
+                                },
+                                "/bootstrap.sh\n",
                                 "\n",
                                 "# Invoke the Lambda function to kickoff the Data Pipeline\n",
                                 "aws lambda invoke --function-name ",
@@ -1047,6 +1023,25 @@
                 "Action": "lambda:InvokeFunction",
                 "Principal": "ec2.amazonaws.com",
                 "SourceArn": "arn:aws:ec2:::*"
+            }
+        },
+        "NewCodeS3Bucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "Tags": [
+                    {
+                        "Key": "StackName",
+                        "Value": {
+                            "Ref": "AWS::StackName"
+                        }
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": {
+                            "Ref": "EnvironmentParameter"
+                        }
+                    }
+                ]
             }
         },
         "IncomingS3Bucket": {
@@ -1550,15 +1545,18 @@
                             },
                             {
                                 "Key": "bootstrapAction",
-                                "StringValue": "ssh-keyscan github.com >> /root/.ssh/known_hosts"
-                            },
-                            {
-                                "Key": "bootstrapAction",
-                                "StringValue": "yum install -y java-devel git-core"
-                            },
-                            {
-                                "Key": "bootstrapAction",
-                                "StringValue": "git clone -b master https://github.com/penzance/harvard-data-tools.git /root/harvard-data-tools"
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "s3://",
+											{
+												"Ref": "NewCodeS3Bucket"
+											},
+                                            "/bootstrap.sh"
+                                        ]
+                                    ]
+                                }
                             },
                             {
                                 "Key": "configuration",
@@ -1594,7 +1592,7 @@
                                             {
                                                 "Ref": "IncomingS3Bucket"
                                             },
-                                            "/dataset-path-placeholder --dest=hdfs:///currentdataset"
+                                            "/dataset-path-placeholder --dest=hdfs:///phase_0"
                                         ]
                                     ]
                                 }
@@ -1606,6 +1604,10 @@
                             {
                                 "Key": "runsOn",
                                 "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
                             },
                             {
                                 "Key": "onSuccess",
@@ -1718,6 +1720,10 @@
                                 "RefValue": "EmrCluster"
                             },
                             {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
                                 "Key": "schedule",
                                 "RefValue": "DefaultSchedule"
                             },
@@ -1739,11 +1745,15 @@
                             },
                             {
                                 "Key": "scriptVariable",
-                                "StringValue": "INPUT=hdfs:///currentdataset"
+                                "StringValue": "HDFS_PHASE_0_DIR=hdfs:///phase_0"
                             },
                             {
                                 "Key": "scriptVariable",
-                                "StringValue": "OUTPUT=hdfs:///output/currentdataset"
+                                "StringValue": "HDFS_PHASE_1_DIR=hdfs:///phase_1"
+                            },
+                            {
+                                "Key": "scriptVariable",
+                                "StringValue": "HDFS_PHASE_2_DIR=hdfs:///phase_2"
                             },
                             {
                                 "Key": "scriptUri",
@@ -1753,17 +1763,9 @@
                                         [
                                             "s3://",
                                             {
-                                                "Ref": "CodeS3BucketParameter"
+                                                "Ref": "NewCodeS3Bucket"
                                             },
-                                            "/",
-                                            {
-                                                "Ref": "HiveCreateScriptLocationParameter"
-                                            },
-                                            "_",
-                                            {
-                                                "Ref": "DownloadVerifyCanvasDataSchemaVersion"
-                                            },
-                                            ".q"
+                                            "/create_tables.q"
                                         ]
                                     ]
                                 }
@@ -1859,65 +1861,46 @@
                         ]
                     },
                     {
-                        "Id": "RunCopyHiveQueryScript",
-                        "Name": "RunCopyHiveQueryScript",
+                        "Id": "RunPhase1CopyCommand",
+                        "Name": "RunPhase1CopyCommand",
                         "Fields": [
                             {
                                 "Key": "type",
-                                "StringValue": "HiveActivity"
+                                "StringValue": "ShellCommandActivity"
                             },
                             {
-                                "Key": "runsOn",
-                                "RefValue": "EmrCluster"
+                                "Key": "command",
+                                "StringValue": "/home/hadoop/copy_unmodified_files_phase_1.sh phase_0 phase_1"
                             },
                             {
                                 "Key": "schedule",
                                 "RefValue": "DefaultSchedule"
                             },
                             {
-                                "Key": "stage",
-                                "StringValue": "false"
-                            },
-                            {
                                 "Key": "dependsOn",
                                 "RefValue": "RunCreateHiveScript"
                             },
                             {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
                                 "Key": "onSuccess",
-                                "RefValue": "SendCopyHiveSuccessSNSMessage"
+                                "RefValue": "SendPhase1CopySuccessSNSMessage"
                             },
                             {
                                 "Key": "onFail",
-                                "RefValue": "SendCopyHiveFailureSNSMessage"
-                            },
-                            {
-                                "Key": "scriptUri",
-                                "StringValue": {
-                                    "Fn::Join": [
-                                        "",
-                                        [
-                                            "s3://",
-                                            {
-                                                "Ref": "CodeS3BucketParameter"
-                                            },
-                                            "/",
-                                            {
-                                                "Ref": "HiveCopyScriptLocationParameter"
-                                            },
-                                            "_",
-                                            {
-                                                "Ref": "DownloadVerifyCanvasDataSchemaVersion"
-                                            },
-                                            ".q"
-                                        ]
-                                    ]
-                                }
+                                "RefValue": "SendPhase1CopyFailureSNSMessage"
                             }
                         ]
                     },
                     {
-                        "Id": "SendCopyHiveSuccessSNSMessage",
-                        "Name": "SendCopyHiveSuccessSNSMessage",
+                        "Id": "SendPhase1CopySuccessSNSMessage",
+                        "Name": "SendPhase1CopySuccessSNSMessage",
                         "Fields": [
                             {
                                 "Key": "type",
@@ -1942,7 +1925,7 @@
                                             {
                                                 "Ref": "EnvironmentParameter"
                                             },
-                                            " Dataset dataset-id-placeholder - Copy script succeeded"
+                                            " Dataset dataset-id-placeholder - Phase 1 copy script succeeded"
                                         ]
                                     ]
                                 }
@@ -1960,8 +1943,8 @@
                         ]
                     },
                     {
-                        "Id": "SendCopyHiveFailureSNSMessage",
-                        "Name": "SendCopyHiveFailureSNSMessage",
+                        "Id": "SendPhase1CopyFailureSNSMessage",
+                        "Name": "SendPhase1CopyFailureSNSMessage",
                         "Fields": [
                             {
                                 "Key": "type",
@@ -1986,7 +1969,7 @@
                                             {
                                                 "Ref": "EnvironmentParameter"
                                             },
-                                            " Dataset dataset-id-placeholder - Copy script failed"
+                                            " Dataset dataset-id-placeholder - Phase 1 copy script failed"
                                         ]
                                     ]
                                 }
@@ -2004,60 +1987,46 @@
                         ]
                     },
                     {
-                        "Id": "RunHiveQueryScript",
-                        "Name": "RunHiveQueryScript",
+                        "Id": "RunPhase1HiveCommand",
+                        "Name": "RunPhase1HiveCommand",
                         "Fields": [
                             {
                                 "Key": "type",
-                                "StringValue": "HiveActivity"
+                                "StringValue": "ShellCommandActivity"
                             },
                             {
-                                "Key": "runsOn",
-                                "RefValue": "EmrCluster"
+                                "Key": "command",
+                                "StringValue": "/home/hadoop/canvas_phase_1_hive.sh /home/hadoop/harvard-data-tools/hive/phase_1"
                             },
                             {
                                 "Key": "schedule",
                                 "RefValue": "DefaultSchedule"
                             },
                             {
-                                "Key": "stage",
-                                "StringValue": "false"
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
                             },
                             {
                                 "Key": "dependsOn",
                                 "RefValue": "RunCreateHiveScript"
                             },
                             {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
                                 "Key": "onSuccess",
-                                "RefValue": "SendHiveSuccessSNSMessage"
+                                "RefValue": "SendPhase1HiveSuccessSNSMessage"
                             },
                             {
                                 "Key": "onFail",
-                                "RefValue": "SendHiveFailureSNSMessage"
-                            },
-                            {
-                                "Key": "scriptUri",
-                                "StringValue": {
-                                    "Fn::Join": [
-                                        "",
-                                        [
-                                            "s3://",
-                                            {
-                                                "Ref": "CodeS3BucketParameter"
-                                            },
-                                            "/",
-                                            {
-                                                "Ref": "HiveQueryScriptLocationParameter"
-                                            }
-                                        ]
-                                    ]
-                                }
+                                "RefValue": "SendPhase1HiveFailureSNSMessage"
                             }
                         ]
                     },
                     {
-                        "Id": "SendHiveSuccessSNSMessage",
-                        "Name": "SendHiveSuccessSNSMessage",
+                        "Id": "SendPhase1HiveSuccessSNSMessage",
+                        "Name": "SendPhase1HiveSuccessSNSMessage",
                         "Fields": [
                             {
                                 "Key": "type",
@@ -2082,7 +2051,7 @@
                                             {
                                                 "Ref": "EnvironmentParameter"
                                             },
-                                            " Dataset dataset-id-placeholder - Hive script succeeded"
+                                            " Dataset dataset-id-placeholder - Phase 1 Hive script succeeded"
                                         ]
                                     ]
                                 }
@@ -2100,8 +2069,8 @@
                         ]
                     },
                     {
-                        "Id": "SendHiveFailureSNSMessage",
-                        "Name": "SendHiveFailureSNSMessage",
+                        "Id": "SendPhase1HiveFailureSNSMessage",
+                        "Name": "SendPhase1HiveFailureSNSMessage",
                         "Fields": [
                             {
                                 "Key": "type",
@@ -2126,7 +2095,7 @@
                                             {
                                                 "Ref": "EnvironmentParameter"
                                             },
-                                            " Dataset dataset-id-placeholder - Hive script failed"
+                                            " Dataset dataset-id-placeholder - Phase 1 Hive script failed"
                                         ]
                                     ]
                                 }
@@ -2144,8 +2113,8 @@
                         ]
                     },
                     {
-                        "Id": "RunHadoopJAR",
-                        "Name": "RunHadoopJAR",
+                        "Id": "RunPhase1HadoopJAR",
+                        "Name": "RunPhase1HadoopJAR",
                         "Fields": [
                             {
                                 "Key": "type",
@@ -2156,16 +2125,20 @@
                                 "RefValue": "EmrCluster"
                             },
                             {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
                                 "Key": "dependsOn",
                                 "RefValue": "RunCreateHiveScript"
                             },
                             {
                                 "Key": "onSuccess",
-                                "RefValue": "SendHadoopSuccessSNSMessage"
+                                "RefValue": "SendPhase1HadoopSuccessSNSMessage"
                             },
                             {
                                 "Key": "onFail",
-                                "RefValue": "SendHadoopFailureSNSMessage"
+                                "RefValue": "SendPhase1HadoopFailureSNSMessage"
                             },
                             {
                                 "Key": "step",
@@ -2175,13 +2148,9 @@
                                         [
                                             "s3://",
                                             {
-                                                "Ref": "CodeS3BucketParameter"
+                                                "Ref": "NewCodeS3Bucket"
                                             },
-                                            "/",
-                                            {
-                                                "Ref": "HadoopJARLocationParameter"
-                                            },
-                                            ",edu.harvard.data.hadoop.requests.CanvasDataHadoop,/currentdataset,/output/currentdataset"
+                                            "/canvas_data_hadoop.jar,edu.harvard.data.hadoop.requests.CanvasDataHadoop,/phase_0,/phase_1"
                                         ]
                                     ]
                                 }
@@ -2189,8 +2158,8 @@
                         ]
                     },
                     {
-                        "Id": "SendHadoopSuccessSNSMessage",
-                        "Name": "SendHadoopSuccessSNSMessage",
+                        "Id": "SendPhase1HadoopSuccessSNSMessage",
+                        "Name": "SendPhase1HadoopSuccessSNSMessage",
                         "Fields": [
                             {
                                 "Key": "type",
@@ -2215,7 +2184,7 @@
                                             {
                                                 "Ref": "EnvironmentParameter"
                                             },
-                                            " Dataset dataset-id-placeholder - Hadoop script succeeded"
+                                            " Dataset dataset-id-placeholder - Phase1 Hadoop script succeeded"
                                         ]
                                     ]
                                 }
@@ -2233,8 +2202,8 @@
                         ]
                     },
                     {
-                        "Id": "SendHadoopFailureSNSMessage",
-                        "Name": "SendHadoopFailureSNSMessage",
+                        "Id": "SendPhase1HadoopFailureSNSMessage",
+                        "Name": "SendPhase1HadoopFailureSNSMessage",
                         "Fields": [
                             {
                                 "Key": "type",
@@ -2259,7 +2228,7 @@
                                             {
                                                 "Ref": "EnvironmentParameter"
                                             },
-                                            " Dataset dataset-id-placeholder - Hadoop script failed"
+                                            " Dataset dataset-id-placeholder - Phase 1 Hadoop script failed"
                                         ]
                                     ]
                                 }
@@ -2290,7 +2259,7 @@
                                     "Fn::Join": [
                                         "",
                                         [
-                                            "s3-dist-cp --src=hdfs:///output/currentdataset --dest=s3://",
+                                            "s3-dist-cp --src=hdfs:///phase_1 --dest=s3://",
                                             {
                                                 "Ref": "IntermediateS3Bucket"
                                             },
@@ -2308,16 +2277,20 @@
                                 "RefValue": "EmrCluster"
                             },
                             {
-                                "Key": "dependsOn",
-                                "RefValue": "RunCopyHiveQueryScript"
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
                             },
                             {
                                 "Key": "dependsOn",
-                                "RefValue": "RunHiveQueryScript"
+                                "RefValue": "RunPhase1CopyCommand"
                             },
                             {
                                 "Key": "dependsOn",
-                                "RefValue": "RunHadoopJAR"
+                                "RefValue": "RunPhase1HiveCommand"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase1HadoopJAR"
                             },
                             {
                                 "Key": "onSuccess",
@@ -2453,6 +2426,10 @@
                                 "RefValue": "EmrCluster"
                             },
                             {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
                                 "Key": "onSuccess",
                                 "RefValue": "SendMoveDatasetSuccessSNSMessage"
                             },
@@ -2586,6 +2563,10 @@
                                 "RefValue": "EmrCluster"
                             },
                             {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
                                 "Key": "dependsOn",
                                 "RefValue": "MoveDatasetToArchives"
                             }
@@ -2610,6 +2591,10 @@
                             {
                                 "Key": "runsOn",
                                 "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
                             },
                             {
                                 "Key": "dependsOn",
@@ -2685,6 +2670,10 @@
                             {
                                 "Key": "runsOn",
                                 "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
                             },
                             {
                                 "Key": "dependsOn",
