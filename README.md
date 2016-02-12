@@ -19,15 +19,9 @@ Please note this CloudFormation spins up a number of resources, including IAM re
 1. Make an S3 bucket to store code and note the location (e.g., `s3://my-awesome-bucket`)
 2. Place the following files in the root of the code S3 bucket unless otherwise noted:
   * `cloudformation/environment.json`
-  * `cloudwatch/awslogs.conf`
   * `lambda/download-verify/download-verify-lambda.zip` (NOTE: This file is the result of running `zip -r download-verify-lambda.zip .` inside the `lambda/download-verify` directory.)
   * `lambda/data-pipeline-init/data-pipeline-init-lambda.zip` (NOTE: This file is the result of running `zip -r data-pipeline-init-lambda-code.zip .` inside the `lambda/data-pipeline-init` directory.)
-  * `python/download_and_verify.py`
-  * `aws_data_tools-A.B.C.jar`
-  * `canvas_data_schema_bindings-X.Y.Z.jar`
   * `secure.properties` based on `java/aws_data_tools/src/main/resources/secure.properties.example`
-  * Hadoop JAR files - details TBD
-  * Hive/Pig scripts - details TBD
 3. Create a customized CloudFormation parameters file by doing the following:
   * Create a `cloudformation/myparameters` directory locally (it and its future contents will be .gitignore'd)
   * Copy `cloudformation/parameters.json.example` to `cloudformation/myparameters/my-custom-parameters.json` edit it to include your specific parameter values
