@@ -46,7 +46,7 @@ public class HiveQueryManifestGenerator {
       final File queryDir) {
     if (queryDir.exists() && queryDir.isDirectory()) {
       for (final String fileName : queryDir.list()) {
-        out.println("source FILE ${" + CanvasDataGenerator.HDFS_HIVE_QUERY_DIR + "}/" + fileName + ";");
+        out.println("source ${" + CanvasDataGenerator.HDFS_HIVE_QUERY_DIR + "}/" + fileName + ";");
       }
     }
   }
