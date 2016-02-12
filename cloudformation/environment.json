@@ -17,11 +17,6 @@
             "Description": "Name of ZIP file in the CodeS3Bucket containing the DowloadVerifyLambda function code",
             "Default": "download-verify-lambda.zip"
         },
-        "DownloadVerifyPythonScriptLocationParameter": {
-            "Type": "String",
-            "Description": "Name of Python file in the CodeS3Bucket containing the DownloadVerify Python script",
-            "Default": "download_and_verify.py"
-        },
         "DownloadVerifySecurePropertiesLocationParameter": {
             "Type": "String",
             "Description": "Name of secure settings file for use by DownloadVerify Python script (NOTE: Name must remain secure.properties for now)",
@@ -32,26 +27,6 @@
             "Description": "Canvas Data Schema Version",
             "Default": "1.3.0"
         },
-        "HiveCreateScriptLocationParameter": {
-            "Type": "String",
-            "Description": "Prefix of the .q file (up until the version number) in the CodeS3Bucket containing the Hive Create script",
-            "Default": "create_tables"
-        },
-        "HiveCopyScriptLocationParameter": {
-            "Type": "String",
-            "Description": "Prefix of the .q file (up until the version number) in the CodeS3Bucket containing the Hive Copy script",
-            "Default": "copy_tables"
-        },
-        "HiveQueryScriptLocationParameter": {
-            "Type": "String",
-            "Description": "Name of the .q file in the CodeS3Bucket containing the Hive Query script",
-            "Default": "hive_queries.q"
-        },
-        "HadoopJARLocationParameter": {
-            "Type": "String",
-            "Description": "Name of JAR file in the CodeS3Bucket containing the Hadoop JAR code",
-            "Default": "myhadoopscript.jar"
-        },
         "CodeS3BucketParameter": {
             "Type": "String",
             "Description": "Name of S3 bucket containing various Lambda, JAR and Hadoop code files",
@@ -61,11 +36,6 @@
             "Type": "String",
             "Description": "Name of ZIP file in the CodeS3Bucket containing the DataPipelineInitLambda function code",
             "Default": "data-pipeline-init-lambda.zip"
-        },
-        "S3toRedshiftLoaderParameter": {
-            "Type": "String",
-            "Description": "Prefix of the SQL file (up until the version number) in the CodeS3Bucket containing the Redshift SQL code to move data from S3 to Redshift after Data Pipeline processing",
-            "Default": "s3_to_redshift_loader"
         },
         "SuccessSNSEmailParameter": {
             "Type": "String",
@@ -862,9 +832,9 @@
                                 "\n",
                                 "# Setup the EMR bootstrap script before launching the Data Pipeline\n",
                                 "sed -i \"s@<canvas_data_schema_version>@",
-								{
-									"Ref": "DownloadVerifyCanvasDataSchemaVersion"
-								},
+                                {
+                                    "Ref": "DownloadVerifyCanvasDataSchemaVersion"
+                                },
                                 "@g\" /root/harvard-data-tools/emr/bootstrap.sh\n",
                                 "\n",
                                 "sed -i \"s@<code_s3_bucket>@",
@@ -1008,7 +978,7 @@
                     ]
                 },
                 "Runtime": "nodejs",
-                "Timeout": 10
+                "Timeout": 15
             }
         },
         "DataPipelineInitLambdaInvokePermission": {
@@ -1550,9 +1520,9 @@
                                         "",
                                         [
                                             "s3://",
-											{
-												"Ref": "NewCodeS3Bucket"
-											},
+                                            {
+                                                "Ref": "NewCodeS3Bucket"
+                                            },
                                             "/bootstrap.sh"
                                         ]
                                     ]
@@ -2142,18 +2112,7 @@
                             },
                             {
                                 "Key": "step",
-                                "StringValue": {
-                                    "Fn::Join": [
-                                        "",
-                                        [
-                                            "s3://",
-                                            {
-                                                "Ref": "NewCodeS3Bucket"
-                                            },
-                                            "/canvas_data_hadoop.jar,edu.harvard.data.hadoop.requests.CanvasDataHadoop,/phase_0,/phase_1"
-                                        ]
-                                    ]
-                                }
+                                "StringValue": "/home/hadoop/canvas_data_hadoop.jar,edu.harvard.data.hadoop.requests.CanvasDataHadoop,/phase_0,/phase_1"
                             }
                         ]
                     },
@@ -2246,8 +2205,8 @@
                         ]
                     },
                     {
-                        "Id": "MoveDataFromHDFS",
-                        "Name": "MoveDataFromHDFS",
+                        "Id": "SignalEndPhase1",
+                        "Name": "SignalEndPhase1",
                         "Fields": [
                             {
                                 "Key": "type",
@@ -2255,18 +2214,7 @@
                             },
                             {
                                 "Key": "command",
-                                "StringValue": {
-                                    "Fn::Join": [
-                                        "",
-                                        [
-                                            "s3-dist-cp --src=hdfs:///phase_1 --dest=s3://",
-                                            {
-                                                "Ref": "IntermediateS3Bucket"
-                                            },
-                                            "/dataset-path-placeholder"
-                                        ]
-                                    ]
-                                }
+                                "StringValue": "echo 'End phase 1'"
                             },
                             {
                                 "Key": "schedule",
@@ -2291,6 +2239,399 @@
                             {
                                 "Key": "dependsOn",
                                 "RefValue": "RunPhase1HadoopJAR"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendSignalEndPhase1SuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendSignalEndPhase1FailureSNSMessage"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendSignalEndPhase1SuccessSNSMessage",
+                        "Name": "SendSignalEndPhase1SuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - End Phase 1 succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendSignalEndPhase1FailureSNSMessage",
+                        "Name": "SendSignalEndPhase1FailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - End Phase 1 failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "RunPhase2CopyCommand",
+                        "Name": "RunPhase2CopyCommand",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "ShellCommandActivity"
+                            },
+                            {
+                                "Key": "command",
+                                "StringValue": "/home/hadoop/copy_unmodified_files_phase_2.sh phase_1 phase_2"
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "SignalEndPhase1"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendPhase2CopySuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendPhase2CopyFailureSNSMessage"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase2CopySuccessSNSMessage",
+                        "Name": "SendPhase2CopySuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 2 copy script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase2CopyFailureSNSMessage",
+                        "Name": "SendPhase2CopyFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 2 copy script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "RunPhase2HiveCommand",
+                        "Name": "RunPhase2HiveCommand",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "ShellCommandActivity"
+                            },
+                            {
+                                "Key": "command",
+                                "StringValue": "/home/hadoop/canvas_phase_2_hive.sh /home/hadoop/harvard-data-tools/hive/phase_2"
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "SignalEndPhase1"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendPhase2HiveSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendPhase2HiveFailureSNSMessage"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase2HiveSuccessSNSMessage",
+                        "Name": "SendPhase2HiveSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 2 Hive script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase2HiveFailureSNSMessage",
+                        "Name": "SendPhase2HiveFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 2 Hive script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "MoveDataFromHDFS",
+                        "Name": "MoveDataFromHDFS",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "ShellCommandActivity"
+                            },
+                            {
+                                "Key": "command",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "s3-dist-cp --src=hdfs:///phase_2 --dest=s3://",
+                                            {
+                                                "Ref": "IntermediateS3Bucket"
+                                            },
+                                            "/dataset-path-placeholder"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase2CopyCommand"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase2HiveCommand"
                             },
                             {
                                 "Key": "onSuccess",
