@@ -42,5 +42,3 @@ chmod 764 /home/hadoop/*.sh
 
 #copy appropriate files to temp S3 bucket here
 aws s3 cp /home/hadoop/create_tables.q s3://<new_code_s3_bucket>/create_tables.q
-
-aws s3 cp /home/hadoop/canvas_data_hadoop.jar s3://<new_code_s3_bucket>/canvas_data_hadoop.jar
