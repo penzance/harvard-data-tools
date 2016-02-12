@@ -37,14 +37,17 @@ public class CreateHiveTableGenerator {
     }
   }
 
+  // TODO: Generate phase 1 and phase 2 tables separately. Drop the phase 1 tables
+  // before creating the phase 2. Maybe that means we can just have in_ and out_ rather
+  // than needing the phase_1 or phase_2 prefix?
   private void generateCreateTablesFile(final PrintStream out,
       final SchemaTransformer transformer) {
     log.info("Creating Hive create_tables.q file");
 
     generateCreateStatements(out, transformer.getPhase(0), "phase_1_in_", true, "SEQUENCEFILE");
     generateCreateStatements(out, transformer.getPhase(1), "phase_1_out_", false, "TEXTFILE");
-    generateCreateStatements(out, transformer.getPhase(1), "phase_2_in_", true, "TEXTFILE");
-    generateCreateStatements(out, transformer.getPhase(2), "phase_2_out_", false, "TEXTFILE");
+    //    generateCreateStatements(out, transformer.getPhase(1), "phase_2_in_", true, "TEXTFILE");
+    //    generateCreateStatements(out, transformer.getPhase(2), "phase_2_out_", false, "TEXTFILE");
   }
 
   private void generateCreateStatements(final PrintStream out, final SchemaPhase phaseInput,
