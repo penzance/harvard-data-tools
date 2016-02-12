@@ -43,8 +43,8 @@ public class CreateHiveTableGenerator {
 
     generateCreateStatements(out, transformer.getPhase(0), "phase_1_in_", true, "SEQUENCEFILE");
     generateCreateStatements(out, transformer.getPhase(1), "phase_1_out_", false, "TEXTFILE");
-    generateCreateStatements(out, transformer.getPhase(1), "phase_2_in_", true, "TEXTFILE");
-    generateCreateStatements(out, transformer.getPhase(2), "phase_2_out_", false, "TEXTFILE");
+    //    generateCreateStatements(out, transformer.getPhase(1), "phase_2_in_", true, "TEXTFILE");
+    //    generateCreateStatements(out, transformer.getPhase(2), "phase_2_out_", false, "TEXTFILE");
   }
 
   private void generateCreateStatements(final PrintStream out, final SchemaPhase phaseInput,
