@@ -45,7 +45,7 @@ public class HiveQueryManifestGenerator {
       final File queryDir) {
     if (queryDir.exists() && queryDir.isDirectory()) {
       for (final String fileName : queryDir.list()) {
-        out.println("source $1/" + fileName + ";");
+        out.println("hive source $1/" + fileName + ";");
       }
     }
   }
