@@ -12,8 +12,8 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import edu.harvard.data.client.canvas.api.CanvasDataSchemaColumn;
-import edu.harvard.data.client.canvas.api.CanvasDataSchemaTable;
+import edu.harvard.data.client.schema.DataSchemaColumn;
+import edu.harvard.data.client.schema.DataSchemaTable;
 import edu.harvard.data.data_tool_generator.SchemaPhase;
 import edu.harvard.data.data_tool_generator.SchemaTransformer;
 
@@ -53,12 +53,12 @@ public class CreateHiveTableGenerator {
   private void generateCreateStatements(final PrintStream out, final SchemaPhase phaseInput,
       final String prefix, final boolean ignoreOwner, final String format) {
     if (phaseInput != null) {
-      final Map<String, CanvasDataSchemaTable> inTables = phaseInput.getSchema().getSchema();
+      final Map<String, DataSchemaTable> inTables = phaseInput.getSchema().getSchema();
       final List<String> inTableKeys = new ArrayList<String>(inTables.keySet());
       Collections.sort(inTableKeys);
 
       for (final String tableKey : inTableKeys) {
-        final CanvasDataSchemaTable table = inTables.get(tableKey);
+        final DataSchemaTable table = inTables.get(tableKey);
         if (ignoreOwner || table.getOwner() == null || table.getOwner().equals("hive")) {
           final String tableName = prefix + table.getTableName();
           dropTable(out, tableName);
@@ -73,7 +73,7 @@ public class CreateHiveTableGenerator {
   }
 
   private void createTable(final PrintStream out, final String tableName,
-      final CanvasDataSchemaTable table, final String format, final String locationVar) {
+      final DataSchemaTable table, final String format, final String locationVar) {
     out.println("CREATE EXTERNAL TABLE " + tableName + " (");
     listFields(out, table);
     out.println(")");
@@ -83,10 +83,10 @@ public class CreateHiveTableGenerator {
     out.println();
   }
 
-  private void listFields(final PrintStream out, final CanvasDataSchemaTable table) {
-    final List<CanvasDataSchemaColumn> columns = table.getColumns();
+  private void listFields(final PrintStream out, final DataSchemaTable table) {
+    final List<DataSchemaColumn> columns = table.getColumns();
     for (int i = 0; i < columns.size(); i++) {
-      final CanvasDataSchemaColumn column = columns.get(i);
+      final DataSchemaColumn column = columns.get(i);
       out.print("    " + column.getName() + " " + column.getHiveType());
       if (i < columns.size() - 1) {
         out.println(",");

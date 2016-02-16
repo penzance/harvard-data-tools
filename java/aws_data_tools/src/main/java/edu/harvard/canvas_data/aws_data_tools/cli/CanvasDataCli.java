@@ -16,7 +16,7 @@ import edu.harvard.canvas_data.aws_data_tools.FatalError;
 import edu.harvard.canvas_data.aws_data_tools.VerificationException;
 import edu.harvard.data.client.DataConfiguration;
 import edu.harvard.data.client.DataConfigurationException;
-import edu.harvard.data.client.canvas.api.UnexpectedApiResponseException;
+import edu.harvard.data.client.schema.UnexpectedApiResponseException;
 
 public class CanvasDataCli {
 

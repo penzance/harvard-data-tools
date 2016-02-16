@@ -1,15 +1,15 @@
-package edu.harvard.data.client.canvas.api;
+package edu.harvard.data.client.schema;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public enum CanvasDataSchemaType {
+public enum DataSchemaType {
   BigInt, Boolean, Date, DateTime, DoublePrecision, Int, Integer, Text, Timestamp, VarChar;
 
-  private static Map<String, CanvasDataSchemaType> stringToType;
+  private static Map<String, DataSchemaType> stringToType;
 
   static {
-    stringToType = new HashMap<String, CanvasDataSchemaType>();
+    stringToType = new HashMap<String, DataSchemaType>();
     stringToType.put("bigint", BigInt);
     stringToType.put("boolean", Boolean);
     stringToType.put("date", Date);
@@ -22,8 +22,8 @@ public enum CanvasDataSchemaType {
     stringToType.put("varchar", VarChar);
   }
 
-  public static CanvasDataSchemaType parse(final String type) {
-    final CanvasDataSchemaType t = stringToType.get(type);
+  public static DataSchemaType parse(final String type) {
+    final DataSchemaType t = stringToType.get(type);
     if (t == null) {
       return valueOf(type);
     }

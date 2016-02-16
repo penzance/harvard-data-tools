@@ -17,12 +17,12 @@ import edu.harvard.canvas_data.aws_data_tools.cli.ReturnStatus;
 import edu.harvard.data.client.AwsUtils;
 import edu.harvard.data.client.DataConfiguration;
 import edu.harvard.data.client.DataConfigurationException;
-import edu.harvard.data.client.canvas.api.CanvasApiClient;
-import edu.harvard.data.client.canvas.api.CanvasDataArtifact;
-import edu.harvard.data.client.canvas.api.CanvasDataDump;
-import edu.harvard.data.client.canvas.api.CanvasDataFile;
-import edu.harvard.data.client.canvas.api.CanvasDataSchema;
-import edu.harvard.data.client.canvas.api.UnexpectedApiResponseException;
+import edu.harvard.data.client.canvas.CanvasApiClient;
+import edu.harvard.data.client.canvas.CanvasDataArtifact;
+import edu.harvard.data.client.canvas.CanvasDataDump;
+import edu.harvard.data.client.canvas.CanvasDataFile;
+import edu.harvard.data.client.canvas.CanvasDataSchema;
+import edu.harvard.data.client.schema.UnexpectedApiResponseException;
 
 public class DumpManager {
 

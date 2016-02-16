@@ -7,9 +7,9 @@ import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.client.DataTable;
 import edu.harvard.data.client.TableFormat;
-import edu.harvard.data.client.canvas.api.CanvasDataSchemaColumn;
-import edu.harvard.data.client.canvas.api.CanvasDataSchemaTable;
-import edu.harvard.data.client.canvas.api.CanvasDataSchemaType;
+import edu.harvard.data.client.schema.DataSchemaColumn;
+import edu.harvard.data.client.schema.DataSchemaTable;
+import edu.harvard.data.client.schema.DataSchemaType;
 import edu.harvard.data.data_tool_generator.SchemaPhase;
 
 // Generate a single model class. A model may have a previous version if the model
@@ -27,14 +27,14 @@ public class ModelClassGenerator {
   private static final Logger log = LogManager.getLogger();
 
   private final String schemaVersion;
-  private final CanvasDataSchemaTable table;
+  private final DataSchemaTable table;
   private final SchemaPhase tableVersion;
   private final SchemaPhase previousVersion;
   private final String className;
   private final String previousClassName;
 
   public ModelClassGenerator(final String schemaVersion, final SchemaPhase tableVersion,
-      final SchemaPhase previousVersion, final CanvasDataSchemaTable table) {
+      final SchemaPhase previousVersion, final DataSchemaTable table) {
     this.schemaVersion = schemaVersion;
     this.table = table;
     this.tableVersion = tableVersion;
@@ -89,7 +89,7 @@ public class ModelClassGenerator {
 
   // Generate the field declarations
   private void outputFields(final PrintStream out) {
-    for (final CanvasDataSchemaColumn column : table.getColumns()) {
+    for (final DataSchemaColumn column : table.getColumns()) {
       final String typeName = JavaBindingGenerator.javaType(column.getType());
       final String variableName = JavaBindingGenerator.javaVariable(column.getName());
       out.println("  private " + typeName + " " + variableName + ";");
@@ -108,7 +108,7 @@ public class ModelClassGenerator {
       out.println("  public " + className + "(final TableFormat format, final CSVRecord record) {");
     }
     int columnIdx = 0;
-    for (final CanvasDataSchemaColumn column : table.getColumns()) {
+    for (final DataSchemaColumn column : table.getColumns()) {
       generateParseFromCsv(out, column, columnIdx++);
     }
     out.println("  }");
@@ -122,7 +122,7 @@ public class ModelClassGenerator {
     if (previousClassName != null && !table.getNewGenerated()) {
       final String previousVar = JavaBindingGenerator.javaVariable(previousClassName);
       out.println("  public " + className + "(" + previousClassName + " " + previousVar + ") {");
-      for (final CanvasDataSchemaColumn column : table.getColumns()) {
+      for (final DataSchemaColumn column : table.getColumns()) {
         if (!column.getNewGenerated()) {
           final String variableName = JavaBindingGenerator.javaVariable(column.getName());
           final String methodName = "get" + JavaBindingGenerator.javaClass(variableName, "");
@@ -138,7 +138,7 @@ public class ModelClassGenerator {
   private void outputAllFieldConstructor(final PrintStream out) {
     out.println("  public " + className + "(");
     int columnCount = 0;
-    for (final CanvasDataSchemaColumn column : table.getColumns()) {
+    for (final DataSchemaColumn column : table.getColumns()) {
       final String paramType = JavaBindingGenerator.javaType(column.getType());
       final String paramName = JavaBindingGenerator.javaVariable(column.getName());
       out.print("        " + paramType + " " + paramName);
@@ -148,7 +148,7 @@ public class ModelClassGenerator {
         out.println(",");
       }
     }
-    for (final CanvasDataSchemaColumn column : table.getColumns()) {
+    for (final DataSchemaColumn column : table.getColumns()) {
       final String variableName = JavaBindingGenerator.javaVariable(column.getName());
       out.println("    this." + variableName + " = " + variableName + ";");
     }
@@ -159,7 +159,7 @@ public class ModelClassGenerator {
   // Generate getters for each field, and setters for any fields that have been
   // added in this step of processing.
   private void outputGettersAndSetters(final PrintStream out) {
-    for (final CanvasDataSchemaColumn column : table.getColumns()) {
+    for (final DataSchemaColumn column : table.getColumns()) {
       final String typeName = JavaBindingGenerator.javaType(column.getType());
       String methodName = "get" + JavaBindingGenerator.javaClass(column.getName(), "");
       final String variableName = JavaBindingGenerator.javaVariable(column.getName());
@@ -187,7 +187,7 @@ public class ModelClassGenerator {
     out.println("  @Override");
     out.println("  public List<Object> getFieldsAsList(final TableFormat formatter) {");
     out.println("    final List<Object> fields = new ArrayList<Object>();");
-    for (final CanvasDataSchemaColumn column : table.getColumns()) {
+    for (final DataSchemaColumn column : table.getColumns()) {
       final String variableName = JavaBindingGenerator.javaVariable(column.getName());
       if (isTimestamp(column) || isDate(column)) {
         out.println("    fields.add(formatter.formatTimestamp(" + variableName + "));");
@@ -205,25 +205,25 @@ public class ModelClassGenerator {
     out.println();
     out.println("  public static List<String> getFieldNames() {");
     out.println("    final List<String> fields = new ArrayList<String>();");
-    for (final CanvasDataSchemaColumn column : table.getColumns()) {
+    for (final DataSchemaColumn column : table.getColumns()) {
       out.println("      fields.add(\"" + column.getName() + "\");");
     }
     out.println("    return fields;");
     out.println("  }");
   }
 
-  private boolean isTimestamp(final CanvasDataSchemaColumn c) {
-    return (c.getType() == CanvasDataSchemaType.Timestamp
-        || c.getType() == CanvasDataSchemaType.DateTime);
+  private boolean isTimestamp(final DataSchemaColumn c) {
+    return (c.getType() == DataSchemaType.Timestamp
+        || c.getType() == DataSchemaType.DateTime);
   }
 
-  private boolean isDate(final CanvasDataSchemaColumn c) {
-    return c.getType() == CanvasDataSchemaType.Date;
+  private boolean isDate(final DataSchemaColumn c) {
+    return c.getType() == DataSchemaType.Date;
   }
 
   // Checks the whole table for any column that is of type Date
-  private boolean hasDateColumn(final CanvasDataSchemaTable table) {
-    for (final CanvasDataSchemaColumn c : table.getColumns()) {
+  private boolean hasDateColumn(final DataSchemaTable table) {
+    for (final DataSchemaColumn c : table.getColumns()) {
       if (isDate(c)) {
         return true;
       }
@@ -232,8 +232,8 @@ public class ModelClassGenerator {
   }
 
   // Checks the whole table for any column that is of type Timestamp
-  private boolean hasTimestampColumn(final CanvasDataSchemaTable table) {
-    for (final CanvasDataSchemaColumn c : table.getColumns()) {
+  private boolean hasTimestampColumn(final DataSchemaTable table) {
+    for (final DataSchemaColumn c : table.getColumns()) {
       if (isTimestamp(c)) {
         return true;
       }
@@ -245,7 +245,7 @@ public class ModelClassGenerator {
   // The CSV reader returns all data as Strings, so we must use the appropriate
   // valueOf method in the case of boxed primitive types, or use the TableFormat
   // class to parse dates and timestamps.
-  private void generateParseFromCsv(final PrintStream out, final CanvasDataSchemaColumn column,
+  private void generateParseFromCsv(final PrintStream out, final DataSchemaColumn column,
       final int idx) {
     String parseMethod = null;
     final String extraParams = "";

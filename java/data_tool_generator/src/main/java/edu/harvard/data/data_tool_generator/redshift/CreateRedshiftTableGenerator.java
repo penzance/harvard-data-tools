@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 
-import edu.harvard.data.client.canvas.api.CanvasDataSchemaColumn;
-import edu.harvard.data.client.canvas.api.CanvasDataSchemaTable;
+import edu.harvard.data.client.schema.DataSchemaColumn;
+import edu.harvard.data.client.schema.DataSchemaTable;
 import edu.harvard.data.data_tool_generator.SchemaPhase;
 import edu.harvard.data.data_tool_generator.SchemaTransformer;
 
@@ -30,11 +30,11 @@ public class CreateRedshiftTableGenerator {
   }
 
   private void generateCreateTableFile(final PrintStream out, final SchemaPhase phase) {
-    for (final CanvasDataSchemaTable table : phase.getSchema().getSchema().values()) {
+    for (final DataSchemaTable table : phase.getSchema().getSchema().values()) {
       out.println("CREATE TABLE " + table.getTableName() + "(");
-      final List<CanvasDataSchemaColumn> columns = table.getColumns();
+      final List<DataSchemaColumn> columns = table.getColumns();
       for (int i=0; i<columns.size(); i++) {
-        final CanvasDataSchemaColumn column = columns.get(i);
+        final DataSchemaColumn column = columns.get(i);
         out.print("    " + column.getName() + " " + column.getRedshiftType());
         if (i < columns.size() - 1) {
           out.println(",");

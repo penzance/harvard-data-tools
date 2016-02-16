@@ -1,9 +1,11 @@
-package edu.harvard.data.client.canvas.api;
+package edu.harvard.data.client.canvas;
 
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import edu.harvard.data.client.schema.SchemaDifference;
 
 public class CanvasDataSchemaDimension {
 

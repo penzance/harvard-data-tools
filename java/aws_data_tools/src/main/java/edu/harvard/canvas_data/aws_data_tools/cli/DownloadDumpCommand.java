@@ -24,10 +24,10 @@ import edu.harvard.data.client.AwsUtils;
 import edu.harvard.data.client.DataClient;
 import edu.harvard.data.client.DataConfiguration;
 import edu.harvard.data.client.DataConfigurationException;
-import edu.harvard.data.client.canvas.api.CanvasApiClient;
-import edu.harvard.data.client.canvas.api.CanvasDataDump;
-import edu.harvard.data.client.canvas.api.CanvasDataSchema;
-import edu.harvard.data.client.canvas.api.UnexpectedApiResponseException;
+import edu.harvard.data.client.canvas.CanvasApiClient;
+import edu.harvard.data.client.canvas.CanvasDataDump;
+import edu.harvard.data.client.canvas.CanvasDataSchema;
+import edu.harvard.data.client.schema.UnexpectedApiResponseException;
 
 public class DownloadDumpCommand implements Command {
 
@@ -41,13 +41,13 @@ public class DownloadDumpCommand implements Command {
   DataConfigurationException, UnexpectedApiResponseException, VerificationException {
     final AwsUtils aws = new AwsUtils();
     final DumpManager manager = new DumpManager(config, aws);
-    final CanvasApiClient api = new DataClient().getCanvasApiClient(config.getCanvasDataHost(),
+    final CanvasApiClient api = DataClient.getCanvasApiClient(config.getCanvasDataHost(),
         config.getCanvasApiKey(), config.getCanvasApiSecret());
     final List<CanvasDataDump> orderedDumps = sortDumps(api.getDumps());
     for (final CanvasDataDump dump : orderedDumps) {
       if (manager.needToSaveDump(dump)) {
         final CanvasDataDump fullDump = api.getDump(dump.getDumpId());
-        final CanvasDataSchema schema = api.getSchema(fullDump.getSchemaVersion());
+        final CanvasDataSchema schema = (CanvasDataSchema) api.getSchema(fullDump.getSchemaVersion());
         log.info("Saving " + fullDump.getSequence());
         final long start = System.currentTimeMillis();
         try {

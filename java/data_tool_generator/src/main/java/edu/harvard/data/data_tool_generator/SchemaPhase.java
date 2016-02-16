@@ -2,11 +2,11 @@ package edu.harvard.data.data_tool_generator;
 
 import java.io.File;
 
-import edu.harvard.data.client.canvas.api.CanvasDataSchema;
+import edu.harvard.data.client.schema.DataSchema;
 
 public class SchemaPhase {
 
-  private CanvasDataSchema schema;
+  private DataSchema schema;
   private String prefix;
 
   private String javaPackage;
@@ -25,7 +25,7 @@ public class SchemaPhase {
     this.prefix = prefix;
   }
 
-  public void setSchema(final CanvasDataSchema schema) {
+  public void setSchema(final DataSchema schema) {
     this.schema = schema;
   }
 
@@ -41,7 +41,7 @@ public class SchemaPhase {
     return javaSourceLocation;
   }
 
-  public CanvasDataSchema getSchema() {
+  public DataSchema getSchema() {
     return schema;
   }
 

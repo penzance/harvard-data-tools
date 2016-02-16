@@ -1,4 +1,4 @@
-package edu.harvard.data.client.canvas.api;
+package edu.harvard.data.client.canvas;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,6 +7,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import edu.harvard.data.client.schema.UnexpectedApiResponseException;
 
 public class CanvasDataArtifact {
   private final String tableName;
@@ -43,7 +45,7 @@ public class CanvasDataArtifact {
     }
   }
 
-  void setRestUtils(final RestUtils rest) {
+  void setRestUtils(final CanvasRestUtils rest) {
     if (files != null) {
       for (final CanvasDataFile file : files) {
         file.setRestUtils(rest);

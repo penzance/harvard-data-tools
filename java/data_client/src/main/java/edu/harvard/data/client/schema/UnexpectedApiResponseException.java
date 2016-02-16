@@ -1,4 +1,4 @@
-package edu.harvard.data.client.canvas.api;
+package edu.harvard.data.client.schema;
 
 public class UnexpectedApiResponseException extends Exception {
 

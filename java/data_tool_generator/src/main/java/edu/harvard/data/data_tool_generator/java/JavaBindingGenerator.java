@@ -21,8 +21,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import edu.harvard.data.client.canvas.api.CanvasDataSchemaTable;
-import edu.harvard.data.client.canvas.api.CanvasDataSchemaType;
+import edu.harvard.data.client.schema.DataSchemaTable;
+import edu.harvard.data.client.schema.DataSchemaType;
 import edu.harvard.data.data_tool_generator.SchemaPhase;
 import edu.harvard.data.data_tool_generator.SchemaTransformer;
 
@@ -83,7 +83,7 @@ public class JavaBindingGenerator {
     final File srcDir = tableVersion.getJavaSourceLocation();
     final String classPrefix = tableVersion.getPrefix();
     final String version = tableVersion.getSchema().getVersion();
-    final Map<String, CanvasDataSchemaTable> tables = tableVersion.getSchema().getSchema();
+    final Map<String, DataSchemaTable> tables = tableVersion.getSchema().getSchema();
 
     // Create the base directory where all of the classes will be generated
     log.info("Generating tables in " + srcDir);
@@ -138,7 +138,7 @@ public class JavaBindingGenerator {
 
   // Generate a sorted list of table names for the switch tables in the enum and
   // factory classes
-  static List<String> generateTableNames(final Map<String, CanvasDataSchemaTable> tables) {
+  static List<String> generateTableNames(final Map<String, DataSchemaTable> tables) {
     final List<String> tableNames = new ArrayList<String>();
     for (final String name : tables.keySet()) {
       tableNames.add(tables.get(name).getTableName());
@@ -237,7 +237,7 @@ public class JavaBindingGenerator {
   }
 
   // Convert the types specified in the schema.json format into Java types.
-  static String javaType(final CanvasDataSchemaType dataType) {
+  static String javaType(final DataSchemaType dataType) {
     switch (dataType) {
     case BigInt:
       return Long.class.getSimpleName();

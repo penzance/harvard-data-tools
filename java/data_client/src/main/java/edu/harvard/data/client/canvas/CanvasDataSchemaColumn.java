@@ -1,4 +1,4 @@
-package edu.harvard.data.client.canvas.api;
+package edu.harvard.data.client.canvas;
 
 import java.util.List;
 
@@ -6,12 +6,16 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class CanvasDataSchemaColumn {
+import edu.harvard.data.client.schema.DataSchemaColumn;
+import edu.harvard.data.client.schema.DataSchemaType;
+import edu.harvard.data.client.schema.SchemaDifference;
+
+public class CanvasDataSchemaColumn implements DataSchemaColumn {
 
   private final String name;
   private final String description;
   private final String descripton; // Typo shows up in around half the columns.
-  private final CanvasDataSchemaType type;
+  private final DataSchemaType type;
   private final CanvasDataSchemaDimension dimension;
   private final int length;
   private final Boolean snowflake; // true for:
@@ -37,7 +41,7 @@ public class CanvasDataSchemaColumn {
     this.description = description;
     this.sortKey = sortKey;
     this.descripton = descripton == null ? descripton : description;
-    this.type = CanvasDataSchemaType.parse(type);
+    this.type = DataSchemaType.parse(type);
     this.dimension = dimension;
     this.length = length;
     this.snowflake = snowflake;
@@ -68,10 +72,12 @@ public class CanvasDataSchemaColumn {
     }
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public String getDescription() {
     return description;
   }
@@ -80,7 +86,8 @@ public class CanvasDataSchemaColumn {
     return descripton;
   }
 
-  public CanvasDataSchemaType getType() {
+  @Override
+  public DataSchemaType getType() {
     return type;
   }
 
@@ -104,6 +111,7 @@ public class CanvasDataSchemaColumn {
     return sortKey;
   }
 
+  @Override
   public String getRedshiftType() {
     String typeString = type.getRedshiftType();
     if (typeString.equals("VARCHAR")) {
@@ -116,14 +124,17 @@ public class CanvasDataSchemaColumn {
     return typeString;
   }
 
+  @Override
   public String getHiveType() {
     return type.getHiveType();
   }
 
+  @Override
   public boolean getNewGenerated() {
     return newGenerated;
   }
 
+  @Override
   public void setNewGenerated(final boolean newGenerated) {
     this.newGenerated = newGenerated;
   }

@@ -1,4 +1,4 @@
-package edu.harvard.data.client.canvas.api;
+package edu.harvard.data.client.canvas;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,9 +26,9 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.harvard.data.client.DataConfigurationException;
+import edu.harvard.data.client.schema.UnexpectedApiResponseException;
 
-public class RestUtils {
-
+public class CanvasRestUtils {
   private static final Logger log = LogManager.getLogger();
 
   private final String host;
@@ -36,7 +36,7 @@ public class RestUtils {
   private final String secret;
   private final ObjectMapper mapper;
 
-  public RestUtils(final String host, final String key, final String secret) {
+  public CanvasRestUtils(final String host, final String key, final String secret) {
     this.host = host;
     this.key = key;
     this.secret = secret;

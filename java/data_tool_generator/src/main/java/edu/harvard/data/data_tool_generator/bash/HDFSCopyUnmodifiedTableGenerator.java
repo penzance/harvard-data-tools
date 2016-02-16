@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import edu.harvard.data.client.canvas.api.CanvasDataSchemaTable;
+import edu.harvard.data.client.schema.DataSchemaTable;
 import edu.harvard.data.data_tool_generator.SchemaPhase;
 import edu.harvard.data.data_tool_generator.SchemaTransformer;
 
@@ -34,11 +34,11 @@ public class HDFSCopyUnmodifiedTableGenerator {
   }
 
   private void copyUnmodifiedFiles(final PrintStream out, final SchemaPhase phase) {
-    final Map<String, CanvasDataSchemaTable> schema = phase.getSchema().getSchema();
+    final Map<String, DataSchemaTable> schema = phase.getSchema().getSchema();
     final List<String> names = new ArrayList<String>(schema.keySet());
     Collections.sort(names);
     for (final String name : names) {
-      final CanvasDataSchemaTable table = schema.get(name);
+      final DataSchemaTable table = schema.get(name);
       if (!table.hasNewlyGeneratedElements()) {
         out.println("hadoop fs -cp /$1/" + table.getTableName() + " /$2/" + table.getTableName());
       }

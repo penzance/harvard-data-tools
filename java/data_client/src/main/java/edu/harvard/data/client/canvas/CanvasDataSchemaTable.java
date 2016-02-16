@@ -1,4 +1,4 @@
-package edu.harvard.data.client.canvas.api;
+package edu.harvard.data.client.canvas;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,7 +9,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class CanvasDataSchemaTable {
+import edu.harvard.data.client.schema.DataSchemaColumn;
+import edu.harvard.data.client.schema.DataSchemaTable;
+import edu.harvard.data.client.schema.SchemaDifference;
+
+public class CanvasDataSchemaTable implements DataSchemaTable {
 
   public enum DataWarehouseType {
     dimension, fact, both
@@ -21,7 +25,7 @@ public class CanvasDataSchemaTable {
   private final String tableName;
   private final Map<String, String> hints; // "sort_key" : "timestamp" in
   // requests
-  private List<CanvasDataSchemaColumn> columns;
+  private List<DataSchemaColumn> columns;
   private final String seeAlso;
   private final String databasePath; // non-null in requests
   private final String originalTable; // non-null in requests
@@ -43,7 +47,6 @@ public class CanvasDataSchemaTable {
       @JsonProperty("owner") final String owner) {
     this.dwType = dwType;
     this.description = description;
-    this.columns = columns;
     this.incremental = incremental;
     this.tableName = tableName;
     this.hints = hints;
@@ -52,6 +55,10 @@ public class CanvasDataSchemaTable {
     this.seeAlso = seeAlso;
     this.setNewGenerated(false);
     this.owner = owner;
+    this.columns = new ArrayList<DataSchemaColumn>();
+    for (final CanvasDataSchemaColumn column : columns) {
+      this.columns.add(new CanvasDataSchemaColumn(column));
+    }
   }
 
   public CanvasDataSchemaTable(final CanvasDataSchemaTable original) {
@@ -65,9 +72,9 @@ public class CanvasDataSchemaTable {
     this.originalTable = original.originalTable;
     this.setNewGenerated(original.newGenerated);
     this.owner = original.owner;
-    this.columns = new ArrayList<CanvasDataSchemaColumn>();
-    for (final CanvasDataSchemaColumn column : original.columns) {
-      this.columns.add(new CanvasDataSchemaColumn(column));
+    this.columns = new ArrayList<DataSchemaColumn>();
+    for (final DataSchemaColumn column : original.columns) {
+      this.columns.add(new CanvasDataSchemaColumn((CanvasDataSchemaColumn) column));
     }
   }
 
@@ -83,6 +90,7 @@ public class CanvasDataSchemaTable {
     return incremental;
   }
 
+  @Override
   public String getTableName() {
     return tableName;
   }
@@ -91,7 +99,8 @@ public class CanvasDataSchemaTable {
     return hints;
   }
 
-  public List<CanvasDataSchemaColumn> getColumns() {
+  @Override
+  public List<DataSchemaColumn> getColumns() {
     return columns;
   }
 
@@ -145,17 +154,17 @@ public class CanvasDataSchemaTable {
     return s1.equals(s2);
   }
 
-  private void calculateColumnDifferences(final List<CanvasDataSchemaColumn> columns2,
+  private void calculateColumnDifferences(final List<DataSchemaColumn> columns2,
       final List<SchemaDifference> differences) {
     final Map<String, CanvasDataSchemaColumn> map = new HashMap<String, CanvasDataSchemaColumn>();
-    for (final CanvasDataSchemaColumn column : columns) {
-      map.put(column.getName(), column);
+    for (final DataSchemaColumn column : columns) {
+      map.put(column.getName(), (CanvasDataSchemaColumn) column);
     }
 
-    for (final CanvasDataSchemaColumn column : columns2) {
+    for (final DataSchemaColumn column : columns2) {
       final String columnName = column.getName();
       if (map.containsKey(columnName)) {
-        map.get(columnName).calculateDifferences(tableName, column, differences);
+        map.get(columnName).calculateDifferences(tableName, (CanvasDataSchemaColumn) column, differences);
         map.remove(columnName);
       } else {
         differences.add(new SchemaDifference(tableName + ": Added column " + columnName));
@@ -187,16 +196,18 @@ public class CanvasDataSchemaTable {
     }
   }
 
-  public void setColumns(final ArrayList<CanvasDataSchemaColumn> newColumns) {
+  public void setColumns(final ArrayList<DataSchemaColumn> newColumns) {
     this.columns = newColumns;
   }
 
+  @Override
   public boolean getNewGenerated() {
     return newGenerated;
   }
 
+  @Override
   public boolean hasNewlyGeneratedElements() {
-    for(final CanvasDataSchemaColumn column : columns) {
+    for(final DataSchemaColumn column : columns) {
       if (column.getNewGenerated()) {
         return true;
       }
@@ -204,14 +215,17 @@ public class CanvasDataSchemaTable {
     return newGenerated;
   }
 
+  @Override
   public void setNewGenerated(final boolean newGenerated) {
     this.newGenerated = newGenerated;
   }
 
+  @Override
   public String getOwner() {
     return owner;
   }
 
+  @Override
   public void setOwner(final String owner) {
     this.owner = owner;
   }

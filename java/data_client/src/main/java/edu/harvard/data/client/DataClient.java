@@ -1,12 +1,18 @@
 package edu.harvard.data.client;
 
-import edu.harvard.data.client.canvas.api.CanvasApiClient;
+import java.io.IOException;
 
-public class DataClient {
+import edu.harvard.data.client.canvas.CanvasApiClient;
+import edu.harvard.data.client.schema.DataSchema;
+import edu.harvard.data.client.schema.UnexpectedApiResponseException;
 
-  public CanvasApiClient getCanvasApiClient(final String host, final String key,
+public abstract class DataClient {
+
+  public static CanvasApiClient getCanvasApiClient(final String host, final String key,
       final String secret) {
     return new CanvasApiClient(host, key, secret);
   }
 
+  public abstract DataSchema getSchema(final String version)
+      throws DataConfigurationException, UnexpectedApiResponseException, IOException;
 }

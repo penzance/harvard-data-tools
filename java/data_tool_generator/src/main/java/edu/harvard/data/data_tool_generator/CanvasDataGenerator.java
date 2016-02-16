@@ -9,9 +9,8 @@ import org.apache.logging.log4j.Logger;
 import edu.harvard.data.client.DataClient;
 import edu.harvard.data.client.DataConfiguration;
 import edu.harvard.data.client.DataConfigurationException;
-import edu.harvard.data.client.canvas.api.CanvasApiClient;
-import edu.harvard.data.client.canvas.api.CanvasDataSchema;
-import edu.harvard.data.client.canvas.api.UnexpectedApiResponseException;
+import edu.harvard.data.client.schema.DataSchema;
+import edu.harvard.data.client.schema.UnexpectedApiResponseException;
 import edu.harvard.data.data_tool_generator.bash.HDFSCopyUnmodifiedTableGenerator;
 import edu.harvard.data.data_tool_generator.hive.CreateHiveTableGenerator;
 import edu.harvard.data.data_tool_generator.hive.HiveQueryManifestGenerator;
@@ -36,27 +35,30 @@ public class CanvasDataGenerator {
   static final String PHASE_ONE_ADDITIONS_JSON = "phase1_schema_additions.json";
   static final String PHASE_TWO_ADDITIONS_JSON = "phase2_schema_additions.json";
 
-  public static void main(final String[] args) throws IOException, DataConfigurationException, UnexpectedApiResponseException {
+  public static void main(final String[] args)
+      throws IOException, DataConfigurationException, UnexpectedApiResponseException {
     if (args.length != 3) {
-      System.err.println("Usage: schema_version /path/to/harvard-data-tools /path/to/output/directory");
+      System.err
+      .println("Usage: schema_version /path/to/harvard-data-tools /path/to/output/directory");
     }
     final String schemaVersion = args[0];
     final File gitDir = new File(args[1]);
     final File dir = new File(args[2]);
     dir.mkdirs();
 
-    final DataConfiguration config = DataConfiguration.getConfiguration("secure.properties");
-
     // Get the specified schema version (or fail if that version doesn't exist).
-    final CanvasApiClient api = new DataClient().getCanvasApiClient(config.getCanvasDataHost(),
-        config.getCanvasApiKey(), config.getCanvasApiSecret());
-    final CanvasDataSchema schema = api.getSchema(schemaVersion);
+    final DataConfiguration config = DataConfiguration.getConfiguration("secure.properties");
+    final String host = config.getCanvasDataHost();
+    final String key = config.getCanvasApiKey();
+    final String secret = config.getCanvasApiSecret();
+    final DataSchema schema = DataClient.getCanvasApiClient(host, key, secret)
+        .getSchema(schemaVersion);
 
     // Specify the three versions of the table bindings
     final SchemaTransformer transformer = new SchemaTransformer(3);
     transformer.setPrefixes("", "Phase1", "Phase2");
     transformer.setSchemas(schema, PHASE_ONE_ADDITIONS_JSON, PHASE_TWO_ADDITIONS_JSON);
-    //  transformer.setHdfsDirectories("PHASE0_DIR", "PHASE1_DIR", "PHASE2_DIR");
+    // transformer.setHdfsDirectories("PHASE0_DIR", "PHASE1_DIR", "PHASE2_DIR");
     transformer.setHdfsDirectories(HDFS_PHASE_0_DIR, HDFS_PHASE_1_DIR, HDFS_PHASE_2_DIR);
 
     // Figure out the Java directory and package structure

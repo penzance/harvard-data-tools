@@ -11,10 +11,10 @@ import edu.harvard.canvas_data.aws_data_tools.DumpInfo;
 import edu.harvard.data.client.DataClient;
 import edu.harvard.data.client.DataConfiguration;
 import edu.harvard.data.client.DataConfigurationException;
-import edu.harvard.data.client.canvas.api.CanvasApiClient;
-import edu.harvard.data.client.canvas.api.CanvasDataSchema;
-import edu.harvard.data.client.canvas.api.SchemaDifference;
-import edu.harvard.data.client.canvas.api.UnexpectedApiResponseException;
+import edu.harvard.data.client.canvas.CanvasApiClient;
+import edu.harvard.data.client.canvas.CanvasDataSchema;
+import edu.harvard.data.client.schema.SchemaDifference;
+import edu.harvard.data.client.schema.UnexpectedApiResponseException;
 
 public class CompareSchemasCommand implements Command {
 
@@ -28,7 +28,7 @@ public class CompareSchemasCommand implements Command {
 
   @Override
   public ReturnStatus execute(final DataConfiguration config) throws IOException, DataConfigurationException, UnexpectedApiResponseException {
-    final CanvasApiClient api = new DataClient().getCanvasApiClient(config.getCanvasDataHost(),
+    final CanvasApiClient api = DataClient.getCanvasApiClient(config.getCanvasDataHost(),
         config.getCanvasApiKey(), config.getCanvasApiSecret());
     final DumpInfo info = DumpInfo.find(dumpId);
 
@@ -36,8 +36,8 @@ public class CompareSchemasCommand implements Command {
       log.info("Schema version numbers match.");
       return ReturnStatus.OK;
     }
-    final CanvasDataSchema schema1 = api.getSchema(expectedVersion);
-    final CanvasDataSchema schema2 = api.getSchema(info.getSchemaVersion());
+    final CanvasDataSchema schema1 = (CanvasDataSchema) api.getSchema(expectedVersion);
+    final CanvasDataSchema schema2 = (CanvasDataSchema) api.getSchema(info.getSchemaVersion());
     final List<SchemaDifference> differences = schema1.calculateDifferences(schema2);
     if (differences.isEmpty()) {
       log.info("Schemas are identical.");

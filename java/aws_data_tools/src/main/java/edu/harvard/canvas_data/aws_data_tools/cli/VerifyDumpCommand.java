@@ -16,8 +16,8 @@ import edu.harvard.data.client.DataConfigurationException;
 import edu.harvard.data.client.FormatLibrary;
 import edu.harvard.data.client.TableFactory;
 import edu.harvard.data.client.TableFormat;
-import edu.harvard.data.client.canvas.api.UnexpectedApiResponseException;
 import edu.harvard.data.client.canvas.phase0.CanvasTableFactory;
+import edu.harvard.data.client.schema.UnexpectedApiResponseException;
 
 public class VerifyDumpCommand implements Command {
 

@@ -7,7 +7,7 @@ import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import edu.harvard.data.client.canvas.api.CanvasDataSchemaTable;
+import edu.harvard.data.client.schema.DataSchemaTable;
 import edu.harvard.data.data_tool_generator.SchemaPhase;
 import edu.harvard.data.data_tool_generator.SchemaTransformer;
 
@@ -31,7 +31,7 @@ public class S3ToRedshiftLoaderGenerator {
 
   private void generateRedshiftLoaderFile(final PrintStream out, final SchemaPhase phase) {
     outputComments(out, phase.getSchema().getVersion());
-    for (final CanvasDataSchemaTable table : phase.getSchema().getSchema().values()) {
+    for (final DataSchemaTable table : phase.getSchema().getSchema().values()) {
       final String tableName = table.getTableName();
       final String stageTableName = table.getTableName() + "_stage";
       final String joinField = table.getColumns().get(0).getName();

@@ -1,4 +1,4 @@
-package edu.harvard.data.client.canvas.api;
+package edu.harvard.data.client.canvas;
 
 import java.io.IOException;
 import java.util.List;
@@ -8,15 +8,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
+import edu.harvard.data.client.DataClient;
 import edu.harvard.data.client.DataConfigurationException;
+import edu.harvard.data.client.schema.DataSchema;
+import edu.harvard.data.client.schema.UnexpectedApiResponseException;
 
-public class CanvasApiClient {
-
-  private final RestUtils rest;
+public class CanvasApiClient extends DataClient {
+  private final CanvasRestUtils rest;
   private final TypeFactory typeFactory;
 
   public CanvasApiClient(final String host, final String key, final String secret) {
-    this.rest = new RestUtils(host, key, secret);
+    this.rest = new CanvasRestUtils(host, key, secret);
     this.typeFactory = new ObjectMapper().getTypeFactory();
   }
 
@@ -56,7 +58,8 @@ public class CanvasApiClient {
     return history;
   }
 
-  public CanvasDataSchema getSchema(final String version)
+  @Override
+  public DataSchema getSchema(final String version)
       throws DataConfigurationException, UnexpectedApiResponseException, IOException {
     final JavaType type = typeFactory.constructType(CanvasDataSchema.class);
     final CanvasDataSchema schema = rest.makeApiCall("/api/schema/" + version, 200, type);

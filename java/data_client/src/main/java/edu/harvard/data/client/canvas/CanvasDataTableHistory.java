@@ -1,4 +1,4 @@
-package edu.harvard.data.client.canvas.api;
+package edu.harvard.data.client.canvas;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +26,7 @@ public class CanvasDataTableHistory {
     return Collections.unmodifiableList(history);
   }
 
-  public void setRestUtils(final RestUtils rest) {
+  public void setRestUtils(final CanvasRestUtils rest) {
     for (final CanvasDataHistoricalDump dump : history) {
       dump.setRestUtils(rest);
     }
