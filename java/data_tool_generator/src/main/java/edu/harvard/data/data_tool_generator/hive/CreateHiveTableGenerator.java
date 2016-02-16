@@ -53,7 +53,7 @@ public class CreateHiveTableGenerator {
   private void generateCreateStatements(final PrintStream out, final SchemaPhase phaseInput,
       final String prefix, final boolean ignoreOwner, final String format) {
     if (phaseInput != null) {
-      final Map<String, DataSchemaTable> inTables = phaseInput.getSchema().getSchema();
+      final Map<String, DataSchemaTable> inTables = phaseInput.getSchema().getTables();
       final List<String> inTableKeys = new ArrayList<String>(inTables.keySet());
       Collections.sort(inTableKeys);
 
@@ -87,7 +87,7 @@ public class CreateHiveTableGenerator {
     final List<DataSchemaColumn> columns = table.getColumns();
     for (int i = 0; i < columns.size(); i++) {
       final DataSchemaColumn column = columns.get(i);
-      out.print("    " + column.getName() + " " + column.getHiveType());
+      out.print("    " + column.getName() + " " + column.getType().getHiveType());
       if (i < columns.size() - 1) {
         out.println(",");
       } else {

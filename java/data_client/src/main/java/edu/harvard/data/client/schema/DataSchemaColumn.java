@@ -1,19 +1,29 @@
 package edu.harvard.data.client.schema;
 
-public interface DataSchemaColumn {
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-  String getName();
+public abstract class DataSchemaColumn {
 
-  String getHiveType();
+  @JsonIgnore
+  protected boolean newlyGenerated;
 
-  DataSchemaType getType();
+  public abstract String getName();
 
-  boolean getNewGenerated();
+  public abstract String getDescription();
 
-  String getDescription();
+  public abstract DataSchemaType getType();
 
-  String getRedshiftType();
+  public abstract Integer getLength();
 
-  void setNewGenerated(boolean flag);
+  protected DataSchemaColumn(final boolean newlyGenerated) {
+    this.newlyGenerated = newlyGenerated;
+  }
 
+  public boolean getNewlyGenerated() {
+    return newlyGenerated;
+  }
+
+  public void setNewlyGenerated(final boolean newlyGenerated) {
+    this.newlyGenerated = newlyGenerated;
+  }
 }

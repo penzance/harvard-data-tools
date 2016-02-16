@@ -83,7 +83,7 @@ public class JavaBindingGenerator {
     final File srcDir = tableVersion.getJavaSourceLocation();
     final String classPrefix = tableVersion.getPrefix();
     final String version = tableVersion.getSchema().getVersion();
-    final Map<String, DataSchemaTable> tables = tableVersion.getSchema().getSchema();
+    final Map<String, DataSchemaTable> tables = tableVersion.getSchema().getTables();
 
     // Create the base directory where all of the classes will be generated
     log.info("Generating tables in " + srcDir);

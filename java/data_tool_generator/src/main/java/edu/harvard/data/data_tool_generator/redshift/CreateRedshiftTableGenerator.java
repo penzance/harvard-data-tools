@@ -30,12 +30,13 @@ public class CreateRedshiftTableGenerator {
   }
 
   private void generateCreateTableFile(final PrintStream out, final SchemaPhase phase) {
-    for (final DataSchemaTable table : phase.getSchema().getSchema().values()) {
+    for (final DataSchemaTable table : phase.getSchema().getTables().values()) {
       out.println("CREATE TABLE " + table.getTableName() + "(");
       final List<DataSchemaColumn> columns = table.getColumns();
       for (int i=0; i<columns.size(); i++) {
         final DataSchemaColumn column = columns.get(i);
-        out.print("    " + column.getName() + " " + column.getRedshiftType());
+        final String redshiftType = column.getType().getRedshiftType(column.getLength());
+        out.print("    " + column.getName() + " " + redshiftType);
         if (i < columns.size() - 1) {
           out.println(",");
         } else {

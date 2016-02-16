@@ -34,7 +34,7 @@ public class HDFSCopyUnmodifiedTableGenerator {
   }
 
   private void copyUnmodifiedFiles(final PrintStream out, final SchemaPhase phase) {
-    final Map<String, DataSchemaTable> schema = phase.getSchema().getSchema();
+    final Map<String, DataSchemaTable> schema = phase.getSchema().getTables();
     final List<String> names = new ArrayList<String>(schema.keySet());
     Collections.sort(names);
     for (final String name : names) {

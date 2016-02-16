@@ -4,7 +4,7 @@ import java.util.Map;
 
 public interface DataSchema {
 
-  Map<String, DataSchemaTable> getSchema();
+  Map<String, DataSchemaTable> getTables();
 
   String getVersion();
 

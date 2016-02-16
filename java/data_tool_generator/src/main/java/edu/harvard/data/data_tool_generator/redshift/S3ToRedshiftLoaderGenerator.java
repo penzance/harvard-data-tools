@@ -31,7 +31,7 @@ public class S3ToRedshiftLoaderGenerator {
 
   private void generateRedshiftLoaderFile(final PrintStream out, final SchemaPhase phase) {
     outputComments(out, phase.getSchema().getVersion());
-    for (final DataSchemaTable table : phase.getSchema().getSchema().values()) {
+    for (final DataSchemaTable table : phase.getSchema().getTables().values()) {
       final String tableName = table.getTableName();
       final String stageTableName = table.getTableName() + "_stage";
       final String joinField = table.getColumns().get(0).getName();

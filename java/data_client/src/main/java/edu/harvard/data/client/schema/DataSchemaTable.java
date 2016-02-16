@@ -2,21 +2,40 @@ package edu.harvard.data.client.schema;
 
 import java.util.List;
 
-public interface DataSchemaTable {
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-  boolean hasNewlyGeneratedElements();
+public abstract class DataSchemaTable {
 
-  String getTableName();
+  @JsonIgnore
+  protected boolean newlyGenerated;
 
-  // Java, Hive, etc
-  String getOwner();
+  public abstract String getTableName();
 
-  List<DataSchemaColumn> getColumns();
+  public abstract List<DataSchemaColumn> getColumns();
 
-  boolean getNewGenerated();
+  public abstract TableOwner getOwner();
 
-  void setNewGenerated(boolean flag);
+  public abstract void setOwner(TableOwner owner);
 
-  void setOwner(String owner);
+  protected DataSchemaTable(final boolean newlyGenerated) {
+    this.newlyGenerated = false;
+  }
+
+  public boolean getNewlyGenerated() {
+    return newlyGenerated;
+  }
+
+  public boolean hasNewlyGeneratedElements() {
+    for(final DataSchemaColumn column : getColumns()) {
+      if (column.getNewlyGenerated()) {
+        return true;
+      }
+    }
+    return newlyGenerated;
+  }
+
+  public void setNewlyGenerated(final boolean newlyGenerated) {
+    this.newlyGenerated = newlyGenerated;
+  }
 
 }

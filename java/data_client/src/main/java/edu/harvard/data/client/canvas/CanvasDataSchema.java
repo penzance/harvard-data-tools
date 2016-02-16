@@ -44,7 +44,7 @@ public class CanvasDataSchema implements DataSchema {
   }
 
   @Override
-  public Map<String, DataSchemaTable> getSchema() {
+  public Map<String, DataSchemaTable> getTables() {
     return tables;
   }
 

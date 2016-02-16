@@ -81,7 +81,7 @@ public class ModelClassGenerator {
     out.println("import " + DataTable.class.getName() + ";");
     out.println("import " + TableFormat.class.getName() + ";");
     out.println();
-    if (previousVersion != null && !table.getNewGenerated()) {
+    if (previousVersion != null && !table.getNewlyGenerated()) {
       out.println("import " + previousVersion.getJavaPackage() + "." + previousClassName + ";");
       out.println();
     }
@@ -119,11 +119,11 @@ public class ModelClassGenerator {
   // exists). For example, class ExtendedRequests will have a constructor
   // 'public ExtendedRequests(Requests requests)'
   private void outputPreviousClassConstructor(final PrintStream out) {
-    if (previousClassName != null && !table.getNewGenerated()) {
+    if (previousClassName != null && !table.getNewlyGenerated()) {
       final String previousVar = JavaBindingGenerator.javaVariable(previousClassName);
       out.println("  public " + className + "(" + previousClassName + " " + previousVar + ") {");
       for (final DataSchemaColumn column : table.getColumns()) {
-        if (!column.getNewGenerated()) {
+        if (!column.getNewlyGenerated()) {
           final String variableName = JavaBindingGenerator.javaVariable(column.getName());
           final String methodName = "get" + JavaBindingGenerator.javaClass(variableName, "");
           out.println("    this." + variableName + " = " + previousVar + "." + methodName + "();");
@@ -169,7 +169,7 @@ public class ModelClassGenerator {
       out.println("  }");
       out.println();
       // Generate setters only for new fields
-      if (column.getNewGenerated()) {
+      if (column.getNewlyGenerated()) {
         methodName = "set" + JavaBindingGenerator.javaClass(column.getName(), "");
         JavaBindingGenerator.writeComment(column.getDescription(), 2, out, true);
         out.println("  public void " + methodName + "(" + typeName + " " + variableName + ") {");

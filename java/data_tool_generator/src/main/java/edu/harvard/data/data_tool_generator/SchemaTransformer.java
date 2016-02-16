@@ -90,8 +90,8 @@ public class SchemaTransformer {
 
     phases.get(0).setSchema(schemaCopy.copy());
     for (int i = 1; i < phases.size(); i++) {
-      setNewGeneratedFlags(schemaCopy.getSchema().values(), false);
-      for (final DataSchemaTable table : schemaCopy.getSchema().values()) {
+      setNewGeneratedFlags(schemaCopy.getTables().values(), false);
+      for (final DataSchemaTable table : schemaCopy.getTables().values()) {
         table.setOwner(null);
       }
       extendTableSchema(schemaCopy, transformationResources[i - 1]);
@@ -109,17 +109,17 @@ public class SchemaTransformer {
     final ClassLoader classLoader = this.getClass().getClassLoader();
     Map<String, DataSchemaTable> updates;
     try (final InputStream in = classLoader.getResourceAsStream(jsonResource)) {
-      updates = jsonMapper.readValue(in, CanvasDataSchema.class).getSchema();
+      updates = jsonMapper.readValue(in, CanvasDataSchema.class).getTables();
     }
     if (updates != null) {
       // Track tables and columns that were added in this update
       setNewGeneratedFlags(updates.values(), true);
       for (final String tableName : updates.keySet()) {
         final DataSchemaTable newTable = updates.get(tableName);
-        if (!schema.getSchema().containsKey(tableName)) {
-          schema.getSchema().put(tableName, newTable);
+        if (!schema.getTables().containsKey(tableName)) {
+          schema.getTables().put(tableName, newTable);
         } else {
-          final DataSchemaTable originalTable = schema.getSchema().get(tableName);
+          final DataSchemaTable originalTable = schema.getTables().get(tableName);
           originalTable.getColumns().addAll(newTable.getColumns());
           originalTable.setOwner(newTable.getOwner());
         }
@@ -131,9 +131,9 @@ public class SchemaTransformer {
   private void setNewGeneratedFlags(final Collection<DataSchemaTable> tableSet,
       final boolean flag) {
     for (final DataSchemaTable table : tableSet) {
-      table.setNewGenerated(flag);
+      table.setNewlyGenerated(flag);
       for (final DataSchemaColumn column : table.getColumns()) {
-        column.setNewGenerated(flag);
+        column.setNewlyGenerated(flag);
       }
     }
   }

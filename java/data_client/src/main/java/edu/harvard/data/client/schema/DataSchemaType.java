@@ -77,4 +77,16 @@ public enum DataSchemaType {
     }
   }
 
+  public String getRedshiftType(final Integer length) {
+    String typeString = getRedshiftType();
+    if (typeString.equals("VARCHAR")) {
+      if (length == null || length == 0) {
+        typeString += "(256)";
+      } else {
+        typeString += "(" + length + ")";
+      }
+    }
+    return typeString;
+  }
+
 }

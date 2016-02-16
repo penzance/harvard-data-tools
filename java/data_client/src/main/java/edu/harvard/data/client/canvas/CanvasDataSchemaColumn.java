@@ -3,14 +3,13 @@ package edu.harvard.data.client.canvas;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import edu.harvard.data.client.schema.DataSchemaColumn;
 import edu.harvard.data.client.schema.DataSchemaType;
 import edu.harvard.data.client.schema.SchemaDifference;
 
-public class CanvasDataSchemaColumn implements DataSchemaColumn {
+public class CanvasDataSchemaColumn extends DataSchemaColumn {
 
   private final String name;
   private final String description;
@@ -25,9 +24,6 @@ public class CanvasDataSchemaColumn implements DataSchemaColumn {
   private final String seeAlso;
   private final Boolean sortKey; // true for requests.timestamp
 
-  @JsonIgnore
-  private boolean newGenerated;
-
   @JsonCreator
   public CanvasDataSchemaColumn(@JsonProperty("name") final String name,
       @JsonProperty("description") final String description,
@@ -37,6 +33,7 @@ public class CanvasDataSchemaColumn implements DataSchemaColumn {
       @JsonProperty("sortKey") final Boolean sortKey,
       @JsonProperty("descripton") final String descripton,
       @JsonProperty("see_also") final String seeAlso) {
+    super(false);
     this.name = name;
     this.description = description;
     this.sortKey = sortKey;
@@ -46,10 +43,10 @@ public class CanvasDataSchemaColumn implements DataSchemaColumn {
     this.length = length;
     this.snowflake = snowflake;
     this.seeAlso = seeAlso;
-    this.newGenerated = false;
   }
 
   public CanvasDataSchemaColumn(final CanvasDataSchemaColumn original) {
+    super(original.newlyGenerated);
     this.name = cleanColumnName(original.name);
     this.description = original.description;
     this.descripton = original.descripton;
@@ -59,7 +56,6 @@ public class CanvasDataSchemaColumn implements DataSchemaColumn {
     this.snowflake = original.snowflake;
     this.seeAlso = original.seeAlso;
     this.sortKey = original.sortKey;
-    this.newGenerated = original.newGenerated;
   }
 
   private String cleanColumnName(final String name) {
@@ -95,7 +91,8 @@ public class CanvasDataSchemaColumn implements DataSchemaColumn {
     return dimension;
   }
 
-  public int getLength() {
+  @Override
+  public Integer getLength() {
     return length;
   }
 
@@ -109,34 +106,6 @@ public class CanvasDataSchemaColumn implements DataSchemaColumn {
 
   public Boolean getSortKey() {
     return sortKey;
-  }
-
-  @Override
-  public String getRedshiftType() {
-    String typeString = type.getRedshiftType();
-    if (typeString.equals("VARCHAR")) {
-      if (length == 0) {
-        typeString += "(256)";
-      } else {
-        typeString += "(" + length + ")";
-      }
-    }
-    return typeString;
-  }
-
-  @Override
-  public String getHiveType() {
-    return type.getHiveType();
-  }
-
-  @Override
-  public boolean getNewGenerated() {
-    return newGenerated;
-  }
-
-  @Override
-  public void setNewGenerated(final boolean newGenerated) {
-    this.newGenerated = newGenerated;
   }
 
   public void calculateDifferences(final String tableName, final CanvasDataSchemaColumn column2, final List<SchemaDifference> differences) {

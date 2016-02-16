@@ -6,14 +6,14 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import edu.harvard.data.client.schema.DataSchemaColumn;
 import edu.harvard.data.client.schema.DataSchemaTable;
 import edu.harvard.data.client.schema.SchemaDifference;
+import edu.harvard.data.client.schema.TableOwner;
 
-public class CanvasDataSchemaTable implements DataSchemaTable {
+public class CanvasDataSchemaTable extends DataSchemaTable {
 
   public enum DataWarehouseType {
     dimension, fact, both
@@ -29,10 +29,8 @@ public class CanvasDataSchemaTable implements DataSchemaTable {
   private final String seeAlso;
   private final String databasePath; // non-null in requests
   private final String originalTable; // non-null in requests
-  private String owner;
+  private TableOwner owner;
 
-  @JsonIgnore
-  private boolean newGenerated;
 
   @JsonCreator
   public CanvasDataSchemaTable(@JsonProperty("dw_type") final DataWarehouseType dwType,
@@ -44,7 +42,8 @@ public class CanvasDataSchemaTable implements DataSchemaTable {
       @JsonProperty("data_base_path") final String databasePath,
       @JsonProperty("original_table") final String originalTable,
       @JsonProperty("see_also") final String seeAlso,
-      @JsonProperty("owner") final String owner) {
+      @JsonProperty("owner") final TableOwner owner) {
+    super(false);
     this.dwType = dwType;
     this.description = description;
     this.incremental = incremental;
@@ -53,7 +52,6 @@ public class CanvasDataSchemaTable implements DataSchemaTable {
     this.databasePath = databasePath;
     this.originalTable = originalTable;
     this.seeAlso = seeAlso;
-    this.setNewGenerated(false);
     this.owner = owner;
     this.columns = new ArrayList<DataSchemaColumn>();
     for (final CanvasDataSchemaColumn column : columns) {
@@ -62,6 +60,7 @@ public class CanvasDataSchemaTable implements DataSchemaTable {
   }
 
   public CanvasDataSchemaTable(final CanvasDataSchemaTable original) {
+    super(original.newlyGenerated);
     this.dwType = original.dwType;
     this.description = original.description;
     this.incremental = original.incremental;
@@ -70,7 +69,6 @@ public class CanvasDataSchemaTable implements DataSchemaTable {
     this.seeAlso = original.seeAlso;
     this.databasePath = original.databasePath;
     this.originalTable = original.originalTable;
-    this.setNewGenerated(original.newGenerated);
     this.owner = original.owner;
     this.columns = new ArrayList<DataSchemaColumn>();
     for (final DataSchemaColumn column : original.columns) {
@@ -201,32 +199,12 @@ public class CanvasDataSchemaTable implements DataSchemaTable {
   }
 
   @Override
-  public boolean getNewGenerated() {
-    return newGenerated;
-  }
-
-  @Override
-  public boolean hasNewlyGeneratedElements() {
-    for(final DataSchemaColumn column : columns) {
-      if (column.getNewGenerated()) {
-        return true;
-      }
-    }
-    return newGenerated;
-  }
-
-  @Override
-  public void setNewGenerated(final boolean newGenerated) {
-    this.newGenerated = newGenerated;
-  }
-
-  @Override
-  public String getOwner() {
+  public TableOwner getOwner() {
     return owner;
   }
 
   @Override
-  public void setOwner(final String owner) {
+  public void setOwner(final TableOwner owner) {
     this.owner = owner;
   }
 }
