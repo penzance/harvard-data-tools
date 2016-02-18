@@ -1,4 +1,4 @@
-package edu.harvard.canvas_data.aws_data_tools;
+package edu.harvard.canvas_data.aws_data_tools.canvas;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,6 +19,8 @@ import org.apache.logging.log4j.Logger;
 import com.amazonaws.services.s3.model.S3ObjectId;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 
+import edu.harvard.canvas_data.aws_data_tools.DumpInfo;
+import edu.harvard.canvas_data.aws_data_tools.VerificationException;
 import edu.harvard.data.client.AwsUtils;
 import edu.harvard.data.client.DataTable;
 import edu.harvard.data.client.TableFactory;
@@ -27,7 +29,7 @@ import edu.harvard.data.client.canvas.phase0.CanvasTable;
 import edu.harvard.data.client.io.TableReader;
 import edu.harvard.data.client.io.TableWriter;
 
-public class Verifier {
+public class Phase0Verifier implements Verifier {
 
   private static final Logger log = LogManager.getLogger();
 
@@ -36,11 +38,28 @@ public class Verifier {
   private final TableFormat format;
   private final TableFactory factory;
   private final AwsUtils aws;
+  private final String dumpId;
 
-  public Verifier(final AwsUtils aws, final TableFactory factory, final TableFormat format) {
+  public Phase0Verifier(final String dumpId, final AwsUtils aws, final TableFactory factory, final TableFormat format) {
+    this.dumpId = dumpId;
     this.aws = aws;
     this.factory = factory;
     this.format = format;
+  }
+
+  @Override
+  public void verify() throws VerificationException, IOException {
+    final DumpInfo info = DumpInfo.find(dumpId);
+    if (!info.getVerified()) {
+      log.info("Verifying dump sequence " + info.getSequence() + " at " + info.getS3Location());
+      final S3ObjectId dumpObj = AwsUtils.key(info.getBucket(), info.getKey());
+      final long errors = verifyDump(dumpObj);
+      if (errors > 0) {
+        throw new VerificationException("Encountered " + errors + " errors when verifying dump at " + dumpObj);
+      }
+      info.setVerified(true);
+      info.save();
+    }
   }
 
   public long verifyDump(final S3ObjectId dumpObj) throws IOException {
