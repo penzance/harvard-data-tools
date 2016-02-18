@@ -1,4 +1,4 @@
-package edu.harvard.data.hadoop.requests;
+package edu.harvard.data.hadoop.phase1;
 
 import java.io.IOException;
 import java.net.URI;
@@ -19,6 +19,7 @@ import edu.harvard.data.client.FormatLibrary;
 import edu.harvard.data.client.FormatLibrary.Format;
 import edu.harvard.data.client.TableFormat;
 import edu.harvard.data.client.canvas.phase0.Requests;
+import edu.harvard.data.hadoop.HadoopJob;
 
 public class RequestPerFileJob extends HadoopJob {
 

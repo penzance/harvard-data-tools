@@ -1,4 +1,4 @@
-package edu.harvard.data.hadoop.requests;
+package edu.harvard.data.hadoop;
 
 import java.io.IOException;
 import java.net.URI;
