@@ -1,9 +1,9 @@
-package edu.harvard.data.aws_data_tools.canvas.phase1;
+package edu.harvard.data.data_tools.canvas.phase1;
 
 import java.io.IOException;
 
-import edu.harvard.data.aws_data_tools.VerificationException;
-import edu.harvard.data.aws_data_tools.Verifier;
+import edu.harvard.data.data_tools.VerificationException;
+import edu.harvard.data.data_tools.Verifier;
 
 public class CanvasPhase1Verifier implements Verifier {
 

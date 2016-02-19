@@ -1,4 +1,4 @@
-package edu.harvard.data.aws_data_tools.canvas.phase0;
+package edu.harvard.data.data_tools.canvas.phase0;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,9 +19,6 @@ import org.apache.logging.log4j.Logger;
 import com.amazonaws.services.s3.model.S3ObjectId;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 
-import edu.harvard.data.aws_data_tools.DumpInfo;
-import edu.harvard.data.aws_data_tools.VerificationException;
-import edu.harvard.data.aws_data_tools.Verifier;
 import edu.harvard.data.client.AwsUtils;
 import edu.harvard.data.client.DataTable;
 import edu.harvard.data.client.TableFactory;
@@ -29,6 +26,9 @@ import edu.harvard.data.client.TableFormat;
 import edu.harvard.data.client.canvas.phase0.CanvasTable;
 import edu.harvard.data.client.io.TableReader;
 import edu.harvard.data.client.io.TableWriter;
+import edu.harvard.data.data_tools.DumpInfo;
+import edu.harvard.data.data_tools.VerificationException;
+import edu.harvard.data.data_tools.Verifier;
 
 public class CanvasPhase0Verifier implements Verifier {
 

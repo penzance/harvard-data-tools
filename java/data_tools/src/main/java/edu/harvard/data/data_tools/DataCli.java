@@ -1,4 +1,4 @@
-package edu.harvard.data.aws_data_tools;
+package edu.harvard.data.data_tools;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,15 +13,15 @@ import org.kohsuke.args4j.spi.SubCommand;
 import org.kohsuke.args4j.spi.SubCommandHandler;
 import org.kohsuke.args4j.spi.SubCommands;
 
-import edu.harvard.data.aws_data_tools.canvas.CanvasDataCommandGroup;
 import edu.harvard.data.client.DataConfiguration;
 import edu.harvard.data.client.DataConfigurationException;
 import edu.harvard.data.client.schema.UnexpectedApiResponseException;
+import edu.harvard.data.data_tools.canvas.CanvasDataCommandGroup;
 
 public class DataCli {
   private static final Logger log = LogManager.getLogger();
 
-  @Argument(handler = SubCommandHandler.class, usage = "Top-level command.", metaVar = "data_set")
+  @Argument(handler = SubCommandHandler.class, usage = "Top-level command.")
   @SubCommands({ @SubCommand(name = "canvas", impl = CanvasDataCommandGroup.class) })
   public Command cmd;
 
@@ -32,7 +32,7 @@ public class DataCli {
     try {
       cli.parseArgument(args);
     } catch (final CmdLineException e) {
-      log.fatal(e);
+      log.fatal("Command line exception", e);
       printUsage(cli);
       System.exit(ReturnStatus.ARGUMENT_ERROR.getCode());
     }

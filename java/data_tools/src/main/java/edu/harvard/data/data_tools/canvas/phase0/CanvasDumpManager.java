@@ -1,4 +1,4 @@
-package edu.harvard.data.aws_data_tools.canvas.phase0;
+package edu.harvard.data.data_tools.canvas.phase0;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,10 +13,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
 
-import edu.harvard.data.aws_data_tools.DumpInfo;
-import edu.harvard.data.aws_data_tools.FatalError;
-import edu.harvard.data.aws_data_tools.ReturnStatus;
-import edu.harvard.data.aws_data_tools.VerificationException;
 import edu.harvard.data.client.AwsUtils;
 import edu.harvard.data.client.DataConfiguration;
 import edu.harvard.data.client.DataConfigurationException;
@@ -26,6 +22,10 @@ import edu.harvard.data.client.canvas.CanvasDataDump;
 import edu.harvard.data.client.canvas.CanvasDataFile;
 import edu.harvard.data.client.canvas.CanvasDataSchema;
 import edu.harvard.data.client.schema.UnexpectedApiResponseException;
+import edu.harvard.data.data_tools.DumpInfo;
+import edu.harvard.data.data_tools.FatalError;
+import edu.harvard.data.data_tools.ReturnStatus;
+import edu.harvard.data.data_tools.VerificationException;
 
 public class CanvasDumpManager {
 

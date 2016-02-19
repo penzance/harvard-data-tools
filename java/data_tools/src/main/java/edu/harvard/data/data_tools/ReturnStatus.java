@@ -1,4 +1,4 @@
-package edu.harvard.data.aws_data_tools;
+package edu.harvard.data.data_tools;
 
 public enum ReturnStatus {
   OK (0, "Application returned correctly"),

@@ -1,4 +1,4 @@
-package edu.harvard.data.aws_data_tools.canvas.phase1;
+package edu.harvard.data.data_tools.canvas.phase1;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -17,13 +17,13 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
-import edu.harvard.data.aws_data_tools.HadoopJob;
 import edu.harvard.data.client.AwsUtils;
 import edu.harvard.data.client.FormatLibrary;
 import edu.harvard.data.client.FormatLibrary.Format;
 import edu.harvard.data.client.TableFormat;
 import edu.harvard.data.client.canvas.phase0.Requests;
 import edu.harvard.data.client.canvas.phase1.Phase1RequestsPerPage;
+import edu.harvard.data.data_tools.HadoopJob;
 
 public class RequestPerPageJob extends HadoopJob {
 

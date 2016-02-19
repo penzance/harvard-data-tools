@@ -1,4 +1,4 @@
-package edu.harvard.data.aws_data_tools.canvas;
+package edu.harvard.data.data_tools.canvas;
 
 import java.io.IOException;
 import java.util.List;
@@ -7,9 +7,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.kohsuke.args4j.Argument;
 
-import edu.harvard.data.aws_data_tools.Command;
-import edu.harvard.data.aws_data_tools.DumpInfo;
-import edu.harvard.data.aws_data_tools.ReturnStatus;
 import edu.harvard.data.client.DataClient;
 import edu.harvard.data.client.DataConfiguration;
 import edu.harvard.data.client.DataConfigurationException;
@@ -17,6 +14,9 @@ import edu.harvard.data.client.canvas.CanvasApiClient;
 import edu.harvard.data.client.canvas.CanvasDataSchema;
 import edu.harvard.data.client.schema.SchemaDifference;
 import edu.harvard.data.client.schema.UnexpectedApiResponseException;
+import edu.harvard.data.data_tools.Command;
+import edu.harvard.data.data_tools.DumpInfo;
+import edu.harvard.data.data_tools.ReturnStatus;
 
 public class CanvasCompareSchemasCommand implements Command {
 

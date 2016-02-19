@@ -4,13 +4,13 @@ import subprocess
 import sys
 
 CURRENT_SCHEMA = os.environ['CANVAS_DATA_SCHEMA_VERSION']
-AWS_DATA_TOOLS_JAR_FILE = os.environ['AWS_DATA_TOOLS_JAR']
+GENERATED_CODE_DIR = os.environ['HARVARD_DATA_GENERATED_OUTPUT']
 SECURE_PROPERTIES_LOCATION = os.environ['SECURE_PROPERTIES_LOCATION']
 RESULT_METADATA = os.environ['CANVAS_DATA_RESULT_FILE']
 
-MAIN_CLASS = 'edu.harvard.canvas_data.aws_data_tools.cli.CanvasDataCli'
-CLASSPATH = "{0}:{1}".format(
-        AWS_DATA_TOOLS_JAR_FILE,
+MAIN_CLASS = 'edu.harvard.data.data_tools.DataCli'
+CLASSPATH = "{0}/data_tools.jar:{1}".format(
+        GENERATED_CODE_DIR,
         SECURE_PROPERTIES_LOCATION
     )
 
@@ -26,7 +26,7 @@ def bail(message):
     print message
 
 def download_and_verify():
-    status = run_command(['download', RESULT_METADATA])
+    status = run_command(['canvas', 'download', RESULT_METADATA])
     if status != 0:
         bail('Failed to download dump')
         return status
@@ -36,12 +36,12 @@ def download_and_verify():
 
     dump_id = download_result['DUMP_ID']
 
-    status = run_command(['compareschemas', dump_id, CURRENT_SCHEMA])
+    status = run_command(['canvas', 'compareschemas', dump_id, CURRENT_SCHEMA])
     if status != 0:
         bail('Failed on schema check')
         return status
 
-    status = run_command(['verify', dump_id])
+    status = run_command(['canvas', 'verify', '0', '-i', dump_id])
     if status != 0:
         bail('Failed to verify dump')
         return status
