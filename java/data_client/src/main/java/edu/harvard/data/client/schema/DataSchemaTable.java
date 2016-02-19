@@ -18,7 +18,7 @@ public abstract class DataSchemaTable {
   public abstract void setOwner(TableOwner owner);
 
   protected DataSchemaTable(final boolean newlyGenerated) {
-    this.newlyGenerated = false;
+    this.newlyGenerated = newlyGenerated;
   }
 
   public boolean getNewlyGenerated() {

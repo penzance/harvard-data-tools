@@ -58,7 +58,6 @@ public class CanvasDataGenerator {
     final SchemaTransformer transformer = new SchemaTransformer(3);
     transformer.setPrefixes("", "Phase1", "Phase2");
     transformer.setSchemas(schema, PHASE_ONE_ADDITIONS_JSON, PHASE_TWO_ADDITIONS_JSON);
-    // transformer.setHdfsDirectories("PHASE0_DIR", "PHASE1_DIR", "PHASE2_DIR");
     transformer.setHdfsDirectories(HDFS_PHASE_0_DIR, HDFS_PHASE_1_DIR, HDFS_PHASE_2_DIR);
 
     // Figure out the Java directory and package structure

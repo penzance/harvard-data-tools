@@ -22,7 +22,7 @@ public class CreateRedshiftTableGenerator {
   }
 
   public void generate() throws IOException {
-    final File createTableFile = new File(dir, "canvas_create_redshift_tables.sql");
+    final File createTableFile = new File(dir, "create_redshift_tables.sql");
 
     try (final PrintStream out = new PrintStream(new FileOutputStream(createTableFile))) {
       generateCreateTableFile(out, schemaVersions.getPhase(2));

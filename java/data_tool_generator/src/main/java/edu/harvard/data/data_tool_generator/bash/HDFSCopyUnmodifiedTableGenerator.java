@@ -24,11 +24,11 @@ public class HDFSCopyUnmodifiedTableGenerator {
 
   public void generate() throws IOException {
     try (final PrintStream out = new PrintStream(
-        new FileOutputStream(new File(dir, "copy_unmodified_files_phase_1.sh")))) {
+        new FileOutputStream(new File(dir, "phase_1_copy_unmodified_files.sh")))) {
       copyUnmodifiedFiles(out, schemaVersions.getPhase(1));
     }
     try (final PrintStream out = new PrintStream(
-        new FileOutputStream(new File(dir, "copy_unmodified_files_phase_2.sh")))) {
+        new FileOutputStream(new File(dir, "phase_2_copy_unmodified_files.sh")))) {
       copyUnmodifiedFiles(out, schemaVersions.getPhase(2));
     }
   }

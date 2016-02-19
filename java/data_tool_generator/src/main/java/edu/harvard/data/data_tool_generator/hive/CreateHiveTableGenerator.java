@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.client.schema.DataSchemaColumn;
 import edu.harvard.data.client.schema.DataSchemaTable;
+import edu.harvard.data.client.schema.TableOwner;
 import edu.harvard.data.data_tool_generator.SchemaPhase;
 import edu.harvard.data.data_tool_generator.SchemaTransformer;
 
@@ -30,24 +31,37 @@ public class CreateHiveTableGenerator {
   }
 
   public void generate() throws IOException {
-    final File createTableFile = new File(dir, "create_tables.q");
+    final File phase1File = new File(dir, "phase_1_create_tables.sh");
+    final File phase2File = new File(dir, "phase_2_create_tables.sh");
 
-    try (final PrintStream out = new PrintStream(new FileOutputStream(createTableFile))) {
-      generateCreateTablesFile(out, schemaVersions);
+
+    try (final PrintStream out = new PrintStream(new FileOutputStream(phase1File))) {
+      log.info("Creating Hive phase_1_create_tables.sh file in " + dir);
+      generateCreateTablesFile(out, schemaVersions.getPhase(0), schemaVersions.getPhase(1),
+          "SEQUENCEFILE");
+    }
+    try (final PrintStream out = new PrintStream(new FileOutputStream(phase2File))) {
+      log.info("Creating Hive phase_2_create_tables.sh file in " + dir);
+      generateCreateTablesFile(out, schemaVersions.getPhase(1), schemaVersions.getPhase(2),
+          "TEXTFILE");
     }
   }
 
-  // TODO: Generate phase 1 and phase 2 tables separately. Drop the phase 1 tables
-  // before creating the phase 2. Maybe that means we can just have in_ and out_ rather
-  // than needing the phase_1 or phase_2 prefix?
-  private void generateCreateTablesFile(final PrintStream out,
-      final SchemaTransformer transformer) {
-    log.info("Creating Hive create_tables.q file");
+  private void generateCreateTablesFile(final PrintStream out, final SchemaPhase input,
+      final SchemaPhase output, final String inputFormat) {
+    generateDropStatements(out, "in_", input.getSchema().getTables());
+    out.println();
+    generateDropStatements(out, "out_", output.getSchema().getTables());
+    out.println();
+    generateCreateStatements(out, input, "in_", true, inputFormat);
+    generateCreateStatements(out, output, "out_", false, "TEXTFILE");
+  }
 
-    generateCreateStatements(out, transformer.getPhase(0), "phase_1_in_", true, "SEQUENCEFILE");
-    generateCreateStatements(out, transformer.getPhase(1), "phase_1_out_", false, "TEXTFILE");
-    //    generateCreateStatements(out, transformer.getPhase(1), "phase_2_in_", true, "TEXTFILE");
-    //    generateCreateStatements(out, transformer.getPhase(2), "phase_2_out_", false, "TEXTFILE");
+  private void generateDropStatements(final PrintStream out, final String prefix,
+      final Map<String, DataSchemaTable> tables) {
+    for (final DataSchemaTable table : tables.values()) {
+      out.println("hive \"DROP TABLE IF EXISTS " + prefix + table.getTableName() + " PURGE;\"");
+    }
   }
 
   private void generateCreateStatements(final PrintStream out, final SchemaPhase phaseInput,
@@ -59,27 +73,22 @@ public class CreateHiveTableGenerator {
 
       for (final String tableKey : inTableKeys) {
         final DataSchemaTable table = inTables.get(tableKey);
-        if (ignoreOwner || table.getOwner() == null || table.getOwner().equals("hive")) {
+        if (ignoreOwner || (table.getOwner() != null && table.getOwner().equals(TableOwner.hive))) {
           final String tableName = prefix + table.getTableName();
-          dropTable(out, tableName);
           createTable(out, tableName, table, format, phaseInput.getHDFSDir());
         }
       }
     }
   }
 
-  private void dropTable(final PrintStream out, final String tableName) {
-    out.println("DROP TABLE IF EXISTS " + tableName + " PURGE;");
-  }
-
   private void createTable(final PrintStream out, final String tableName,
       final DataSchemaTable table, final String format, final String locationVar) {
-    out.println("CREATE EXTERNAL TABLE " + tableName + " (");
+    out.println("hive \"CREATE EXTERNAL TABLE " + tableName + " (");
     listFields(out, table);
     out.println(")");
     out.println("  ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' LINES TERMINATED By '\\n'");
     out.println("  STORED AS " + format);
-    out.println("  LOCATION '${" + locationVar + "}/" + table.getTableName() + "/';");
+    out.println("  LOCATION '${" + locationVar + "}/" + table.getTableName() + "/';\"");
     out.println();
   }
 

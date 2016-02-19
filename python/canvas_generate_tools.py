@@ -48,7 +48,7 @@ def clean_up_files():
     )
     os.rename(
         "{0}/target/canvas_data_hadoop-1.0.0.jar".format(CANVAS_DATA_HADOOP_DIR),
-        "{0}/canvas_data_hadoop.jar".format(GENERATED_CODE_DIR)
+        "{0}/hadoop_jobs.jar".format(GENERATED_CODE_DIR)
     )
     shutil.rmtree("{0}/java".format(GENERATED_CODE_DIR))
 

@@ -26,8 +26,8 @@ public class HiveQueryManifestGenerator {
   }
 
   public void generate() throws IOException {
-    final File phase1File = new File(dir, "canvas_phase_1_hive.sh");
-    final File phase2File = new File(dir, "canvas_phase_2_hive.sh");
+    final File phase1File = new File(dir, "phase_1_hive.sh");
+    final File phase2File = new File(dir, "phase_2_hive.sh");
 
     log.info("Phase 1 file: "+ phase1File);
     log.info("Phase 2 file: "+ phase2File);
