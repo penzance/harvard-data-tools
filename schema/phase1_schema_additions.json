@@ -1,4 +1,4 @@
-{ "schema": 
+{ "tables": 
   { "requests": {
       "owner": "java",
       "columns" : [ 

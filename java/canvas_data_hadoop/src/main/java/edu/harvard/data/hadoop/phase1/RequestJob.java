@@ -19,10 +19,10 @@ import edu.harvard.data.client.AwsUtils;
 import edu.harvard.data.client.FormatLibrary;
 import edu.harvard.data.client.FormatLibrary.Format;
 import edu.harvard.data.client.TableFormat;
-import edu.harvard.data.client.analysis_utils.UserAgentParser;
 import edu.harvard.data.client.canvas.phase0.Requests;
 import edu.harvard.data.client.canvas.phase1.Phase1Requests;
 import edu.harvard.data.hadoop.HadoopJob;
+import edu.harvard.data.hadoop.utils.UserAgentParser;
 import net.sf.uadetector.ReadableUserAgent;
 
 public class RequestJob extends HadoopJob {

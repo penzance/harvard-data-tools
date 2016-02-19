@@ -29,13 +29,12 @@ public class CanvasDataSchemaTable extends DataSchemaTable {
   private final String seeAlso;
   private final String databasePath; // non-null in requests
   private final String originalTable; // non-null in requests
-  private TableOwner owner;
 
 
   @JsonCreator
   public CanvasDataSchemaTable(@JsonProperty("dw_type") final DataWarehouseType dwType,
       @JsonProperty("description") final String description,
-      @JsonProperty("columns") final List<CanvasDataSchemaColumn> columns,
+      @JsonProperty("columns") final List<CanvasDataSchemaColumn> columnList,
       @JsonProperty("incremental") final boolean incremental,
       @JsonProperty("tableName") final String tableName,
       @JsonProperty("hints") final Map<String, String> hints,
@@ -43,7 +42,7 @@ public class CanvasDataSchemaTable extends DataSchemaTable {
       @JsonProperty("original_table") final String originalTable,
       @JsonProperty("see_also") final String seeAlso,
       @JsonProperty("owner") final TableOwner owner) {
-    super(false);
+    super(false, owner);
     this.dwType = dwType;
     this.description = description;
     this.incremental = incremental;
@@ -54,13 +53,15 @@ public class CanvasDataSchemaTable extends DataSchemaTable {
     this.seeAlso = seeAlso;
     this.owner = owner;
     this.columns = new ArrayList<DataSchemaColumn>();
-    for (final CanvasDataSchemaColumn column : columns) {
-      this.columns.add(new CanvasDataSchemaColumn(column));
+    if (columnList != null) {
+      for (final CanvasDataSchemaColumn column : columnList) {
+        this.columns.add(column);
+      }
     }
   }
 
   public CanvasDataSchemaTable(final CanvasDataSchemaTable original) {
-    super(original.newlyGenerated);
+    super(original.newlyGenerated, original.owner);
     this.dwType = original.dwType;
     this.description = original.description;
     this.incremental = original.incremental;
@@ -196,15 +197,5 @@ public class CanvasDataSchemaTable extends DataSchemaTable {
 
   public void setColumns(final ArrayList<DataSchemaColumn> newColumns) {
     this.columns = newColumns;
-  }
-
-  @Override
-  public TableOwner getOwner() {
-    return owner;
-  }
-
-  @Override
-  public void setOwner(final TableOwner owner) {
-    this.owner = owner;
   }
 }

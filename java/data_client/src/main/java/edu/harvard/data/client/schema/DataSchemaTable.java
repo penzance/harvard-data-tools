@@ -8,17 +8,15 @@ public abstract class DataSchemaTable {
 
   @JsonIgnore
   protected boolean newlyGenerated;
+  protected TableOwner owner;
 
   public abstract String getTableName();
 
   public abstract List<DataSchemaColumn> getColumns();
 
-  public abstract TableOwner getOwner();
-
-  public abstract void setOwner(TableOwner owner);
-
-  protected DataSchemaTable(final boolean newlyGenerated) {
+  protected DataSchemaTable(final boolean newlyGenerated, final TableOwner owner) {
     this.newlyGenerated = newlyGenerated;
+    this.owner = owner;
   }
 
   public boolean getNewlyGenerated() {
@@ -36,6 +34,14 @@ public abstract class DataSchemaTable {
 
   public void setNewlyGenerated(final boolean newlyGenerated) {
     this.newlyGenerated = newlyGenerated;
+  }
+
+  public TableOwner getOwner() {
+    return owner;
+  }
+
+  public void setOwner(final TableOwner owner) {
+    this.owner = owner;
   }
 
 }

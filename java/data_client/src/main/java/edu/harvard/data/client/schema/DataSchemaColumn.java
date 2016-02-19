@@ -26,4 +26,15 @@ public abstract class DataSchemaColumn {
   public void setNewlyGenerated(final boolean newlyGenerated) {
     this.newlyGenerated = newlyGenerated;
   }
+
+  protected String cleanColumnName(final String name) {
+    final String clean = name;
+    switch(name) {
+    case "default":
+      return "is_default";
+    default:
+      return clean;
+    }
+  }
+
 }

@@ -34,7 +34,7 @@ public class CanvasDataSchemaColumn extends DataSchemaColumn {
       @JsonProperty("descripton") final String descripton,
       @JsonProperty("see_also") final String seeAlso) {
     super(false);
-    this.name = name;
+    this.name = cleanColumnName(name);
     this.description = description;
     this.sortKey = sortKey;
     this.descripton = descripton == null ? descripton : description;
@@ -56,16 +56,6 @@ public class CanvasDataSchemaColumn extends DataSchemaColumn {
     this.snowflake = original.snowflake;
     this.seeAlso = original.seeAlso;
     this.sortKey = original.sortKey;
-  }
-
-  private String cleanColumnName(final String name) {
-    final String clean = name;
-    switch(name) {
-    case "default":
-      return "is_default";
-    default:
-      return clean;
-    }
   }
 
   @Override
