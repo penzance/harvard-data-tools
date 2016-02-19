@@ -15,6 +15,8 @@ public abstract class DataSchemaColumn {
 
   public abstract Integer getLength();
 
+  public abstract DataSchemaColumn copy();
+
   protected DataSchemaColumn(final boolean newlyGenerated) {
     this.newlyGenerated = newlyGenerated;
   }

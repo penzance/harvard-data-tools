@@ -73,8 +73,13 @@ public class CanvasDataSchemaTable extends DataSchemaTable {
     this.owner = original.owner;
     this.columns = new ArrayList<DataSchemaColumn>();
     for (final DataSchemaColumn column : original.columns) {
-      this.columns.add(new CanvasDataSchemaColumn((CanvasDataSchemaColumn) column));
+      this.columns.add(column.copy());
     }
+  }
+
+  @Override
+  public DataSchemaTable copy() {
+    return new CanvasDataSchemaTable(this);
   }
 
   public DataWarehouseType getDwType() {

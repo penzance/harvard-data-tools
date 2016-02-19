@@ -33,8 +33,7 @@ public class CanvasDataSchema implements DataSchema {
     this.version = original.version;
     this.tables = new HashMap<String, DataSchemaTable>();
     for (final String tableName : original.tables.keySet()) {
-      this.tables.put(tableName,
-          new CanvasDataSchemaTable((CanvasDataSchemaTable) original.tables.get(tableName)));
+      this.tables.put(tableName, original.tables.get(tableName).copy());
     }
   }
 

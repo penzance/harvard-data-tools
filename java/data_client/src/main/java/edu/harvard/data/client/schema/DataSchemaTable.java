@@ -14,6 +14,8 @@ public abstract class DataSchemaTable {
 
   public abstract List<DataSchemaColumn> getColumns();
 
+  public abstract DataSchemaTable copy();
+
   protected DataSchemaTable(final boolean newlyGenerated, final TableOwner owner) {
     this.newlyGenerated = newlyGenerated;
     this.owner = owner;
@@ -43,5 +45,6 @@ public abstract class DataSchemaTable {
   public void setOwner(final TableOwner owner) {
     this.owner = owner;
   }
+
 
 }

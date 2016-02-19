@@ -59,6 +59,11 @@ public class CanvasDataSchemaColumn extends DataSchemaColumn {
   }
 
   @Override
+  public DataSchemaColumn copy() {
+    return new CanvasDataSchemaColumn(this);
+  }
+
+  @Override
   public String getName() {
     return name;
   }
