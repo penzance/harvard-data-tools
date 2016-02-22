@@ -49,18 +49,20 @@ public class CreateHiveTableGenerator {
 
   private void generateCreateTablesFile(final PrintStream out, final SchemaPhase input,
       final SchemaPhase output, final String inputFormat) {
+    out.println("hive -e \"");
     generateDropStatements(out, "in_", input.getSchema().getTables());
     out.println();
     generateDropStatements(out, "out_", output.getSchema().getTables());
     out.println();
     generateCreateStatements(out, input, "in_", true, inputFormat);
     generateCreateStatements(out, output, "out_", false, "TEXTFILE");
+    out.println("\"");
   }
 
   private void generateDropStatements(final PrintStream out, final String prefix,
       final Map<String, DataSchemaTable> tables) {
     for (final DataSchemaTable table : tables.values()) {
-      out.println("hive -e \"DROP TABLE IF EXISTS " + prefix + table.getTableName() + " PURGE;\"");
+      out.println("  DROP TABLE IF EXISTS " + prefix + table.getTableName() + " PURGE;");
     }
   }
 
@@ -83,12 +85,12 @@ public class CreateHiveTableGenerator {
 
   private void createTable(final PrintStream out, final String tableName,
       final DataSchemaTable table, final String format, final String locationVar) {
-    out.println("hive -e \"CREATE EXTERNAL TABLE " + tableName + " (");
+    out.println("  CREATE EXTERNAL TABLE " + tableName + " (");
     listFields(out, table);
-    out.println(")");
-    out.println("  ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' LINES TERMINATED By '\\n'");
-    out.println("  STORED AS " + format);
-    out.println("  LOCATION '$" + locationVar + "/" + table.getTableName() + "/';\"");
+    out.println("    )");
+    out.println("    ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' LINES TERMINATED By '\\n'");
+    out.println("    STORED AS " + format);
+    out.println("    LOCATION '$" + locationVar + "/" + table.getTableName() + "/';");
     out.println();
   }
 
