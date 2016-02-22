@@ -36,7 +36,7 @@ sudo yum install -y apache-maven
 aws s3 cp s3://<code_s3_bucket>/secure.properties /home/hadoop/.
 
 # generate the tools
-python /home/hadoop/harvard-data-tools/python/generate_tools.py
+python /home/hadoop/harvard-data-tools/python/canvas_generate_tools.py
 
 chmod 764 /home/hadoop/*.sh
 
