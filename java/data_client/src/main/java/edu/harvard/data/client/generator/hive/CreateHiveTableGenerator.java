@@ -21,6 +21,8 @@ import edu.harvard.data.client.schema.TableOwner;
 public class CreateHiveTableGenerator {
 
   private static final Logger log = LogManager.getLogger();
+  private static final String INPUT_METAVAR = "INPUT_PHASE_DIR";
+  private static final String OUTPUT_METAVAR = "OUTPUT_PHASE_DIR";
 
   private final SchemaTransformer schemaVersions;
   private final File dir;
@@ -33,7 +35,6 @@ public class CreateHiveTableGenerator {
   public void generate() throws IOException {
     final File phase1File = new File(dir, "phase_1_create_tables.sh");
     final File phase2File = new File(dir, "phase_2_create_tables.sh");
-
 
     try (final PrintStream out = new PrintStream(new FileOutputStream(phase1File))) {
       log.info("Creating Hive phase_1_create_tables.sh file in " + dir);
@@ -49,23 +50,26 @@ public class CreateHiveTableGenerator {
 
   private void generateCreateTablesFile(final PrintStream out, final SchemaPhase input,
       final SchemaPhase output, final String inputFormat) {
+    out.println("hive -d " + INPUT_METAVAR + "=$" + input.getHDFSDir() + " -d " + OUTPUT_METAVAR + "=$"
+        + output.getHDFSDir() + " -e \"");
     generateDropStatements(out, "in_", input.getSchema().getTables());
     out.println();
     generateDropStatements(out, "out_", output.getSchema().getTables());
     out.println();
-    generateCreateStatements(out, input, "in_", true, inputFormat);
-    generateCreateStatements(out, output, "out_", false, "TEXTFILE");
+    generateCreateStatements(out, input, "in_", true, inputFormat, INPUT_METAVAR);
+    generateCreateStatements(out, output, "out_", false, "TEXTFILE", OUTPUT_METAVAR);
+    out.println("\"");
   }
 
   private void generateDropStatements(final PrintStream out, final String prefix,
       final Map<String, DataSchemaTable> tables) {
     for (final DataSchemaTable table : tables.values()) {
-      out.println("hive \"DROP TABLE IF EXISTS " + prefix + table.getTableName() + " PURGE;\"");
+      out.println("  DROP TABLE IF EXISTS " + prefix + table.getTableName() + " PURGE;");
     }
   }
 
   private void generateCreateStatements(final PrintStream out, final SchemaPhase phaseInput,
-      final String prefix, final boolean ignoreOwner, final String format) {
+      final String prefix, final boolean ignoreOwner, final String format, final String locationVar) {
     if (phaseInput != null) {
       final Map<String, DataSchemaTable> inTables = phaseInput.getSchema().getTables();
       final List<String> inTableKeys = new ArrayList<String>(inTables.keySet());
@@ -75,7 +79,7 @@ public class CreateHiveTableGenerator {
         final DataSchemaTable table = inTables.get(tableKey);
         if (ignoreOwner || (table.getOwner() != null && table.getOwner().equals(TableOwner.hive))) {
           final String tableName = prefix + table.getTableName();
-          createTable(out, tableName, table, format, phaseInput.getHDFSDir());
+          createTable(out, tableName, table, format, locationVar);
         }
       }
     }
@@ -83,12 +87,12 @@ public class CreateHiveTableGenerator {
 
   private void createTable(final PrintStream out, final String tableName,
       final DataSchemaTable table, final String format, final String locationVar) {
-    out.println("hive \"CREATE EXTERNAL TABLE " + tableName + " (");
+    out.println("  CREATE EXTERNAL TABLE " + tableName + " (");
     listFields(out, table);
-    out.println(")");
-    out.println("  ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' LINES TERMINATED By '\\n'");
-    out.println("  STORED AS " + format);
-    out.println("  LOCATION '$" + locationVar + "/" + table.getTableName() + "/';\"");
+    out.println("    )");
+    out.println("    ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' LINES TERMINATED By '\\n'");
+    out.println("    STORED AS " + format);
+    out.println("    LOCATION '${" + locationVar + "}/" + table.getTableName() + "/';");
     out.println();
   }
 
