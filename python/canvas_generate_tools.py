@@ -31,10 +31,10 @@ def check_return_code(return_code):
     if return_code != 0:
         sys.exit(return_code)
 
-def compile_java(dir):
+def compile_java(code_dir):
     command = ['mvn', 'clean', 'install']
-    print "Running {0} in {1}".format(command, dir)
-    process = subprocess.Popen(command, cwd=dir)
+    print "Running {0} in {1}".format(command, code_dir)
+    process = subprocess.Popen(command, cwd=code_dir)
     process.wait()
     print "Return code: {0}".format(process.returncode)
     check_return_code(process.returncode)

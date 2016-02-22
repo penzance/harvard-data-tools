@@ -60,7 +60,7 @@ public class CreateHiveTableGenerator {
   private void generateDropStatements(final PrintStream out, final String prefix,
       final Map<String, DataSchemaTable> tables) {
     for (final DataSchemaTable table : tables.values()) {
-      out.println("hive \"DROP TABLE IF EXISTS " + prefix + table.getTableName() + " PURGE;\"");
+      out.println("hive -e \"DROP TABLE IF EXISTS " + prefix + table.getTableName() + " PURGE;\"");
     }
   }
 
@@ -83,7 +83,7 @@ public class CreateHiveTableGenerator {
 
   private void createTable(final PrintStream out, final String tableName,
       final DataSchemaTable table, final String format, final String locationVar) {
-    out.println("hive \"CREATE EXTERNAL TABLE " + tableName + " (");
+    out.println("hive -e \"CREATE EXTERNAL TABLE " + tableName + " (");
     listFields(out, table);
     out.println(")");
     out.println("  ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' LINES TERMINATED By '\\n'");
