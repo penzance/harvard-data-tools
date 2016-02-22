@@ -18,6 +18,11 @@ export HARVARD_DATA_GENERATED_OUTPUT=/home/hadoop
 #     files will be generated. Format as a string, e.g. 1.2.0
 export CANVAS_DATA_SCHEMA_VERSION=<canvas_data_schema_version>
 
+# - HDFS_PHASE_n_DIR: HDFS directories for data in each phase n
+export HDFS_PHASE_0_DIR=hdfs:///phase_0
+export HDFS_PHASE_1_DIR=hdfs:///phase_1
+export HDFS_PHASE_2_DIR=hdfs:///phase_2
+
 # add github.com to known_hosts and run ansible-pull
 ssh-keyscan github.com >> /home/hadoop/.ssh/known_hosts
 
