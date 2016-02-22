@@ -88,7 +88,7 @@ public class CreateHiveTableGenerator {
     out.println(")");
     out.println("  ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' LINES TERMINATED By '\\n'");
     out.println("  STORED AS " + format);
-    out.println("  LOCATION '${" + locationVar + "}/" + table.getTableName() + "/';\"");
+    out.println("  LOCATION '$" + locationVar + "/" + table.getTableName() + "/';\"");
     out.println();
   }
 
