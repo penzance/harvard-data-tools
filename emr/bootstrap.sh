@@ -44,3 +44,8 @@ aws s3 cp s3://<code_s3_bucket>/secure.properties /home/hadoop/.
 python /home/hadoop/harvard-data-tools/python/canvas_generate_tools.py
 
 chmod 764 /home/hadoop/*.sh
+
+# Fix Hive logging complaints (http://stackoverflow.com/questions/35069721/java-io-filenotfoundexception-error-on-new-emr-cluster)
+mkdir /var/log/hive/user
+mkdir /var/log/hive/user/hadoop
+chown hadoop -R /var/log/hive
