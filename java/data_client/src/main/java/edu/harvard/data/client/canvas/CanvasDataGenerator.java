@@ -24,9 +24,9 @@ public class CanvasDataGenerator {
   private static final Logger log = LogManager.getLogger();
 
   public static final String HDFS_HIVE_QUERY_DIR = "HIVE_QUERY_DIR";
-  public static final String HDFS_PHASE_0_DIR = "HDFS_PHASE_0_DIR";
-  public static final String HDFS_PHASE_1_DIR = "HDFS_PHASE_1_DIR";
-  public static final String HDFS_PHASE_2_DIR = "HDFS_PHASE_2_DIR";
+  public static final String HDFS_PHASE_0_DIR = "hdfs:///phase_0";
+  public static final String HDFS_PHASE_1_DIR = "hdfs:///phase_1";
+  public static final String HDFS_PHASE_2_DIR = "hdfs:///phase_2";
 
   public static final String CLIENT_PACKAGE = "edu.harvard.data.client";
   private static final String PHASE_ZERO_PACKAGE = CLIENT_PACKAGE + ".canvas.phase0";

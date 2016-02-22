@@ -48,8 +48,6 @@ public class CreateHiveTableGenerator {
 
   private void generateCreateTablesFile(final PrintStream out, final SchemaPhase input,
       final SchemaPhase output, final String inputFormat) {
-    out.println("echo \"Input HDFS directory: $" + input.getHDFSDir() + "\"");
-    out.println("echo \"Output HDFS directory: $" + output.getHDFSDir() + "\"");
     out.println("hive -e \"");
     generateDropStatements(out, "in_", input.getSchema().getTables());
     out.println();
@@ -67,10 +65,10 @@ public class CreateHiveTableGenerator {
     }
   }
 
-  private void generateCreateStatements(final PrintStream out, final SchemaPhase phaseInput,
+  private void generateCreateStatements(final PrintStream out, final SchemaPhase phase,
       final String prefix, final boolean ignoreOwner, final String format) {
-    if (phaseInput != null) {
-      final Map<String, DataSchemaTable> inTables = phaseInput.getSchema().getTables();
+    if (phase != null) {
+      final Map<String, DataSchemaTable> inTables = phase.getSchema().getTables();
       final List<String> inTableKeys = new ArrayList<String>(inTables.keySet());
       Collections.sort(inTableKeys);
 
@@ -78,7 +76,7 @@ public class CreateHiveTableGenerator {
         final DataSchemaTable table = inTables.get(tableKey);
         if (ignoreOwner || (table.getOwner() != null && table.getOwner().equals(TableOwner.hive))) {
           final String tableName = prefix + table.getTableName();
-          createTable(out, tableName, table, format, phaseInput.getHDFSDir());
+          createTable(out, tableName, table, format, phase.getHDFSDir());
         }
       }
     }
@@ -91,7 +89,7 @@ public class CreateHiveTableGenerator {
     out.println("    )");
     out.println("    ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' LINES TERMINATED By '\\n'");
     out.println("    STORED AS " + format);
-    out.println("    LOCATION '$" + locationVar + "/" + table.getTableName() + "/';");
+    out.println("    LOCATION '" + locationVar + "/" + table.getTableName() + "/';");
     out.println();
   }
 
