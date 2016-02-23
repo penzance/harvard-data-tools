@@ -50,7 +50,7 @@ public class HiveQueryManifestGenerator {
     out.println("sudo chown hive:hive -R /var/log/hive");
     if (queryDir.exists() && queryDir.isDirectory()) {
       for (final String fileName : queryDir.list()) {
-        out.println("hive source $1/" + fileName + " &>> " + logFile);
+        out.println("hive -f $1/" + fileName + " &>> " + logFile);
       }
     }
   }
