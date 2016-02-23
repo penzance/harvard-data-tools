@@ -37,12 +37,12 @@ public class CreateHiveTableGenerator {
     try (final PrintStream out = new PrintStream(new FileOutputStream(phase1File))) {
       log.info("Creating Hive phase_1_create_tables.sh file in " + dir);
       generateCreateTablesFile(out, schemaVersions.getPhase(0), schemaVersions.getPhase(1),
-          "phase_1_create_tables.out");
+          "/home/hadoop/phase_1_create_tables.out");
     }
     try (final PrintStream out = new PrintStream(new FileOutputStream(phase2File))) {
       log.info("Creating Hive phase_2_create_tables.sh file in " + dir);
       generateCreateTablesFile(out, schemaVersions.getPhase(1), schemaVersions.getPhase(2),
-          "phase_2_create_tables.out");
+          "/home/hadoop/phase_2_create_tables.out");
     }
   }
 

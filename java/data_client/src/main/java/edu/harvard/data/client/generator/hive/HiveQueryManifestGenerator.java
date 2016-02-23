@@ -35,11 +35,11 @@ public class HiveQueryManifestGenerator {
     log.info("Phase 2 hive directory: " + new File(gitDir, "hive/phase_2"));
     try (final PrintStream out = new PrintStream(new FileOutputStream(phase1File))) {
       generateHiveManifest(out, schemaVersions.getPhase(1), new File(gitDir, "hive/phase_1"),
-          "phase_1_hive.out");
+          "/home/hadoop/phase_1_hive.out");
     }
     try (final PrintStream out = new PrintStream(new FileOutputStream(phase2File))) {
       generateHiveManifest(out, schemaVersions.getPhase(1), new File(gitDir, "hive/phase_2"),
-          "phase_2_hive.out");
+          "/home/hadoop/phase_2_hive.out");
     }
   }
 
