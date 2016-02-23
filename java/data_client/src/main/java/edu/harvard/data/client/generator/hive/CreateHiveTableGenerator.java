@@ -37,25 +37,27 @@ public class CreateHiveTableGenerator {
     try (final PrintStream out = new PrintStream(new FileOutputStream(phase1File))) {
       log.info("Creating Hive phase_1_create_tables.sh file in " + dir);
       generateCreateTablesFile(out, schemaVersions.getPhase(0), schemaVersions.getPhase(1),
-          "SEQUENCEFILE");
+          "phase_1_create_tables.out");
     }
     try (final PrintStream out = new PrintStream(new FileOutputStream(phase2File))) {
       log.info("Creating Hive phase_2_create_tables.sh file in " + dir);
       generateCreateTablesFile(out, schemaVersions.getPhase(1), schemaVersions.getPhase(2),
-          "TEXTFILE");
+          "phase_2_create_tables.out");
     }
   }
 
   private void generateCreateTablesFile(final PrintStream out, final SchemaPhase input,
-      final SchemaPhase output, final String inputFormat) {
+      final SchemaPhase output, final String logFile) {
     out.println("hive -e \"");
+    out.println("mkdir -p /var/log/hive/user/hadoop # Workaround for Hive logging bug");
     generateDropStatements(out, "in_", input.getSchema().getTables());
     out.println();
     generateDropStatements(out, "out_", output.getSchema().getTables());
     out.println();
-    generateCreateStatements(out, input, "in_", true, inputFormat);
-    generateCreateStatements(out, output, "out_", false, "TEXTFILE");
-    out.println("\"");
+    generateCreateStatements(out, input, "in_", true);
+    generateCreateStatements(out, output, "out_", false);
+    out.println("\" &> " + logFile);
+    out.println("exit $?");
   }
 
   private void generateDropStatements(final PrintStream out, final String prefix,
@@ -66,7 +68,7 @@ public class CreateHiveTableGenerator {
   }
 
   private void generateCreateStatements(final PrintStream out, final SchemaPhase phase,
-      final String prefix, final boolean ignoreOwner, final String format) {
+      final String prefix, final boolean ignoreOwner) {
     if (phase != null) {
       final Map<String, DataSchemaTable> inTables = phase.getSchema().getTables();
       final List<String> inTableKeys = new ArrayList<String>(inTables.keySet());
@@ -76,19 +78,19 @@ public class CreateHiveTableGenerator {
         final DataSchemaTable table = inTables.get(tableKey);
         if (ignoreOwner || (table.getOwner() != null && table.getOwner().equals(TableOwner.hive))) {
           final String tableName = prefix + table.getTableName();
-          createTable(out, tableName, table, format, phase.getHDFSDir());
+          createTable(out, tableName, table, phase.getHDFSDir());
         }
       }
     }
   }
 
   private void createTable(final PrintStream out, final String tableName,
-      final DataSchemaTable table, final String format, final String locationVar) {
+      final DataSchemaTable table, final String locationVar) {
     out.println("  CREATE EXTERNAL TABLE " + tableName + " (");
     listFields(out, table);
     out.println("    )");
     out.println("    ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' LINES TERMINATED By '\\n'");
-    out.println("    STORED AS " + format);
+    out.println("    STORED AS TEXTFILE");
     out.println("    LOCATION '" + locationVar + "/" + table.getTableName() + "/';");
     out.println();
   }

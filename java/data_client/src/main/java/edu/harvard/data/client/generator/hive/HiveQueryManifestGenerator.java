@@ -43,6 +43,8 @@ public class HiveQueryManifestGenerator {
 
   private void generateHiveManifest(final PrintStream out, final SchemaPhase phase,
       final File queryDir) {
+    out.println("set -e"); // Exit on any failure
+    out.println("mkdir -p /var/log/hive/user/hadoop # Workaround for Hive logging bug");
     if (queryDir.exists() && queryDir.isDirectory()) {
       for (final String fileName : queryDir.list()) {
         out.println("hive source $1/" + fileName + ";");
