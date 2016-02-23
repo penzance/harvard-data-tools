@@ -45,7 +45,7 @@ python /home/hadoop/harvard-data-tools/python/canvas_generate_tools.py
 
 chmod 764 /home/hadoop/*.sh
 
-# Fix Hive logging complaints (http://stackoverflow.com/questions/35069721/java-io-filenotfoundexception-error-on-new-emr-cluster)
-mkdir /var/log/hive/user
-mkdir /var/log/hive/user/hadoop
-chown hadoop -R /var/log/hive
+# setup CloudWatch logging
+sudo yum install -y awslogs
+sudo cp /home/hadoop/harvard-data-tools/cloudwatch/awslogs-emr.conf /etc/awslogs/awslogs.conf
+sudo service awslogs start
