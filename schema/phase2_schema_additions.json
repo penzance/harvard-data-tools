@@ -1,1 +1,20 @@
-{ }
+{ "tables": 
+  { "external_tool_launches_per_course": {
+      "owner": "hive",
+      "tableName" : "external_tool_launches_per_course",
+      "columns" : [ 
+        {
+          "name" : "course_id",
+          "description" : "Course ID, as defined in requests.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "launches",
+          "description" : "Count of external tool launches in the course.",
+          "type" : "integer"
+        }
+      ]
+    }
+  }
+}
