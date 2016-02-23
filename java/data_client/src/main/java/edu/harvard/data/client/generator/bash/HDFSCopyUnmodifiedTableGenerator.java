@@ -25,16 +25,18 @@ public class HDFSCopyUnmodifiedTableGenerator {
   public void generate() throws IOException {
     try (final PrintStream out = new PrintStream(
         new FileOutputStream(new File(dir, "phase_1_copy_unmodified_files.sh")))) {
-      copyUnmodifiedFiles(out, schemaVersions.getPhase(0), schemaVersions.getPhase(1));
+      copyUnmodifiedFiles(out, schemaVersions.getPhase(0), schemaVersions.getPhase(1),
+          "phase_1_copy_unmodified_files.out");
     }
     try (final PrintStream out = new PrintStream(
         new FileOutputStream(new File(dir, "phase_2_copy_unmodified_files.sh")))) {
-      copyUnmodifiedFiles(out, schemaVersions.getPhase(1), schemaVersions.getPhase(2));
+      copyUnmodifiedFiles(out, schemaVersions.getPhase(1), schemaVersions.getPhase(2),
+          "phase_2_copy_unmodified_files.out");
     }
   }
 
   private void copyUnmodifiedFiles(final PrintStream out, final SchemaPhase inputPhase,
-      final SchemaPhase outputPhase) {
+      final SchemaPhase outputPhase, final String logFile) {
     out.println("set -e"); // Exit on any failure
     out.println("mkdir -p /var/log/hive/user/hadoop # Workaround for Hive logging bug");
     final Map<String, DataSchemaTable> schema = outputPhase.getSchema().getTables();
@@ -44,7 +46,7 @@ public class HDFSCopyUnmodifiedTableGenerator {
       final DataSchemaTable table = schema.get(name);
       if (!table.hasNewlyGeneratedElements()) {
         out.println("hadoop fs -cp " + inputPhase.getHDFSDir() + "/" + table.getTableName() + " "
-            + outputPhase.getHDFSDir() + "/" + table.getTableName());
+            + outputPhase.getHDFSDir() + "/" + table.getTableName() + " &>> " + logFile);
       }
     }
   }
