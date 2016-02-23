@@ -29,25 +29,27 @@ public class HiveQueryManifestGenerator {
     final File phase1File = new File(dir, "phase_1_hive.sh");
     final File phase2File = new File(dir, "phase_2_hive.sh");
 
-    log.info("Phase 1 file: "+ phase1File);
-    log.info("Phase 2 file: "+ phase2File);
-    log.info("Phase 1 hive directory: "+ new File(gitDir, "hive/phase_1"));
-    log.info("Phase 2 hive directory: "+ new File(gitDir, "hive/phase_2"));
+    log.info("Phase 1 file: " + phase1File);
+    log.info("Phase 2 file: " + phase2File);
+    log.info("Phase 1 hive directory: " + new File(gitDir, "hive/phase_1"));
+    log.info("Phase 2 hive directory: " + new File(gitDir, "hive/phase_2"));
     try (final PrintStream out = new PrintStream(new FileOutputStream(phase1File))) {
-      generateHiveManifest(out, schemaVersions.getPhase(1), new File(gitDir, "hive/phase_1"));
+      generateHiveManifest(out, schemaVersions.getPhase(1), new File(gitDir, "hive/phase_1"),
+          "phase_1_hive.out");
     }
     try (final PrintStream out = new PrintStream(new FileOutputStream(phase2File))) {
-      generateHiveManifest(out, schemaVersions.getPhase(1), new File(gitDir, "hive/phase_2"));
+      generateHiveManifest(out, schemaVersions.getPhase(1), new File(gitDir, "hive/phase_2"),
+          "phase_2_hive.out");
     }
   }
 
   private void generateHiveManifest(final PrintStream out, final SchemaPhase phase,
-      final File queryDir) {
+      final File queryDir, final String logFile) {
     out.println("set -e"); // Exit on any failure
     out.println("mkdir -p /var/log/hive/user/hadoop # Workaround for Hive logging bug");
     if (queryDir.exists() && queryDir.isDirectory()) {
       for (final String fileName : queryDir.list()) {
-        out.println("hive source $1/" + fileName + ";");
+        out.println("hive source $1/" + fileName + " &>> " + logFile);
       }
     }
   }
