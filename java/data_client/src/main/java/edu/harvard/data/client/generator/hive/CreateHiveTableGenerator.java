@@ -48,8 +48,8 @@ public class CreateHiveTableGenerator {
 
   private void generateCreateTablesFile(final PrintStream out, final SchemaPhase input,
       final SchemaPhase output, final String logFile) {
-    out.println("hive -e \"");
     out.println("mkdir -p /var/log/hive/user/hadoop # Workaround for Hive logging bug");
+    out.println("hive -e \"");
     generateDropStatements(out, "in_", input.getSchema().getTables());
     out.println();
     generateDropStatements(out, "out_", output.getSchema().getTables());
