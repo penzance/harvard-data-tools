@@ -7,5 +7,5 @@ INSERT OVERWRITE TABLE out_external_tool_launches_per_course
     web_application_controller='external_tools'
   AND
     web_applicaiton_action='show'
-  GROUP_BY
+  GROUP BY
     course_id;
