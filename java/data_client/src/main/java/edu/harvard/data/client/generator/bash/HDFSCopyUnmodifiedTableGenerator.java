@@ -38,7 +38,8 @@ public class HDFSCopyUnmodifiedTableGenerator {
   private void copyUnmodifiedFiles(final PrintStream out, final SchemaPhase inputPhase,
       final SchemaPhase outputPhase, final String logFile) {
     out.println("set -e"); // Exit on any failure
-    out.println("mkdir -p /var/log/hive/user/hadoop # Workaround for Hive logging bug");
+    out.println("sudo mkdir -p /var/log/hive/user/hadoop # Workaround for Hive logging bug");
+    out.println("sudo chown hive:hive -R /var/log/hive");
     final Map<String, DataSchemaTable> schema = outputPhase.getSchema().getTables();
     final List<String> names = new ArrayList<String>(schema.keySet());
     Collections.sort(names);
