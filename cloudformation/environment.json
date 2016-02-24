@@ -477,6 +477,9 @@
                                         "elasticmapreduce:AddJobFlowSteps",
                                         "elasticmapreduce:Describe*",
                                         "elasticmapreduce:ListInstance*",
+                                        "logs:CreateLogGroup",
+                                        "logs:CreateLogStream",
+                                        "logs:PutLogEvents",
                                         "rds:Describe*",
                                         "redshift:DescribeClusters",
                                         "redshift:DescribeClusterSecurityGroups",
@@ -738,12 +741,7 @@
                                 "\n",
                                 "# setup CloudWatch logging\n",
                                 "yum install -y awslogs\n",
-                                "#aws s3 cp s3://",
-                                {
-                                    "Ref": "CodeS3BucketParameter"
-                                },
-                                "/awslogs.conf /etc/awslogs/.\n",
-                                "\\cp /root/harvard-data-tools/cloudwatch/awslogs.conf /etc/awslogs/.\n",
+                                "\\cp /root/harvard-data-tools/cloudwatch/awslogs-downloadverify.conf /etc/awslogs/awslogs.conf\n",
                                 "service awslogs start\n",
                                 "\n",
                                 "#Install maven via instructions at https://gist.github.com/sebsto/19b99f1fa1f32cae5d00\n",
@@ -1417,8 +1415,8 @@
                         ]
                     },
                     {
-                        "Id": "EmrConfig",
-                        "Name": "EmrConfig",
+                        "Id": "EmrConfigHiveSite",
+                        "Name": "EmrConfigHiveSite",
                         "Fields": [
                             {
                                 "Key": "type",
@@ -1449,6 +1447,42 @@
                             {
                                 "Key": "value",
                                 "StringValue": "true"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "EmrConfigHiveLog4J",
+                        "Name": "EmrConfigHiveLog4J",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "EmrConfiguration"
+                            },
+                            {
+                                "Key": "classification",
+                                "StringValue": "hive-log4j"
+                            },
+                            {
+                                "Key": "property",
+                                "RefValue": "EmrHiveLogs"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "EmrHiveLogs",
+                        "Name": "EmrHiveLogs",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "Property"
+                            },
+                            {
+                                "Key": "key",
+                                "StringValue": "hive.log.dir"
+                            },
+                            {
+                                "Key": "value",
+                                "StringValue": "/home/hadoop"
                             }
                         ]
                     },
@@ -1529,7 +1563,11 @@
                             },
                             {
                                 "Key": "configuration",
-                                "RefValue": "EmrConfig"
+                                "RefValue": "EmrConfigHiveSite"
+                            },
+                            {
+                                "Key": "configuration",
+                                "RefValue": "EmrConfigHiveLog4J"
                             }
                         ]
                     },
@@ -1561,7 +1599,7 @@
                                             {
                                                 "Ref": "IncomingS3Bucket"
                                             },
-                                            "/dataset-path-placeholder --dest=hdfs:///phase_0"
+                                            "/dataset-path-placeholder --dest=hdfs:///phase_0 --outputCodec=none"
                                         ]
                                     ]
                                 }
@@ -1677,12 +1715,24 @@
                         ]
                     },
                     {
-                        "Id": "RunCreateHiveScript",
-                        "Name": "RunCreateHiveScript",
+                        "Id": "RunPhase1CreateCommand",
+                        "Name": "RunPhase1CreateCommand",
                         "Fields": [
                             {
                                 "Key": "type",
-                                "StringValue": "HiveActivity"
+                                "StringValue": "ShellCommandActivity"
+                            },
+                            {
+                                "Key": "command",
+                                "StringValue": "/home/hadoop/phase_1_create_tables.sh"
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "MoveDataToHDFS"
                             },
                             {
                                 "Key": "runsOn",
@@ -1693,57 +1743,18 @@
                                 "StringValue": "2 Minutes"
                             },
                             {
-                                "Key": "schedule",
-                                "RefValue": "DefaultSchedule"
-                            },
-                            {
-                                "Key": "stage",
-                                "StringValue": "false"
-                            },
-                            {
-                                "Key": "dependsOn",
-                                "RefValue": "MoveDataToHDFS"
-                            },
-                            {
                                 "Key": "onSuccess",
-                                "RefValue": "SendCreateSuccessSNSMessage"
+                                "RefValue": "SendPhase1CreateSuccessSNSMessage"
                             },
                             {
                                 "Key": "onFail",
-                                "RefValue": "SendCreateFailureSNSMessage"
-                            },
-                            {
-                                "Key": "scriptVariable",
-                                "StringValue": "HDFS_PHASE_0_DIR=hdfs:///phase_0"
-                            },
-                            {
-                                "Key": "scriptVariable",
-                                "StringValue": "HDFS_PHASE_1_DIR=hdfs:///phase_1"
-                            },
-                            {
-                                "Key": "scriptVariable",
-                                "StringValue": "HDFS_PHASE_2_DIR=hdfs:///phase_2"
-                            },
-                            {
-                                "Key": "scriptUri",
-                                "StringValue": {
-                                    "Fn::Join": [
-                                        "",
-                                        [
-                                            "s3://",
-                                            {
-                                                "Ref": "NewCodeS3Bucket"
-                                            },
-                                            "/create_tables.q"
-                                        ]
-                                    ]
-                                }
+                                "RefValue": "SendPhase1CreateFailureSNSMessage"
                             }
                         ]
                     },
                     {
-                        "Id": "SendCreateSuccessSNSMessage",
-                        "Name": "SendCreateSuccessSNSMessage",
+                        "Id": "SendPhase1CreateSuccessSNSMessage",
+                        "Name": "SendPhase1CreateSuccessSNSMessage",
                         "Fields": [
                             {
                                 "Key": "type",
@@ -1768,7 +1779,7 @@
                                             {
                                                 "Ref": "EnvironmentParameter"
                                             },
-                                            " Dataset dataset-id-placeholder - Hive Create Tables succeeded"
+                                            " Dataset dataset-id-placeholder - Phase 1 create tables script succeeded"
                                         ]
                                     ]
                                 }
@@ -1786,8 +1797,8 @@
                         ]
                     },
                     {
-                        "Id": "SendCreateFailureSNSMessage",
-                        "Name": "SendCreateFailureSNSMessage",
+                        "Id": "SendPhase1CreateFailureSNSMessage",
+                        "Name": "SendPhase1CreateFailureSNSMessage",
                         "Fields": [
                             {
                                 "Key": "type",
@@ -1812,7 +1823,7 @@
                                             {
                                                 "Ref": "EnvironmentParameter"
                                             },
-                                            " Dataset dataset-id-placeholder - Hive Create Tables failed"
+                                            " Dataset dataset-id-placeholder - Phase 1 create tables script failed"
                                         ]
                                     ]
                                 }
@@ -1839,7 +1850,7 @@
                             },
                             {
                                 "Key": "command",
-                                "StringValue": "/home/hadoop/copy_unmodified_files_phase_1.sh phase_0 phase_1"
+                                "StringValue": "/home/hadoop/phase_1_copy_unmodified_files.sh phase_0 phase_1"
                             },
                             {
                                 "Key": "schedule",
@@ -1847,7 +1858,7 @@
                             },
                             {
                                 "Key": "dependsOn",
-                                "RefValue": "RunCreateHiveScript"
+                                "RefValue": "RunPhase1CreateCommand"
                             },
                             {
                                 "Key": "runsOn",
@@ -1965,7 +1976,7 @@
                             },
                             {
                                 "Key": "command",
-                                "StringValue": "/home/hadoop/canvas_phase_1_hive.sh /home/hadoop/harvard-data-tools/hive/phase_1"
+                                "StringValue": "/home/hadoop/phase_1_hive.sh /home/hadoop/harvard-data-tools/hive/phase_1"
                             },
                             {
                                 "Key": "schedule",
@@ -1977,7 +1988,7 @@
                             },
                             {
                                 "Key": "dependsOn",
-                                "RefValue": "RunCreateHiveScript"
+                                "RefValue": "RunPhase1CreateCommand"
                             },
                             {
                                 "Key": "retryDelay",
@@ -2020,7 +2031,7 @@
                                             {
                                                 "Ref": "EnvironmentParameter"
                                             },
-                                            " Dataset dataset-id-placeholder - Phase 1 Hive script succeeded"
+                                            " Dataset dataset-id-placeholder - Phase 1 Hive command succeeded"
                                         ]
                                     ]
                                 }
@@ -2064,7 +2075,7 @@
                                             {
                                                 "Ref": "EnvironmentParameter"
                                             },
-                                            " Dataset dataset-id-placeholder - Phase 1 Hive script failed"
+                                            " Dataset dataset-id-placeholder - Phase 1 Hive command failed"
                                         ]
                                     ]
                                 }
@@ -2099,7 +2110,7 @@
                             },
                             {
                                 "Key": "dependsOn",
-                                "RefValue": "RunCreateHiveScript"
+                                "RefValue": "RunPhase1CreateCommand"
                             },
                             {
                                 "Key": "onSuccess",
@@ -2111,7 +2122,7 @@
                             },
                             {
                                 "Key": "step",
-                                "StringValue": "/home/hadoop/canvas_data_hadoop.jar,edu.harvard.data.hadoop.requests.CanvasDataHadoop,/phase_0,/phase_1"
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.data_tools.DataCli,canvas,hadoop,1,/phase_0,/phase_1"
                             }
                         ]
                     },
@@ -2142,7 +2153,7 @@
                                             {
                                                 "Ref": "EnvironmentParameter"
                                             },
-                                            " Dataset dataset-id-placeholder - Phase1 Hadoop script succeeded"
+                                            " Dataset dataset-id-placeholder - Phase 1 Hadoop script succeeded"
                                         ]
                                     ]
                                 }
@@ -2204,8 +2215,8 @@
                         ]
                     },
                     {
-                        "Id": "SignalEndPhase1",
-                        "Name": "SignalEndPhase1",
+                        "Id": "RunPhase2CreateCommand",
+                        "Name": "RunPhase2CreateCommand",
                         "Fields": [
                             {
                                 "Key": "type",
@@ -2213,19 +2224,11 @@
                             },
                             {
                                 "Key": "command",
-                                "StringValue": "echo 'End phase 1'"
+                                "StringValue": "/home/hadoop/phase_2_create_tables.sh"
                             },
                             {
                                 "Key": "schedule",
                                 "RefValue": "DefaultSchedule"
-                            },
-                            {
-                                "Key": "runsOn",
-                                "RefValue": "EmrCluster"
-                            },
-                            {
-                                "Key": "retryDelay",
-                                "StringValue": "2 Minutes"
                             },
                             {
                                 "Key": "dependsOn",
@@ -2240,18 +2243,26 @@
                                 "RefValue": "RunPhase1HadoopJAR"
                             },
                             {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
                                 "Key": "onSuccess",
-                                "RefValue": "SendSignalEndPhase1SuccessSNSMessage"
+                                "RefValue": "SendPhase2CreateSuccessSNSMessage"
                             },
                             {
                                 "Key": "onFail",
-                                "RefValue": "SendSignalEndPhase1FailureSNSMessage"
+                                "RefValue": "SendPhase2CreateFailureSNSMessage"
                             }
                         ]
                     },
                     {
-                        "Id": "SendSignalEndPhase1SuccessSNSMessage",
-                        "Name": "SendSignalEndPhase1SuccessSNSMessage",
+                        "Id": "SendPhase2CreateSuccessSNSMessage",
+                        "Name": "SendPhase2CreateSuccessSNSMessage",
                         "Fields": [
                             {
                                 "Key": "type",
@@ -2276,7 +2287,7 @@
                                             {
                                                 "Ref": "EnvironmentParameter"
                                             },
-                                            " Dataset dataset-id-placeholder - End Phase 1 succeeded"
+                                            " Dataset dataset-id-placeholder - Phase 2 create tables script succeeded"
                                         ]
                                     ]
                                 }
@@ -2294,8 +2305,8 @@
                         ]
                     },
                     {
-                        "Id": "SendSignalEndPhase1FailureSNSMessage",
-                        "Name": "SendSignalEndPhase1FailureSNSMessage",
+                        "Id": "SendPhase2CreateFailureSNSMessage",
+                        "Name": "SendPhase2CreateFailureSNSMessage",
                         "Fields": [
                             {
                                 "Key": "type",
@@ -2320,7 +2331,7 @@
                                             {
                                                 "Ref": "EnvironmentParameter"
                                             },
-                                            " Dataset dataset-id-placeholder - End Phase 1 failed"
+                                            " Dataset dataset-id-placeholder - Phase 2 create tables script failed"
                                         ]
                                     ]
                                 }
@@ -2347,7 +2358,7 @@
                             },
                             {
                                 "Key": "command",
-                                "StringValue": "/home/hadoop/copy_unmodified_files_phase_2.sh phase_1 phase_2"
+                                "StringValue": "/home/hadoop/phase_2_copy_unmodified_files.sh phase_1 phase_2"
                             },
                             {
                                 "Key": "schedule",
@@ -2355,7 +2366,7 @@
                             },
                             {
                                 "Key": "dependsOn",
-                                "RefValue": "SignalEndPhase1"
+                                "RefValue": "RunPhase2CreateCommand"
                             },
                             {
                                 "Key": "runsOn",
@@ -2473,7 +2484,7 @@
                             },
                             {
                                 "Key": "command",
-                                "StringValue": "/home/hadoop/canvas_phase_2_hive.sh /home/hadoop/harvard-data-tools/hive/phase_2"
+                                "StringValue": "/home/hadoop/phase_2_hive.sh /home/hadoop/harvard-data-tools/hive/phase_2"
                             },
                             {
                                 "Key": "schedule",
@@ -2485,7 +2496,7 @@
                             },
                             {
                                 "Key": "dependsOn",
-                                "RefValue": "SignalEndPhase1"
+                                "RefValue": "RunPhase2CreateCommand"
                             },
                             {
                                 "Key": "retryDelay",
@@ -2528,7 +2539,7 @@
                                             {
                                                 "Ref": "EnvironmentParameter"
                                             },
-                                            " Dataset dataset-id-placeholder - Phase 2 Hive script succeeded"
+                                            " Dataset dataset-id-placeholder - Phase 2 Hive command succeeded"
                                         ]
                                     ]
                                 }
@@ -2572,7 +2583,129 @@
                                             {
                                                 "Ref": "EnvironmentParameter"
                                             },
-                                            " Dataset dataset-id-placeholder - Phase 2 Hive script failed"
+                                            " Dataset dataset-id-placeholder - Phase 2 Hive command failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "RunPhase2HadoopJAR",
+                        "Name": "RunPhase2HadoopJAR",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "EmrActivity"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase2CreateCommand"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendPhase2HadoopSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendPhase2HadoopFailureSNSMessage"
+                            },
+                            {
+                                "Key": "step",
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.data_tools.DataCli,canvas,hadoop,2,/phase_1,/phase_2"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase2HadoopSuccessSNSMessage",
+                        "Name": "SendPhase2HadoopSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 2 Hadoop script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase2HadoopFailureSNSMessage",
+                        "Name": "SendPhase2HadoopFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 2 Hadoop script failed"
                                         ]
                                     ]
                                 }
@@ -2631,6 +2764,10 @@
                             {
                                 "Key": "dependsOn",
                                 "RefValue": "RunPhase2HiveCommand"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase2HadoopJAR"
                             },
                             {
                                 "Key": "onSuccess",
@@ -2886,9 +3023,9 @@
                                         "",
                                         [
                                             "aws s3 rm s3://",
-                                            {
-                                                "Ref": "CodeS3BucketParameter"
-                                            },
+											{
+												"Ref": "NewCodeS3Bucket"
+											},
                                             "/dataset-id-placeholder.sql"
                                         ]
                                     ]
@@ -2995,9 +3132,9 @@
                                         "",
                                         [
                                             "s3://",
-                                            {
-                                                "Ref": "CodeS3BucketParameter"
-                                            },
+											{
+												"Ref": "NewCodeS3Bucket"
+											},
                                             "/dataset-id-placeholder.sql"
                                         ]
                                     ]
