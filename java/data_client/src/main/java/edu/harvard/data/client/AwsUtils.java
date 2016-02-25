@@ -138,6 +138,10 @@ public class AwsUtils {
     IOUtils.copy(in, out);
   }
 
+  public void putFile(final S3ObjectId objId, final File file) throws IOException {
+    client.putObject(objId.getBucket(), objId.getKey(), file);
+  }
+
   public void deleteKey(final S3ObjectId key) {
     client.deleteObject(key.getBucket(), key.getKey());
   }

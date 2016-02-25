@@ -29,7 +29,8 @@ public class CanvasCompareSchemasCommand implements Command {
   private String expectedVersion;
 
   @Override
-  public ReturnStatus execute(final DataConfiguration config) throws IOException, DataConfigurationException, UnexpectedApiResponseException {
+  public ReturnStatus execute(final DataConfiguration config)
+      throws IOException, DataConfigurationException, UnexpectedApiResponseException {
     final CanvasApiClient api = DataClient.getCanvasApiClient(config.getCanvasDataHost(),
         config.getCanvasApiKey(), config.getCanvasApiSecret());
     final DumpInfo info = DumpInfo.find(dumpId);
