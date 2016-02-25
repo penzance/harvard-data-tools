@@ -221,7 +221,8 @@
                                     "Action": [
                                         "cloudformation:Describe*",
                                         "autoscaling:UpdateAutoScalingGroup",
-                                        "autoscaling:SetDesiredCapacity"
+                                        "autoscaling:SetDesiredCapacity",
+                                        "sns:Publish"
                                     ],
                                     "Resource": [
                                         "*"
@@ -3347,6 +3348,18 @@
             "Description": "DumpStatus DynamoDB Table",
             "Value": {
                 "Ref": "DumpStatusDynamoDBTable"
+            }
+        },
+        "SuccessSNSARN": {
+            "Description": "Success SNS ARN",
+            "Value": {
+                "Ref": "SuccessSNS"
+            }
+        },
+        "FailureSNSARN": {
+            "Description": "Failure SNS ARN",
+            "Value": {
+                "Ref": "FailureSNS"
             }
         }
     }

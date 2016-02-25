@@ -46,7 +46,33 @@ exports.handler = function(event, context) {
                             autoscaling.setDesiredCapacity(params, function(err, data) {
                                 if (err) console.log(err, err.stack); // an error occurred
                                 else console.log(data);
-                                context.succeed();
+
+								var cfn2 = new AWS.CloudFormation();
+								cfn2.describeStacks({
+									StackName: stackName
+								}, function(err, data) {
+									if (err) {
+										console.log(responseData.Error + ':\\n', err);
+										context.fail('Error', responseData.Error + ': ' + err);
+									} else {
+										data.Stacks[0].Outputs.forEach(function(output) {
+											if (output.OutputKey == 'SuccessSNSARN') {
+												var downloadVerifySuccessSNSARN = output.OutputValue;
+												console.log('DownloadVerifySuccessSNS ARN: ' + downloadVerifySuccessSNSARN);
+
+												var sns = new AWS.SNS();
+												var params = {
+													Message: "Starting Download and Verify", 
+													Subject: stackName + " - Starting Download and Verify",
+													TopicArn: downloadVerifySuccessSNSARN
+												};
+												sns.publish(params, function(err, data) {
+															context.succeed();
+												});
+											}
+										});
+									}
+								});
                             });
                         }
                     });
