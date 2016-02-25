@@ -45,4 +45,9 @@ public class ExtensionSchema implements DataSchema {
     return new ExtensionSchema(this);
   }
 
+  @Override
+  public DataSchemaTable getTableByName(final String name) {
+    return tables.get(name);
+  }
+
 }

@@ -7,11 +7,13 @@ CURRENT_SCHEMA = os.environ['CANVAS_DATA_SCHEMA_VERSION']
 GENERATED_CODE_DIR = os.environ['HARVARD_DATA_GENERATED_OUTPUT']
 SECURE_PROPERTIES_LOCATION = os.environ['SECURE_PROPERTIES_LOCATION']
 RESULT_METADATA = os.environ['CANVAS_DATA_RESULT_FILE']
+GIT_BASE = os.environ['HARVARD_DATA_TOOLS_BASE']
 
 MAIN_CLASS = 'edu.harvard.data.data_tools.DataCli'
-CLASSPATH = "{0}/data_tools.jar:{1}".format(
+CLASSPATH = "{0}/data_tools.jar:{1}:{2}".format(
         GENERATED_CODE_DIR,
-        SECURE_PROPERTIES_LOCATION
+        SECURE_PROPERTIES_LOCATION,
+        "{0}/schema".format(GIT_BASE)
     )
 
 def run_command(args):
@@ -44,6 +46,11 @@ def download_and_verify():
     status = run_command(['canvas', 'verify', '0', '-i', dump_id])
     if status != 0:
         bail('Failed to verify dump')
+        return status
+
+    status = run_command(['canvas', 'redshift', dump_id])
+    if status != 0:
+        bail('Failed to update Redshift schema')
         return status
 
     return 0

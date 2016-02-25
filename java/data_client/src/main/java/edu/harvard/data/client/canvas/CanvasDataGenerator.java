@@ -2,6 +2,7 @@ package edu.harvard.data.client.canvas;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,11 +34,11 @@ public class CanvasDataGenerator {
   private static final String PHASE_ONE_PACKAGE = CLIENT_PACKAGE + ".canvas.phase1";
   private static final String PHASE_TWO_PACKAGE = CLIENT_PACKAGE + ".canvas.phase2";
 
-  static final String PHASE_ONE_ADDITIONS_JSON = "phase1_schema_additions.json";
-  static final String PHASE_TWO_ADDITIONS_JSON = "phase2_schema_additions.json";
+  public static final String PHASE_ONE_ADDITIONS_JSON = "phase1_schema_additions.json";
+  public static final String PHASE_TWO_ADDITIONS_JSON = "phase2_schema_additions.json";
 
   public static void main(final String[] args)
-      throws IOException, DataConfigurationException, UnexpectedApiResponseException {
+      throws IOException, DataConfigurationException, UnexpectedApiResponseException, SQLException {
     if (args.length != 3) {
       System.err
       .println("Usage: schema_version /path/to/harvard-data-tools /path/to/output/directory");
@@ -75,6 +76,8 @@ public class CanvasDataGenerator {
         PHASE_TWO_PACKAGE.replaceAll("\\.", File.separator));
     transformer.setJavaPackages(PHASE_ZERO_PACKAGE, PHASE_ONE_PACKAGE, PHASE_TWO_PACKAGE);
     transformer.setJavaSourceLocations(javaPhase0Dir, javaPhase1Dir, javaPhase2Dir);
+
+    System.out.println(transformer.getPhase(0).getSchema());
 
     // Generate the bindings.
     log.info("Generating Java bindings in " + dir);

@@ -41,7 +41,7 @@ public class CanvasCompareSchemasCommand implements Command {
     }
     final CanvasDataSchema schema1 = (CanvasDataSchema) api.getSchema(expectedVersion);
     final CanvasDataSchema schema2 = (CanvasDataSchema) api.getSchema(info.getSchemaVersion());
-    final List<SchemaDifference> differences = schema1.calculateDifferences(schema2);
+    final List<SchemaDifference> differences = schema1.diff(schema2);
     if (differences.isEmpty()) {
       log.info("Schemas are identical.");
       return ReturnStatus.OK;

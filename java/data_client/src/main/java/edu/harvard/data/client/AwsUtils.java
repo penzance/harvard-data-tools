@@ -6,6 +6,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,6 +31,8 @@ import com.amazonaws.services.s3.model.S3ObjectId;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+
+import edu.harvard.data.client.redshift.RedshiftSchema;
 
 public class AwsUtils {
 
@@ -126,7 +133,6 @@ public class AwsUtils {
     final byte[] bytes = json.getBytes();
     final ObjectMetadata metadata = new ObjectMetadata();
     metadata.setContentLength(bytes.length);
-
     client.putObject(obj.getBucket(), obj.getKey(), new ByteArrayInputStream(bytes), metadata);
   }
 
@@ -144,6 +150,35 @@ public class AwsUtils {
 
   public void deleteKey(final S3ObjectId key) {
     client.deleteObject(key.getBucket(), key.getKey());
+  }
+
+  public RedshiftSchema getRedshiftSchema(final DataConfiguration config) throws SQLException {
+    final String query = "SELECT * FROM information_schema.columns WHERE table_schema='public'";
+    final String url = getDbUrl(config);
+    try (
+        Connection connection = DriverManager.getConnection(url, config.getRedshiftUser(),
+            config.getRedshiftPassword());
+        Statement st = connection.createStatement();
+        ResultSet resultSet = st.executeQuery(query);) {
+      return new RedshiftSchema(resultSet);
+    }
+  }
+
+  private String getDbUrl(final DataConfiguration config) {
+    return "jdbc:postgresql://" + config.getRedshiftHost() + ":" + config.getRedshiftPort() + "/"
+        + config.getRedshiftDatabase();
+  }
+
+  public void executeRedshiftQuery(final String query, final DataConfiguration config)
+      throws SQLException {
+    final String url = getDbUrl(config);
+    log.info("Executing query \n" + query + "\n on " + url);
+    try (
+        Connection connection = DriverManager.getConnection(url, config.getRedshiftUser(),
+            config.getRedshiftPassword());
+        Statement st = connection.createStatement();) {
+      st.execute(query);
+    }
   }
 
 }

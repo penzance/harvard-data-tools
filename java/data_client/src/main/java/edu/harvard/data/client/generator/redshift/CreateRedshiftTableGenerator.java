@@ -4,11 +4,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.List;
 
 import edu.harvard.data.client.generator.SchemaPhase;
 import edu.harvard.data.client.generator.SchemaTransformer;
-import edu.harvard.data.client.schema.DataSchemaColumn;
 import edu.harvard.data.client.schema.DataSchemaTable;
 
 public class CreateRedshiftTableGenerator {
@@ -31,19 +29,7 @@ public class CreateRedshiftTableGenerator {
 
   private void generateCreateTableFile(final PrintStream out, final SchemaPhase phase) {
     for (final DataSchemaTable table : phase.getSchema().getTables().values()) {
-      out.println("CREATE TABLE " + table.getTableName() + "(");
-      final List<DataSchemaColumn> columns = table.getColumns();
-      for (int i=0; i<columns.size(); i++) {
-        final DataSchemaColumn column = columns.get(i);
-        final String redshiftType = column.getType().getRedshiftType(column.getLength());
-        out.print("    " + column.getName() + " " + redshiftType);
-        if (i < columns.size() - 1) {
-          out.println(",");
-        } else {
-          out.println();
-        }
-      }
-      out.println(");");
+      out.println(SqlGenerator.generateCreateStatement(table));
     }
   }
 

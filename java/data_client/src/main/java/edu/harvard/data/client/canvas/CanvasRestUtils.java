@@ -45,10 +45,10 @@ public class CanvasRestUtils {
 
   public <T> T makeApiCall(final String resourcePath, final int expectedStatus, final JavaType type)
       throws DataConfigurationException, UnexpectedApiResponseException, IOException {
-    log.debug("Making Canvas API call to " + resourcePath);
+    final String url = "https://" + host + resourcePath;
+    log.debug("Making Canvas API call to " + url);
     final String date = getDate();
     final String signature = generateSignature(resourcePath, date);
-    final String url = "https://" + host + resourcePath;
     final HttpGet get = new HttpGet(url);
     get.addHeader("Authorization", "HMACAuth " + key + ":" + signature);
     get.addHeader("Date", date);
@@ -57,9 +57,11 @@ public class CanvasRestUtils {
       final int status = response.getStatusLine().getStatusCode();
       if (status != expectedStatus) {
         log.warn("Unexpected REST API response: " + status);
-        final String responseValue = mapper.readValue(response.getEntity().getContent(),
-            String.class);
-        log.warn(responseValue);
+        if (response.getEntity().getContentLength() > 0) {
+          final String responseValue = mapper.readValue(response.getEntity().getContent(),
+              String.class);
+          log.warn(responseValue);
+        }
         throw new UnexpectedApiResponseException(expectedStatus, status, url);
       }
       return mapper.readValue(response.getEntity().getContent(), type);

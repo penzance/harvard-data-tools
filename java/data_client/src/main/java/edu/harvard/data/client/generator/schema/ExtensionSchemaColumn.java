@@ -57,4 +57,9 @@ public class ExtensionSchemaColumn extends DataSchemaColumn {
     return length;
   }
 
+  @Override
+  public String toString() {
+    return name + ": " + type + " (" + length + ") " + (newlyGenerated ? "*":"");
+  }
+
 }

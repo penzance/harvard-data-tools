@@ -16,6 +16,8 @@ public abstract class DataSchemaTable {
 
   public abstract DataSchemaTable copy();
 
+  public abstract DataSchemaColumn getColumn(final String name);
+
   protected DataSchemaTable(final boolean newlyGenerated, final TableOwner owner) {
     this.newlyGenerated = newlyGenerated;
     this.owner = owner;
@@ -26,7 +28,7 @@ public abstract class DataSchemaTable {
   }
 
   public boolean hasNewlyGeneratedElements() {
-    for(final DataSchemaColumn column : getColumns()) {
+    for (final DataSchemaColumn column : getColumns()) {
       if (column.getNewlyGenerated()) {
         return true;
       }
@@ -45,6 +47,5 @@ public abstract class DataSchemaTable {
   public void setOwner(final TableOwner owner) {
     this.owner = owner;
   }
-
 
 }

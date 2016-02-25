@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum DataSchemaType {
-  BigInt, Boolean, Date, DateTime, DoublePrecision, Int, Integer, Text, Timestamp, VarChar;
+  BigInt, Boolean, Date, DateTime, DoublePrecision, Integer, Text, Timestamp, VarChar;
 
   private static Map<String, DataSchemaType> stringToType;
 
@@ -13,13 +13,15 @@ public enum DataSchemaType {
     stringToType.put("bigint", BigInt);
     stringToType.put("boolean", Boolean);
     stringToType.put("date", Date);
+    stringToType.put("timestamp without time zone", Date);
     stringToType.put("datetime", DateTime);
     stringToType.put("double precision", DoublePrecision);
-    stringToType.put("int", Int);
+    stringToType.put("int", Integer);
     stringToType.put("integer", Integer);
     stringToType.put("text", Text);
     stringToType.put("timestamp", Timestamp);
     stringToType.put("varchar", VarChar);
+    stringToType.put("character varying", VarChar);
   }
 
   public static DataSchemaType parse(final String type) {
@@ -43,7 +45,6 @@ public enum DataSchemaType {
       return "TIMESTAMP";
     case DoublePrecision:
       return "DOUBLE";
-    case Int:
     case Integer:
       return "INT";
     case Text:
@@ -66,7 +67,6 @@ public enum DataSchemaType {
       return "TIMESTAMP";
     case DoublePrecision:
       return "DOUBLE PRECISION";
-    case Int:
     case Integer:
       return "INTEGER";
     case Text:

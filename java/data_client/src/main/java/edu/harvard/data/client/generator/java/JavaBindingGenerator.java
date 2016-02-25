@@ -253,7 +253,6 @@ public class JavaBindingGenerator {
       return Timestamp.class.getSimpleName();
     case DoublePrecision:
       return Double.class.getSimpleName();
-    case Int:
     case Integer:
       return Integer.class.getSimpleName();
     case Text:

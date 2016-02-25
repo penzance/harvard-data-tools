@@ -38,6 +38,11 @@ public class SchemaTransformer {
     return phases.get(i);
   }
 
+  public SchemaPhase getLastPhase() {
+    return phases.get(phases.size() - 1);
+  }
+
+
   public void setJavaPackages(final String... packageList) {
     if (packageList.length != phases.size()) {
       throw new RuntimeException(

@@ -266,7 +266,6 @@ public class ModelClassGenerator {
     case DoublePrecision:
       parseMethod = "Double.valueOf";
       break;
-    case Int:
     case Integer:
       parseMethod = "Integer.valueOf";
       break;

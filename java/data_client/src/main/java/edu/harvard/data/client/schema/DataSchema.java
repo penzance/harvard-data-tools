@@ -10,4 +10,6 @@ public interface DataSchema {
 
   DataSchema copy();
 
+  DataSchemaTable getTableByName(String name);
+
 }

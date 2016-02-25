@@ -148,4 +148,9 @@ public class CanvasDataSchemaColumn extends DataSchemaColumn {
     return s1.equals(s2);
   }
 
+  @Override
+  public String toString() {
+    return name + ": " + type + " (" + length + ") " + (newlyGenerated ? "*":"");
+  }
+
 }

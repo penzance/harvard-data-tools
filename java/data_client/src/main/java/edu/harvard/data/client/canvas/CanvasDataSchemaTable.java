@@ -26,6 +26,7 @@ public class CanvasDataSchemaTable extends DataSchemaTable {
   private final Map<String, String> hints; // "sort_key" : "timestamp" in
   // requests
   private List<DataSchemaColumn> columns;
+  private final Map<String, DataSchemaColumn> columnsByName;
   private final String seeAlso;
   private final String databasePath; // non-null in requests
   private final String originalTable; // non-null in requests
@@ -53,9 +54,11 @@ public class CanvasDataSchemaTable extends DataSchemaTable {
     this.seeAlso = seeAlso;
     this.owner = owner;
     this.columns = new ArrayList<DataSchemaColumn>();
+    this.columnsByName = new HashMap<String, DataSchemaColumn>();
     if (columnList != null) {
       for (final CanvasDataSchemaColumn column : columnList) {
         this.columns.add(column);
+        this.columnsByName.put(column.getName(), column);
       }
     }
   }
@@ -72,8 +75,11 @@ public class CanvasDataSchemaTable extends DataSchemaTable {
     this.originalTable = original.originalTable;
     this.owner = original.owner;
     this.columns = new ArrayList<DataSchemaColumn>();
+    this.columnsByName = new HashMap<String, DataSchemaColumn>();
     for (final DataSchemaColumn column : original.columns) {
-      this.columns.add(column.copy());
+      final DataSchemaColumn columnCopy = column.copy();
+      this.columns.add(columnCopy);
+      this.columnsByName.put(columnCopy.getName(), columnCopy);
     }
   }
 
@@ -202,5 +208,19 @@ public class CanvasDataSchemaTable extends DataSchemaTable {
 
   public void setColumns(final ArrayList<DataSchemaColumn> newColumns) {
     this.columns = newColumns;
+  }
+
+  @Override
+  public DataSchemaColumn getColumn(final String name) {
+    return columnsByName.get(name);
+  }
+
+  @Override
+  public String toString() {
+    String s = tableName + (newlyGenerated ? " *" : "");
+    for (final DataSchemaColumn column : columns) {
+      s += "\n    " + column;
+    }
+    return s;
   }
 }

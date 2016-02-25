@@ -24,6 +24,7 @@ public class CanvasDataCommandGroup implements Command {
   @SubCommands({ @SubCommand(name = "download", impl = CanvasDownloadDumpCommand.class),
     @SubCommand(name = "verify", impl = CanvasVerifyDumpCommand.class),
     @SubCommand(name = "hadoop", impl = CanvasHadoopCommand.class),
+    @SubCommand(name = "redshift", impl = CanvasUpdateRedshiftCommand.class),
     @SubCommand(name = "compareschemas", impl = CanvasCompareSchemasCommand.class), })
   public Command cmd;
 
