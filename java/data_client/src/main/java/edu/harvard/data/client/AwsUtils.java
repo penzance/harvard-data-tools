@@ -152,6 +152,14 @@ public class AwsUtils {
     client.deleteObject(key.getBucket(), key.getKey());
   }
 
+  public void writeEmptyFile(final S3ObjectId obj) {
+    log.debug("Writing empty file to " + obj);
+    final byte[] bytes = new byte[0];
+    final ObjectMetadata metadata = new ObjectMetadata();
+    metadata.setContentLength(bytes.length);
+    client.putObject(obj.getBucket(), obj.getKey(), new ByteArrayInputStream(bytes), metadata);
+  }
+
   public RedshiftSchema getRedshiftSchema(final DataConfiguration config) throws SQLException {
     final String query = "SELECT * FROM information_schema.columns WHERE table_schema='public'";
     final String url = getDbUrl(config);

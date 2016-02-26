@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
@@ -21,6 +23,7 @@ import edu.harvard.data.client.canvas.CanvasDataArtifact;
 import edu.harvard.data.client.canvas.CanvasDataDump;
 import edu.harvard.data.client.canvas.CanvasDataFile;
 import edu.harvard.data.client.canvas.CanvasDataSchema;
+import edu.harvard.data.client.schema.DataSchemaTable;
 import edu.harvard.data.client.schema.UnexpectedApiResponseException;
 import edu.harvard.data.data_tools.DumpInfo;
 import edu.harvard.data.data_tools.FatalError;
@@ -120,6 +123,17 @@ public class CanvasDumpManager {
     final S3ObjectId archiveObj = getArchiveDumpObj(dump);
     aws.writeJson(AwsUtils.key(archiveObj, "schema.json"), schema);
     aws.writeJson(AwsUtils.key(archiveObj, "dump_info.json"), dump);
+    final Set<String> dirs = new HashSet<String>();
+    for (final S3ObjectId directory : aws.listDirectories(archiveObj)) {
+      dirs.add(directory.getKey());
+    }
+    for (final DataSchemaTable table : schema.getTables().values()) {
+      final S3ObjectId tableKey = AwsUtils.key(archiveObj, table.getTableName());
+      if (!dirs.contains(tableKey.getKey())) {
+        System.out.println("Table " + tableKey + " missing");
+        aws.writeEmptyFile(AwsUtils.key(tableKey, "empty_file"));
+      }
+    }
     return archiveObj;
   }
 
