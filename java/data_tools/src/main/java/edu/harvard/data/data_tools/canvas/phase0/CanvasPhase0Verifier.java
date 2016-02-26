@@ -70,15 +70,22 @@ public class CanvasPhase0Verifier implements Verifier {
       final CanvasTable table = CanvasTable.fromSourceName(tableName);
       for (final S3ObjectSummary file : aws.listKeys(dir)) {
         log.info("Verifying S3 file " + file.getBucketName() + "/" + file.getKey());
-        final File tempFile = new File(
-            "/tmp/tempfile" + file.getKey().substring(file.getKey().lastIndexOf(".")));
-        aws.getFile(AwsUtils.key(file.getBucketName(), file.getKey()), tempFile);
-        final List<String> errors = verifyFile(tempFile, tableName, table.getTableClass());
-        tempFile.delete();
-        if (!errors.isEmpty()) {
-          log.info("  Found " + errors.size() + " errors");
-          errorCount += errors.size();
+        final String ext;
+        if (file.getKey().contains(".")) {
+          ext = file.getKey().substring(file.getKey().lastIndexOf("."));
+        } else {
+          ext = "";
         }
+        final File tempFile = new File("/tmp/tempfile" + ext);
+        aws.getFile(AwsUtils.key(file.getBucketName(), file.getKey()), tempFile);
+        if (tempFile.length() > 0) {
+          final List<String> errors = verifyFile(tempFile, tableName, table.getTableClass());
+          if (!errors.isEmpty()) {
+            log.info("  Found " + errors.size() + " errors");
+            errorCount += errors.size();
+          }
+        }
+        tempFile.delete();
       }
     }
     return errorCount;
