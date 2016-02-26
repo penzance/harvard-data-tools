@@ -21,7 +21,7 @@ public class DataConfiguration {
   private String redshiftPort;
   private String redshiftUser;
   private String redshiftPassword;
-
+  private String tableInfoDynamoTable;
 
   public static DataConfiguration getConfiguration(final String propertiesFileName)
       throws IOException, DataConfigurationException {
@@ -43,6 +43,7 @@ public class DataConfiguration {
     config.canvasDataArchiveKey = new S3ObjectId(dataBucket,
         getConfigParameter(properties, "canvas_data_archive_key"));
     config.dumpInfoDynamoTable = getConfigParameter(properties, "dump_info_dynamo_table");
+    config.tableInfoDynamoTable = getConfigParameter(properties, "table_info_dynamo_table");
     config.redshiftDb = getConfigParameter(properties, "redshift_database");
     config.redshiftHost = getConfigParameter(properties, "redshift_host");
     config.redshiftPort = getConfigParameter(properties, "redshift_port");
@@ -87,6 +88,10 @@ public class DataConfiguration {
     return dumpInfoDynamoTable;
   }
 
+  public String getTableInfoDynamoTable() {
+    return tableInfoDynamoTable;
+  }
+
   public String getRedshiftHost() {
     return redshiftHost;
   }
@@ -107,5 +112,8 @@ public class DataConfiguration {
     return redshiftPassword;
   }
 
+  public String getRedshiftUrl() {
+    return "jdbc:postgresql://" + redshiftHost + ":" + redshiftPort + "/" + redshiftDb;
+  }
 
 }

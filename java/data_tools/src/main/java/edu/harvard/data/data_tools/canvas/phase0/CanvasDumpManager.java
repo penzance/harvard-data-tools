@@ -28,6 +28,7 @@ import edu.harvard.data.client.schema.UnexpectedApiResponseException;
 import edu.harvard.data.data_tools.DumpInfo;
 import edu.harvard.data.data_tools.FatalError;
 import edu.harvard.data.data_tools.ReturnStatus;
+import edu.harvard.data.data_tools.TableInfo;
 import edu.harvard.data.data_tools.VerificationException;
 
 public class CanvasDumpManager {
@@ -152,4 +153,14 @@ public class CanvasDumpManager {
     return AwsUtils.key(config.getCanvasDataArchiveKey(), dirName);
   }
 
+  public void updateTableInfoTable(final CanvasDataDump dump) {
+    for (final CanvasDataArtifact artifact : dump.getArtifactsByTable().values()) {
+      final String tableName = artifact.getTableName();
+      final boolean partial = artifact.isPartial();
+      if (!partial) {
+        final TableInfo info = new TableInfo(tableName, dump.getDumpId(), dump.getSequence());
+        info.save();
+      }
+    }
+  }
 }

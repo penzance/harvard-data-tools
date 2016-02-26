@@ -46,6 +46,7 @@ public class DataCli {
       try {
         config = DataConfiguration.getConfiguration("secure.properties");
         DumpInfo.init(config.getDumpInfoDynamoTable());
+        TableInfo.init(config.getTableInfoDynamoTable());
         log.info("Using table " + config.getDumpInfoDynamoTable() + " for dump info.");
       } catch (final DataConfigurationException e) {
         log.fatal("Invalid configuration. Field", e);

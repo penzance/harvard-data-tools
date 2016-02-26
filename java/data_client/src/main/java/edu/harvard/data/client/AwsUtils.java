@@ -162,7 +162,7 @@ public class AwsUtils {
 
   public RedshiftSchema getRedshiftSchema(final DataConfiguration config) throws SQLException {
     final String query = "SELECT * FROM information_schema.columns WHERE table_schema='public'";
-    final String url = getDbUrl(config);
+    final String url = config.getRedshiftUrl();
     try (
         Connection connection = DriverManager.getConnection(url, config.getRedshiftUser(),
             config.getRedshiftPassword());
@@ -172,14 +172,9 @@ public class AwsUtils {
     }
   }
 
-  private String getDbUrl(final DataConfiguration config) {
-    return "jdbc:postgresql://" + config.getRedshiftHost() + ":" + config.getRedshiftPort() + "/"
-        + config.getRedshiftDatabase();
-  }
-
   public void executeRedshiftQuery(final String query, final DataConfiguration config)
       throws SQLException {
-    final String url = getDbUrl(config);
+    final String url = config.getRedshiftUrl();
     log.info("Executing query \n" + query + "\n on " + url);
     try (
         Connection connection = DriverManager.getConnection(url, config.getRedshiftUser(),

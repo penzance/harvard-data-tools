@@ -69,6 +69,7 @@ public class CanvasDownloadDumpCommand implements Command {
           info.setKey(dumpLocation.getKey());
           info.setDownloaded(true);
           info.save();
+          manager.updateTableInfoTable(fullDump);
         } finally {
           manager.deleteTemporaryDump(fullDump);
         }
