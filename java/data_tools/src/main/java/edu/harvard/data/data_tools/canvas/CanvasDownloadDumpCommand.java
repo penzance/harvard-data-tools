@@ -103,7 +103,7 @@ public class CanvasDownloadDumpCommand implements Command {
     mapper.enable(SerializationFeature.INDENT_OUTPUT);
     mapper.writeValue(output, metadataMap);
     try (PrintStream out = new PrintStream(new FileOutputStream(output))) {
-      out.println(mapper.writeValueAsString(metadataMap).replaceAll("  ", "    "));
+      out.println(mapper.writeValueAsString(metadataMap));
     }
   }
 
