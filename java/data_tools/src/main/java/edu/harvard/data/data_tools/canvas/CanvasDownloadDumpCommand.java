@@ -1,7 +1,9 @@
 package edu.harvard.data.data_tools.canvas;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -100,6 +102,9 @@ public class CanvasDownloadDumpCommand implements Command {
     final ObjectMapper mapper = new ObjectMapper();
     mapper.enable(SerializationFeature.INDENT_OUTPUT);
     mapper.writeValue(output, metadataMap);
+    try (PrintStream out = new PrintStream(new FileOutputStream(output))) {
+      out.println(mapper.writeValueAsString(metadataMap).replaceAll("  ", "    "));
+    }
   }
 
   @Override
