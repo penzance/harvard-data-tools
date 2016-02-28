@@ -15,7 +15,6 @@ import org.kohsuke.args4j.Argument;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 import edu.harvard.data.client.AwsUtils;
 import edu.harvard.data.client.DataClient;
@@ -98,7 +97,6 @@ public class CanvasDownloadDumpCommand implements Command {
 
   private void writeMetadata(final Map<String, String> metadataMap) throws IOException {
     final ObjectMapper mapper = new ObjectMapper();
-    mapper.enable(SerializationFeature.INDENT_OUTPUT);
     mapper.writeValue(output, metadataMap);
   }
 
