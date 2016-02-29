@@ -49,6 +49,16 @@ public class CanvasApiClient extends DataClient {
     return dump;
   }
 
+  public CanvasDataDump getDump(final long sequence)
+      throws DataConfigurationException, UnexpectedApiResponseException, IOException {
+    for (final CanvasDataDump dump : getDumps()) {
+      if (dump.getSequence() == sequence) {
+        return getDump(dump.getDumpId());
+      }
+    }
+    return null;
+  }
+
   public CanvasDataTableHistory getTableHistory(final String table)
       throws DataConfigurationException, UnexpectedApiResponseException, IOException {
     final JavaType type = typeFactory.constructType(CanvasDataTableHistory.class);

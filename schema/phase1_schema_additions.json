@@ -3,6 +3,12 @@
       "owner": "java",
       "columns" : [ 
         {
+          "name" : "research_id",
+          "description" : "UUID generated for research data set.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
           "name" : "browser",
           "description" : "Client-side browser from which the request was sent",
           "type" : "varchar",

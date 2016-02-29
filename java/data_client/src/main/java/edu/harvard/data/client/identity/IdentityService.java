@@ -1,5 +1,6 @@
 package edu.harvard.data.client.identity;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -10,6 +11,7 @@ import java.util.UUID;
 
 import edu.harvard.data.client.AwsUtils;
 import edu.harvard.data.client.DataConfiguration;
+import edu.harvard.data.client.DataConfigurationException;
 import edu.harvard.data.client.schema.DataSchema;
 
 public class IdentityService {
@@ -19,9 +21,10 @@ public class IdentityService {
   private final DataConfiguration config;
   private boolean initialized = false;
 
-  public IdentityService(final AwsUtils aws, final DataConfiguration config) {
-    this.aws = aws;
-    this.config = config;
+  public IdentityService()
+      throws IOException, DataConfigurationException {
+    this.aws = new AwsUtils();
+    this.config = DataConfiguration.getConfiguration("secure.properties");
   }
 
   public void init() throws SQLException {
@@ -64,9 +67,8 @@ public class IdentityService {
 
   private void generateResearchId(final IndividualIdentity id) {
     final String uuid = UUID.randomUUID().toString();
-
     // TODO Check for collisions
-    id.addIdentity(IdentityType.RESEARCH_ID, UUID.randomUUID().toString());
+    id.addIdentity(IdentityType.RESEARCH_ID, uuid);
   }
 
   private void getIdentities(final IndividualIdentity id) throws SQLException {
@@ -118,9 +120,15 @@ public class IdentityService {
     String vals = "";
     final IdentityType[] values = IdentityType.values();
     for (int i = 0; i < values.length; i++) {
-      final String value = id.getId(values[i]);
+      final Object value = id.getId(values[i]);
       fields += values[i].toString().toLowerCase();
-      vals += value == null ? "NULL" : "'" + value + "'";
+      if (value == null) {
+        vals += "NULL";
+      } else if (value instanceof String) {
+        vals += value;
+      } else {
+        vals += "'" + value + "'";
+      }
       if (i < values.length - 1) {
         fields += ", ";
         vals += ", ";

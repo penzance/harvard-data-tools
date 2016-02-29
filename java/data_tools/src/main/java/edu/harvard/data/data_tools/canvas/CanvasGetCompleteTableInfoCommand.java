@@ -7,6 +7,8 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.kohsuke.args4j.Argument;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
@@ -25,6 +27,7 @@ import edu.harvard.data.data_tools.TableInfo;
 import edu.harvard.data.data_tools.VerificationException;
 
 public class CanvasGetCompleteTableInfoCommand implements Command {
+  private static final Logger log = LogManager.getLogger();
 
   private static final String FULL_DUMP_DIR = "full_dump";
 
@@ -40,13 +43,22 @@ public class CanvasGetCompleteTableInfoCommand implements Command {
   @Argument(index = 3, usage = "AWS region.", metaVar = "us-east-1", required = true)
   public String region;
 
+  @Argument(index = 4, usage = "Latest dump sequence. The generated script will bring copy all files to this dump in order to generate a current snapshot.",
+      metaVar = "116", required = true)
+  public long latestSequence;
+
   @Override
   public ReturnStatus execute(final DataConfiguration config) throws IOException,
   UnexpectedApiResponseException, DataConfigurationException, VerificationException {
     final CanvasApiClient api = DataClient.getCanvasApiClient(config.getCanvasDataHost(),
         config.getCanvasApiKey(), config.getCanvasApiSecret());
     final AwsUtils aws = new AwsUtils();
-    final CanvasDataDump dump = api.getLatestDump();
+    final CanvasDataDump dump = api.getDump(latestSequence);
+    if (dump == null) {
+      log.error("Can't find dump sequence " + latestSequence);
+      return ReturnStatus.ARGUMENT_ERROR;
+    }
+    System.out.println(dump);
     final Map<String, Long> sequence = new HashMap<String, Long>();
     for (final CanvasDataArtifact artifact : dump.getArtifactsByTable().values()) {
       final String tableName = artifact.getTableName();
@@ -67,7 +79,7 @@ public class CanvasGetCompleteTableInfoCommand implements Command {
           final S3ObjectId inKey = AwsUtils.key(archive, String.format("%05d", i), table);
           if (!aws.listKeys(inKey).isEmpty()) {
             out.println("aws s3 cp s3://" + inKey.getBucket() + "/" + inKey.getKey() + " s3://"
-                + outKey.getBucket() + "/" + outKey.getKey() + " --region " + region
+                + outKey.getBucket() + "/" + outKey.getKey() + "/" + i + " --region " + region
                 + " --recursive");
           }
         }

@@ -56,7 +56,7 @@ public class CanvasHadoopCommand implements Command {
     final List<Job> jobs = new ArrayList<Job>();
     switch (phase) {
     case 1:
-      jobs.add(new RequestJob(conf, aws, hdfsService, inputDir, outputDir).getJob());
+      jobs.add(new RequestJob(conf, config, aws, hdfsService, inputDir, outputDir).getJob());
       jobs.add(new RequestPerFileJob(conf, aws, hdfsService, inputDir, outputDir).getJob());
       jobs.add(new RequestPerPageJob(conf, aws, hdfsService, inputDir, outputDir).getJob());
       break;

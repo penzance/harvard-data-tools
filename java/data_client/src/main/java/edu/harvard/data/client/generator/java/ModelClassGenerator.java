@@ -156,8 +156,7 @@ public class ModelClassGenerator {
     out.println();
   }
 
-  // Generate getters for each field, and setters for any fields that have been
-  // added in this step of processing.
+  // Generate getters and setters for each field.
   private void outputGettersAndSetters(final PrintStream out) {
     for (final DataSchemaColumn column : table.getColumns()) {
       final String typeName = JavaBindingGenerator.javaType(column.getType());
@@ -168,15 +167,12 @@ public class ModelClassGenerator {
       out.println("    return this." + variableName + ";");
       out.println("  }");
       out.println();
-      // Generate setters only for new fields
-      if (column.getNewlyGenerated()) {
-        methodName = "set" + JavaBindingGenerator.javaClass(column.getName(), "");
-        JavaBindingGenerator.writeComment(column.getDescription(), 2, out, true);
-        out.println("  public void " + methodName + "(" + typeName + " " + variableName + ") {");
-        out.println("    this." + variableName + " = " + variableName + ";");
-        out.println("  }");
-        out.println();
-      }
+      methodName = "set" + JavaBindingGenerator.javaClass(column.getName(), "");
+      JavaBindingGenerator.writeComment(column.getDescription(), 2, out, true);
+      out.println("  public void " + methodName + "(" + typeName + " " + variableName + ") {");
+      out.println("    this." + variableName + " = " + variableName + ";");
+      out.println("  }");
+      out.println();
     }
   }
 
