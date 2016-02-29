@@ -36,10 +36,8 @@ public abstract class HadoopJob {
     final FileSystem fs = FileSystem.get(hdfsService, conf);
     final FileStatus[] fileStatus = fs.listStatus(new Path(in));
     for(final FileStatus status : fileStatus){
-      if (!status.isDirectory()) {
-        FileInputFormat.addInputPath(job, status.getPath());
-        System.out.println("Input path: " + status.getPath().toString());
-      }
+      FileInputFormat.addInputPath(job, status.getPath());
+      System.out.println("Input path: " + status.getPath().toString());
     }
 
     System.out.println("Output path: " + out);
