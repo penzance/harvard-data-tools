@@ -77,7 +77,7 @@ class RequestMapper extends Mapper<Object, Text, Text, NullWritable> {
       final Requests request = new Requests(format, csvRecord);
       final Phase1Requests extended = new Phase1Requests(request);
       parseUserAgent(extended);
-      stripIdentity(extended, context);
+      //      stripIdentity(extended, context);
 
       final StringWriter writer = new StringWriter();
       try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
