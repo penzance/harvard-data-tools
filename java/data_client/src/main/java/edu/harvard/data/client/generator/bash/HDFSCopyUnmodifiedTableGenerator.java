@@ -46,7 +46,7 @@ public class HDFSCopyUnmodifiedTableGenerator {
     for (final String name : names) {
       final DataSchemaTable table = schema.get(name);
       if (!table.hasNewlyGeneratedElements()) {
-        out.println("hadoop fs -cp " + inputPhase.getHDFSDir() + "/" + table.getTableName() + " "
+        out.println("hadoop fs -mv " + inputPhase.getHDFSDir() + "/" + table.getTableName() + " "
             + outputPhase.getHDFSDir() + "/" + table.getTableName() + " &>> " + logFile);
       }
     }

@@ -125,9 +125,9 @@ public class IdentityService {
       if (value == null) {
         vals += "NULL";
       } else if (value instanceof String) {
-        vals += value;
-      } else {
         vals += "'" + value + "'";
+      } else {
+        vals += value;
       }
       if (i < values.length - 1) {
         fields += ", ";
