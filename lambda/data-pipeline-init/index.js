@@ -72,7 +72,8 @@ exports.handler = function(event, context) {
                             var fileKey;
                             if (fullObjectKey.indexOf("/") > -1) {
                                 directoryOfKey = fullObjectKey.substr(0, fullObjectKey.lastIndexOf("/"));
-                                fileKey = parseInt(fullObjectKey.substr(fullObjectKey.lastIndexOf("/") + 1), 10).toString();
+//                                fileKey = parseInt(fullObjectKey.substr(fullObjectKey.lastIndexOf("/") + 1), 10).toString();
+                                fileKey = event.DUMP_SEQUENCE;
                             }
 
                             var params = {
