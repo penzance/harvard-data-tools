@@ -52,6 +52,11 @@
             "Description": "Redshift node type",
             "Default": "dc1.large"
         },
+        "RedshiftNumberOfNodesParameter": {
+            "Type": "String",
+            "Description": "Redshift number of nodes",
+            "Default": "1"
+        },
         "RedshiftMasterUserNameParameter": {
             "Type": "String",
             "Description": "Redshift master user (and default db) name",
@@ -851,7 +856,7 @@
                                 {
                                     "Ref": "NewCodeS3Bucket"
                                 },
-                                "/bootstrap.sh\n",
+                                "/bootstrap$DATASETNUM.sh\n",
                                 "\n",
                                 "# Invoke the Lambda function to kickoff the Data Pipeline\n",
                                 "aws lambda invoke --function-name ",
@@ -1165,6 +1170,9 @@
                 },
                 "NodeType": {
                     "Ref": "RedshiftNodeTypeParameter"
+                },
+                "NumberOfNodes": {
+                    "Ref": "RedshiftNumberOfNodesParameter"
                 },
                 "Port": {
                     "Ref": "RedshiftPortParameter"
@@ -1548,6 +1556,10 @@
                                 }
                             },
                             {
+                                "Key": "terminateAfter",
+                                "StringValue": "4 Hours"
+                            },
+                            {
                                 "Key": "bootstrapAction",
                                 "StringValue": {
                                     "Fn::Join": [
@@ -1557,7 +1569,7 @@
                                             {
                                                 "Ref": "NewCodeS3Bucket"
                                             },
-                                            "/bootstrap.sh"
+                                            "/bootstrapdataset-id-placeholder.sh"
                                         ]
                                     ]
                                 }
@@ -3045,8 +3057,378 @@
                                 "StringValue": "2 Minutes"
                             },
                             {
+                                "Key": "onSuccess",
+                                "RefValue": "SendDeleteS3toRedshiftLoadScriptSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendDeleteS3toRedshiftLoadScriptFailureSNSMessage"
+                            },
+                            {
                                 "Key": "dependsOn",
-                                "RefValue": "MoveDatasetToArchives"
+                                "RefValue": "S3toRedshiftLoad"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendDeleteS3toRedshiftLoadScriptSuccessSNSMessage",
+                        "Name": "SendDeleteS3toRedshiftLoadScriptSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Delete S3-to-Redshift load script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendDeleteS3toRedshiftLoadScriptFailureSNSMessage",
+                        "Name": "SendDeleteS3toRedshiftLoadScriptFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Datatset dataset-id-placeholder - Delete S3-to-Redshift load script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "DeleteBootstrapScript",
+                        "Name": "DeleteBootstrapScript",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "ShellCommandActivity"
+                            },
+                            {
+                                "Key": "command",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "aws s3 rm s3://",
+											{
+												"Ref": "NewCodeS3Bucket"
+											},
+                                            "/bootstrapdataset-id-placeholder.sh"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendDeleteBootstrapScriptSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendDeleteBootstrapScriptFailureSNSMessage"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "S3toRedshiftLoad"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendDeleteBootstrapScriptSuccessSNSMessage",
+                        "Name": "SendDeleteBootstrapScriptSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Delete bootstrap script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendDeleteBootstrapScriptFailureSNSMessage",
+                        "Name": "SendDeleteBootstrapScriptFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Datatset dataset-id-placeholder - Delete bootstrap script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "DeleteIntermediateS3Data",
+                        "Name": "DeleteIntermediateS3Data",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "ShellCommandActivity"
+                            },
+                            {
+                                "Key": "command",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "aws s3 rm s3://",
+                                            {
+                                                "Ref": "IntermediateS3Bucket"
+                                            },
+                                            "/dataset-path-placeholder --recursive"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendDeleteIntermediateS3DataSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendDeleteIntermediateS3DataFailureSNSMessage"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "S3toRedshiftLoad"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendDeleteIntermediateS3DataSuccessSNSMessage",
+                        "Name": "SendDeleteIntermediateS3DataSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Delete intermediate S3 data succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendDeleteIntermediateS3DataFailureSNSMessage",
+                        "Name": "SendDeleteIntermediateS3DataFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Datatset dataset-id-placeholder - Delete intermediate S3 data failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
                             }
                         ]
                     },
@@ -3077,6 +3459,18 @@
                             {
                                 "Key": "dependsOn",
                                 "RefValue": "DeleteS3toRedshiftLoadScript"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "DeleteBootstrapScript"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "DeleteIntermediateS3Data"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "MoveDatasetToArchives"
                             }
                         ]
                     },
@@ -3293,6 +3687,42 @@
                     ]
                 }
             }
+        },
+        "TableInfoDynamoDBTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+                "AttributeDefinitions": [
+                    {
+                        "AttributeName": "name",
+                        "AttributeType": "S"
+                    }
+                ],
+                "KeySchema": [
+                    {
+                        "KeyType": "HASH",
+                        "AttributeName": "name"
+                    }
+                ],
+                "ProvisionedThroughput": {
+                    "ReadCapacityUnits": "5",
+                    "WriteCapacityUnits": "5"
+                },
+                "TableName": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "-",
+                            {
+                                "Ref": "EnvironmentParameter"
+                            },
+                            "-table-info"
+                        ]
+                    ]
+                }
+            }
         }
     },
     "Outputs": {
@@ -3348,6 +3778,12 @@
             "Description": "DumpStatus DynamoDB Table",
             "Value": {
                 "Ref": "DumpStatusDynamoDBTable"
+            }
+        },
+        "TableInfoDynamoTable": {
+            "Description": "TableInfo DynamoDB Table",
+            "Value": {
+                "Ref": "TableInfoDynamoDBTable"
             }
         },
         "SuccessSNSARN": {
