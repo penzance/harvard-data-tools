@@ -72,7 +72,8 @@ public class CanvasDumpManager {
   }
 
   public void saveDump(final CanvasApiClient api, final CanvasDataDump dump, final DumpInfo info)
-      throws IOException, UnexpectedApiResponseException, DataConfigurationException, VerificationException {
+      throws IOException, UnexpectedApiResponseException, DataConfigurationException,
+      VerificationException {
     info.setDownloadStart(new Date());
     final File directory = getScratchDumpDir(dump);
     final boolean created = directory.mkdirs();
@@ -81,7 +82,7 @@ public class CanvasDumpManager {
     final List<String> tables = new ArrayList<String>(artifactsByTable.keySet());
     int downloadedFiles = 0;
     for (final String table : tables) {
-      int fileIndex = 0;
+      final int fileIndex = 0;
       final File tableDir = new File(directory, table);
       final CanvasDataArtifact artifact = artifactsByTable.get(table);
       log.info("Dumping " + table + " to " + tableDir);
@@ -96,8 +97,7 @@ public class CanvasDumpManager {
               "Mismatch in file name for refreshed dump. Expected" + refreshedFile.getFilename()
               + ", got " + file.getFilename());
         }
-        final String filename = artifact.getTableName() + "-" + String.format("%05d", fileIndex++)
-        + ".gz";
+        final String filename = getArtifactFileName(refreshedDump.getDumpId(), artifact, fileIndex);
         final File downloadFile = new File(tableDir, filename);
         refreshedFile.download(downloadFile);
         archiveFile(dump, table, downloadFile);
@@ -109,6 +109,12 @@ public class CanvasDumpManager {
       + " files. Actually downloaded " + downloadedFiles);
     }
     info.setDownloadEnd(new Date());
+  }
+
+  private String getArtifactFileName(final String dumpId, final CanvasDataArtifact artifact,
+      int fileIndex) {
+    return artifact.getTableName() + "-" + dumpId + "-" + String.format("%05d", fileIndex++)
+    + ".gz";
   }
 
   public void archiveFile(final CanvasDataDump dump, final String table, final File downloadFile) {
