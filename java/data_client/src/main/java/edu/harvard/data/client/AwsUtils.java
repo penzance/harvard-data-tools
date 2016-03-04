@@ -23,6 +23,8 @@ import org.apache.logging.log4j.Logger;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.CopyObjectRequest;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -88,6 +90,13 @@ public class AwsUtils {
       objects = client.listNextBatchOfObjects(objects);
     } while (objects.isTruncated());
     return dirs;
+  }
+
+  public void rename(final S3ObjectId oldKey, final S3ObjectId newKey) {
+    final CopyObjectRequest copyObjRequest = new CopyObjectRequest(oldKey.getBucket(),
+        oldKey.getKey(), newKey.getBucket(), newKey.getKey());
+    client.copyObject(copyObjRequest);
+    client.deleteObject(new DeleteObjectRequest(oldKey.getBucket(), oldKey.getKey()));
   }
 
   public static String uri(final S3ObjectId obj) {

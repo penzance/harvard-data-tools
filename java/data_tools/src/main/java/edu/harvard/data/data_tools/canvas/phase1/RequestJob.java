@@ -3,7 +3,6 @@ package edu.harvard.data.data_tools.canvas.phase1;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
-import java.sql.SQLException;
 
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -15,8 +14,6 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.client.AwsUtils;
 import edu.harvard.data.client.DataConfiguration;
@@ -26,9 +23,6 @@ import edu.harvard.data.client.FormatLibrary.Format;
 import edu.harvard.data.client.TableFormat;
 import edu.harvard.data.client.canvas.phase0.Requests;
 import edu.harvard.data.client.canvas.phase1.Phase1Requests;
-import edu.harvard.data.client.identity.IdentityService;
-import edu.harvard.data.client.identity.IdentityType;
-import edu.harvard.data.client.identity.IndividualIdentity;
 import edu.harvard.data.data_tools.HadoopJob;
 import edu.harvard.data.data_tools.UserAgentParser;
 import net.sf.uadetector.ReadableUserAgent;
@@ -57,16 +51,12 @@ public class RequestJob extends HadoopJob {
 
 class RequestMapper extends Mapper<Object, Text, Text, NullWritable> {
 
-  private static final Logger log = LogManager.getLogger();
-
   private final TableFormat format;
   private final UserAgentParser uaParser;
-  private final IdentityService ids;
 
   public RequestMapper() throws IOException, DataConfigurationException {
     this.format = new FormatLibrary().getFormat(Format.CanvasDataFlatFiles);
     this.uaParser = new UserAgentParser();
-    ids = new IdentityService();
   }
 
   @Override
@@ -77,7 +67,6 @@ class RequestMapper extends Mapper<Object, Text, Text, NullWritable> {
       final Requests request = new Requests(format, csvRecord);
       final Phase1Requests extended = new Phase1Requests(request);
       parseUserAgent(extended);
-      //      stripIdentity(extended, context);
 
       final StringWriter writer = new StringWriter();
       try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
@@ -85,22 +74,6 @@ class RequestMapper extends Mapper<Object, Text, Text, NullWritable> {
       }
       final Text csvText = new Text(writer.toString().trim());
       context.write(csvText, NullWritable.get());
-    }
-  }
-
-  private void stripIdentity(final Phase1Requests extended, final Mapper<Object, Text, Text, NullWritable>.Context context) {
-    final IndividualIdentity id = new IndividualIdentity();
-    if (extended.getUserId() != null) {
-      id.addIdentity(IdentityType.CANVAS_DATA_ID, extended.getUserId());
-      extended.setUserId(null);
-    }
-    if (!id.getIds().isEmpty()){
-      try {
-        ids.populateId(id);
-        extended.setResearchId((String) id.getId(IdentityType.RESEARCH_ID));
-      } catch (final SQLException e) {
-        log.error("SQL error while resolving ID", e);
-      }
     }
   }
 

@@ -58,7 +58,6 @@ public class CanvasGetCompleteTableInfoCommand implements Command {
       log.error("Can't find dump sequence " + latestSequence);
       return ReturnStatus.ARGUMENT_ERROR;
     }
-    System.out.println(dump);
     final Map<String, Long> sequence = new HashMap<String, Long>();
     for (final CanvasDataArtifact artifact : dump.getArtifactsByTable().values()) {
       final String tableName = artifact.getTableName();
@@ -79,7 +78,7 @@ public class CanvasGetCompleteTableInfoCommand implements Command {
           final S3ObjectId inKey = AwsUtils.key(archive, String.format("%05d", i), table);
           if (!aws.listKeys(inKey).isEmpty()) {
             out.println("aws s3 cp s3://" + inKey.getBucket() + "/" + inKey.getKey() + " s3://"
-                + outKey.getBucket() + "/" + outKey.getKey() + "/" + i + " --region " + region
+                + outKey.getBucket() + "/" + outKey.getKey() + " --region " + region
                 + " --recursive");
           }
         }

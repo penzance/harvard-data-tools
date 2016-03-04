@@ -18,7 +18,7 @@ INSERT OVERWRITE TABLE out_course_dim
     active_user_count.cnt
   FROM
     in_course_dim
-  JOIN (
+  LEFT JOIN (
       SELECT
         course_id, count(*) as cnt
       FROM (
