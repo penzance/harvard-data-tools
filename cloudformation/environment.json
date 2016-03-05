@@ -1871,7 +1871,11 @@
                             },
                             {
                                 "Key": "dependsOn",
-                                "RefValue": "RunPhase1CreateCommand"
+                                "RefValue": "RunPhase1HiveCommand"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase1HadoopJAR"
                             },
                             {
                                 "Key": "runsOn",
@@ -2246,14 +2250,6 @@
                             {
                                 "Key": "dependsOn",
                                 "RefValue": "RunPhase1CopyCommand"
-                            },
-                            {
-                                "Key": "dependsOn",
-                                "RefValue": "RunPhase1HiveCommand"
-                            },
-                            {
-                                "Key": "dependsOn",
-                                "RefValue": "RunPhase1HadoopJAR"
                             },
                             {
                                 "Key": "runsOn",
