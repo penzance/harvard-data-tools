@@ -243,6 +243,7 @@ public class JavaBindingGenerator {
   static String javaType(final DataSchemaType dataType) {
     switch (dataType) {
     case BigInt:
+    case Guid:
       return Long.class.getSimpleName();
     case Boolean:
       return Boolean.class.getSimpleName();

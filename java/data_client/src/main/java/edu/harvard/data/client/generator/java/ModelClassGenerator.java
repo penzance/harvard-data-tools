@@ -247,6 +247,7 @@ public class ModelClassGenerator {
     final String extraParams = "";
     switch (column.getType()) {
     case BigInt:
+    case Guid:
       parseMethod = "Long.valueOf";
       break;
     case Boolean:
