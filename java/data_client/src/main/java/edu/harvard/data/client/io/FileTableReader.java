@@ -23,13 +23,17 @@ public class FileTableReader<T extends DataTable> implements TableReader<T> {
   private final Class<T> tableType;
   private final DelimitedFileIterator<T> iterator;
 
-  public FileTableReader(final Class<T> tableType, final TableFormat format, final File file,
-      final String tableName) throws IOException {
+  public FileTableReader(final Class<T> tableType, final TableFormat format, final File file) throws IOException {
     this.tableType = tableType;
     if (!file.exists() || file.isDirectory()) {
       throw new FileNotFoundException(file.toString());
     }
     iterator = new DelimitedFileIterator<T>(tableType, format, file);
+  }
+
+  public FileTableReader(final Class<T> tableType, final TableFormat format, final InputStream inStream) throws IOException {
+    this.tableType = tableType;
+    iterator = new DelimitedFileIterator<T>(tableType, format, inStream);
   }
 
   @Override
@@ -55,7 +59,8 @@ class DelimitedFileIterator<T extends DataTable> implements Iterator<T>, Closeab
   private CSVParser requestParser;
   private final Class<T> table;
   private final TableFormat format;
-  private final File file;
+  private File file;
+  private InputStream inStream;
   private int line;
 
   public DelimitedFileIterator(final Class<T> table, final TableFormat format, final File file)
@@ -71,6 +76,12 @@ class DelimitedFileIterator<T extends DataTable> implements Iterator<T>, Closeab
     }
   }
 
+  public DelimitedFileIterator(final Class<T> table, final TableFormat format, final InputStream inStream)
+      throws IOException {
+    this(table, format, (File) null);
+    this.inStream = inStream;
+  }
+
   private void createIterator() {
     try {
       final InputStream in = getInputStream();
@@ -83,6 +94,9 @@ class DelimitedFileIterator<T extends DataTable> implements Iterator<T>, Closeab
   }
 
   InputStream getInputStream() throws IOException {
+    if (inStream != null) {
+      return inStream;
+    }
     switch (format.getCompression()) {
     case Gzip:
       return new GZIPInputStream(new FileInputStream(file));

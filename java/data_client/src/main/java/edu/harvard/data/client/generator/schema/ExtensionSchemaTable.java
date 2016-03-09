@@ -15,18 +15,16 @@ import edu.harvard.data.client.schema.TableOwner;
 public class ExtensionSchemaTable extends DataSchemaTable {
 
   private final String description;
-  private final String tableName;
+  private String tableName;
   private final Map<String, DataSchemaColumn> columnsByName;
   private final List<DataSchemaColumn> columns;
 
   @JsonCreator
   public ExtensionSchemaTable(@JsonProperty("description") final String description,
       @JsonProperty("columns") final List<ExtensionSchemaColumn> columnList,
-      @JsonProperty("tableName") final String tableName,
       @JsonProperty("owner") final TableOwner owner) {
     super(false, owner);
     this.description = description;
-    this.tableName = tableName;
     this.columns = new ArrayList<DataSchemaColumn>();
     this.columnsByName = new HashMap<String, DataSchemaColumn>();
     if (columnList != null) {
@@ -61,6 +59,10 @@ public class ExtensionSchemaTable extends DataSchemaTable {
       this.columns.add(columnCopy);
       this.columnsByName.put(columnCopy.getName(), columnCopy);
     }
+  }
+
+  public void setTableName(final String tableName) {
+    this.tableName = tableName;
   }
 
   @Override

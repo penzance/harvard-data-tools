@@ -85,7 +85,7 @@ public class TableFactoryGenerator {
       final String className = JavaBindingGenerator.javaClass(name, classPrefix);
       out.println("    case \"" + name + "\":");
       out.println("      return new FileTableReader<" + className + ">(" + className
-          + ".class, format, file, \"" + name + "\");");
+          + ".class, format, file);");
     }
     out.println("    }");
     out.println("    return null;");
@@ -105,7 +105,7 @@ public class TableFactoryGenerator {
       final String className = JavaBindingGenerator.javaClass(name, classPrefix);
       out.println("    case \"" + name + "\":");
       out.println("      return new S3TableReader<" + className + ">(aws, " + className
-          + ".class, format, obj, \"" + name + "\", tempDir);");
+          + ".class, format, obj, tempDir);");
     }
     out.println("    }");
     out.println("    return null;");
