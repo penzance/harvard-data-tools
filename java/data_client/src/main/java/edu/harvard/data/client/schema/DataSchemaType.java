@@ -36,7 +36,6 @@ public enum DataSchemaType {
   public String getHiveType() {
     switch (this) {
     case BigInt:
-    case Guid:
       return "BIGINT";
     case Boolean:
       return "BOOLEAN";
@@ -49,12 +48,12 @@ public enum DataSchemaType {
       return "DOUBLE";
     case Integer:
       return "INT";
+    case Guid:
     case Text:
     case VarChar:
       return "STRING";
-    default:
-      throw new RuntimeException("Unknown Hive type: " + this);
     }
+    throw new RuntimeException("Unknown Hive type: " + this);
   }
 
   public String getRedshiftType() {
@@ -75,12 +74,14 @@ public enum DataSchemaType {
     case Text:
     case VarChar:
       return "VARCHAR";
-    default:
-      throw new RuntimeException("Unknown Redshift type: " + this);
     }
+    throw new RuntimeException("Unknown Redshift type: " + this);
   }
 
   public String getRedshiftType(final Integer length) {
+    if (this.equals(Guid)) {
+      return "VARCHAR(50)";
+    }
     String typeString = getRedshiftType();
     if (typeString.equals("VARCHAR")) {
       if (length == null || length == 0) {

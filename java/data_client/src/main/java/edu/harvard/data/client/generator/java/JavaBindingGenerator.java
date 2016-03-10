@@ -243,7 +243,6 @@ public class JavaBindingGenerator {
   static String javaType(final DataSchemaType dataType) {
     switch (dataType) {
     case BigInt:
-    case Guid:
       return Long.class.getSimpleName();
     case Boolean:
       return Boolean.class.getSimpleName();
@@ -256,12 +255,12 @@ public class JavaBindingGenerator {
       return Double.class.getSimpleName();
     case Integer:
       return Integer.class.getSimpleName();
+    case Guid:
     case Text:
     case VarChar:
       return String.class.getSimpleName();
-    default:
-      throw new RuntimeException("Unknown data type: " + dataType);
     }
+    throw new RuntimeException("Unknown data type: " + dataType);
   }
 
 }

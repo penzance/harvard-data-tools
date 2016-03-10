@@ -247,7 +247,6 @@ public class ModelClassGenerator {
     final String extraParams = "";
     switch (column.getType()) {
     case BigInt:
-    case Guid:
       parseMethod = "Long.valueOf";
       break;
     case Boolean:
@@ -266,11 +265,10 @@ public class ModelClassGenerator {
     case Integer:
       parseMethod = "Integer.valueOf";
       break;
+    case Guid:
     case Text:
     case VarChar:
       break;
-    default:
-      throw new RuntimeException("Unknown data type: " + column.getType());
     }
     final String getRecord = "record.get(" + idx + ")";
     final String varName = JavaBindingGenerator.javaVariable(column.getName());
