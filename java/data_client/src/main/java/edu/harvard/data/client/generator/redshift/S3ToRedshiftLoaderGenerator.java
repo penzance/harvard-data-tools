@@ -60,6 +60,10 @@ public class S3ToRedshiftLoaderGenerator {
 
       // Drop the staging table.
       out.println("DROP TABLE " + stageTableName + ";");
+
+      // Vacuum and analyze table for optimal performance.
+      out.println("VACUUM " + tableName + ";");
+      out.println("ANALYZE " + tableName + ";");
       out.println();
       out.println();
     }
