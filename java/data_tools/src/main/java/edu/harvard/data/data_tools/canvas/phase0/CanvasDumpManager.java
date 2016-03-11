@@ -82,7 +82,7 @@ public class CanvasDumpManager {
     final List<String> tables = new ArrayList<String>(artifactsByTable.keySet());
     int downloadedFiles = 0;
     for (final String table : tables) {
-      final int fileIndex = 0;
+      int fileIndex = 0;
       final File tableDir = new File(directory, table);
       final CanvasDataArtifact artifact = artifactsByTable.get(table);
       log.info("Dumping " + table + " to " + tableDir);
@@ -97,7 +97,7 @@ public class CanvasDumpManager {
               "Mismatch in file name for refreshed dump. Expected" + refreshedFile.getFilename()
               + ", got " + file.getFilename());
         }
-        final String filename = getArtifactFileName(refreshedDump.getDumpId(), artifact, fileIndex);
+        final String filename = getArtifactFileName(refreshedDump.getDumpId(), artifact, fileIndex++);
         final File downloadFile = new File(tableDir, filename);
         refreshedFile.download(downloadFile);
         archiveFile(dump, table, downloadFile);
@@ -112,8 +112,8 @@ public class CanvasDumpManager {
   }
 
   private String getArtifactFileName(final String dumpId, final CanvasDataArtifact artifact,
-      int fileIndex) {
-    return artifact.getTableName() + "-" + dumpId + "-" + String.format("%05d", fileIndex++)
+      final int fileIndex) {
+    return artifact.getTableName() + "-" + dumpId + "-" + String.format("%05d", fileIndex)
     + ".gz";
   }
 
