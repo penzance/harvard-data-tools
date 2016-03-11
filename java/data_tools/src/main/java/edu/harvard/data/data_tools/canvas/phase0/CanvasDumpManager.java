@@ -45,8 +45,8 @@ public class CanvasDumpManager {
 
   public boolean needToSaveDump(final CanvasDataDump dump) throws IOException {
     final DumpInfo info = DumpInfo.find(dump.getDumpId());
-    if (dump.getSequence() < 116) {
-      log.warn("Dump downloader set to ignore dumps with sequence < 116");
+    if (dump.getSequence() < 136) {
+      log.warn("Dump downloader set to ignore dumps with sequence < 136");
       return false;
     }
     if (info == null) {
