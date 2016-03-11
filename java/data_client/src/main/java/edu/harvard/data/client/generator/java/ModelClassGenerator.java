@@ -32,6 +32,7 @@ public class ModelClassGenerator {
   private final SchemaPhase previousVersion;
   private final String className;
   private final String previousClassName;
+  private final String classPrefix;
 
   public ModelClassGenerator(final String schemaVersion, final SchemaPhase tableVersion,
       final SchemaPhase previousVersion, final DataSchemaTable table) {
@@ -39,7 +40,7 @@ public class ModelClassGenerator {
     this.table = table;
     this.tableVersion = tableVersion;
     this.previousVersion = previousVersion;
-    final String classPrefix = tableVersion.getPrefix();
+    classPrefix = tableVersion.getPrefix();
     this.className = JavaBindingGenerator.javaClass(table.getTableName(), classPrefix);
     this.previousClassName = previousVersion == null ? null
         : JavaBindingGenerator.javaClass(table.getTableName(), previousVersion.getPrefix());
@@ -54,6 +55,8 @@ public class ModelClassGenerator {
 
     outputImportStatements(out);
     out.println("public class " + className + " implements DataTable {");
+    out.println();
+    outputEnumTypes(out);
     outputFields(out);
     outputCsvConstructor(out);
     outputPreviousClassConstructor(out);
@@ -62,6 +65,53 @@ public class ModelClassGenerator {
     outputGetFieldsAsListMethod(out);
     outputGetFieldNames(out);
     out.println("}");
+  }
+
+  private void outputEnumTypes(final PrintStream out) {
+    for (final DataSchemaColumn column : table.getColumns()) {
+      if (column.getType() == DataSchemaType.Enum) {
+        final String enumName = JavaBindingGenerator.javaEnum(column);
+        out.println("  public enum " + enumName + " {");
+        final String desc = column.getDescription();
+        final String[] split = desc.split("'");
+        for (int i=1; i<split.length; i+=2) {
+          out.print("    " + JavaBindingGenerator.javaClass(split[i], "") + "(\"" + split[i] + "\")");
+          if (i + 2 < split.length) {
+            out.println(",");
+          } else {
+            out.println(";");
+          }
+        }
+        out.println();
+        out.println("    private static final Map<String, " + enumName + "> values;");
+        out.println("    static {");
+        out.println("      values = new HashMap<String, " + enumName + ">();");
+        out.println("      for (final " + enumName + " v : " + enumName + ".values()) {");
+        out.println("        values.put(v.value, v);");
+        out.println("      }");
+        out.println("    };");
+        out.println("    public static " + enumName + " parse(final String str) {");
+        out.println("      if (values.containsKey(str)) {");
+        out.println("        return values.get(str);");
+        out.println("      }");
+        out.println("      return valueOf(str);");
+        out.println("    }");
+        out.println();
+        out.println("    private final String value;");
+        out.println("    private " + enumName + "(final String value) {");
+        out.println("      this.value = value;");
+        out.println("    }");
+        out.println("    public String getValue() {");
+        out.println("      return value;");
+        out.println("    }");
+        out.println("    @Override");
+        out.println("    public String toString() {");
+        out.println("      return value;");
+        out.println("    }");
+        out.println("  }");
+        out.println();
+      }
+    }
   }
 
   // Generate the import statements required for the class. Only produce imports
@@ -73,6 +123,10 @@ public class ModelClassGenerator {
     if (hasDateColumn(table)) {
       out.println("import java.util.Date;");
       out.println("import java.text.ParseException;");
+    }
+    if (hasEnumColumn(table)) {
+      out.println("import java.util.Map;");
+      out.println("import java.util.HashMap;");
     }
     out.println("import java.util.ArrayList;");
     out.println("import java.util.List;");
@@ -90,7 +144,7 @@ public class ModelClassGenerator {
   // Generate the field declarations
   private void outputFields(final PrintStream out) {
     for (final DataSchemaColumn column : table.getColumns()) {
-      final String typeName = JavaBindingGenerator.javaType(column.getType());
+      final String typeName = JavaBindingGenerator.javaType(column);
       final String variableName = JavaBindingGenerator.javaVariable(column.getName());
       out.println("  private " + typeName + " " + variableName + ";");
     }
@@ -109,7 +163,7 @@ public class ModelClassGenerator {
     }
     int columnIdx = 0;
     for (final DataSchemaColumn column : table.getColumns()) {
-      generateParseFromCsv(out, column, columnIdx++);
+      outputParseFromCsv(out, column, columnIdx++);
     }
     out.println("  }");
     out.println();
@@ -126,7 +180,12 @@ public class ModelClassGenerator {
         if (!column.getNewlyGenerated()) {
           final String variableName = JavaBindingGenerator.javaVariable(column.getName());
           final String methodName = "get" + JavaBindingGenerator.javaClass(variableName, "");
-          out.println("    this." + variableName + " = " + previousVar + "." + methodName + "();");
+          if (column.getType() == DataSchemaType.Enum) {
+            final String enumName = JavaBindingGenerator.javaEnum(column);
+            out.println("    this." + variableName + " = " + enumName + ".parse(" + previousVar + "." + methodName + "().getValue());");
+          } else {
+            out.println("    this." + variableName + " = " + previousVar + "." + methodName + "();");
+          }
         }
       }
       out.println("  }");
@@ -139,7 +198,7 @@ public class ModelClassGenerator {
     out.println("  public " + className + "(");
     int columnCount = 0;
     for (final DataSchemaColumn column : table.getColumns()) {
-      final String paramType = JavaBindingGenerator.javaType(column.getType());
+      final String paramType = JavaBindingGenerator.javaType(column);
       final String paramName = JavaBindingGenerator.javaVariable(column.getName());
       out.print("        " + paramType + " " + paramName);
       if (++columnCount == table.getColumns().size()) {
@@ -159,7 +218,7 @@ public class ModelClassGenerator {
   // Generate getters and setters for each field.
   private void outputGettersAndSetters(final PrintStream out) {
     for (final DataSchemaColumn column : table.getColumns()) {
-      final String typeName = JavaBindingGenerator.javaType(column.getType());
+      final String typeName = JavaBindingGenerator.javaType(column);
       String methodName = "get" + JavaBindingGenerator.javaClass(column.getName(), "");
       final String variableName = JavaBindingGenerator.javaVariable(column.getName());
       JavaBindingGenerator.writeComment(column.getDescription(), 2, out, true);
@@ -227,6 +286,16 @@ public class ModelClassGenerator {
     return false;
   }
 
+  // Checks the whole table for any column that is of type Enum
+  private boolean hasEnumColumn(final DataSchemaTable table) {
+    for (final DataSchemaColumn c : table.getColumns()) {
+      if (c.getType() == DataSchemaType.Enum) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   // Checks the whole table for any column that is of type Timestamp
   private boolean hasTimestampColumn(final DataSchemaTable table) {
     for (final DataSchemaColumn c : table.getColumns()) {
@@ -241,7 +310,7 @@ public class ModelClassGenerator {
   // The CSV reader returns all data as Strings, so we must use the appropriate
   // valueOf method in the case of boxed primitive types, or use the TableFormat
   // class to parse dates and timestamps.
-  private void generateParseFromCsv(final PrintStream out, final DataSchemaColumn column,
+  private void outputParseFromCsv(final PrintStream out, final DataSchemaColumn column,
       final int idx) {
     String parseMethod = null;
     final String extraParams = "";
@@ -265,6 +334,8 @@ public class ModelClassGenerator {
     case Integer:
       parseMethod = "Integer.valueOf";
       break;
+    case Enum:
+      parseMethod = JavaBindingGenerator.javaEnum(column) + ".parse";
     case Guid:
     case Text:
     case VarChar:

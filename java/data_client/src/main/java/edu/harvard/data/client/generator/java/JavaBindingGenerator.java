@@ -23,8 +23,8 @@ import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.client.generator.SchemaPhase;
 import edu.harvard.data.client.generator.SchemaTransformer;
+import edu.harvard.data.client.schema.DataSchemaColumn;
 import edu.harvard.data.client.schema.DataSchemaTable;
-import edu.harvard.data.client.schema.DataSchemaType;
 
 public class JavaBindingGenerator {
 
@@ -210,6 +210,10 @@ public class JavaBindingGenerator {
     }
   }
 
+  public static String javaEnum(final DataSchemaColumn column) {
+    return javaClass(column.getName() + "Enum", "");
+  }
+
   // Format a String into the CorrectJavaClassName format.
   static String javaClass(final String str, final String classPrefix) {
     String className = classPrefix;
@@ -240,8 +244,8 @@ public class JavaBindingGenerator {
   }
 
   // Convert the types specified in the schema.json format into Java types.
-  static String javaType(final DataSchemaType dataType) {
-    switch (dataType) {
+  static String javaType(final DataSchemaColumn column) {
+    switch (column.getType()) {
     case BigInt:
       return Long.class.getSimpleName();
     case Boolean:
@@ -259,8 +263,10 @@ public class JavaBindingGenerator {
     case Text:
     case VarChar:
       return String.class.getSimpleName();
+    case Enum:
+      return javaEnum(column);
     }
-    throw new RuntimeException("Unknown data type: " + dataType);
+    throw new RuntimeException("Unknown data type: " + column.getType());
   }
 
 }
