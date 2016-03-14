@@ -65,28 +65,28 @@ public class DataCli {
         exec = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         final ReturnStatus status = parser.cmd.execute(config, exec);
         if (status.isFailure()) {
-          bail(status, args, config, "Task resulted in unexpected status code.");
+          bail(status, args, config, "Task resulted in unexpected status code.", null);
         }
       } catch (final IOException e) {
         log.fatal(e.getMessage(), e);
-        bail(ReturnStatus.IO_ERROR, args, config, "IO error: " + e.getMessage());
+        bail(ReturnStatus.IO_ERROR, args, config, "IO error: " + e.getMessage(), e);
       } catch (final VerificationException e) {
         log.fatal(e.getMessage(), e);
         bail(ReturnStatus.VERIFICATION_FAILURE, args, config,
-            "Verification error: " + e.getMessage());
+            "Verification error: " + e.getMessage(), e);
       } catch (final IllegalArgumentException e) {
         log.fatal(e.getMessage(), e);
         printUsage(cli);
-        bail(ReturnStatus.ARGUMENT_ERROR, args, config, e.getMessage());
+        bail(ReturnStatus.ARGUMENT_ERROR, args, config, e.getMessage(), e);
       } catch (final UnexpectedApiResponseException e) {
         log.fatal(e.getMessage(), e);
-        bail(ReturnStatus.API_ERROR, args, config, "API error: " + e.getMessage());
+        bail(ReturnStatus.API_ERROR, args, config, "API error: " + e.getMessage(), e);
       } catch (final FatalError e) {
         log.fatal(e.getMessage(), e);
-        bail(e.getStatus(), args, config, e.getMessage());
+        bail(e.getStatus(), args, config, e.getMessage(), e);
       } catch (final Throwable t) {
         log.fatal(t.getMessage(), t);
-        bail(ReturnStatus.UNKNOWN_ERROR, args, config, "Unexpected error: " + t.getMessage());
+        bail(ReturnStatus.UNKNOWN_ERROR, args, config, "Unexpected error: " + t.getMessage(), t);
       } finally {
         if (exec != null) {
           final List<Runnable> jobs = exec.shutdownNow();
@@ -132,9 +132,13 @@ public class DataCli {
   }
 
   public static void bail(final ReturnStatus status, final String[] args,
-      final DataConfiguration config, final String message) {
+      final DataConfiguration config, final String message, final Throwable t) {
     log.error("Exiting with error status " + status);
-    log.error(message);
+    if (t == null) {
+      log.error(message);
+    } else {
+      log.error(message, t);
+    }
     log.error("Application was launched with arguments:");
     for (final String arg : args) {
       log.error("  " + arg);

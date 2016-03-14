@@ -76,19 +76,23 @@ public class AwsUtils {
 
   public Set<S3ObjectId> listDirectories(final S3ObjectId obj) {
     log.debug("Listing directories for " + obj);
+    final Set<String> keys = new HashSet<String>();
     final String prefix = obj.getKey() + "/";
     ObjectListing objects = client.listObjects(obj.getBucket(), prefix);
-    final Set<S3ObjectId> dirs = new HashSet<S3ObjectId>();
     do {
       for (final S3ObjectSummary objectSummary : objects.getObjectSummaries()) {
         final String subKey = objectSummary.getKey().substring(prefix.length());
         final String[] keyParts = subKey.split("/");
         if (keyParts.length == 2) {
-          dirs.add(key(obj, keyParts[0]));
+          keys.add(keyParts[0]);
         }
       }
       objects = client.listNextBatchOfObjects(objects);
     } while (objects.isTruncated());
+    final Set<S3ObjectId> dirs = new HashSet<S3ObjectId>();
+    for (final String k : keys) {
+      dirs.add(key(obj, k));
+    }
     return dirs;
   }
 

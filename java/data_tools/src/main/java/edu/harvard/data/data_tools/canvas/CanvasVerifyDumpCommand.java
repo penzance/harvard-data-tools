@@ -12,9 +12,7 @@ import edu.harvard.data.client.AwsUtils;
 import edu.harvard.data.client.DataConfiguration;
 import edu.harvard.data.client.DataConfigurationException;
 import edu.harvard.data.client.FormatLibrary;
-import edu.harvard.data.client.TableFactory;
 import edu.harvard.data.client.TableFormat;
-import edu.harvard.data.client.canvas.phase0.CanvasTableFactory;
 import edu.harvard.data.client.schema.UnexpectedApiResponseException;
 import edu.harvard.data.data_tools.Command;
 import edu.harvard.data.data_tools.ReturnStatus;
@@ -41,7 +39,6 @@ public class CanvasVerifyDumpCommand implements Command {
   public ReturnStatus execute(final DataConfiguration config, final ExecutorService exec)
       throws IOException, DataConfigurationException, UnexpectedApiResponseException {
     final AwsUtils aws = new AwsUtils();
-    final TableFactory factory = new CanvasTableFactory();
     final FormatLibrary formats = new FormatLibrary();
     final TableFormat format = formats.getFormat(FormatLibrary.Format.CanvasDataFlatFiles);
 
@@ -51,7 +48,7 @@ public class CanvasVerifyDumpCommand implements Command {
         log.error("Dump ID is required for Phase 0");
         return ReturnStatus.ARGUMENT_ERROR;
       }
-      verifier = new CanvasPhase0Verifier(dumpId, aws, factory, format, config.getScratchDir(),
+      verifier = new CanvasPhase0Verifier(dumpId, aws, format, config.getScratchDir(),
           exec);
     } else {
       if (dataDir == null) {

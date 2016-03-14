@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface DataTable {
 
-  List<Object> getFieldsAsList(final TableFormat formatter);
+  List<Object> getFieldsAsList(final TableFormat format);
 
 }

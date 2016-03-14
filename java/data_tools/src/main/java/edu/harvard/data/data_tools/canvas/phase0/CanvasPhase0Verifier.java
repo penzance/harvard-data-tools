@@ -7,11 +7,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -19,6 +19,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.zip.GZIPInputStream;
 
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,11 +30,8 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 import edu.harvard.data.client.AwsUtils;
 import edu.harvard.data.client.DataTable;
-import edu.harvard.data.client.TableFactory;
 import edu.harvard.data.client.TableFormat;
 import edu.harvard.data.client.canvas.phase0.CanvasTable;
-import edu.harvard.data.client.io.TableReader;
-import edu.harvard.data.client.io.TableWriter;
 import edu.harvard.data.data_tools.DumpInfo;
 import edu.harvard.data.data_tools.VerificationException;
 import edu.harvard.data.data_tools.Verifier;
@@ -43,14 +43,12 @@ public class CanvasPhase0Verifier implements Verifier {
   private final AwsUtils aws;
   private final ExecutorService exec;
   private final File tmpDir;
-  private final TableFactory factory;
   private final TableFormat format;
 
-  public CanvasPhase0Verifier(final String dumpId, final AwsUtils aws, final TableFactory factory,
-      final TableFormat format, final File tmpDir, final ExecutorService exec) {
+  public CanvasPhase0Verifier(final String dumpId, final AwsUtils aws, final TableFormat format,
+      final File tmpDir, final ExecutorService exec) {
     this.dumpId = dumpId;
     this.aws = aws;
-    this.factory = factory;
     this.format = format;
     this.tmpDir = tmpDir;
     this.exec = exec;
@@ -72,7 +70,7 @@ public class CanvasPhase0Verifier implements Verifier {
     }
   }
 
-  private long verifyDump(final S3ObjectId dumpObj) throws IOException {
+  private long verifyDump(final S3ObjectId dumpObj) throws IOException, VerificationException {
     final Set<Future<Long>> futures = new HashSet<Future<Long>>();
     for (final S3ObjectId dir : aws.listDirectories(dumpObj)) {
       final String tableName = dir.getKey().substring(dir.getKey().lastIndexOf("/") + 1);
@@ -81,7 +79,7 @@ public class CanvasPhase0Verifier implements Verifier {
         final S3ObjectId awsFile = AwsUtils.key(file.getBucketName(), file.getKey());
         log.info("Verifying S3 file " + file.getBucketName() + "/" + file.getKey()
         + " representing table " + table);
-        final Callable<Long> job = new CanvasPhase0VerifierJob(aws, awsFile, factory, format, table,
+        final Callable<Long> job = new CanvasPhase0VerifierJob2(aws, awsFile, format, table,
             tmpDir);
         final Future<Long> future = exec.submit(job);
         futures.add(future);
@@ -98,9 +96,11 @@ public class CanvasPhase0Verifier implements Verifier {
       } catch (final ExecutionException e) {
         if (e.getCause() instanceof IOException) {
           throw (IOException) e.getCause();
+        } else if (e.getCause() instanceof VerificationException) {
+          throw (VerificationException) e.getCause();
         } else {
-          log.error("Caught unexpected error from verify job", e);
-          throw new RuntimeException(e);
+          log.error("Caught unexpected error from verify job", e.getCause());
+          throw new VerificationException(e.getCause());
         }
       }
     }
@@ -108,29 +108,26 @@ public class CanvasPhase0Verifier implements Verifier {
   }
 }
 
-class CanvasPhase0VerifierJob implements Callable<Long> {
+class CanvasPhase0VerifierJob2 implements Callable<Long> {
   private static final int MAX_LOG_LINES = 100;
   private static final Logger log = LogManager.getLogger();
   private final S3ObjectId awsFile;
   private final CanvasTable table;
   private final File tmpDir;
   private final AwsUtils aws;
-  private final TableFactory factory;
   private final TableFormat format;
 
-  public CanvasPhase0VerifierJob(final AwsUtils aws, final S3ObjectId awsFile,
-      final TableFactory factory, final TableFormat format, final CanvasTable table,
-      final File tmpDir) {
+  public CanvasPhase0VerifierJob2(final AwsUtils aws, final S3ObjectId awsFile,
+      final TableFormat format, final CanvasTable table, final File tmpDir) {
     this.aws = aws;
     this.awsFile = awsFile;
-    this.factory = factory;
     this.format = format;
     this.table = table;
     this.tmpDir = tmpDir;
   }
 
   @Override
-  public Long call() throws IOException {
+  public Long call() throws IOException, VerificationException {
     log.info("Running verifier job for " + awsFile);
     final String path;
     String fileName;
@@ -148,7 +145,7 @@ class CanvasPhase0VerifierJob implements Callable<Long> {
       aws.getFile(awsFile, tmpFile);
       long errorCount = 0;
       if (tmpFile.length() > 0) {
-        final List<String> errors = verifyFile(tmpFile, table);
+        final List<String> errors = verifyFile(table.getTableClass(), tmpFile);
         if (!errors.isEmpty()) {
           errorCount += errors.size();
         }
@@ -162,82 +159,55 @@ class CanvasPhase0VerifierJob implements Callable<Long> {
 
   }
 
-  @SuppressWarnings("unchecked")
-  private <T extends DataTable> List<String> verifyFile(final File tmpFile,
-      final CanvasTable table2) throws IOException {
-    final File parsedFile = new File(
-        tmpFile.getParent() + File.separator + "parsed-" + tmpFile.getName());
-    try (
-        final TableReader<T> in = (TableReader<T>) factory.getTableReader(table.getSourceName(),
-            format, tmpFile);
-        final TableWriter<T> out = (TableWriter<T>) factory.getTableWriter(table.getSourceName(),
-            format, parsedFile)) {
-      out.pipe(in);
+  private <T extends DataTable> List<String> verifyFile(final Class<T> cls, final File tmpFile)
+      throws IOException, VerificationException {
+    Constructor<T> constructor;
+    try {
+      constructor = cls.getConstructor(TableFormat.class, CSVRecord.class);
+    } catch (NoSuchMethodException | SecurityException e) {
+      log.error("Failed to load constructor for class " + cls.getCanonicalName(), e);
+      throw new VerificationException(e);
     }
-    final List<String> differences = textualCompareFiles(tmpFile, parsedFile);
-    parsedFile.delete();
+    final List<String> differences = new ArrayList<String>();
+    int linesPrinted = 0;
+    try (final BufferedReader in = getReaderForFile(tmpFile);) {
+      String line = in.readLine();
+      while (line != null) {
+        line += "\n"; // put back the newline that in.readLine stripped.
+        final StringBuilder parsedLine = new StringBuilder();
+        final CSVPrinter printer = format.getCsvFormat().print(parsedLine);
+        for (final CSVRecord csvRecord : CSVParser.parse(line, format.getCsvFormat())
+            .getRecords()) {
+          T record;
+          try {
+            record = constructor.newInstance(format, csvRecord);
+          } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+              | InvocationTargetException e) {
+            log.error("Failed to create instance of " + cls.getCanonicalName(), e);
+            log.info("File: " + tmpFile);
+            log.info("Line: " + line);
+            log.info("Record: " + csvRecord);
+            throw new VerificationException(e);
+          }
+          printer.printRecord(record.getFieldsAsList(format));
+        }
+        final String cleanOriginal = cleanLine(line);
+        final String cleanParsed = cleanLine(parsedLine.toString());
+        if (!cleanOriginal.equals(cleanParsed)) {
+          differences.add("< " + cleanOriginal + "\n> " + cleanParsed);
+          if (linesPrinted++ < MAX_LOG_LINES) {
+            log.debug("Difference found in " + tmpFile.getName() + ":\n"
+                + differences.get(differences.size() - 1));
+          }
+        }
+        line = in.readLine();
+      }
+    }
+
     return differences;
   }
 
-  private List<String> textualCompareFiles(final File file, final File parsedFile)
-      throws IOException {
-    final Map<String, Integer> lineMap = buildLineMap(file);
-    final List<String> errors = removeMatchingLines(lineMap, parsedFile);
-    int linesPrinted = 0;
-    for (final String line : lineMap.keySet()) {
-      for (int i = 0; i < lineMap.get(line); i++) {
-        errors.add("< " + line);
-        if (linesPrinted++ < MAX_LOG_LINES) {
-          log.debug(errors.get(errors.size() - 1));
-        }
-      }
-    }
-    return errors;
-  }
-
-  private Map<String, Integer> buildLineMap(final File file) throws IOException {
-    final Map<String, Integer> lineMap = new HashMap<String, Integer>();
-    try (BufferedReader in = getReaderForFile(file)) {
-      String line = readAndCleanLine(in);
-      while (line != null) {
-        if (lineMap.containsKey(line)) {
-          lineMap.put(line, lineMap.get(line) + 1);
-        } else {
-          lineMap.put(line, 1);
-        }
-        line = readAndCleanLine(in);
-      }
-    }
-    return lineMap;
-  }
-
-  private List<String> removeMatchingLines(final Map<String, Integer> lineMap,
-      final File parsedFile) throws IOException {
-    final List<String> errors = new ArrayList<String>();
-    int linesPrinted = 0;
-    try (BufferedReader in = getReaderForFile(parsedFile)) {
-      String line = readAndCleanLine(in);
-      while (line != null) {
-        if (!lineMap.containsKey(line)) {
-          errors.add("> " + line);
-          if (linesPrinted++ < MAX_LOG_LINES) {
-            log.debug(errors.get(errors.size() - 1));
-          }
-        } else {
-          if (lineMap.get(line) == 1) {
-            lineMap.remove(line);
-          } else {
-            lineMap.put(line, lineMap.get(line) - 1);
-          }
-        }
-        line = readAndCleanLine(in);
-      }
-    }
-    return errors;
-  }
-
-  private String readAndCleanLine(final BufferedReader in) throws IOException {
-    String line = in.readLine();
+  private String cleanLine(String line) throws IOException {
     if (line != null) {
       line = line.replaceAll("\\\\N", "\\\\n");
       line = line.replaceAll("\\.0\\t", "\t");
