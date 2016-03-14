@@ -8,6 +8,7 @@ GENERATED_CODE_DIR = os.environ['HARVARD_DATA_GENERATED_OUTPUT']
 SECURE_PROPERTIES_LOCATION = os.environ['SECURE_PROPERTIES_LOCATION']
 RESULT_METADATA = os.environ['CANVAS_DATA_RESULT_FILE']
 GIT_BASE = os.environ['HARVARD_DATA_TOOLS_BASE']
+DUMP_ID = os.environ.get('CANVAS_DATA_DUMP_ID', None)
 
 MAIN_CLASS = 'edu.harvard.data.data_tools.DataCli'
 CLASSPATH = "{0}/data_tools.jar:{1}:{2}".format(
@@ -28,15 +29,18 @@ def bail(message):
     print message
 
 def download_and_verify():
-    status = run_command(['canvas', 'download', RESULT_METADATA])
-    if status != 0:
-        bail('Failed to download dump')
-        return status
+    if not DUMP_ID:
+        status = run_command(['canvas', 'download', RESULT_METADATA])
+        if status != 0:
+            bail('Failed to download dump')
+            return status
 
-    with open(RESULT_METADATA) as result_file:
-        download_result = json.load(result_file)
-
-    dump_id = download_result['DUMP_ID']
+        with open(RESULT_METADATA) as result_file:
+            download_result = json.load(result_file)
+        dump_id = download_result['DUMP_ID']
+    else:
+        dump_id = DUMP_ID
+        print "Skipping download for Dump ID: {0}".format(dump_id)
 
     status = run_command(['canvas', 'compareschemas', dump_id, CURRENT_SCHEMA])
     if status != 0:
