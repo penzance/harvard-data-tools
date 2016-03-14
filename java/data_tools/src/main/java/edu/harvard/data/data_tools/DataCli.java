@@ -3,6 +3,9 @@ package edu.harvard.data.data_tools;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,6 +23,8 @@ import edu.harvard.data.data_tools.canvas.CanvasDataCommandGroup;
 
 public class DataCli {
   private static final Logger log = LogManager.getLogger();
+
+  private static final int THREAD_POOL_SIZE = 10;
 
   @Argument(handler = SubCommandHandler.class, usage = "Top-level command.")
   @SubCommands({ @SubCommand(name = "canvas", impl = CanvasDataCommandGroup.class) })
@@ -55,8 +60,10 @@ public class DataCli {
         log.fatal("IO error when reading configuration: " + e.getMessage(), e);
         System.exit(ReturnStatus.IO_ERROR.getCode());
       }
+      ExecutorService exec = null;
       try {
-        final ReturnStatus status = parser.cmd.execute(config);
+        exec = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+        final ReturnStatus status = parser.cmd.execute(config, exec);
         if (status.isFailure()) {
           bail(status, args, config, "Task resulted in unexpected status code.");
         }
@@ -80,6 +87,13 @@ public class DataCli {
       } catch (final Throwable t) {
         log.fatal(t.getMessage(), t);
         bail(ReturnStatus.UNKNOWN_ERROR, args, config, "Unexpected error: " + t.getMessage());
+      } finally {
+        if (exec != null) {
+          final List<Runnable> jobs = exec.shutdownNow();
+          if (jobs.size() > 0) {
+            log.error("Shutting down execution framework with " + jobs.size() + " jobs remaining");
+          }
+        }
       }
     }
   }

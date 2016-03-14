@@ -1,6 +1,7 @@
 package edu.harvard.data.data_tools;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
 
 import edu.harvard.data.client.DataConfiguration;
 import edu.harvard.data.client.DataConfigurationException;
@@ -10,7 +11,7 @@ public interface Command {
 
   String getDescription();
 
-  ReturnStatus execute(DataConfiguration config) throws IOException, UnexpectedApiResponseException,
-  DataConfigurationException, VerificationException;
+  ReturnStatus execute(DataConfiguration config, ExecutorService exec) throws IOException,
+  UnexpectedApiResponseException, DataConfigurationException, VerificationException;
 
 }

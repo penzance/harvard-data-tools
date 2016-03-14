@@ -2,6 +2,7 @@ package edu.harvard.data.data_tools.canvas;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,7 +30,7 @@ public class CanvasCompareSchemasCommand implements Command {
   private String expectedVersion;
 
   @Override
-  public ReturnStatus execute(final DataConfiguration config)
+  public ReturnStatus execute(final DataConfiguration config, final ExecutorService exec)
       throws IOException, DataConfigurationException, UnexpectedApiResponseException {
     final CanvasApiClient api = DataClient.getCanvasApiClient(config.getCanvasDataHost(),
         config.getCanvasApiKey(), config.getCanvasApiSecret());

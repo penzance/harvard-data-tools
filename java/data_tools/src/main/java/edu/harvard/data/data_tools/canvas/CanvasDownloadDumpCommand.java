@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,7 +42,7 @@ public class CanvasDownloadDumpCommand implements Command {
   private File output;
 
   @Override
-  public ReturnStatus execute(final DataConfiguration config) throws IOException,
+  public ReturnStatus execute(final DataConfiguration config, final ExecutorService exec) throws IOException,
   DataConfigurationException, UnexpectedApiResponseException, VerificationException {
     final AwsUtils aws = new AwsUtils();
     final CanvasDumpManager manager = new CanvasDumpManager(config, aws);

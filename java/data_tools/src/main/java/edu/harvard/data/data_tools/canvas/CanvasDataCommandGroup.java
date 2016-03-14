@@ -1,6 +1,7 @@
 package edu.harvard.data.data_tools.canvas;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,9 +37,10 @@ public class CanvasDataCommandGroup implements Command {
   }
 
   @Override
-  public ReturnStatus execute(final DataConfiguration config) throws IOException,
-  UnexpectedApiResponseException, DataConfigurationException, VerificationException {
+  public ReturnStatus execute(final DataConfiguration config, final ExecutorService exec)
+      throws IOException, UnexpectedApiResponseException, DataConfigurationException,
+      VerificationException {
     log.info("Running command: " + cmd.getDescription());
-    return cmd.execute(config);
+    return cmd.execute(config, exec);
   }
 }

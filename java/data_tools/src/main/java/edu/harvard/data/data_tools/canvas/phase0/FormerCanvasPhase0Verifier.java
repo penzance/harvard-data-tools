@@ -9,14 +9,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.logging.log4j.LogManager;
@@ -36,24 +30,22 @@ import edu.harvard.data.data_tools.DumpInfo;
 import edu.harvard.data.data_tools.VerificationException;
 import edu.harvard.data.data_tools.Verifier;
 
-public class CanvasPhase0Verifier implements Verifier {
+public class FormerCanvasPhase0Verifier implements Verifier {
 
   private static final Logger log = LogManager.getLogger();
-  private final String dumpId;
-  private final AwsUtils aws;
-  private final ExecutorService exec;
-  private final File tmpDir;
-  private final TableFactory factory;
-  private final TableFormat format;
 
-  public CanvasPhase0Verifier(final String dumpId, final AwsUtils aws, final TableFactory factory,
-      final TableFormat format, final File tmpDir, final ExecutorService exec) {
+  private static final int MAX_LOG_LINES = 100;
+
+  private final TableFormat format;
+  private final TableFactory factory;
+  private final AwsUtils aws;
+  private final String dumpId;
+
+  public FormerCanvasPhase0Verifier(final String dumpId, final AwsUtils aws, final TableFactory factory, final TableFormat format) {
     this.dumpId = dumpId;
     this.aws = aws;
     this.factory = factory;
     this.format = format;
-    this.tmpDir = tmpDir;
-    this.exec = exec;
   }
 
   @Override
@@ -64,117 +56,52 @@ public class CanvasPhase0Verifier implements Verifier {
       final S3ObjectId dumpObj = AwsUtils.key(info.getBucket(), info.getKey());
       final long errors = verifyDump(dumpObj);
       if (errors > 0) {
-        throw new VerificationException(
-            "Encountered " + errors + " errors when verifying dump at " + dumpObj);
+        throw new VerificationException("Encountered " + errors + " errors when verifying dump at " + dumpObj);
       }
       info.setVerified(true);
       info.save();
     }
   }
 
-  private long verifyDump(final S3ObjectId dumpObj) throws IOException {
-    final Set<Future<Long>> futures = new HashSet<Future<Long>>();
+  public long verifyDump(final S3ObjectId dumpObj) throws IOException {
+    long errorCount = 0;
     for (final S3ObjectId dir : aws.listDirectories(dumpObj)) {
       final String tableName = dir.getKey().substring(dir.getKey().lastIndexOf("/") + 1);
       final CanvasTable table = CanvasTable.fromSourceName(tableName);
       for (final S3ObjectSummary file : aws.listKeys(dir)) {
-        final S3ObjectId awsFile = AwsUtils.key(file.getBucketName(), file.getKey());
-        log.info("Verifying S3 file " + file.getBucketName() + "/" + file.getKey()
-        + " representing table " + table);
-        final Callable<Long> job = new CanvasPhase0VerifierJob(aws, awsFile, factory, format, table,
-            tmpDir);
-        final Future<Long> future = exec.submit(job);
-        futures.add(future);
-      }
-    }
-    long errorCount = 0;
-    for (final Future<Long> future : futures) {
-      try {
-        errorCount += future.get();
-      } catch (final InterruptedException e) {
-        log.error("Interrupted while waiting for verify tasks to complete", e);
-        return errorCount + 1; // Ensure that we don't mark the verify as
-        // successful.
-      } catch (final ExecutionException e) {
-        if (e.getCause() instanceof IOException) {
-          throw (IOException) e.getCause();
+        log.info("Verifying S3 file " + file.getBucketName() + "/" + file.getKey());
+        final String ext;
+        if (file.getKey().contains(".")) {
+          ext = file.getKey().substring(file.getKey().lastIndexOf("."));
         } else {
-          log.error("Caught unexpected error from verify job", e);
-          throw new RuntimeException(e);
+          ext = "";
         }
+        final File tempFile = new File("/tmp/tempfile" + ext);
+        aws.getFile(AwsUtils.key(file.getBucketName(), file.getKey()), tempFile);
+        if (tempFile.length() > 0) {
+          final List<String> errors = verifyFile(tempFile, tableName, table.getTableClass());
+          if (!errors.isEmpty()) {
+            log.info("  Found " + errors.size() + " errors");
+            errorCount += errors.size();
+          }
+        }
+        tempFile.delete();
       }
     }
     return errorCount;
   }
-}
-
-class CanvasPhase0VerifierJob implements Callable<Long> {
-  private static final int MAX_LOG_LINES = 100;
-  private static final Logger log = LogManager.getLogger();
-  private final S3ObjectId awsFile;
-  private final CanvasTable table;
-  private final File tmpDir;
-  private final AwsUtils aws;
-  private final TableFactory factory;
-  private final TableFormat format;
-
-  public CanvasPhase0VerifierJob(final AwsUtils aws, final S3ObjectId awsFile,
-      final TableFactory factory, final TableFormat format, final CanvasTable table,
-      final File tmpDir) {
-    this.aws = aws;
-    this.awsFile = awsFile;
-    this.factory = factory;
-    this.format = format;
-    this.table = table;
-    this.tmpDir = tmpDir;
-  }
-
-  @Override
-  public Long call() throws IOException {
-    log.info("Running verifier job for " + awsFile);
-    final String path;
-    String fileName;
-    if (awsFile.getKey().contains("/")) {
-      fileName = awsFile.getKey().substring(awsFile.getKey().lastIndexOf("/"));
-      path = awsFile.getKey().substring(0, awsFile.getKey().lastIndexOf("/"));
-    } else {
-      fileName = awsFile.getKey();
-      path = "/";
-    }
-    final File tmpFile = new File(tmpDir, path + "/" + fileName);
-    log.info("Temp file: " + tmpFile);
-
-    try {
-      aws.getFile(awsFile, tmpFile);
-      long errorCount = 0;
-      if (tmpFile.length() > 0) {
-        final List<String> errors = verifyFile(tmpFile, table);
-        if (!errors.isEmpty()) {
-          errorCount += errors.size();
-        }
-      }
-      log.info("Found " + errorCount + " errors in file " + awsFile);
-
-      return errorCount;
-    } finally {
-      tmpFile.delete();
-    }
-
-  }
 
   @SuppressWarnings("unchecked")
-  private <T extends DataTable> List<String> verifyFile(final File tmpFile,
-      final CanvasTable table2) throws IOException {
+  private <T extends DataTable> List<String> verifyFile(final File tempFile, final String table,
+      final Class<? extends DataTable> class1) throws IOException {
     final File parsedFile = new File(
-        tmpFile.getParent() + File.separator + "parsed-" + tmpFile.getName());
-    try (
-        final TableReader<T> in = (TableReader<T>) factory.getTableReader(table.getSourceName(),
-            format, tmpFile);
-        final TableWriter<T> out = (TableWriter<T>) factory.getTableWriter(table.getSourceName(),
-            format, parsedFile)) {
+        tempFile.getParent() + File.separator + "parsed-" + tempFile.getName());
+    try (final TableReader<T> in = (TableReader<T>) factory.getTableReader(table, format, tempFile);
+        final TableWriter<T> out = (TableWriter<T>) factory.getTableWriter(table, format,
+            parsedFile)) {
       out.pipe(in);
     }
-    final List<String> differences = textualCompareFiles(tmpFile, parsedFile);
+    final List<String> differences = textualCompareFiles(tempFile, parsedFile);
     parsedFile.delete();
     return differences;
   }

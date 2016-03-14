@@ -1,6 +1,7 @@
 package edu.harvard.data.data_tools.canvas;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
 
 import edu.harvard.data.client.DataClient;
 import edu.harvard.data.client.DataConfiguration;
@@ -15,7 +16,7 @@ import edu.harvard.data.data_tools.VerificationException;
 public class CanvasListDumpsCommand implements Command {
 
   @Override
-  public ReturnStatus execute(final DataConfiguration config) throws IOException,
+  public ReturnStatus execute(final DataConfiguration config, final ExecutorService exec) throws IOException,
   UnexpectedApiResponseException, DataConfigurationException, VerificationException {
     final CanvasApiClient api = DataClient.getCanvasApiClient(config.getCanvasDataHost(),
         config.getCanvasApiKey(), config.getCanvasApiSecret());

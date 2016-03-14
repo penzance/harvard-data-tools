@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,13 +44,13 @@ public class CanvasGetCompleteTableInfoCommand implements Command {
   @Argument(index = 3, usage = "AWS region.", metaVar = "us-east-1", required = true)
   public String region;
 
-  @Argument(index = 4, usage = "Latest dump sequence. The generated script will bring copy all files to this dump in order to generate a current snapshot.",
-      metaVar = "116", required = true)
+  @Argument(index = 4, usage = "Latest dump sequence. The generated script will bring copy all files to this dump in order to generate a current snapshot.", metaVar = "116", required = true)
   public long latestSequence;
 
   @Override
-  public ReturnStatus execute(final DataConfiguration config) throws IOException,
-  UnexpectedApiResponseException, DataConfigurationException, VerificationException {
+  public ReturnStatus execute(final DataConfiguration config, final ExecutorService exec)
+      throws IOException, UnexpectedApiResponseException, DataConfigurationException,
+      VerificationException {
     final CanvasApiClient api = DataClient.getCanvasApiClient(config.getCanvasDataHost(),
         config.getCanvasApiKey(), config.getCanvasApiSecret());
     final AwsUtils aws = new AwsUtils();

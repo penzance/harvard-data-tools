@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Job;
@@ -37,7 +38,7 @@ public class CanvasHadoopCommand implements Command {
   public String outputDir;
 
   @Override
-  public ReturnStatus execute(final DataConfiguration config) throws IOException,
+  public ReturnStatus execute(final DataConfiguration config, final ExecutorService exec) throws IOException,
   UnexpectedApiResponseException, DataConfigurationException, VerificationException {
     final AwsUtils aws = new AwsUtils();
     final Configuration conf = new Configuration();

@@ -2,6 +2,7 @@ package edu.harvard.data.data_tools.canvas;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,8 +30,9 @@ public class CanvasUpdateRedshiftCommand implements Command {
   public String dumpId;
 
   @Override
-  public ReturnStatus execute(final DataConfiguration config) throws IOException,
-  UnexpectedApiResponseException, DataConfigurationException, VerificationException {
+  public ReturnStatus execute(final DataConfiguration config, final ExecutorService exec)
+      throws IOException, UnexpectedApiResponseException, DataConfigurationException,
+      VerificationException {
     final AwsUtils aws = new AwsUtils();
     final CanvasApiClient api = DataClient.getCanvasApiClient(config.getCanvasDataHost(),
         config.getCanvasApiKey(), config.getCanvasApiSecret());
