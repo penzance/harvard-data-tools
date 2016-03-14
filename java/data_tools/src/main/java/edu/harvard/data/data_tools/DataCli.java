@@ -24,7 +24,7 @@ import edu.harvard.data.data_tools.canvas.CanvasDataCommandGroup;
 public class DataCli {
   private static final Logger log = LogManager.getLogger();
 
-  private static final int THREAD_POOL_SIZE = 10;
+  private static final int THREAD_POOL_SIZE = 32;
 
   @Argument(handler = SubCommandHandler.class, usage = "Top-level command.")
   @SubCommands({ @SubCommand(name = "canvas", impl = CanvasDataCommandGroup.class) })
