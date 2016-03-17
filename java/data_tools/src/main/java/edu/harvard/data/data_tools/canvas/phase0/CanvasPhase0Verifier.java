@@ -57,6 +57,9 @@ public class CanvasPhase0Verifier implements Verifier {
   @Override
   public void verify() throws VerificationException, IOException {
     final DumpInfo info = DumpInfo.find(dumpId);
+    if (!info.getDownloaded()) {
+      throw new VerificationException("Dump " + dumpId + " has not been downloaded");
+    }
     if (!info.getVerified()) {
       log.info("Verifying dump sequence " + info.getSequence() + " at " + info.getS3Location());
       final S3ObjectId dumpObj = AwsUtils.key(info.getBucket(), info.getKey());

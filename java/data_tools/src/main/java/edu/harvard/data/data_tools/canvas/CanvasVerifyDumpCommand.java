@@ -70,7 +70,8 @@ public class CanvasVerifyDumpCommand implements Command {
     try {
       verifier.verify();
     } catch (final VerificationException e) {
-      log.error(e);
+      log.error("Verification Exception", e);
+      return ReturnStatus.VERIFICATION_FAILURE;
     }
     return ReturnStatus.OK;
   }
