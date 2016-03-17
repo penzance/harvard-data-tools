@@ -1,0 +1,19 @@
+{
+	"requests": {
+		"user_id": ["CanvasDataID"]
+		},
+	"user_dim": {
+		"id": ["CanvasDataID"],
+		"canvas_id": ["CanvasID"],
+		"id": ["CanvasDataID"]
+		},
+	"pseudonym_dim": {
+		"user_id": ["CanvasDataID"],
+		"canvas_id": ["CanvasID"],
+		"unique_id": ["HUID", "XID"],
+		"sis_user_id": ["CanvasDataID"]
+		},
+	"pseudonym_fact": {
+		"user_id": ["CanvasDataID"]
+		}
+}

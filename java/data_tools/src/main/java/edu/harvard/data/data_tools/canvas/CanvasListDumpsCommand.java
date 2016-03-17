@@ -6,12 +6,12 @@ import java.util.concurrent.ExecutorService;
 import edu.harvard.data.client.DataClient;
 import edu.harvard.data.client.DataConfiguration;
 import edu.harvard.data.client.DataConfigurationException;
+import edu.harvard.data.client.VerificationException;
 import edu.harvard.data.client.canvas.CanvasApiClient;
 import edu.harvard.data.client.canvas.CanvasDataDump;
 import edu.harvard.data.client.schema.UnexpectedApiResponseException;
 import edu.harvard.data.data_tools.Command;
 import edu.harvard.data.data_tools.ReturnStatus;
-import edu.harvard.data.data_tools.VerificationException;
 
 public class CanvasListDumpsCommand implements Command {
 

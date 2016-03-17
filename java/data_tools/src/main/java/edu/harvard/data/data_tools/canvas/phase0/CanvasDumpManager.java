@@ -18,6 +18,7 @@ import com.amazonaws.services.s3.model.S3ObjectId;
 import edu.harvard.data.client.AwsUtils;
 import edu.harvard.data.client.DataConfiguration;
 import edu.harvard.data.client.DataConfigurationException;
+import edu.harvard.data.client.VerificationException;
 import edu.harvard.data.client.canvas.CanvasApiClient;
 import edu.harvard.data.client.canvas.CanvasDataArtifact;
 import edu.harvard.data.client.canvas.CanvasDataDump;
@@ -29,7 +30,6 @@ import edu.harvard.data.data_tools.DumpInfo;
 import edu.harvard.data.data_tools.FatalError;
 import edu.harvard.data.data_tools.ReturnStatus;
 import edu.harvard.data.data_tools.TableInfo;
-import edu.harvard.data.data_tools.VerificationException;
 
 public class CanvasDumpManager {
 

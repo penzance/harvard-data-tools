@@ -13,6 +13,7 @@ import edu.harvard.data.client.DataClient;
 import edu.harvard.data.client.DataConfiguration;
 import edu.harvard.data.client.DataConfigurationException;
 import edu.harvard.data.client.UpdateRedshift;
+import edu.harvard.data.client.VerificationException;
 import edu.harvard.data.client.canvas.CanvasApiClient;
 import edu.harvard.data.client.canvas.CanvasDataGenerator;
 import edu.harvard.data.client.generator.SchemaTransformer;
@@ -21,7 +22,6 @@ import edu.harvard.data.client.schema.UnexpectedApiResponseException;
 import edu.harvard.data.data_tools.Command;
 import edu.harvard.data.data_tools.DumpInfo;
 import edu.harvard.data.data_tools.ReturnStatus;
-import edu.harvard.data.data_tools.VerificationException;
 
 public class CanvasUpdateRedshiftCommand implements Command {
   private static final Logger log = LogManager.getLogger();

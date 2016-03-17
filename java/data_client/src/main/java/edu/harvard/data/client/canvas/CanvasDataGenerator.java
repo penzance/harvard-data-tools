@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import edu.harvard.data.client.DataClient;
 import edu.harvard.data.client.DataConfiguration;
 import edu.harvard.data.client.DataConfigurationException;
+import edu.harvard.data.client.VerificationException;
 import edu.harvard.data.client.generator.SchemaTransformer;
 import edu.harvard.data.client.generator.bash.HDFSCopyUnmodifiedTableGenerator;
 import edu.harvard.data.client.generator.hive.CreateHiveTableGenerator;
@@ -38,7 +39,7 @@ public class CanvasDataGenerator {
   public static final String PHASE_TWO_ADDITIONS_JSON = "phase2_schema_additions.json";
 
   public static void main(final String[] args)
-      throws IOException, DataConfigurationException, UnexpectedApiResponseException, SQLException {
+      throws IOException, DataConfigurationException, UnexpectedApiResponseException, SQLException, VerificationException {
     if (args.length != 3) {
       System.err
       .println("Usage: schema_version /path/to/harvard-data-tools /path/to/output/directory");

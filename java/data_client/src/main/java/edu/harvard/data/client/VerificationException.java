@@ -1,4 +1,4 @@
-package edu.harvard.data.data_tools;
+package edu.harvard.data.client;
 
 public class VerificationException extends Exception {
 

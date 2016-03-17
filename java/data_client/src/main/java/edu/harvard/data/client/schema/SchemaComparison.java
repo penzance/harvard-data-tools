@@ -3,8 +3,10 @@ package edu.harvard.data.client.schema;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import edu.harvard.data.client.generator.schema.ExtensionSchemaTable;
 
@@ -43,10 +45,13 @@ public class SchemaComparison {
 
   private DataSchemaTable getTableAdditions(final DataSchemaTable t1, final DataSchemaTable t2) {
     final List<DataSchemaColumn> changes = new ArrayList<DataSchemaColumn>();
-    for (int i = 0; i < t1.getColumns().size(); i++) {
-      if (!(i < t2.getColumns().size()
-          && t1.getColumns().get(i).getName().equals(t2.getColumns().get(i).getName()))) {
-        final DataSchemaColumn column = t1.getColumns().get(i).copy();
+    final Set<String> t2ColumnNames = new HashSet<String>();
+    for (final DataSchemaColumn column : t2.getColumns()) {
+      t2ColumnNames.add(column.getName());
+    }
+    for (final DataSchemaColumn t1Column : t1.getColumns()) {
+      if (!t2ColumnNames.contains(t1Column.getName())) {
+        final DataSchemaColumn column = t1Column.copy();
         column.setNewlyGenerated(true);
         changes.add(column);
       }

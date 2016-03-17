@@ -18,6 +18,7 @@ import org.kohsuke.args4j.spi.SubCommands;
 
 import edu.harvard.data.client.DataConfiguration;
 import edu.harvard.data.client.DataConfigurationException;
+import edu.harvard.data.client.VerificationException;
 import edu.harvard.data.client.schema.UnexpectedApiResponseException;
 import edu.harvard.data.data_tools.canvas.CanvasDataCommandGroup;
 

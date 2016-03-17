@@ -9,6 +9,7 @@ import java.util.Date;
 
 import edu.harvard.data.client.generator.SchemaPhase;
 import edu.harvard.data.client.generator.SchemaTransformer;
+import edu.harvard.data.client.schema.DataSchemaColumn;
 import edu.harvard.data.client.schema.DataSchemaTable;
 
 public class S3ToRedshiftLoaderGenerator {
@@ -35,6 +36,15 @@ public class S3ToRedshiftLoaderGenerator {
       final String tableName = table.getTableName();
       final String stageTableName = table.getTableName() + "_stage";
       final String joinField = table.getColumns().get(0).getName();
+      String columnList = "(";
+      for (int i=0; i<table.getColumns().size(); i++) {
+        final DataSchemaColumn column = table.getColumns().get(i);
+        if (i > 0) {
+          columnList += ",";
+        }
+        columnList += column.getName();
+      }
+      columnList += ")";
 
       out.println("------- Table " + tableName + "-------");
 
@@ -43,7 +53,7 @@ public class S3ToRedshiftLoaderGenerator {
       out.println("CREATE TABLE " + stageTableName + " (LIKE " + tableName + ");");
 
       // Copy the final incoming data into final the stage table
-      out.println("COPY " + stageTableName + " FROM '<intermediates3bucketandpath>/" + tableName
+      out.println("COPY " + stageTableName + " " + columnList + " FROM '<intermediates3bucketandpath>/" + tableName
           + "/' CREDENTIALS '<awskeyandsecret>' DELIMITER '\\t' TRUNCATECOLUMNS;");
 
       // Use an inner join with the staging table to delete the rows from the

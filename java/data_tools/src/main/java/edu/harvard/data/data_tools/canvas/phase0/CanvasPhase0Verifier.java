@@ -31,9 +31,9 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
 import edu.harvard.data.client.AwsUtils;
 import edu.harvard.data.client.DataTable;
 import edu.harvard.data.client.TableFormat;
+import edu.harvard.data.client.VerificationException;
 import edu.harvard.data.client.canvas.phase0.CanvasTable;
 import edu.harvard.data.data_tools.DumpInfo;
-import edu.harvard.data.data_tools.VerificationException;
 import edu.harvard.data.data_tools.Verifier;
 
 public class CanvasPhase0Verifier implements Verifier {
