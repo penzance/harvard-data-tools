@@ -54,7 +54,7 @@ public class S3ToRedshiftLoaderGenerator {
 
       // Copy the final incoming data into final the stage table
       out.println("COPY " + stageTableName + " " + columnList + " FROM '<intermediates3bucketandpath>/" + tableName
-          + "/' CREDENTIALS '<awskeyandsecret>' DELIMITER '\\t' TRUNCATECOLUMNS;");
+          + "/' CREDENTIALS '<awskeyandsecret>' DELIMITER '\\t' TRUNCATECOLUMNS GZIP;");
 
       // Use an inner join with the staging table to delete the rows from the
       // target table that are being updated.
