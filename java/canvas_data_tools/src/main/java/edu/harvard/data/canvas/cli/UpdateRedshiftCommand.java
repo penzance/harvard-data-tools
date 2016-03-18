@@ -17,7 +17,7 @@ import edu.harvard.data.UpdateRedshift;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.canvas.CanvasCodeGenerator;
 import edu.harvard.data.canvas.data_api.ApiClient;
-import edu.harvard.data.generator.SchemaTransformer;
+import edu.harvard.data.generator.GenerationSpec;
 import edu.harvard.data.schema.DataSchema;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
@@ -37,7 +37,7 @@ public class UpdateRedshiftCommand implements Command {
     final DumpInfo info = DumpInfo.find(dumpId);
     final DataSchema schema = api.getSchema(info.getSchemaVersion());
 
-    final SchemaTransformer transformer = new SchemaTransformer(3);
+    final GenerationSpec transformer = new GenerationSpec(3);
     transformer.setSchemas(schema, CanvasCodeGenerator.PHASE_ONE_ADDITIONS_JSON,
         CanvasCodeGenerator.PHASE_TWO_ADDITIONS_JSON);
     try {
