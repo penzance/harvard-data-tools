@@ -9,8 +9,9 @@ SECURE_PROPERTIES_LOCATION = os.environ['SECURE_PROPERTIES_LOCATION']
 RESULT_METADATA = os.environ['CANVAS_DATA_RESULT_FILE']
 GIT_BASE = os.environ['HARVARD_DATA_TOOLS_BASE']
 DUMP_ID = os.environ.get('CANVAS_DATA_DUMP_ID', None)
+THREAD_COUNT = os.environ.get('CANVAS_DATA_THREAD_COUNT', 1)
 
-MAIN_CLASS = 'edu.harvard.data.data_tools.DataCli'
+MAIN_CLASS = 'edu.harvard.data.canvas.cli.CanvasDataCli'
 CLASSPATH = "{0}/data_tools.jar:{1}:{2}".format(
         GENERATED_CODE_DIR,
         SECURE_PROPERTIES_LOCATION,
@@ -30,7 +31,7 @@ def bail(message):
 
 def download_and_verify():
     if not DUMP_ID:
-        status = run_command(['canvas', 'download', RESULT_METADATA])
+        status = run_command(['download', RESULT_METADATA])
         if status != 0:
             bail('Failed to download dump')
             return status
@@ -42,17 +43,17 @@ def download_and_verify():
         dump_id = DUMP_ID
         print "Skipping download for Dump ID: {0}".format(dump_id)
 
-    status = run_command(['canvas', 'compareschemas', dump_id, CURRENT_SCHEMA])
+    status = run_command(['compareschemas', dump_id, CURRENT_SCHEMA])
     if status != 0:
         bail('Failed on schema check')
         return status
 
-    status = run_command(['canvas', 'verify', '0', '-i', dump_id])
+    status = run_command(['-threads', THREAD_COUNT, 'postverify', '0', '-i', dump_id])
     if status != 0:
         bail('Failed to verify dump')
         return status
 
-    status = run_command(['canvas', 'redshift', dump_id])
+    status = run_command(['updateredshift', dump_id])
     if status != 0:
         bail('Failed to update Redshift schema')
         return status
