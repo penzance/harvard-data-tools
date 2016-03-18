@@ -22,6 +22,11 @@
             "Description": "Name of secure settings file for use by DownloadVerify Python script (NOTE: Name must remain secure.properties for now)",
             "Default": "secure.properties"
         },
+        "HDTGitTagOrBranchParameter": {
+            "Type": "String",
+            "Description": "harvard-data-tools git tag or branch to deploy",
+            "Default": "master"
+        },
         "DownloadVerifyCanvasDataSchemaVersion": {
             "Type": "String",
             "Description": "Canvas Data Schema Version",
@@ -46,6 +51,16 @@
             "Type": "String",
             "Description": "Email address to receive failure messages",
             "Default": "failure@example.com"
+        },
+        "FailureSNSEmailParameter": {
+            "Type": "String",
+            "Description": "Email address to receive failure messages",
+            "Default": "failure@example.com"
+        },
+        "MonitoringSNSEmailParameter": {
+            "Type": "String",
+            "Description": "Email address to receive monitoring messages",
+            "Default": "monitoring@example.com"
         },
         "RedshiftNodeTypeParameter": {
             "Type": "String",
@@ -132,10 +147,25 @@
             "Description": "Private subnet CIDR block for the DownloadVerify EC2 and the EMRCluster",
             "Default": "10.0.1.0/24"
         },
-        "VPNCidrParameter": {
+        "VPN1CidrParameter": {
             "Type": "String",
-            "Description": "CIDR block for our internal VPN (to allow access to Redshift from our VPN)",
+            "Description": "CIDR block for our internal VPN1 (to allow access to Redshift from our VPN1)",
             "Default": "10.0.2.0/24"
+        },
+        "VPN2CidrParameter": {
+            "Type": "String",
+            "Description": "CIDR block for our internal VPN2 (to allow access to Redshift from our VPN2)",
+            "Default": "10.0.3.0/24"
+        },
+        "VPN3CidrParameter": {
+            "Type": "String",
+            "Description": "CIDR block for our internal VPN3 (to allow access to Redshift from our VPN3)",
+            "Default": "10.0.4.0/24"
+        },
+        "VPN4CidrParameter": {
+            "Type": "String",
+            "Description": "CIDR block for our internal VPN4 (to allow access to Redshift from our VPN4)",
+            "Default": "10.0.5.0/24"
         },
         "DownloadVerifyAMIIdParameter": {
             "Type": "String",
@@ -735,6 +765,10 @@
                                     "Ref": "DownloadVerifyCanvasDataSchemaVersion"
                                 },
                                 "\n",
+                                "# - CANVAS_DATA_DUMP_ID: the UUID of a particular data dump. Uncomment this environment\n",
+                                "#     variable setting to skip the download and perform only the verify portion of the process.\n",
+                                "#export CANVAS_DATA_DUMP_ID=143b91b2-e9c4-4c76-8033-00176520bce5\n",
+                                "\n",
                                 "\n",
                                 "# add github.com to known_hosts and run ansible-pull\n",
                                 "ssh-keyscan github.com >> /root/.ssh/known_hosts\n",
@@ -767,7 +801,7 @@
                                 " /root/.\n",
                                 "\n",
                                 "# generate the tools\n",
-                                "python /root/harvard-data-tools/python/canvas_generate_tools.py\n",
+                                "python /root/harvard-data-tools/python/canvas_generate_tools.py > /root/canvas-generate-tools.out\n",
                                 "\n",
                                 "# setup some environment variables\n",
                                 "export CANVAS_DATA_RESULT_FILE=/root/the_result.json\n",
@@ -852,6 +886,18 @@
                                 },
                                 "@g\" /root/harvard-data-tools/emr/bootstrap.sh\n",
                                 "\n",
+
+
+                                "sed -i \"s@<my_branch>@",
+                                {
+                                    "Ref": "HDTGitTagOrBranchParameter"
+                                },
+                                "@g\" /root/harvard-data-tools/emr/bootstrap.sh\n",
+                                "\n",
+
+
+
+
                                 "aws s3 cp /root/harvard-data-tools/emr/bootstrap.sh s3://",
                                 {
                                     "Ref": "NewCodeS3Bucket"
@@ -859,7 +905,7 @@
                                 "/bootstrap$DATASETNUM.sh\n",
                                 "\n",
                                 "# Invoke the Lambda function to kickoff the Data Pipeline\n",
-                                "aws lambda invoke --function-name ",
+                                "#aws lambda invoke --function-name ",
                                 {
                                     "Ref": "DataPipelineInitLambda"
                                 },
@@ -1132,7 +1178,31 @@
                         "FromPort": "5439",
                         "ToPort": "5439",
                         "CidrIp": {
-                            "Ref": "VPNCidrParameter"
+                            "Ref": "VPN1CidrParameter"
+                        }
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "5439",
+                        "ToPort": "5439",
+                        "CidrIp": {
+                            "Ref": "VPN2CidrParameter"
+                        }
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "5439",
+                        "ToPort": "5439",
+                        "CidrIp": {
+                            "Ref": "VPN3CidrParameter"
+                        }
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "5439",
+                        "ToPort": "5439",
+                        "CidrIp": {
+                            "Ref": "VPN4CidrParameter"
                         }
                     }
                 ],
@@ -1319,6 +1389,69 @@
                 ]
             }
         },
+        "MonitoringSNS": {
+            "Type": "AWS::SNS::Topic",
+            "Properties": {
+                "DisplayName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            {
+                                "Ref": "EnvironmentParameter"
+                            },
+                            "monitoring"
+                        ]
+                    ]
+                },
+                "Subscription": [
+                    {
+                        "Endpoint": {
+                            "Ref": "MonitoringSNSEmailParameter"
+                        },
+                        "Protocol": "email"
+                    }
+                ]
+            }
+        },
+		"RedshiftDiskSpaceAlarm" : {
+		  "Type" : "AWS::CloudWatch::Alarm",
+		  "Properties" : {
+			"AlarmDescription" : "Alarm for Redshift disk space",
+			"AlarmActions" : [ { "Ref" : "MonitoringSNS" } ],
+			"MetricName" : "PercentageDiskSpaceUsed",
+			"Namespace" : "AWS/Redshift",
+			"Statistic" : "Average",
+			"Period" : "300",
+			"EvaluationPeriods" : "1",
+			"Threshold" : "90",
+			"ComparisonOperator" : "GreaterThanThreshold",
+			"Dimensions" : [ {
+			  "Name" : "ClusterIdentifier",
+			  "Value" : { "Ref" : "RedshiftCluster" }
+			} ]
+		  }
+		},
+		"RedshiftHealthStatusDownAlarm" : {
+		  "Type" : "AWS::CloudWatch::Alarm",
+		  "Properties" : {
+			"AlarmDescription" : "Alarm for Redshift health degradation",
+			"AlarmActions" : [ { "Ref" : "MonitoringSNS" } ],
+			"MetricName" : "HealthStatus",
+			"Namespace" : "AWS/Redshift",
+			"Statistic" : "Average",
+			"Period" : "60",
+			"EvaluationPeriods" : "2",
+			"Threshold" : "1",
+			"ComparisonOperator" : "LessThanThreshold",
+			"Dimensions" : [ {
+			  "Name" : "ClusterIdentifier",
+			  "Value" : { "Ref" : "RedshiftCluster" }
+			} ]
+		  }
+		},
         "Pipeline": {
             "Type": "AWS::DataPipeline::Pipeline",
             "Properties": {
@@ -2745,7 +2878,7 @@
                                     "Fn::Join": [
                                         "",
                                         [
-                                            "s3-dist-cp --src=hdfs:///phase_2 --dest=s3://",
+                                            "s3-dist-cp --src=hdfs:///phase_2 --outputCodec=gzip --dest=s3://",
                                             {
                                                 "Ref": "IntermediateS3Bucket"
                                             },
@@ -3305,7 +3438,7 @@
                                     "Fn::Join": [
                                         "",
                                         [
-                                            "aws s3 rm s3://",
+                                            "#aws s3 rm s3://",
                                             {
                                                 "Ref": "IntermediateS3Bucket"
                                             },
