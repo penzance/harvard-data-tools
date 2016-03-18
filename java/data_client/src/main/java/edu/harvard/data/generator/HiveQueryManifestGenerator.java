@@ -12,11 +12,11 @@ public class HiveQueryManifestGenerator {
   private static final Logger log = LogManager.getLogger();
 
   private final File gitDir;
-  private final SchemaTransformer schemaVersions;
+  private final GenerationSpec schemaVersions;
   private final File dir;
 
   public HiveQueryManifestGenerator(final File gitDir, final File dir,
-      final SchemaTransformer schemaVersions) {
+      final GenerationSpec schemaVersions) {
     this.gitDir = gitDir;
     this.dir = dir;
     this.schemaVersions = schemaVersions;

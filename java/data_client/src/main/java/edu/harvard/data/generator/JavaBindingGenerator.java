@@ -30,14 +30,20 @@ public class JavaBindingGenerator {
 
   private static final String POM_XML_TEMPLATE = "pom.xml.template";
 
-  private final SchemaTransformer schemaVersions;
-  private final File dir;
+  private final GenerationSpec spec;
+  private final GenerationSpec schemaVersions;
   private final String projectName;
+  private final File javaSrcBase;
+  private final File baseDir;
+  private final String tableEnumName;
 
-  public JavaBindingGenerator(final File dir, final SchemaTransformer schemaVersions, final String projectName) {
-    this.dir = dir;
-    this.schemaVersions = schemaVersions;
+  public JavaBindingGenerator(final GenerationSpec spec, final String projectName) {
+    this.spec = spec;
+    baseDir = new File(spec.getOutputBase(), "java");
+    this.javaSrcBase = new File(baseDir, "src/main/java");
+    this.schemaVersions = spec;
     this.projectName = projectName;
+    this.tableEnumName = spec.getJavaTableEnumName();
   }
 
   // Generates a new Maven project in the directory passed to the constructor.
@@ -56,9 +62,10 @@ public class JavaBindingGenerator {
   // PHASE_TWO_ADDITIONS_JSON.
   //
   public void generate() throws IOException {
-    // Create the pom.xml file from a template in src/main/resources, with the
-    // appropriate version number.
-    copyPomXml(schemaVersions.getPhase(0));
+    javaSrcBase.mkdirs();
+
+    // Create the pom.xml file from a template in src/main/resources.
+    copyPomXml();
 
     // Generate bindings for each step in the processing pipeline.
     generateTableSet(schemaVersions.getPhase(0), null);
@@ -78,12 +85,14 @@ public class JavaBindingGenerator {
   // TableGenerator is run once per table, and creates the individual table
   // class.
   //
-  private void generateTableSet(final SchemaPhase tableVersion, final SchemaPhase previousVersion)
+  private void generateTableSet(final SchemaPhase phase, final SchemaPhase previousVersion)
       throws IOException {
-    final File srcDir = tableVersion.getJavaSourceLocation();
-    final String classPrefix = tableVersion.getPrefix();
-    final String version = tableVersion.getSchema().getVersion();
-    final Map<String, DataSchemaTable> tables = tableVersion.getSchema().getTables();
+    final File srcDir = new File(javaSrcBase,
+        phase.getJavaPackage().replaceAll("\\.", File.separator));
+    final String classPrefix = phase.getPrefix();
+    final String version = phase.getSchema().getVersion();
+    final Map<String, DataSchemaTable> tables = phase.getSchema().getTables();
+    final String tableEnumName = spec.getJavaTableEnumName();
 
     // Create the base directory where all of the classes will be generated
     log.info("Generating tables in " + srcDir);
@@ -95,17 +104,16 @@ public class JavaBindingGenerator {
     final List<String> tableNames = generateTableNames(tables);
 
     // Generate the Table enum.
-    final File tableEnumFile = new File(srcDir,
-        classPrefix + tableVersion.getTableEnumName() + ".java");
+    final File tableEnumFile = new File(srcDir, classPrefix + tableEnumName + ".java");
     try (final PrintStream out = new PrintStream(new FileOutputStream(tableEnumFile))) {
-      new JavaTableEnumGenerator(version, tableNames, tableVersion).generate(out);
+      new JavaTableEnumGenerator(version, tableNames, phase, tableEnumName)
+      .generate(out);
     }
 
     // Generate the TableFactory class.
-    final File tableFactoryFile = new File(srcDir,
-        classPrefix + tableVersion.getTableEnumName() + "Factory.java");
+    final File tableFactoryFile = new File(srcDir, classPrefix + tableEnumName + "Factory.java");
     try (final PrintStream out = new PrintStream(new FileOutputStream(tableFactoryFile))) {
-      new JavaTableFactoryGenerator(version, tableNames, tableVersion).generate(out);
+      new JavaTableFactoryGenerator(version, tableNames, phase, tableEnumName).generate(out);
     }
 
     // Generate a model class for each table.
@@ -113,7 +121,7 @@ public class JavaBindingGenerator {
       final String className = javaClass(tables.get(name).getTableName(), classPrefix);
       final File classFile = new File(srcDir, className + ".java");
       try (final PrintStream out = new PrintStream(new FileOutputStream(classFile))) {
-        new JavaModelClassGenerator(version, tableVersion, previousVersion, tables.get(name))
+        new JavaModelClassGenerator(version, phase, previousVersion, tables.get(name))
         .generate(out);
       }
     }
@@ -121,8 +129,8 @@ public class JavaBindingGenerator {
 
   // Generate the pom.xml file for the Maven project, based off a template in
   // the src/main/resources directory.
-  private void copyPomXml(final SchemaPhase tableVersion) throws IOException {
-    final File pomFile = new File(dir, "pom.xml");
+  private void copyPomXml() throws IOException {
+    final File pomFile = new File(baseDir, "pom.xml");
     log.info("Creating pom.xml file at " + pomFile);
     try (
         InputStream inStream = this.getClass().getClassLoader()
@@ -155,8 +163,7 @@ public class JavaBindingGenerator {
     writeComment("This file was generated on "
         + new SimpleDateFormat("M-dd-yyyy hh:mm:ss").format(new Date()) + ". Do not manually edit.",
         0, out, false);
-    writeComment("This class is based on Version " + version + " of the schema", 0, out,
-        false);
+    writeComment("This class is based on Version " + version + " of the schema", 0, out, false);
     out.println();
   }
 

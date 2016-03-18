@@ -13,9 +13,9 @@ import edu.harvard.data.schema.DataSchemaTable;
 public class S3ToRedshiftLoaderGenerator {
 
   private final File dir;
-  private final SchemaTransformer schemaVersions;
+  private final GenerationSpec schemaVersions;
 
-  public S3ToRedshiftLoaderGenerator(final File dir, final SchemaTransformer schemaVersions) {
+  public S3ToRedshiftLoaderGenerator(final File dir, final GenerationSpec schemaVersions) {
     this.dir = dir;
     this.schemaVersions = schemaVersions;
   }

@@ -1,23 +1,13 @@
 package edu.harvard.data.generator;
 
-import java.io.File;
-
 import edu.harvard.data.schema.DataSchema;
 
 public class SchemaPhase {
 
   private DataSchema schema;
   private String prefix;
-
   private String javaPackage;
-  private File javaSourceLocation;
   private String hdfsDir;
-  private String tableEnumName;
-  private String clientPackage;
-
-  public void setJavaSourceDir(final File sourceDir) {
-    this.javaSourceLocation = sourceDir;
-  }
 
   public void setJavaPackage(final String javaPackage) {
     this.javaPackage = javaPackage;
@@ -39,10 +29,6 @@ public class SchemaPhase {
     return prefix;
   }
 
-  public File getJavaSourceLocation() {
-    return javaSourceLocation;
-  }
-
   public DataSchema getSchema() {
     return schema;
   }
@@ -55,19 +41,4 @@ public class SchemaPhase {
     return hdfsDir;
   }
 
-  public String getTableEnumName() {
-    return tableEnumName;
-  }
-
-  public void setTableEnumName(final String tableEnumName) {
-    this.tableEnumName = tableEnumName;
-  }
-
-  public String getClientPackage() {
-    return clientPackage;
-  }
-
-  public void setClientPackage(final String clientPackage) {
-    this.clientPackage = clientPackage;
-  }
 }

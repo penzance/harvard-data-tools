@@ -20,10 +20,10 @@ public class CreateHiveTableGenerator {
 
   private static final Logger log = LogManager.getLogger();
 
-  private final SchemaTransformer schemaVersions;
+  private final GenerationSpec schemaVersions;
   private final File dir;
 
-  public CreateHiveTableGenerator(final File dir, final SchemaTransformer schemaVersions) {
+  public CreateHiveTableGenerator(final File dir, final GenerationSpec schemaVersions) {
     this.dir = dir;
     this.schemaVersions = schemaVersions;
   }

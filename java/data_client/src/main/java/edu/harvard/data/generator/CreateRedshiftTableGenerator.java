@@ -10,9 +10,9 @@ import edu.harvard.data.schema.DataSchemaTable;
 public class CreateRedshiftTableGenerator {
 
   private final File dir;
-  private final SchemaTransformer schemaVersions;
+  private final GenerationSpec schemaVersions;
 
-  public CreateRedshiftTableGenerator(final File dir, final SchemaTransformer schemaVersions) {
+  public CreateRedshiftTableGenerator(final File dir, final GenerationSpec schemaVersions) {
     this.dir = dir;
     this.schemaVersions = schemaVersions;
   }

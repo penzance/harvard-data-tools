@@ -18,9 +18,9 @@ public class MoveUnmodifiedTableGenerator {
   private static final Logger log = LogManager.getLogger();
 
   private final File dir;
-  private final SchemaTransformer schemaVersions;
+  private final GenerationSpec schemaVersions;
 
-  public MoveUnmodifiedTableGenerator(final File dir, final SchemaTransformer schemaVersions) {
+  public MoveUnmodifiedTableGenerator(final File dir, final GenerationSpec schemaVersions) {
     this.dir = dir;
     this.schemaVersions = schemaVersions;
   }

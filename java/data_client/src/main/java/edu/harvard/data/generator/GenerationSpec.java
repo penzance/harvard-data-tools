@@ -23,13 +23,15 @@ import edu.harvard.data.schema.DataSchemaType;
 import edu.harvard.data.schema.extension.ExtensionSchema;
 import edu.harvard.data.schema.extension.ExtensionSchemaTable;
 
-public class SchemaTransformer {
+public class GenerationSpec {
   private static final Logger log = LogManager.getLogger();
 
   private final List<SchemaPhase> phases;
   private final ObjectMapper jsonMapper;
+  private File outputBase;
+  private String tableEnumName;
 
-  public SchemaTransformer(final int phaseCount) {
+  public GenerationSpec(final int phaseCount) {
     this.phases = new ArrayList<SchemaPhase>();
     for (int i = 0; i < phaseCount; i++) {
       phases.add(new SchemaPhase());
@@ -42,8 +44,20 @@ public class SchemaTransformer {
     return phases.get(i);
   }
 
+  public File getOutputBase() {
+    return outputBase;
+  }
+
+  public String getJavaTableEnumName() {
+    return tableEnumName;
+  }
+
   public SchemaPhase getLastPhase() {
     return phases.get(phases.size() - 1);
+  }
+
+  public void setOutputBaseDirectory(final File outputBase) {
+    this.outputBase = outputBase;
   }
 
   public void setJavaPackages(final String... packageList) {
@@ -66,26 +80,8 @@ public class SchemaTransformer {
     }
   }
 
-  public void setTableEnumNames(final String name) {
-    for (final SchemaPhase phase : phases) {
-      phase.setTableEnumName(name);
-    }
-  }
-
-  public void setClientPackage(final String clientPackage) {
-    for (final SchemaPhase phase : phases) {
-      phase.setClientPackage(clientPackage);
-    }
-  }
-
-  public void setJavaSourceLocations(final File... sourceDirs) {
-    if (sourceDirs.length != phases.size()) {
-      throw new RuntimeException(
-          "Expected " + phases.size() + " source directories, got " + sourceDirs.length);
-    }
-    for (int i = 0; i < sourceDirs.length; i++) {
-      phases.get(i).setJavaSourceDir(sourceDirs[i]);
-    }
+  public void setJavaTableEnumName(final String tableEnumName) {
+    this.tableEnumName = tableEnumName;
   }
 
   public void setHdfsDirectories(final String... hdfsDirs) {

@@ -29,11 +29,14 @@ public class JavaTableFactoryGenerator {
   private final List<String> tableNames;
   private final String classPrefix;
 
+  private final String tableEnumName;
+
   public JavaTableFactoryGenerator(final String schemaVersion, final List<String> tableNames,
-      final SchemaPhase tableVersion) {
+      final SchemaPhase tableVersion, final String tableEnumName) {
     this.schemaVersion = schemaVersion;
     this.tableNames = tableNames;
     this.tableVersion = tableVersion;
+    this.tableEnumName = tableEnumName;
     this.classPrefix = tableVersion.getPrefix();
   }
 
@@ -44,8 +47,8 @@ public class JavaTableFactoryGenerator {
     out.println();
 
     outputImportStatements(out);
-    out.println("public class " + classPrefix + tableVersion.getTableEnumName()
-    + "Factory implements TableFactory {");
+    out.println("public class " + classPrefix + tableEnumName
+        + "Factory implements TableFactory {");
     out.println();
     outputFileTableReaderFactory(out);
     outputS3TableReaderFactory(out);

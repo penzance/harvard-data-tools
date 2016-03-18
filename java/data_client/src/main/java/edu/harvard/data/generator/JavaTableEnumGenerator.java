@@ -15,17 +15,19 @@ public class JavaTableEnumGenerator {
   private final SchemaPhase tableVersion;
   private final List<String> tableNames;
   private final String schemaVersion;
+  private final String tableEnumName;
 
   public JavaTableEnumGenerator(final String schemaVersion, final List<String> tableNames,
-      final SchemaPhase tableVersion) {
+      final SchemaPhase tableVersion, final String tableEnumName) {
     this.schemaVersion = schemaVersion;
     this.tableNames = tableNames;
     this.tableVersion = tableVersion;
+    this.tableEnumName = tableEnumName;
   }
 
   public void generate(final PrintStream out) {
     final String classPrefix = tableVersion.getPrefix();
-    final String baseEnumName = tableVersion.getTableEnumName();
+    final String baseEnumName = tableEnumName;
     log.info("Generating Table Enum");
     JavaBindingGenerator.writeFileHeader(out, schemaVersion);
     out.println("package " + tableVersion.getJavaPackage() + ";");
