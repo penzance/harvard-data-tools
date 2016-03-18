@@ -37,7 +37,8 @@ public class PostVerifyCommand implements Command {
 
   @Override
   public ReturnStatus execute(final DataConfiguration config, final ExecutorService exec)
-      throws IOException, DataConfigurationException, UnexpectedApiResponseException {
+      throws IOException, DataConfigurationException, UnexpectedApiResponseException,
+      ArgumentError {
     if (!checkArguments()) {
       return ReturnStatus.ARGUMENT_ERROR;
     }
@@ -51,7 +52,8 @@ public class PostVerifyCommand implements Command {
     return ReturnStatus.OK;
   }
 
-  private Verifier getVerifier(final DataConfiguration config, final ExecutorService exec) {
+  private Verifier getVerifier(final DataConfiguration config, final ExecutorService exec)
+      throws ArgumentError {
     final AwsUtils aws = new AwsUtils();
     final FormatLibrary formats = new FormatLibrary();
     final TableFormat format = formats.getFormat(FormatLibrary.Format.CanvasDataFlatFiles);
@@ -65,7 +67,7 @@ public class PostVerifyCommand implements Command {
     case 3:
       return new Phase3PostVerifier();
     }
-    throw new ArgumentError(ReturnStatus.ARGUMENT_ERROR, "Invalid phase " + phase);
+    throw new ArgumentError("Invalid phase " + phase);
   }
 
   private boolean checkArguments() {

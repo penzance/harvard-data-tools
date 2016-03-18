@@ -67,7 +67,6 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     }
   }
 
-
   public IdentityMap(final String researchId, final String huid, final Long canvasId,
       final Long canvasDataId) {
     this.researchId = researchId;
@@ -76,60 +75,34 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     this.canvasDataId = canvasDataId;
   }
 
-  /**
-   * UUID generated for research data set.
-   */
   public String getResearchId() {
     return this.researchId;
   }
 
-  /**
-   * UUID generated for research data set.
-   */
   public void setResearchId(final String researchId) {
     this.researchId = researchId;
   }
 
-  /**
-   * Harvard University ID. Unique ID issued to all 'Harvard Persons'.
-   */
   public String getHuid() {
     return this.huid;
   }
 
-  /**
-   * Harvard University ID. Unique ID issued to all 'Harvard Persons'.
-   */
   public void setHuid(final String huid) {
     this.huid = huid;
   }
 
-  /**
-   * User ID in the Canvas platform
-   */
   public Long getCanvasId() {
     return this.canvasId;
   }
 
-  /**
-   * User ID in the Canvas platform
-   */
   public void setCanvasId(final Long canvasId) {
     this.canvasId = canvasId;
   }
 
-  /**
-   * Semantically-meaningless ID generated for each user with an account in
-   * Canvas
-   */
   public Long getCanvasDataId() {
     return this.canvasDataId;
   }
 
-  /**
-   * Semantically-meaningless ID generated for each user with an account in
-   * Canvas
-   */
   public void setCanvasDataId(final Long canvasDataId) {
     this.canvasDataId = canvasDataId;
   }

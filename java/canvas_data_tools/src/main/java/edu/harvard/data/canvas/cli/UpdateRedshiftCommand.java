@@ -1,5 +1,10 @@
 package edu.harvard.data.canvas.cli;
 
+import static edu.harvard.data.canvas.CanvasCodeGenerator.PHASE_ONE_ADDITIONS_JSON;
+import static edu.harvard.data.canvas.CanvasCodeGenerator.PHASE_THREE_ADDITIONS_JSON;
+import static edu.harvard.data.canvas.CanvasCodeGenerator.PHASE_TWO_ADDITIONS_JSON;
+import static edu.harvard.data.canvas.CanvasCodeGenerator.readExtensionSchema;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
@@ -15,9 +20,8 @@ import edu.harvard.data.DumpInfo;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.UpdateRedshift;
 import edu.harvard.data.VerificationException;
-import edu.harvard.data.canvas.CanvasCodeGenerator;
 import edu.harvard.data.canvas.data_api.ApiClient;
-import edu.harvard.data.generator.GenerationSpec;
+import edu.harvard.data.generator.SchemaTransformer;
 import edu.harvard.data.schema.DataSchema;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
@@ -35,13 +39,14 @@ public class UpdateRedshiftCommand implements Command {
     final ApiClient api = new ApiClient(config.getCanvasDataHost(),
         config.getCanvasApiKey(), config.getCanvasApiSecret());
     final DumpInfo info = DumpInfo.find(dumpId);
-    final DataSchema schema = api.getSchema(info.getSchemaVersion());
 
-    final GenerationSpec transformer = new GenerationSpec(3);
-    transformer.setSchemas(schema, CanvasCodeGenerator.PHASE_ONE_ADDITIONS_JSON,
-        CanvasCodeGenerator.PHASE_TWO_ADDITIONS_JSON);
+    final SchemaTransformer transformer = new SchemaTransformer();
+    final DataSchema schema0 = api.getSchema(info.getSchemaVersion());
+    final DataSchema schema1 = transformer.transform(schema0, readExtensionSchema(PHASE_ONE_ADDITIONS_JSON));
+    final DataSchema schema2 = transformer.transform(schema1, readExtensionSchema(PHASE_TWO_ADDITIONS_JSON));
+    final DataSchema schema3 = transformer.transform(schema2, readExtensionSchema(PHASE_THREE_ADDITIONS_JSON));
     try {
-      new UpdateRedshift(transformer.getLastPhase().getSchema()).update(aws, config);
+      new UpdateRedshift(schema3).update(aws, config);
     } catch (final SQLException e) {
       log.fatal("Error while updating Redshift schema", e);
       return ReturnStatus.IO_ERROR;

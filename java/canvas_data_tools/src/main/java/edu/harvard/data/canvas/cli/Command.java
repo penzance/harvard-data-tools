@@ -14,6 +14,6 @@ public interface Command {
   String getDescription();
 
   ReturnStatus execute(DataConfiguration config, ExecutorService exec) throws IOException,
-  UnexpectedApiResponseException, DataConfigurationException, VerificationException;
+  UnexpectedApiResponseException, DataConfigurationException, VerificationException, ArgumentError;
 
 }

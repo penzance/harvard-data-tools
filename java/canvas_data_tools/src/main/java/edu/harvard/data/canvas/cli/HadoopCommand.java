@@ -37,7 +37,7 @@ public class HadoopCommand implements Command {
   @Override
   public ReturnStatus execute(final DataConfiguration config, final ExecutorService exec)
       throws IOException, UnexpectedApiResponseException, DataConfigurationException,
-      VerificationException {
+      VerificationException, ArgumentError {
     final Configuration hadoopConfig = new Configuration();
     log.info("Setting up Canvas Hadoop job");
     log.info("Phase: " + phase);
@@ -71,7 +71,7 @@ public class HadoopCommand implements Command {
   }
 
   private List<Job> setupJobs(final Configuration hadoopConfig, final DataConfiguration config)
-      throws DataConfigurationException, IOException {
+      throws DataConfigurationException, IOException, ArgumentError {
     final AwsUtils aws = new AwsUtils();
     final URI hdfsService;
     try {
@@ -91,7 +91,7 @@ public class HadoopCommand implements Command {
     case 3:
       break;
     default:
-      throw new ArgumentError(ReturnStatus.ARGUMENT_ERROR, "Invalid phase: " + phase);
+      throw new ArgumentError("Invalid phase: " + phase);
     }
     return jobs;
   }

@@ -27,8 +27,8 @@ import edu.harvard.data.DumpInfo;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.canvas.data_api.ApiClient;
-import edu.harvard.data.canvas.data_api.DataDump;
 import edu.harvard.data.canvas.data_api.CanvasDataSchema;
+import edu.harvard.data.canvas.data_api.DataDump;
 import edu.harvard.data.canvas.phase_0.DumpManager;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
@@ -41,7 +41,8 @@ public class DownloadDumpCommand implements Command {
 
   @Override
   public ReturnStatus execute(final DataConfiguration config, final ExecutorService exec) throws IOException,
-  DataConfigurationException, UnexpectedApiResponseException, VerificationException {
+  DataConfigurationException, UnexpectedApiResponseException,
+  VerificationException, ArgumentError {
     final AwsUtils aws = new AwsUtils();
     final DumpManager manager = new DumpManager(config, aws);
     final ApiClient api = new ApiClient(config.getCanvasDataHost(),

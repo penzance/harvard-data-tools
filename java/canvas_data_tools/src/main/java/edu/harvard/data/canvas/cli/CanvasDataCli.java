@@ -97,7 +97,7 @@ public class CanvasDataCli {
         bail(ReturnStatus.API_ERROR, args, config, "API error: " + e.getMessage(), e);
       } catch (final ArgumentError e) {
         log.fatal(e.getMessage(), e);
-        bail(e.getStatus(), args, config, e.getMessage(), e);
+        bail(ReturnStatus.ARGUMENT_ERROR, args, config, e.getMessage(), e);
       } catch (final Throwable t) {
         log.fatal(t.getMessage(), t);
         bail(ReturnStatus.UNKNOWN_ERROR, args, config, "Unexpected error: " + t.getMessage(), t);

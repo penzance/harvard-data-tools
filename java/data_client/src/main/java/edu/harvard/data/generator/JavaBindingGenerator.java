@@ -35,7 +35,6 @@ public class JavaBindingGenerator {
   private final String projectName;
   private final File javaSrcBase;
   private final File baseDir;
-  private final String tableEnumName;
 
   public JavaBindingGenerator(final GenerationSpec spec, final String projectName) {
     this.spec = spec;
@@ -43,7 +42,6 @@ public class JavaBindingGenerator {
     this.javaSrcBase = new File(baseDir, "src/main/java");
     this.schemaVersions = spec;
     this.projectName = projectName;
-    this.tableEnumName = spec.getJavaTableEnumName();
   }
 
   // Generates a new Maven project in the directory passed to the constructor.

@@ -19,15 +19,14 @@ import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.DumpInfo;
-import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.TableInfo;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.canvas.cli.ArgumentError;
 import edu.harvard.data.canvas.data_api.ApiClient;
+import edu.harvard.data.canvas.data_api.CanvasDataSchema;
 import edu.harvard.data.canvas.data_api.DataArtifact;
 import edu.harvard.data.canvas.data_api.DataDump;
 import edu.harvard.data.canvas.data_api.DataFile;
-import edu.harvard.data.canvas.data_api.CanvasDataSchema;
 import edu.harvard.data.schema.DataSchemaTable;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
@@ -73,7 +72,7 @@ public class DumpManager {
 
   public void saveDump(final ApiClient api, final DataDump dump, final DumpInfo info)
       throws IOException, UnexpectedApiResponseException, DataConfigurationException,
-      VerificationException {
+      VerificationException, ArgumentError {
     info.setDownloadStart(new Date());
     final File directory = getScratchDumpDir(dump);
     final boolean created = directory.mkdirs();
@@ -93,11 +92,11 @@ public class DumpManager {
         final DataArtifact refreshedArtifact = refreshedDump.getArtifactsByTable().get(table);
         final DataFile refreshedFile = refreshedArtifact.getFiles().get(i);
         if (!refreshedFile.getFilename().equals(file.getFilename())) {
-          throw new ArgumentError(ReturnStatus.API_ERROR,
-              "Mismatch in file name for refreshed dump. Expected" + refreshedFile.getFilename()
-              + ", got " + file.getFilename());
+          throw new ArgumentError("Mismatch in file name for refreshed dump. Expected"
+              + refreshedFile.getFilename() + ", got " + file.getFilename());
         }
-        final String filename = getArtifactFileName(refreshedDump.getDumpId(), artifact, fileIndex++);
+        final String filename = getArtifactFileName(refreshedDump.getDumpId(), artifact,
+            fileIndex++);
         final File downloadFile = new File(tableDir, filename);
         refreshedFile.download(downloadFile);
         archiveFile(dump, table, downloadFile);
@@ -113,8 +112,7 @@ public class DumpManager {
 
   private String getArtifactFileName(final String dumpId, final DataArtifact artifact,
       final int fileIndex) {
-    return artifact.getTableName() + "-" + dumpId + "-" + String.format("%05d", fileIndex)
-    + ".gz";
+    return artifact.getTableName() + "-" + dumpId + "-" + String.format("%05d", fileIndex) + ".gz";
   }
 
   public void archiveFile(final DataDump dump, final String table, final File downloadFile) {

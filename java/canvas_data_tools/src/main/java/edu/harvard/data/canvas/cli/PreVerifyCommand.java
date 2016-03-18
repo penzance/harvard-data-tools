@@ -34,7 +34,8 @@ public class PreVerifyCommand implements Command {
 
   @Override
   public ReturnStatus execute(final DataConfiguration config, final ExecutorService exec)
-      throws IOException, DataConfigurationException, UnexpectedApiResponseException {
+      throws IOException, DataConfigurationException, UnexpectedApiResponseException,
+      ArgumentError {
     if (!checkArguments()) {
       return ReturnStatus.ARGUMENT_ERROR;
     }
@@ -48,7 +49,8 @@ public class PreVerifyCommand implements Command {
     return ReturnStatus.OK;
   }
 
-  private Verifier getVerifier(final DataConfiguration config, final ExecutorService exec) {
+  private Verifier getVerifier(final DataConfiguration config, final ExecutorService exec)
+      throws ArgumentError {
     switch (phase) {
     case 0:
       return new Phase0PreVerifier();
@@ -59,7 +61,7 @@ public class PreVerifyCommand implements Command {
     case 3:
       return new Phase3PreVerifier();
     }
-    throw new ArgumentError(ReturnStatus.ARGUMENT_ERROR, "Invalid phase " + phase);
+    throw new ArgumentError("Invalid phase " + phase);
   }
 
   private boolean checkArguments() {
