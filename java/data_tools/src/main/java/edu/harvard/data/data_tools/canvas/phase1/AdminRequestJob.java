@@ -22,41 +22,38 @@ import edu.harvard.data.client.FormatLibrary;
 import edu.harvard.data.client.FormatLibrary.Format;
 import edu.harvard.data.client.TableFormat;
 import edu.harvard.data.client.canvas.phase0.Requests;
+import edu.harvard.data.client.canvas.phase1.Phase1AdminRequests;
 import edu.harvard.data.client.canvas.phase1.Phase1Requests;
 import edu.harvard.data.data_tools.HadoopJob;
-import edu.harvard.data.data_tools.UserAgentParser;
-import net.sf.uadetector.ReadableUserAgent;
 
-public class RequestJob extends HadoopJob {
+public class AdminRequestJob extends HadoopJob {
 
-  public RequestJob(final Configuration conf, final DataConfiguration dataConfig,
+  public AdminRequestJob(final Configuration conf, final DataConfiguration dataConfig,
       final AwsUtils aws, final URI hdfsService, final String inputDir, final String outputDir) {
     super(conf, aws, hdfsService, inputDir, outputDir);
   }
 
   @Override
   public Job getJob() throws IOException {
-    final Job job = Job.getInstance(conf, "requests-hadoop");
-    job.setMapperClass(RequestMapper.class);
+    final Job job = Job.getInstance(conf, "admin-requests");
+    job.setMapperClass(AdminRequestMapper.class);
     job.setMapOutputKeyClass(Text.class);
     job.setMapOutputValueClass(NullWritable.class);
     job.setNumReduceTasks(0);
 
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
-    setPaths(job, aws, hdfsService, inputDir + "/requests", outputDir + "/requests");
+    setPaths(job, aws, hdfsService, inputDir + "/requests", outputDir + "/admin_requests");
     return job;
   }
 }
 
-class RequestMapper extends Mapper<Object, Text, Text, NullWritable> {
+class AdminRequestMapper extends Mapper<Object, Text, Text, NullWritable> {
 
   private final TableFormat format;
-  private final UserAgentParser uaParser;
 
-  public RequestMapper() throws IOException, DataConfigurationException {
+  public AdminRequestMapper() throws IOException, DataConfigurationException {
     this.format = new FormatLibrary().getFormat(Format.CanvasDataFlatFiles);
-    this.uaParser = new UserAgentParser();
   }
 
   @Override
@@ -64,28 +61,17 @@ class RequestMapper extends Mapper<Object, Text, Text, NullWritable> {
       throws IOException, InterruptedException {
     final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
     for (final CSVRecord csvRecord : parser.getRecords()) {
-      final Requests request = new Requests(format, csvRecord);
-      if (request.getUserId() == null || (request.getUserId() != -262295411484124942L
-          || request.getUserId() == 134926641248969922L)) {
-        final Phase1Requests extended = new Phase1Requests(request);
-        parseUserAgent(extended);
+      final Phase1Requests request = new Phase1Requests(new Requests(format, csvRecord));
 
+      if (request.getUserId() != null && (request.getUserId() == -262295411484124942L
+          || request.getUserId() == 134926641248969922L)) {
         final StringWriter writer = new StringWriter();
         try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
-          printer.printRecord(extended.getFieldsAsList(format));
+          printer.printRecord(new Phase1AdminRequests(request).getFieldsAsList(format));
         }
         final Text csvText = new Text(writer.toString().trim());
         context.write(csvText, NullWritable.get());
       }
-    }
-  }
-
-  private void parseUserAgent(final Phase1Requests request) {
-    final String agentString = request.getUserAgent();
-    if (agentString != null) {
-      final ReadableUserAgent agent = uaParser.parse(agentString);
-      request.setBrowser(agent.getName());
-      request.setOs(agent.getOperatingSystem().getName());
     }
   }
 

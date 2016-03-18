@@ -18,6 +18,8 @@ public abstract class DataSchemaTable {
 
   public abstract DataSchemaColumn getColumn(final String name);
 
+  public abstract String getLikeTable();
+
   protected DataSchemaTable(final boolean newlyGenerated, final TableOwner owner) {
     this.newlyGenerated = newlyGenerated;
     this.owner = owner;

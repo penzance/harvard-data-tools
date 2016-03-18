@@ -78,8 +78,6 @@ public class CanvasDataGenerator {
     transformer.setJavaPackages(PHASE_ZERO_PACKAGE, PHASE_ONE_PACKAGE, PHASE_TWO_PACKAGE);
     transformer.setJavaSourceLocations(javaPhase0Dir, javaPhase1Dir, javaPhase2Dir);
 
-    System.out.println(transformer.getPhase(0).getSchema());
-
     // Generate the bindings.
     log.info("Generating Java bindings in " + dir);
     new JavaBindingGenerator(javaBase, transformer, "canvas_data_schema_bindings").generate();

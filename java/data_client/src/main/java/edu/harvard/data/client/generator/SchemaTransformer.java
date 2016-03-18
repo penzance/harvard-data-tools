@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,10 +15,13 @@ import org.apache.logging.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.harvard.data.client.FormatLibrary;
+import edu.harvard.data.client.VerificationException;
 import edu.harvard.data.client.generator.schema.ExtensionSchema;
+import edu.harvard.data.client.generator.schema.ExtensionSchemaTable;
 import edu.harvard.data.client.schema.DataSchema;
 import edu.harvard.data.client.schema.DataSchemaColumn;
 import edu.harvard.data.client.schema.DataSchemaTable;
+import edu.harvard.data.client.schema.DataSchemaType;
 
 public class SchemaTransformer {
   private static final Logger log = LogManager.getLogger();
@@ -41,7 +45,6 @@ public class SchemaTransformer {
   public SchemaPhase getLastPhase() {
     return phases.get(phases.size() - 1);
   }
-
 
   public void setJavaPackages(final String... packageList) {
     if (packageList.length != phases.size()) {
@@ -96,7 +99,7 @@ public class SchemaTransformer {
   }
 
   public void setSchemas(final DataSchema schema, final String... transformationResources)
-      throws IOException {
+      throws IOException, VerificationException {
     if (transformationResources.length != phases.size() - 1) {
       throw new RuntimeException("Expected " + (phases.size() - 1)
           + " transformation resources, got " + transformationResources.length);
@@ -121,7 +124,7 @@ public class SchemaTransformer {
   // table does exist, any fields specified in the JSON are appended to the
   // field list for that table.
   private void extendTableSchema(final DataSchema schema, final String jsonResource)
-      throws IOException {
+      throws IOException, VerificationException {
     log.info("Extending schema from file " + jsonResource);
     final ClassLoader classLoader = this.getClass().getClassLoader();
     Map<String, DataSchemaTable> updates;
@@ -132,14 +135,60 @@ public class SchemaTransformer {
       // Track tables and columns that were added in this update
       setNewGeneratedFlags(updates.values(), true);
       for (final String tableName : updates.keySet()) {
-        final DataSchemaTable newTable = updates.get(tableName);
+        final ExtensionSchemaTable newTable = (ExtensionSchemaTable) updates.get(tableName);
+        newTable.setTableName(tableName);
+        handleLikeField(newTable, updates, schema);
         if (!schema.getTables().containsKey(tableName)) {
           schema.getTables().put(tableName, newTable);
         } else {
           final DataSchemaTable originalTable = schema.getTables().get(tableName);
-          originalTable.getColumns().addAll(newTable.getColumns());
+          for (final DataSchemaColumn column : newTable.getColumns()) {
+            if (originalTable.getColumn(column.getName()) != null) {
+              throw new VerificationException("Redefining " + column.getName() + " in table " + tableName);
+            }
+            originalTable.getColumns().add(column);
+          }
           originalTable.setOwner(newTable.getOwner());
         }
+      }
+    }
+  }
+
+  private void handleLikeField(final DataSchemaTable table,
+      final Map<String, DataSchemaTable> updates, final DataSchema schema)
+          throws VerificationException {
+    final String likeTableName = table.getLikeTable();
+    final Map<String, DataSchemaType> seenColumns = new HashMap<String, DataSchemaType>();
+    for (final DataSchemaColumn column : table.getColumns()) {
+      seenColumns.put(column.getName(), column.getType());
+    }
+    if (likeTableName != null) {
+      final String tableName = table.getTableName();
+      if (!updates.containsKey(tableName) && schema.getTableByName(tableName) == null) {
+        throw new VerificationException(
+            "Table " + tableName + " specified to be like missing table " + likeTableName);
+      }
+      addColumns(table, updates.get(likeTableName), seenColumns);
+      addColumns(table, schema.getTableByName(likeTableName), seenColumns);
+    }
+  }
+
+  private void addColumns(final DataSchemaTable table, final DataSchemaTable likeTable,
+      final Map<String, DataSchemaType> seenColumns) throws VerificationException {
+    if (likeTable != null) {
+      for (final DataSchemaColumn column : likeTable.getColumns()) {
+        final String columnName = column.getName();
+        final DataSchemaType columnType = column.getType();
+        if (seenColumns.containsKey(columnName)) {
+          if (!seenColumns.get(columnName).equals(columnType)) {
+            throw new VerificationException(
+                "Redefining " + columnName + " of table " + table.getTableName() + " from "
+                    + seenColumns.get(columnName) + " to " + columnType);
+          }
+        } else {
+          table.getColumns().add(0, column);
+        }
+        seenColumns.put(columnName, columnType);
       }
     }
   }

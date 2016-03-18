@@ -60,6 +60,7 @@ public class ModelClassGenerator {
     outputFields(out);
     outputCsvConstructor(out);
     outputPreviousClassConstructor(out);
+    outputLikeClassConstructor(out);
     outputAllFieldConstructor(out);
     outputGettersAndSetters(out);
     outputGetFieldsAsListMethod(out);
@@ -74,8 +75,9 @@ public class ModelClassGenerator {
         out.println("  public enum " + enumName + " {");
         final String desc = column.getDescription();
         final String[] split = desc.split("'");
-        for (int i=1; i<split.length; i+=2) {
-          out.print("    " + JavaBindingGenerator.javaClass(split[i], "") + "(\"" + split[i] + "\")");
+        for (int i = 1; i < split.length; i += 2) {
+          out.print(
+              "    " + JavaBindingGenerator.javaClass(split[i], "") + "(\"" + split[i] + "\")");
           if (i + 2 < split.length) {
             out.println(",");
           } else {
@@ -178,19 +180,45 @@ public class ModelClassGenerator {
       out.println("  public " + className + "(" + previousClassName + " " + previousVar + ") {");
       for (final DataSchemaColumn column : table.getColumns()) {
         if (!column.getNewlyGenerated()) {
-          final String variableName = JavaBindingGenerator.javaVariable(column.getName());
-          final String methodName = "get" + JavaBindingGenerator.javaClass(variableName, "");
-          if (column.getType() == DataSchemaType.Enum) {
-            final String enumName = JavaBindingGenerator.javaEnum(column);
-            out.println("    this." + variableName + " = " + enumName + ".parse(" + previousVar + "." + methodName + "().getValue());");
-          } else {
-            out.println("    this." + variableName + " = " + previousVar + "." + methodName + "();");
-          }
+          assignField(out, column, previousVar);
         }
       }
       out.println("  }");
       out.println();
     }
+  }
+
+  // If the table was declared as "like" another, include a constructor for that
+  // table's model class.
+  private void outputLikeClassConstructor(final PrintStream out) {
+    if (table.getLikeTable() != null) {
+      final String likeTableName = table.getLikeTable();
+      final DataSchemaTable likeTable = tableVersion.getSchema().getTableByName(likeTableName);
+      final String likeTableClass = JavaBindingGenerator.javaClass(likeTableName, classPrefix);
+      out.println("  public " + className + "(" + likeTableClass + " likeTable) {");
+      for (final DataSchemaColumn column : likeTable.getColumns()) {
+        assignField(out, column, "likeTable");
+      }
+      out.println("  }");
+      out.println();
+    }
+  }
+
+  // Generate code to assign a value from the get method on another variable,
+  // e.g.
+  // this.variableName = originalField.getVariableName();
+  private void assignField(final PrintStream out, final DataSchemaColumn column,
+      final String originalField) {
+    final String variableName = JavaBindingGenerator.javaVariable(column.getName());
+    final String methodName = "get" + JavaBindingGenerator.javaClass(variableName, "");
+    if (column.getType() == DataSchemaType.Enum) {
+      final String enumName = JavaBindingGenerator.javaEnum(column);
+      out.println("    this." + variableName + " = " + enumName + ".parse(" + originalField + "."
+          + methodName + "().getValue());");
+    } else {
+      out.println("    this." + variableName + " = " + originalField + "." + methodName + "();");
+    }
+
   }
 
   // Generate a constructor that takes each field in order as parameters.
@@ -268,8 +296,7 @@ public class ModelClassGenerator {
   }
 
   private boolean isTimestamp(final DataSchemaColumn c) {
-    return (c.getType() == DataSchemaType.Timestamp
-        || c.getType() == DataSchemaType.DateTime);
+    return (c.getType() == DataSchemaType.Timestamp || c.getType() == DataSchemaType.DateTime);
   }
 
   private boolean isDate(final DataSchemaColumn c) {

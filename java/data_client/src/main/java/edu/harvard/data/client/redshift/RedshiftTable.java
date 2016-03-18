@@ -51,6 +51,11 @@ public class RedshiftTable extends DataSchemaTable {
   }
 
   @Override
+  public String getLikeTable() {
+    return null;
+  }
+
+  @Override
   public DataSchemaTable copy() {
     return new RedshiftTable(this);
   }

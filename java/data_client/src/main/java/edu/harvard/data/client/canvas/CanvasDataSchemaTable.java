@@ -126,6 +126,11 @@ public class CanvasDataSchemaTable extends DataSchemaTable {
     return originalTable;
   }
 
+  @Override
+  public String getLikeTable() {
+    return null;
+  }
+
   public void calculateDifferences(final CanvasDataSchemaTable table2,
       final List<SchemaDifference> differences) {
     if (dwType != table2.dwType) {

@@ -14,16 +14,19 @@ import edu.harvard.data.client.schema.TableOwner;
 
 public class ExtensionSchemaTable extends DataSchemaTable {
 
+  private final String like;
   private final String description;
   private String tableName;
   private final Map<String, DataSchemaColumn> columnsByName;
   private final List<DataSchemaColumn> columns;
 
   @JsonCreator
-  public ExtensionSchemaTable(@JsonProperty("description") final String description,
+  public ExtensionSchemaTable(@JsonProperty("like") final String like,
+      @JsonProperty("description") final String description,
       @JsonProperty("columns") final List<ExtensionSchemaColumn> columnList,
       @JsonProperty("owner") final TableOwner owner) {
     super(false, owner);
+    this.like = like;
     this.description = description;
     this.columns = new ArrayList<DataSchemaColumn>();
     this.columnsByName = new HashMap<String, DataSchemaColumn>();
@@ -38,6 +41,7 @@ public class ExtensionSchemaTable extends DataSchemaTable {
   public ExtensionSchemaTable(final String name, final List<DataSchemaColumn> columns) {
     super(false, null);
     this.tableName = name;
+    this.like = null;
     this.description = null;
     this.columns = new ArrayList<DataSchemaColumn>();
     this.columnsByName = new HashMap<String, DataSchemaColumn>();
@@ -50,6 +54,7 @@ public class ExtensionSchemaTable extends DataSchemaTable {
 
   private ExtensionSchemaTable(final ExtensionSchemaTable original) {
     super(original.newlyGenerated, original.owner);
+    this.like = original.like;
     this.description = original.description;
     this.tableName = original.tableName;
     this.columns = new ArrayList<DataSchemaColumn>();
@@ -81,6 +86,11 @@ public class ExtensionSchemaTable extends DataSchemaTable {
   }
 
   @Override
+  public String getLikeTable() {
+    return like;
+  }
+
+  @Override
   public DataSchemaTable copy() {
     return new ExtensionSchemaTable(this);
   }
@@ -88,6 +98,9 @@ public class ExtensionSchemaTable extends DataSchemaTable {
   @Override
   public String toString() {
     String s = tableName + (newlyGenerated ? " *" : "");
+    if (like != null) {
+      s += " like " + like;
+    }
     for (final DataSchemaColumn column : columns) {
       s += "\n    " + column;
     }

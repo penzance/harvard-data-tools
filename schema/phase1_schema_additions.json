@@ -22,6 +22,9 @@
         }
       ]
     },
+    "admin_requests": {
+      "like": "requests"
+    },
     "requests_per_file": {
       "owner": "java",
       "tableName" : "requests_per_file",

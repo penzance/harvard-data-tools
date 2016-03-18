@@ -20,9 +20,8 @@ import edu.harvard.data.client.VerificationException;
 import edu.harvard.data.client.schema.UnexpectedApiResponseException;
 import edu.harvard.data.data_tools.Command;
 import edu.harvard.data.data_tools.ReturnStatus;
+import edu.harvard.data.data_tools.canvas.phase1.AdminRequestJob;
 import edu.harvard.data.data_tools.canvas.phase1.RequestJob;
-import edu.harvard.data.data_tools.canvas.phase1.RequestPerFileJob;
-import edu.harvard.data.data_tools.canvas.phase1.RequestPerPageJob;
 
 public class CanvasHadoopCommand implements Command {
 
@@ -58,8 +57,9 @@ public class CanvasHadoopCommand implements Command {
     switch (phase) {
     case 1:
       jobs.add(new RequestJob(conf, config, aws, hdfsService, inputDir, outputDir).getJob());
-      jobs.add(new RequestPerFileJob(conf, aws, hdfsService, inputDir, outputDir).getJob());
-      jobs.add(new RequestPerPageJob(conf, aws, hdfsService, inputDir, outputDir).getJob());
+      jobs.add(new AdminRequestJob(conf, config, aws, hdfsService, inputDir, outputDir).getJob());
+      //      jobs.add(new RequestPerFileJob(conf, aws, hdfsService, inputDir, outputDir).getJob());
+      //      jobs.add(new RequestPerPageJob(conf, aws, hdfsService, inputDir, outputDir).getJob());
       break;
     case 2:
       break;
