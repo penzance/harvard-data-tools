@@ -30,7 +30,7 @@ ssh-keyscan github.com >> /home/hadoop/.ssh/known_hosts
 sudo yum install -y java-devel git-core
 
 # clone our repo
-git clone -b master https://github.com/penzance/harvard-data-tools.git /home/hadoop/harvard-data-tools
+git clone -b <my_branch> https://github.com/penzance/harvard-data-tools.git /home/hadoop/harvard-data-tools
 
 #Install maven via instructions at https://gist.github.com/sebsto/19b99f1fa1f32cae5d00
 sudo wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
