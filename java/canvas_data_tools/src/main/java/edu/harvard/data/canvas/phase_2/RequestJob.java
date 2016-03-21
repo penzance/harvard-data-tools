@@ -65,18 +65,18 @@ class RequestMapper extends Mapper<Object, Text, Text, NullWritable> {
     final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
     for (final CSVRecord csvRecord : parser.getRecords()) {
       final Phase1Requests request = new Phase1Requests(format, csvRecord);
-      if (request.getUserId() == null || (request.getUserId() != -262295411484124942L
-          || request.getUserId() == 134926641248969922L)) {
-        final Phase2Requests extended = new Phase2Requests(request);
-        parseUserAgent(extended);
+      //      if (request.getUserId() == null || (request.getUserId() != -262295411484124942L
+      //          || request.getUserId() == 134926641248969922L)) {
+      final Phase2Requests extended = new Phase2Requests(request);
+      parseUserAgent(extended);
 
-        final StringWriter writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
-          printer.printRecord(extended.getFieldsAsList(format));
-        }
-        final Text csvText = new Text(writer.toString().trim());
-        context.write(csvText, NullWritable.get());
+      final StringWriter writer = new StringWriter();
+      try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
+        printer.printRecord(extended.getFieldsAsList(format));
       }
+      final Text csvText = new Text(writer.toString().trim());
+      context.write(csvText, NullWritable.get());
+      //      }
     }
   }
 

@@ -63,15 +63,15 @@ class AdminRequestMapper extends Mapper<Object, Text, Text, NullWritable> {
     for (final CSVRecord csvRecord : parser.getRecords()) {
       final Phase2Requests request = new Phase2Requests(new Phase1Requests(format, csvRecord));
 
-      if (request.getUserId() != null && (request.getUserId() == -262295411484124942L
-          || request.getUserId() == 134926641248969922L)) {
-        final StringWriter writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
-          printer.printRecord(new Phase2AdminRequests(request).getFieldsAsList(format));
-        }
-        final Text csvText = new Text(writer.toString().trim());
-        context.write(csvText, NullWritable.get());
+      //      if (request.getUserId() != null && (request.getUserId() == -262295411484124942L
+      //          || request.getUserId() == 134926641248969922L)) {
+      final StringWriter writer = new StringWriter();
+      try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
+        printer.printRecord(new Phase2AdminRequests(request).getFieldsAsList(format));
       }
+      final Text csvText = new Text(writer.toString().trim());
+      context.write(csvText, NullWritable.get());
+      //      }
     }
   }
 
