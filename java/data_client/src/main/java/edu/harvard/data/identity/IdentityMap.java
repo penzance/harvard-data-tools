@@ -16,6 +16,7 @@ import edu.harvard.data.TableFormat;
 // CREATE TABLE identity_map (
 //     research_id VARCHAR(255),
 //     huid VARCHAR(255),
+//     xid VARCHAR(255),
 //     canvas_id BIGINT,
 //     canvas_data_id BIGINT
 // );
@@ -26,8 +27,12 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
 
   private String researchId;
   private String huid;
+  private String xid;
   private Long canvasId;
   private Long canvasDataId;
+
+  public IdentityMap() {
+  }
 
   public IdentityMap(final CSVRecord record) {
     this.populate(record);
@@ -44,11 +49,12 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
   public void populate(final CSVRecord record) {
     this.researchId = record.get(0);
     this.huid = record.get(1);
-    final String $canvasId = record.get(2);
+    this.xid = record.get(2);
+    final String $canvasId = record.get(3);
     if ($canvasId != null && $canvasId.length() > 0) {
       this.canvasId = Long.valueOf($canvasId);
     }
-    final String $canvasDataId = record.get(3);
+    final String $canvasDataId = record.get(4);
     if ($canvasDataId != null && $canvasDataId.length() > 0) {
       this.canvasDataId = Long.valueOf($canvasDataId);
     }
@@ -57,6 +63,7 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
   public void populate(final ResultSet resultSet) throws SQLException {
     this.researchId = resultSet.getString("research_id");
     this.huid = resultSet.getString("huid");
+    this.xid = resultSet.getString("xid");
     this.canvasId = resultSet.getLong("canvas_id");
     if (resultSet.wasNull()) {
       this.canvasId = null;
@@ -65,14 +72,6 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     if (resultSet.wasNull()) {
       this.canvasDataId = null;
     }
-  }
-
-  public IdentityMap(final String researchId, final String huid, final Long canvasId,
-      final Long canvasDataId) {
-    this.researchId = researchId;
-    this.huid = huid;
-    this.canvasId = canvasId;
-    this.canvasDataId = canvasDataId;
   }
 
   public String getResearchId() {
@@ -89,6 +88,14 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
 
   public void setHuid(final String huid) {
     this.huid = huid;
+  }
+
+  public String getXid() {
+    return this.xid;
+  }
+
+  public void setXid(final String xid) {
+    this.xid = xid;
   }
 
   public Long getCanvasId() {
@@ -112,6 +119,7 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     final List<Object> fields = new ArrayList<Object>();
     fields.add(researchId);
     fields.add(huid);
+    fields.add(xid);
     fields.add(canvasId);
     fields.add(canvasDataId);
     return fields;
@@ -121,6 +129,7 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     final List<String> fields = new ArrayList<String>();
     fields.add("research_id");
     fields.add("huid");
+    fields.add("xid");
     fields.add("canvas_id");
     fields.add("canvas_data_id");
     return fields;
@@ -128,7 +137,7 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
 
   @Override
   public String toString() {
-    return "research_id: " + researchId + "\nhuid: " + huid + "\ncanvas_id: " + canvasId
+    return "research_id: " + researchId + "\nhuid: " + huid + "\nxid: " + xid + "\ncanvas_id: " + canvasId
         + "\ncanvasDataId: " + canvasDataId;
   }
 
@@ -147,6 +156,10 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     if (huid != null) {
       params.add("huid = ?");
       vals.add(huid);
+    }
+    if (huid != null) {
+      params.add("xid = ?");
+      vals.add(xid);
     }
     if (canvasId != null) {
       params.add("canvas_id = ?");

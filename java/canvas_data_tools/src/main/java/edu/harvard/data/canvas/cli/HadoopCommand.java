@@ -18,6 +18,7 @@ import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.VerificationException;
+import edu.harvard.data.canvas.phase_1.Phase1HadoopManager;
 import edu.harvard.data.canvas.phase_2.Phase2HadoopManager;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
@@ -38,13 +39,36 @@ public class HadoopCommand implements Command {
   public ReturnStatus execute(final DataConfiguration config, final ExecutorService exec)
       throws IOException, UnexpectedApiResponseException, DataConfigurationException,
       VerificationException, ArgumentError {
-    final Configuration hadoopConfig = new Configuration();
     log.info("Setting up Canvas Hadoop job");
     log.info("Phase: " + phase);
     log.info("Input directory: " + inputDir);
     log.info("Output directory: " + outputDir);
 
-    final List<Job> jobs = setupJobs(hadoopConfig, config);
+    final URI hdfsService;
+    try {
+      hdfsService = new URI("hdfs///");
+    } catch (final URISyntaxException e) {
+      throw new DataConfigurationException(e);
+    }
+
+    final Configuration hadoopConfig = new Configuration();
+    if (phase == 1) {
+      final Phase1HadoopManager phase1 = new Phase1HadoopManager(inputDir,
+          outputDir, hdfsService);
+      phase1.runMapJobs(hadoopConfig);
+      phase1.runScrubJobs(hadoopConfig);
+    } else {
+      runParallelJobs(hadoopConfig, config, hdfsService);
+    }
+
+    log.info("All jobs complete");
+    return ReturnStatus.OK;
+  }
+
+  private void runParallelJobs(final Configuration hadoopConfig, final DataConfiguration config,
+      final URI hdfsService)
+          throws DataConfigurationException, IOException, ArgumentError {
+    final List<Job> jobs = setupJobs(hadoopConfig, config, hdfsService);
 
     for (final Job job : jobs) {
       job.setJarByClass(HadoopCommand.class);
@@ -66,19 +90,11 @@ public class HadoopCommand implements Command {
         }
       }
     }
-    log.info("All jobs complete");
-    return ReturnStatus.OK;
   }
 
-  private List<Job> setupJobs(final Configuration hadoopConfig, final DataConfiguration config)
+  private List<Job> setupJobs(final Configuration hadoopConfig, final DataConfiguration config, final URI hdfsService)
       throws DataConfigurationException, IOException, ArgumentError {
     final AwsUtils aws = new AwsUtils();
-    final URI hdfsService;
-    try {
-      hdfsService = new URI("hdfs///");
-    } catch (final URISyntaxException e) {
-      throw new DataConfigurationException(e);
-    }
     final List<Job> jobs = new ArrayList<Job>();
     switch (phase) {
     case 0:

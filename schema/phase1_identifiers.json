@@ -5,13 +5,15 @@
 	"user_dim": {
 		"id": ["CanvasDataID"],
 		"canvas_id": ["CanvasID"],
-		"id": ["CanvasDataID"]
+		"name": ["Other"],
+		"sortable_name": ["Other"]
 		},
 	"pseudonym_dim": {
+		"id": ["Other"],
 		"user_id": ["CanvasDataID"],
 		"canvas_id": ["CanvasID"],
-		"unique_id": ["HUID", "XID"],
-		"sis_user_id": ["CanvasDataID"]
+		"sis_user_id": ["HUID", "XID"],
+		"unique_name": ["Other"]
 		},
 	"pseudonym_fact": {
 		"user_id": ["CanvasDataID"]
