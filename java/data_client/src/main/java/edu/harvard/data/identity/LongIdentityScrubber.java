@@ -6,7 +6,9 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -20,15 +22,18 @@ import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.io.FileTableReader;
 
-public class IdentityScrubber extends Mapper<Object, Text, Text, NullWritable> {
+public abstract class LongIdentityScrubber extends Mapper<Object, Text, Text, NullWritable> {
 
   protected final TableFormat format;
   protected final Map<Long, IdentityMap> identities;
 
-  public IdentityScrubber() {
+  public LongIdentityScrubber() {
     this.format = new FormatLibrary().getFormat(Format.CanvasDataFlatFiles);
     this.identities = new HashMap<Long, IdentityMap>();
   }
+
+  protected abstract DataTable populateRecord(CSVRecord csvRecord);
+  protected abstract Long getHadoopKey(IdentityMap id);
 
   @Override
   protected void setup(final Context context) throws IOException, InterruptedException {
@@ -40,9 +45,19 @@ public class IdentityScrubber extends Mapper<Object, Text, Text, NullWritable> {
           FileTableReader<IdentityMap> in = new FileTableReader<IdentityMap>(IdentityMap.class,
               format, inStream)) {
         for (final IdentityMap id : in) {
-          identities.put(id.getCanvasDataId(), id);
+          identities.put(getHadoopKey(id), id);
         }
       }
+    }
+  }
+
+  @Override
+  public void map(final Object key, final Text value, final Context context)
+      throws IOException, InterruptedException {
+    final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
+    for (final CSVRecord csvRecord : parser.getRecords()) {
+      final DataTable record = populateRecord(csvRecord);
+      writeRecord(record, context);
     }
   }
 

@@ -30,7 +30,7 @@ public class JavaTableEnumGenerator {
     final String baseEnumName = tableEnumName;
     log.info("Generating Table Enum");
     JavaBindingGenerator.writeFileHeader(out, schemaVersion);
-    out.println("package " + tableVersion.getJavaPackage() + ";");
+    out.println("package " + tableVersion.getJavaBindingPackage() + ";");
     out.println();
     out.println("import " + DataTable.class.getCanonicalName() + ";");
     out.println();

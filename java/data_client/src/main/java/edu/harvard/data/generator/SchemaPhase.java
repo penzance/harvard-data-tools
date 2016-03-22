@@ -6,11 +6,11 @@ public class SchemaPhase {
 
   private DataSchema schema;
   private String prefix;
-  private String javaPackage;
+  private String javaBindingPackage;
   private String hdfsDir;
 
-  public void setJavaPackage(final String javaPackage) {
-    this.javaPackage = javaPackage;
+  public void setJavaBindingPackage(final String javaBindingPackage) {
+    this.javaBindingPackage = javaBindingPackage;
   }
 
   public void setPrefix(final String prefix) {
@@ -21,8 +21,8 @@ public class SchemaPhase {
     this.schema = schema;
   }
 
-  public String getJavaPackage() {
-    return javaPackage;
+  public String getJavaBindingPackage() {
+    return javaBindingPackage;
   }
 
   public String getPrefix() {

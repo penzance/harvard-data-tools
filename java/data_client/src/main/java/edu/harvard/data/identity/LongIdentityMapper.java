@@ -1,4 +1,4 @@
-package edu.harvard.data.canvas.phase_1;
+package edu.harvard.data.identity;
 
 import java.io.IOException;
 
@@ -11,30 +11,33 @@ import org.apache.hadoop.mapreduce.Mapper;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.TableFormat;
-import edu.harvard.data.canvas.bindings.phase0.Phase0Requests;
-import edu.harvard.data.identity.HadoopIdentityKey;
-import edu.harvard.data.identity.IdentityMap;
 
-public class RequestsIdentityMapper
+public abstract class LongIdentityMapper
 extends Mapper<Object, Text, LongWritable, HadoopIdentityKey> {
 
   protected final TableFormat format;
 
-  public RequestsIdentityMapper() {
+  public LongIdentityMapper() {
     this.format = new FormatLibrary().getFormat(Format.CanvasDataFlatFiles);
   }
+
+  protected abstract void readRecord(CSVRecord csvRecord);
+
+  protected abstract Long getHadoopKey();
+
+  protected abstract boolean populateIdentityMap(IdentityMap id);
 
   @Override
   public void map(final Object key, final Text value, final Context context)
       throws IOException, InterruptedException {
     final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
     for (final CSVRecord csvRecord : parser.getRecords()) {
-      final Phase0Requests request = new Phase0Requests(format, csvRecord);
-      final Long canvasDataId = request.getUserId();
-      if (canvasDataId != null) {
-        final IdentityMap id = new IdentityMap();
-        id.setCanvasDataId(canvasDataId);
-        context.write(new LongWritable(canvasDataId), new HadoopIdentityKey(id));
+      readRecord(csvRecord);
+      final Long hadoopKey = getHadoopKey();
+      final IdentityMap id = new IdentityMap();
+      final boolean populated = populateIdentityMap(id);
+      if (populated) {
+        context.write(new LongWritable(hadoopKey), new HadoopIdentityKey(id));
       }
     }
   }

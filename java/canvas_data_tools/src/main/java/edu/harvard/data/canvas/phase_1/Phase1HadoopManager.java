@@ -19,6 +19,10 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
+import edu.harvard.data.canvas.identity.PseudonymDimIdentityMapper;
+import edu.harvard.data.canvas.identity.PseudonymDimIdentityScrubber;
+import edu.harvard.data.canvas.identity.RequestsIdentityMapper;
+import edu.harvard.data.canvas.identity.RequestsIdentityScrubber;
 import edu.harvard.data.identity.HadoopIdentityKey;
 import edu.harvard.data.identity.IdentityReducer;
 

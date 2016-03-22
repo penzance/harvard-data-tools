@@ -82,35 +82,35 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     this.researchId = researchId;
   }
 
-  public String getHuid() {
+  public String getHUID() {
     return this.huid;
   }
 
-  public void setHuid(final String huid) {
+  public void setHUID(final String huid) {
     this.huid = huid;
   }
 
-  public String getXid() {
+  public String getXID() {
     return this.xid;
   }
 
-  public void setXid(final String xid) {
+  public void setXID(final String xid) {
     this.xid = xid;
   }
 
-  public Long getCanvasId() {
+  public Long getCanvasID() {
     return this.canvasId;
   }
 
-  public void setCanvasId(final Long canvasId) {
+  public void setCanvasID(final Long canvasId) {
     this.canvasId = canvasId;
   }
 
-  public Long getCanvasDataId() {
+  public Long getCanvasDataID() {
     return this.canvasDataId;
   }
 
-  public void setCanvasDataId(final Long canvasDataId) {
+  public void setCanvasDataID(final Long canvasDataId) {
     this.canvasDataId = canvasDataId;
   }
 
