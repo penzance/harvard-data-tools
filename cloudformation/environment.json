@@ -3750,6 +3750,128 @@
                         ]
                     },
                     {
+                        "Id": "RunCleanup",
+                        "Name": "RunCleanup",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "EmrActivity"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase3MoveCommand"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendCleanupSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendCleanupFailureSNSMessage"
+                            },
+                            {
+                                "Key": "step",
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.canvas.cli.CanvasDataCli,cleanup"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendCleanupSuccessSNSMessage",
+                        "Name": "SendCleanupSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Cleanup script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendCleanupFailureSNSMessage",
+                        "Name": "SendCleanupFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Cleanup script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
                         "Id": "MoveDataFromHDFS",
                         "Name": "MoveDataFromHDFS",
                         "Fields": [
@@ -3786,7 +3908,7 @@
                             },
                             {
                                 "Key": "dependsOn",
-                                "RefValue": "RunPhase3MoveCommand"
+                                "RefValue": "RunCleanup"
                             },
                             {
                                 "Key": "onSuccess",
