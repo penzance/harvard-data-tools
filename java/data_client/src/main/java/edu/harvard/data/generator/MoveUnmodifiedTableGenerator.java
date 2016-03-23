@@ -39,7 +39,7 @@ public class MoveUnmodifiedTableGenerator {
 
   private void moveUnmodifiedFiles(final PrintStream out, final SchemaPhase inputPhase,
       final SchemaPhase outputPhase, final String logFile) {
-    out.println("hadoop fs -mkdir " + outputPhase.getHDFSDir());
+//    out.println("hadoop fs -mkdir " + outputPhase.getHDFSDir());
     out.println("set -e"); // Exit on any failure
     out.println("sudo mkdir -p /var/log/hive/user/hadoop # Workaround for Hive logging bug");
     out.println("sudo chown hive:hive -R /var/log/hive");
