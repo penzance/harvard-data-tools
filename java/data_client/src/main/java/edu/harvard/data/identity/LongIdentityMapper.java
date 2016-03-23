@@ -1,6 +1,7 @@
 package edu.harvard.data.identity;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -23,7 +24,10 @@ extends Mapper<Object, Text, LongWritable, HadoopIdentityKey> {
 
   protected abstract void readRecord(CSVRecord csvRecord);
 
-  protected abstract Long getHadoopKey();
+  // Get a map in case there are two identifier fields but one of them is null.
+  // This way we register that we're dealing with the second case in the map
+  // method.
+  protected abstract Map<String, Long> getHadoopKeys();
 
   protected abstract boolean populateIdentityMap(IdentityMap id);
 
@@ -33,11 +37,25 @@ extends Mapper<Object, Text, LongWritable, HadoopIdentityKey> {
     final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
     for (final CSVRecord csvRecord : parser.getRecords()) {
       readRecord(csvRecord);
-      final Long hadoopKey = getHadoopKey();
-      final IdentityMap id = new IdentityMap();
-      final boolean populated = populateIdentityMap(id);
-      if (populated) {
-        context.write(new LongWritable(hadoopKey), new HadoopIdentityKey(id));
+      final Map<String, Long> hadoopKeys = getHadoopKeys();
+      if (hadoopKeys.size() == 1) {
+        // If there's only one Canvas data ID, we can use this table to figure
+        // out other identities for that individual.
+        final Long hadoopKey = hadoopKeys.entrySet().iterator().next().getValue();
+        final IdentityMap id = new IdentityMap();
+        final boolean populated = populateIdentityMap(id);
+        if (populated) {
+          context.write(new LongWritable(hadoopKey), new HadoopIdentityKey(id));
+        }
+      } else {
+        // If there are multiple Canvas data IDs in the table, it's ambiguous as
+        // to which individual other identifier fields may refer. We just log
+        // the identifier and leave it at that.
+        for (final Long hadoopKey : hadoopKeys.values()) {
+          if (hadoopKey != null) {
+            context.write(new LongWritable(hadoopKey), new HadoopIdentityKey(new IdentityMap()));
+          }
+        }
       }
     }
   }

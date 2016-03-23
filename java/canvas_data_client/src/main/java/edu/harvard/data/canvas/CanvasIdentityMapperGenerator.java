@@ -1,6 +1,8 @@
 package edu.harvard.data.canvas;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,8 +31,8 @@ public class CanvasIdentityMapperGenerator {
   private final String modelClass;
 
   public CanvasIdentityMapperGenerator(final DataSchemaTable table,
-      final Map<String, List<IdentifierType>> identities, final String className, final String schemaVersion,
-      final String hadoopPackage, final SchemaPhase phase) {
+      final Map<String, List<IdentifierType>> identities, final String className,
+      final String schemaVersion, final String hadoopPackage, final SchemaPhase phase) {
     this.table = table;
     this.identities = identities;
     this.className = className;
@@ -54,13 +56,15 @@ public class CanvasIdentityMapperGenerator {
     out.println();
     outputReadRecord(out);
     out.println();
-    outputGetHadoopKey(out);
+    outputGetHadoopKeys(out);
     out.println();
     outputPopulateIdentityMap(out);
     out.println("}");
   }
 
   private void outputImportStatements(final PrintStream out) {
+    out.println("import " + Map.class.getCanonicalName() + ";");
+    out.println("import " + HashMap.class.getCanonicalName() + ";");
     out.println("import " + CSVRecord.class.getCanonicalName() + ";");
     if (hasMultiplexedIdentities()) {
       out.println("import " + IdentifierType.class.getCanonicalName() + ";");
@@ -86,25 +90,35 @@ public class CanvasIdentityMapperGenerator {
     out.println("  }");
   }
 
-  private void outputGetHadoopKey(final PrintStream out) throws VerificationException {
+  private void outputGetHadoopKeys(final PrintStream out) throws VerificationException {
     out.println("  @Override");
-    out.println("  protected Long getHadoopKey() {");
-    out.println("    return phase0." + getHadoopKeyGetter() + "();");
+    out.println("  protected Map<String, Long> getHadoopKeys() {");
+    out.println("    Map<String, Long> keys = new HashMap<String, Long>();");
+    for (final String column : getCanvasDataIdColumns()) {
+      final String getter = JavaBindingGenerator.javaGetter(column);
+      out.println("    keys.put(\"" + column + "\", phase0." + getter + "());");
+    }
+    out.println("    return keys;");
     out.println("  }");
   }
 
   private void outputPopulateIdentityMap(final PrintStream out) throws VerificationException {
     out.println("  @Override");
     out.println("  protected boolean populateIdentityMap(final IdentityMap $id) {");
-    out.println("    boolean populated = false;");
-    for (final String columnName : identities.keySet()) {
-      if (identities.get(columnName).size() == 1) {
-        outputSimpleIdPopulation(out, columnName);
-      } else {
-        outputComplexIdPopulation(out, columnName);
+    if (getCanvasDataIdColumns().size() > 1) {
+      out.println(
+          "    throw new RuntimeException(\"Can't populate identity map with multiple Canvas Data IDs\");");
+    } else {
+      out.println("    boolean populated = false;");
+      for (final String columnName : identities.keySet()) {
+        if (identities.get(columnName).size() == 1) {
+          outputSimpleIdPopulation(out, columnName);
+        } else {
+          outputComplexIdPopulation(out, columnName);
+        }
       }
+      out.println("    return populated;");
     }
-    out.println("    return populated;");
     out.println("  }");
   }
 
@@ -147,14 +161,18 @@ public class CanvasIdentityMapperGenerator {
     }
   }
 
-  private String getHadoopKeyGetter() throws VerificationException {
+  private List<String> getCanvasDataIdColumns() throws VerificationException {
+    final List<String> ids = new ArrayList<String>();
     for (final String columnName : identities.keySet()) {
       if (identities.get(columnName).contains(IdentifierType.CanvasDataID)) {
-        return JavaBindingGenerator.javaGetter(columnName);
+        ids.add(columnName);
       }
     }
-    throw new VerificationException(
-        "Table " + table.getTableName() + " does not have a CanvasDataID field");
+    if (ids.size() == 0) {
+      throw new VerificationException(
+          "Table " + table.getTableName() + " does not have a CanvasDataID field");
+    }
+    return ids;
   }
 
 }

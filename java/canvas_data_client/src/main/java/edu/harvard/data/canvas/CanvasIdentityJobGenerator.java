@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,26 +37,48 @@ public class CanvasIdentityJobGenerator {
   }
 
   public void generate() throws IOException, VerificationException {
+    javaSrcBase.mkdirs();
+
+    final List<String> tableNames = new ArrayList<String>();
+    final List<String> mapperNames = new ArrayList<String>();
+    final List<String> scrubberNames = new ArrayList<String>();
+    final String hadoopPackage = spec.getIdentityHadoopPackage();
+    final String version = schema.getVersion();
+
     for (final String tableName : identities.keySet()) {
+      final String classBase = JavaBindingGenerator.javaClass(tableName, "");
+      final Map<String, List<IdentifierType>> tableIds = identities.get(tableName);
       final DataSchemaTable table = schema.getTableByName(tableName);
       final SchemaPhase phase0 = spec.getPhase(0);
       final SchemaPhase phase1 = spec.getPhase(1);
 
-      final String mapperClass = JavaBindingGenerator.javaClass(tableName, "") + "IdentityMapper";
+      final String mapperClass = classBase + "IdentityMapper";
       final File mapperFile = new File(javaSrcBase, mapperClass + ".java");
       try (final PrintStream out = new PrintStream(new FileOutputStream(mapperFile))) {
         log.info("Generating " + mapperClass + " at " + mapperFile);
-        new CanvasIdentityMapperGenerator(table, identities.get(tableName), mapperClass,
-            schema.getVersion(), spec.getIdentityHadoopPackage(), phase0).generate(out);
+        new CanvasIdentityMapperGenerator(table, tableIds, mapperClass, version, hadoopPackage,
+            phase0).generate(out);
       }
 
-      final String scrubberClass = JavaBindingGenerator.javaClass(tableName, "") + "IdentityScrubber";
+      final String scrubberClass = classBase + "IdentityScrubber";
       final File scrubberFile = new File(javaSrcBase, scrubberClass + ".java");
       try (final PrintStream out = new PrintStream(new FileOutputStream(scrubberFile))) {
         log.info("Generating " + scrubberClass + " at " + scrubberFile);
-        new CanvasIdentityScrubberGenerator(table, identities.get(tableName), scrubberClass,
-            schema.getVersion(), spec.getIdentityHadoopPackage(), phase0, phase1).generate(out);
+        new CanvasIdentityScrubberGenerator(table, tableIds, scrubberClass, version, hadoopPackage,
+            phase0, phase1).generate(out);
       }
+
+      tableNames.add(tableName);
+      mapperNames.add(mapperClass);
+      scrubberNames.add(scrubberClass);
+    }
+
+    final String managerClass = "CanvasIdentityHadoopManager";
+    final File managerFile = new File(javaSrcBase, managerClass + ".java");
+    try (final PrintStream out = new PrintStream(new FileOutputStream(managerFile))) {
+      new CanvasIdentityManagerGenerator(hadoopPackage, managerClass, tableNames, mapperNames,
+          scrubberNames).generate(out);
     }
   }
+
 }

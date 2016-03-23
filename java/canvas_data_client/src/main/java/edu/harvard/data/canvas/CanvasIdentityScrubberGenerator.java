@@ -1,6 +1,7 @@
 package edu.harvard.data.canvas;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import edu.harvard.data.generator.JavaBindingGenerator;
 import edu.harvard.data.generator.SchemaPhase;
 import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.identity.IdentityMap;
+import edu.harvard.data.identity.IdentitySchemaTransformer;
 import edu.harvard.data.identity.LongIdentityScrubber;
 import edu.harvard.data.schema.DataSchemaTable;
 
@@ -67,24 +69,28 @@ public class CanvasIdentityScrubberGenerator {
   private void outputImportStatements(final PrintStream out) {
     out.println("import " + CSVRecord.class.getCanonicalName() + ";");
     out.println("import " + IdentityMap.class.getCanonicalName() + ";");
-    out.println("import " + LongIdentityScrubber.class.getCanonicalName() + ";");
     out.println("import " + DataTable.class.getCanonicalName() + ";");
+    out.println("import " + LongIdentityScrubber.class.getCanonicalName() + ";");
     out.println("import " + phase0ModelPackage + "." + phase0ModelClass + ";");
     out.println("import " + phase1ModelPackage + "." + phase1ModelClass + ";");
   }
 
   private void outputPopulateRecord(final PrintStream out) throws VerificationException {
-    final String canvasDataIdGetter = getHadoopKeyGetter();
     out.println("  @Override");
     out.println("  protected DataTable populateRecord(final CSVRecord csvRecord) {");
     out.println("    final " + phase0ModelClass + " phase0 = new " + phase0ModelClass
         + "(format, csvRecord);");
     out.println(
         "    final " + phase1ModelClass + " phase1 = new " + phase1ModelClass + "(phase0);");
-    out.println("    if (phase0." + canvasDataIdGetter + "() != null) {");
-    out.println("      phase1.setResearchUuid(identities.get(phase0." + canvasDataIdGetter
-        + "()).getResearchId());");
-    out.println("    }");
+    for (final String idColumn : getCanvasDataIdColumns()) {
+      final String getter = JavaBindingGenerator.javaGetter(idColumn);
+      final String setter = JavaBindingGenerator
+          .javaSetter(idColumn + IdentitySchemaTransformer.RESARCH_UUID_SUFFIX);
+      out.println("    if (phase0." + getter + "() != null) {");
+      out.println(
+          "      phase1." + setter + "(identities.get(phase0." + getter + "()).getResearchId());");
+      out.println("    }");
+    }
     out.println("    return phase1;");
     out.println("  }");
   }
@@ -96,14 +102,18 @@ public class CanvasIdentityScrubberGenerator {
     out.println("  }");
   }
 
-  private String getHadoopKeyGetter() throws VerificationException {
+  private List<String> getCanvasDataIdColumns() throws VerificationException {
+    final List<String> ids = new ArrayList<String>();
     for (final String columnName : identities.keySet()) {
       if (identities.get(columnName).contains(IdentifierType.CanvasDataID)) {
-        return JavaBindingGenerator.javaGetter(columnName);
+        ids.add(columnName);
       }
     }
-    throw new VerificationException(
-        "Table " + table.getTableName() + " does not have a CanvasDataID field");
+    if (ids.size() == 0) {
+      throw new VerificationException(
+          "Table " + table.getTableName() + " does not have a CanvasDataID field");
+    }
+    return ids;
   }
 
 }

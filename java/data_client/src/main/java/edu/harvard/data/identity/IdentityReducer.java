@@ -41,7 +41,7 @@ public class IdentityReducer extends Reducer<LongWritable, HadoopIdentityKey, Te
           FileTableReader<IdentityMap> in = new FileTableReader<IdentityMap>(IdentityMap.class,
               format, inStream)) {
         for (final IdentityMap id : in) {
-          identities.put(id.getCanvasDataId(), id);
+          identities.put(id.getCanvasDataID(), id);
         }
       }
     }
@@ -51,24 +51,24 @@ public class IdentityReducer extends Reducer<LongWritable, HadoopIdentityKey, Te
   public void reduce(final LongWritable canvasDataId, final Iterable<HadoopIdentityKey> values,
       final Context context) throws IOException, InterruptedException {
     final IdentityMap id = new IdentityMap();
-    id.setCanvasDataId(canvasDataId.get());
+    id.setCanvasDataID(canvasDataId.get());
     if (identities.containsKey(canvasDataId)) {
       id.setResearchId(identities.get(canvasDataId).getResearchId());
     } else {
       id.setResearchId(UUID.randomUUID().toString());
     }
     for (final HadoopIdentityKey value : values) {
-      final Long canvasId = value.getIdentityMap().getCanvasId();
-      final String huid = value.getIdentityMap().getHuid();
-      final String xid = value.getIdentityMap().getXid();
-      if (id.getCanvasId() == null && canvasId != null) {
-        id.setCanvasId(canvasId);
+      final Long canvasId = value.getIdentityMap().getCanvasID();
+      final String huid = value.getIdentityMap().getHUID();
+      final String xid = value.getIdentityMap().getXID();
+      if (id.getCanvasID() == null && canvasId != null) {
+        id.setCanvasID(canvasId);
       }
-      if (id.getHuid() == null && huid != null) {
-        id.setHuid(huid);
+      if (id.getHUID() == null && huid != null) {
+        id.setHUID(huid);
       }
-      if (id.getXid() == null && xid != null) {
-        id.setXid(xid);
+      if (id.getXID() == null && xid != null) {
+        id.setXID(xid);
       }
     }
     final StringWriter writer = new StringWriter();

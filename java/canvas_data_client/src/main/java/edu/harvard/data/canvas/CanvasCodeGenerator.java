@@ -19,7 +19,13 @@ import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.canvas.data_api.ApiClient;
+import edu.harvard.data.generator.CreateHiveTableGenerator;
+import edu.harvard.data.generator.CreateRedshiftTableGenerator;
 import edu.harvard.data.generator.GenerationSpec;
+import edu.harvard.data.generator.HiveQueryManifestGenerator;
+import edu.harvard.data.generator.JavaBindingGenerator;
+import edu.harvard.data.generator.MoveUnmodifiedTableGenerator;
+import edu.harvard.data.generator.S3ToRedshiftLoaderGenerator;
 import edu.harvard.data.generator.SchemaTransformer;
 import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.identity.IdentitySchemaTransformer;
@@ -79,27 +85,27 @@ public class CanvasCodeGenerator {
     spec.setSchemas(schemas.get(0), schemas.get(1), schemas.get(2), schemas.get(3));
 
     // Generate the bindings.
-    //    log.info("Generating Java bindings in " + dir);
-    //    new JavaBindingGenerator(spec, "canvas_data_schema_bindings").generate();
+    log.info("Generating Java bindings in " + dir);
+    new JavaBindingGenerator(spec, "canvas_data_schema_bindings").generate();
 
     log.info("Generating Java identity Hadoop jobs in " + dir);
     new CanvasIdentityJobGenerator(spec, readIdentities(PHASE_ONE_IDENTIFIERS_JSON))
     .generate();
 
-    //    log.info("Generating Hive table definitions in " + dir);
-    //    new CreateHiveTableGenerator(dir, spec).generate();
-    //
-    //    log.info("Generating Hive query manifests in " + dir);
-    //    new HiveQueryManifestGenerator(gitDir, dir, spec).generate();
-    //
-    //    log.info("Generating Redshift table definitions in " + dir);
-    //    new CreateRedshiftTableGenerator(dir, spec).generate();
-    //
-    //    log.info("Generating Redshift copy from S3 script in " + dir);
-    //    new S3ToRedshiftLoaderGenerator(dir, spec).generate();
-    //
-    //    log.info("Generating move unmodified files script in " + dir);
-    //    new MoveUnmodifiedTableGenerator(dir, spec).generate();
+    log.info("Generating Hive table definitions in " + dir);
+    new CreateHiveTableGenerator(dir, spec).generate();
+
+    log.info("Generating Hive query manifests in " + dir);
+    new HiveQueryManifestGenerator(gitDir, dir, spec).generate();
+
+    log.info("Generating Redshift table definitions in " + dir);
+    new CreateRedshiftTableGenerator(dir, spec).generate();
+
+    log.info("Generating Redshift copy from S3 script in " + dir);
+    new S3ToRedshiftLoaderGenerator(dir, spec).generate();
+
+    log.info("Generating move unmodified files script in " + dir);
+    new MoveUnmodifiedTableGenerator(dir, spec).generate();
 
   }
 

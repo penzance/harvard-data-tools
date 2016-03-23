@@ -11,6 +11,8 @@ import edu.harvard.data.schema.extension.ExtensionSchemaColumn;
 
 public class IdentitySchemaTransformer {
 
+  public static final String RESARCH_UUID_SUFFIX = "_research_uuid";
+
   public DataSchema transform(final DataSchema base,
       final Map<String, Map<String, List<IdentifierType>>> identifiers)
           throws VerificationException {
@@ -27,12 +29,18 @@ public class IdentitySchemaTransformer {
           throw new VerificationException("Identifier specified for missing column '" + columnName
               + "' of table '" + tableName + "'");
         }
-        columns.remove(table.getColumn(columnName));
+        final DataSchemaColumn oldColumn = table.getColumn(columnName);
+        columns.remove(oldColumn);
+        if (identifiers.get(tableName).get(columnName).contains(IdentifierType.CanvasDataID)) {
+          final String ridColumn = columnName + RESARCH_UUID_SUFFIX;
+          final ExtensionSchemaColumn newColumn = new ExtensionSchemaColumn(ridColumn,
+              oldColumn.getDescription()
+              + ". Value replaced by a UUID generated for the research data set.",
+              "varchar", 255);
+          newColumn.setNewlyGenerated(true);
+          columns.add(newColumn);
+        }
       }
-      final ExtensionSchemaColumn newColumn = new ExtensionSchemaColumn("research_uuid",
-          "UUID generated for research data set.", "varchar", 255);
-      newColumn.setNewlyGenerated(true);
-      columns.add(newColumn);
     }
     return schema;
   }
