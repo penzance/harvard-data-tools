@@ -1998,136 +1998,6 @@
                         ]
                     },
                     {
-                        "Id": "RunPhase1MoveCommand",
-                        "Name": "RunPhase1MoveCommand",
-                        "Fields": [
-                            {
-                                "Key": "type",
-                                "StringValue": "ShellCommandActivity"
-                            },
-                            {
-                                "Key": "command",
-                                "StringValue": "/home/hadoop/phase_1_move_unmodified_files.sh phase_0 phase_1"
-                            },
-                            {
-                                "Key": "schedule",
-                                "RefValue": "DefaultSchedule"
-                            },
-                            {
-                                "Key": "dependsOn",
-                                "RefValue": "RunPhase1HiveCommand"
-                            },
-                            {
-                                "Key": "dependsOn",
-                                "RefValue": "RunPhase1HadoopJAR"
-                            },
-                            {
-                                "Key": "runsOn",
-                                "RefValue": "EmrCluster"
-                            },
-                            {
-                                "Key": "retryDelay",
-                                "StringValue": "2 Minutes"
-                            },
-                            {
-                                "Key": "onSuccess",
-                                "RefValue": "SendPhase1MoveSuccessSNSMessage"
-                            },
-                            {
-                                "Key": "onFail",
-                                "RefValue": "SendPhase1MoveFailureSNSMessage"
-                            }
-                        ]
-                    },
-                    {
-                        "Id": "SendPhase1MoveSuccessSNSMessage",
-                        "Name": "SendPhase1MoveSuccessSNSMessage",
-                        "Fields": [
-                            {
-                                "Key": "type",
-                                "StringValue": "SnsAlarm"
-                            },
-                            {
-                                "Key": "role",
-                                "StringValue": {
-                                    "Ref": "DataPipelineRole"
-                                }
-                            },
-                            {
-                                "Key": "subject",
-                                "StringValue": {
-                                    "Fn::Join": [
-                                        "",
-                                        [
-                                            {
-                                                "Ref": "AWS::StackName"
-                                            },
-                                            "-",
-                                            {
-                                                "Ref": "EnvironmentParameter"
-                                            },
-                                            " Dataset dataset-id-placeholder - Phase 1 move script succeeded"
-                                        ]
-                                    ]
-                                }
-                            },
-                            {
-                                "Key": "message",
-                                "StringValue": "Yay!"
-                            },
-                            {
-                                "Key": "topicArn",
-                                "StringValue": {
-                                    "Ref": "SuccessSNS"
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "Id": "SendPhase1MoveFailureSNSMessage",
-                        "Name": "SendPhase1MoveFailureSNSMessage",
-                        "Fields": [
-                            {
-                                "Key": "type",
-                                "StringValue": "SnsAlarm"
-                            },
-                            {
-                                "Key": "role",
-                                "StringValue": {
-                                    "Ref": "DataPipelineRole"
-                                }
-                            },
-                            {
-                                "Key": "subject",
-                                "StringValue": {
-                                    "Fn::Join": [
-                                        "",
-                                        [
-                                            {
-                                                "Ref": "AWS::StackName"
-                                            },
-                                            "-",
-                                            {
-                                                "Ref": "EnvironmentParameter"
-                                            },
-                                            " Dataset dataset-id-placeholder - Phase 1 move script failed"
-                                        ]
-                                    ]
-                                }
-                            },
-                            {
-                                "Key": "message",
-                                "StringValue": "Boo!"
-                            },
-                            {
-                                "Key": "topicArn",
-                                "StringValue": {
-                                    "Ref": "FailureSNS"
-                                }
-                            }
-                        ]
-                    },
-                    {
                         "Id": "RunPhase1HiveCommand",
                         "Name": "RunPhase1HiveCommand",
                         "Fields": [
@@ -2283,7 +2153,7 @@
                             },
                             {
                                 "Key": "step",
-                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.data_tools.DataCli,canvas,hadoop,1,/phase_0,/phase_1"
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,hadoop,1,/phase_0,/phase_1"
                             }
                         ]
                     },
@@ -2359,6 +2229,136 @@
                                                 "Ref": "EnvironmentParameter"
                                             },
                                             " Dataset dataset-id-placeholder - Phase 1 Hadoop script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "RunPhase1MoveCommand",
+                        "Name": "RunPhase1MoveCommand",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "ShellCommandActivity"
+                            },
+                            {
+                                "Key": "command",
+                                "StringValue": "/home/hadoop/phase_1_move_unmodified_files.sh phase_0 phase_1"
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase1HiveCommand"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase1HadoopJAR"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendPhase1MoveSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendPhase1MoveFailureSNSMessage"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase1MoveSuccessSNSMessage",
+                        "Name": "SendPhase1MoveSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 1 move script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase1MoveFailureSNSMessage",
+                        "Name": "SendPhase1MoveFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 1 move script failed"
                                         ]
                                     ]
                                 }
@@ -2485,132 +2485,6 @@
                                                 "Ref": "EnvironmentParameter"
                                             },
                                             " Dataset dataset-id-placeholder - Phase 2 create tables script failed"
-                                        ]
-                                    ]
-                                }
-                            },
-                            {
-                                "Key": "message",
-                                "StringValue": "Boo!"
-                            },
-                            {
-                                "Key": "topicArn",
-                                "StringValue": {
-                                    "Ref": "FailureSNS"
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "Id": "RunPhase2MoveCommand",
-                        "Name": "RunPhase2MoveCommand",
-                        "Fields": [
-                            {
-                                "Key": "type",
-                                "StringValue": "ShellCommandActivity"
-                            },
-                            {
-                                "Key": "command",
-                                "StringValue": "/home/hadoop/phase_2_move_unmodified_files.sh phase_1 phase_2"
-                            },
-                            {
-                                "Key": "schedule",
-                                "RefValue": "DefaultSchedule"
-                            },
-                            {
-                                "Key": "dependsOn",
-                                "RefValue": "RunPhase2CreateCommand"
-                            },
-                            {
-                                "Key": "runsOn",
-                                "RefValue": "EmrCluster"
-                            },
-                            {
-                                "Key": "retryDelay",
-                                "StringValue": "2 Minutes"
-                            },
-                            {
-                                "Key": "onSuccess",
-                                "RefValue": "SendPhase2MoveSuccessSNSMessage"
-                            },
-                            {
-                                "Key": "onFail",
-                                "RefValue": "SendPhase2MoveFailureSNSMessage"
-                            }
-                        ]
-                    },
-                    {
-                        "Id": "SendPhase2MoveSuccessSNSMessage",
-                        "Name": "SendPhase2MoveSuccessSNSMessage",
-                        "Fields": [
-                            {
-                                "Key": "type",
-                                "StringValue": "SnsAlarm"
-                            },
-                            {
-                                "Key": "role",
-                                "StringValue": {
-                                    "Ref": "DataPipelineRole"
-                                }
-                            },
-                            {
-                                "Key": "subject",
-                                "StringValue": {
-                                    "Fn::Join": [
-                                        "",
-                                        [
-                                            {
-                                                "Ref": "AWS::StackName"
-                                            },
-                                            "-",
-                                            {
-                                                "Ref": "EnvironmentParameter"
-                                            },
-                                            " Dataset dataset-id-placeholder - Phase 2 move script succeeded"
-                                        ]
-                                    ]
-                                }
-                            },
-                            {
-                                "Key": "message",
-                                "StringValue": "Yay!"
-                            },
-                            {
-                                "Key": "topicArn",
-                                "StringValue": {
-                                    "Ref": "SuccessSNS"
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "Id": "SendPhase2MoveFailureSNSMessage",
-                        "Name": "SendPhase2MoveFailureSNSMessage",
-                        "Fields": [
-                            {
-                                "Key": "type",
-                                "StringValue": "SnsAlarm"
-                            },
-                            {
-                                "Key": "role",
-                                "StringValue": {
-                                    "Ref": "DataPipelineRole"
-                                }
-                            },
-                            {
-                                "Key": "subject",
-                                "StringValue": {
-                                    "Fn::Join": [
-                                        "",
-                                        [
-                                            {
-                                                "Ref": "AWS::StackName"
-                                            },
-                                            "-",
-                                            {
-                                                "Ref": "EnvironmentParameter"
-                                            },
-                                            " Dataset dataset-id-placeholder - Phase 2 move script failed"
                                         ]
                                     ]
                                 }
@@ -2783,7 +2657,7 @@
                             },
                             {
                                 "Key": "step",
-                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.data_tools.DataCli,canvas,hadoop,2,/phase_1,/phase_2"
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.canvas.cli.CanvasDataCli,hadoop,2,/phase_1,/phase_2"
                             }
                         ]
                     },
@@ -2876,6 +2750,136 @@
                         ]
                     },
                     {
+                        "Id": "RunPhase2MoveCommand",
+                        "Name": "RunPhase2MoveCommand",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "ShellCommandActivity"
+                            },
+                            {
+                                "Key": "command",
+                                "StringValue": "/home/hadoop/phase_2_move_unmodified_files.sh phase_1 phase_2"
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase2HiveCommand"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase2HadoopJAR"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendPhase2MoveSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendPhase2MoveFailureSNSMessage"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase2MoveSuccessSNSMessage",
+                        "Name": "SendPhase2MoveSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 2 move script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase2MoveFailureSNSMessage",
+                        "Name": "SendPhase2MoveFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 2 move script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
                         "Id": "MoveDataFromHDFS",
                         "Name": "MoveDataFromHDFS",
                         "Fields": [
@@ -2913,14 +2917,6 @@
                             {
                                 "Key": "dependsOn",
                                 "RefValue": "RunPhase2MoveCommand"
-                            },
-                            {
-                                "Key": "dependsOn",
-                                "RefValue": "RunPhase2HiveCommand"
-                            },
-                            {
-                                "Key": "dependsOn",
-                                "RefValue": "RunPhase2HadoopJAR"
                             },
                             {
                                 "Key": "onSuccess",
