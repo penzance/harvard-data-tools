@@ -3124,6 +3124,632 @@
                         ]
                     },
                     {
+                        "Id": "RunPhase3PreVerifyJAR",
+                        "Name": "RunPhase3PreVerifyJAR",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "EmrActivity"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase2MoveCommand"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendPhase3PreVerifySuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendPhase3PreVerifyFailureSNSMessage"
+                            },
+                            {
+                                "Key": "step",
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,preverify,3,-d,hdfs:///phase_2"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase3PreVerifySuccessSNSMessage",
+                        "Name": "SendPhase3PreVerifySuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 3 Pre-Verify script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase3PreVerifyFailureSNSMessage",
+                        "Name": "SendPhase3PreVerifyFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 3 Pre-Verify script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "RunPhase3CreateCommand",
+                        "Name": "RunPhase3CreateCommand",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "ShellCommandActivity"
+                            },
+                            {
+                                "Key": "command",
+                                "StringValue": "/home/hadoop/phase_3_create_tables.sh"
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase3PreVerifyJAR"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendPhase3CreateSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendPhase3CreateFailureSNSMessage"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase3CreateSuccessSNSMessage",
+                        "Name": "SendPhase3CreateSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 3 create tables script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase3CreateFailureSNSMessage",
+                        "Name": "SendPhase3CreateFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 3 create tables script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "RunPhase3HiveCommand",
+                        "Name": "RunPhase3HiveCommand",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "ShellCommandActivity"
+                            },
+                            {
+                                "Key": "command",
+                                "StringValue": "/home/hadoop/phase_3_hive.sh /home/hadoop/harvard-data-tools/hive/phase_3"
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase2CreateCommand"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendPhase3HiveSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendPhase3HiveFailureSNSMessage"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase3HiveSuccessSNSMessage",
+                        "Name": "SendPhase3HiveSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 3 Hive command succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase3HiveFailureSNSMessage",
+                        "Name": "SendPhase3HiveFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 3 Hive command failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "RunPhase3HadoopJAR",
+                        "Name": "RunPhase3HadoopJAR",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "EmrActivity"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase3CreateCommand"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendPhase3HadoopSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendPhase3HadoopFailureSNSMessage"
+                            },
+                            {
+                                "Key": "step",
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.canvas.cli.CanvasDataCli,hadoop,3,/phase_2,/phase_3"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase3HadoopSuccessSNSMessage",
+                        "Name": "SendPhase3HadoopSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 3 Hadoop script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase3HadoopFailureSNSMessage",
+                        "Name": "SendPhase3HadoopFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 3 Hadoop script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "RunPhase3MoveCommand",
+                        "Name": "RunPhase3MoveCommand",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "ShellCommandActivity"
+                            },
+                            {
+                                "Key": "command",
+                                "StringValue": "/home/hadoop/phase_3_move_unmodified_files.sh phase_2 phase_3"
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase3HiveCommand"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase3HadoopJAR"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendPhase3MoveSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendPhase3MoveFailureSNSMessage"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase3MoveSuccessSNSMessage",
+                        "Name": "SendPhase3MoveSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 3 move script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase3MoveFailureSNSMessage",
+                        "Name": "SendPhase3MoveFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 3 move script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
                         "Id": "MoveDataFromHDFS",
                         "Name": "MoveDataFromHDFS",
                         "Fields": [
@@ -3160,7 +3786,7 @@
                             },
                             {
                                 "Key": "dependsOn",
-                                "RefValue": "RunPhase2MoveCommand"
+                                "RefValue": "RunPhase3MoveCommand"
                             },
                             {
                                 "Key": "onSuccess",
