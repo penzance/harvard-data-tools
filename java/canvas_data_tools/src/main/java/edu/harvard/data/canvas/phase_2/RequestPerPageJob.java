@@ -27,14 +27,14 @@ import edu.harvard.data.canvas.bindings.phase2.Phase2RequestsPerPage;
 
 class RequestPerPageJob extends HadoopJob {
 
-  public RequestPerPageJob(final Configuration conf, final AwsUtils aws, final URI hdfsService,
-      final String inputDir, final String outputDir) {
-    super(conf, aws, hdfsService, inputDir, outputDir);
+  public RequestPerPageJob(final Configuration hadoopConf, final AwsUtils aws,
+      final URI hdfsService, final String inputDir, final String outputDir) {
+    super(hadoopConf, aws, hdfsService, inputDir, outputDir);
   }
 
   @Override
   public Job getJob() throws IOException {
-    final Job job = Job.getInstance(conf, "requests-pages-hadoop");
+    final Job job = Job.getInstance(hadoopConf, "requests-pages-hadoop");
 
     job.setInputFormatClass(TextInputFormat.class);
 

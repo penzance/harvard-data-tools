@@ -28,14 +28,14 @@ import edu.harvard.data.canvas.bindings.phase2.Phase2Requests;
 
 public class AdminRequestJob extends HadoopJob {
 
-  public AdminRequestJob(final Configuration conf, final DataConfiguration dataConfig,
+  public AdminRequestJob(final Configuration hadoopConf, final DataConfiguration dataConfig,
       final AwsUtils aws, final URI hdfsService, final String inputDir, final String outputDir) {
-    super(conf, aws, hdfsService, inputDir, outputDir);
+    super(hadoopConf, aws, hdfsService, inputDir, outputDir);
   }
 
   @Override
   public Job getJob() throws IOException {
-    final Job job = Job.getInstance(conf, "admin-requests");
+    final Job job = Job.getInstance(hadoopConf, "admin-requests");
     job.setMapperClass(AdminRequestMapper.class);
     job.setMapOutputKeyClass(Text.class);
     job.setMapOutputValueClass(NullWritable.class);

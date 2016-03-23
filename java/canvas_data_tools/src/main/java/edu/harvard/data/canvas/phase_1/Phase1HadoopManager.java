@@ -20,6 +20,8 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
+import edu.harvard.data.DataConfigurationException;
+import edu.harvard.data.canvas.HadoopMultipleJobRunner;
 import edu.harvard.data.canvas.identity.CanvasIdentityHadoopManager;
 import edu.harvard.data.identity.HadoopIdentityKey;
 import edu.harvard.data.identity.IdentityReducer;
@@ -71,21 +73,16 @@ public class Phase1HadoopManager {
   }
 
   @SuppressWarnings("rawtypes")
-  public void runScrubJobs(final Configuration hadoopConfig) throws IOException {
+  public void runScrubJobs(final Configuration hadoopConfig)
+      throws IOException, DataConfigurationException {
     final List<String> tables = hadoopManager.getIdentityTableNames();
     final List<Class<? extends Mapper>> scrubberClasses = hadoopManager.getScrubberClasses();
     final List<Job> jobs = new ArrayList<Job>();
     for (int i = 0; i < scrubberClasses.size(); i++) {
       jobs.add(buildScrubJob(hadoopConfig, tables.get(i), scrubberClasses.get(i)));
     }
-
-    try {
-      for (final Job job : jobs) {
-        job.waitForCompletion(true);
-      }
-    } catch (ClassNotFoundException | InterruptedException e) {
-      throw new RuntimeException(e);
-    }
+    final HadoopMultipleJobRunner jobRunner = new HadoopMultipleJobRunner(hadoopConfig);
+    jobRunner.runParallelJobs(jobs);
   }
 
   @SuppressWarnings("rawtypes")

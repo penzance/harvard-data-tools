@@ -4,6 +4,6 @@ import java.io.IOException;
 
 public interface Verifier {
 
-  void verify() throws VerificationException, IOException;
+  void verify() throws VerificationException, IOException, DataConfigurationException;
 
 }

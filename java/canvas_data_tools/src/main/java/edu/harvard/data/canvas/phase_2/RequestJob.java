@@ -29,14 +29,14 @@ import net.sf.uadetector.ReadableUserAgent;
 
 class RequestJob extends HadoopJob {
 
-  public RequestJob(final Configuration conf, final DataConfiguration dataConfig,
+  public RequestJob(final Configuration hadoopConf, final DataConfiguration dataConfig,
       final AwsUtils aws, final URI hdfsService, final String inputDir, final String outputDir) {
-    super(conf, aws, hdfsService, inputDir, outputDir);
+    super(hadoopConf, aws, hdfsService, inputDir, outputDir);
   }
 
   @Override
   public Job getJob() throws IOException {
-    final Job job = Job.getInstance(conf, "requests-hadoop");
+    final Job job = Job.getInstance(hadoopConf, "requests-hadoop");
     job.setMapperClass(RequestMapper.class);
     job.setMapOutputKeyClass(Text.class);
     job.setMapOutputValueClass(NullWritable.class);

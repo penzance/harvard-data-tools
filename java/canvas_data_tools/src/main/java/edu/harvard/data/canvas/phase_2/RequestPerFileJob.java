@@ -23,14 +23,14 @@ import edu.harvard.data.canvas.bindings.phase1.Phase1Requests;
 
 class RequestPerFileJob extends HadoopJob {
 
-  public RequestPerFileJob(final Configuration conf, final AwsUtils aws, final URI hdfsService,
+  public RequestPerFileJob(final Configuration hadoopConf, final AwsUtils aws, final URI hdfsService,
       final String inputDir, final String outputDir) {
-    super(conf, aws, hdfsService, inputDir, outputDir);
+    super(hadoopConf, aws, hdfsService, inputDir, outputDir);
   }
 
   @Override
   public Job getJob() throws IOException {
-    final Job job = Job.getInstance(conf, "requests-files-hadoop");
+    final Job job = Job.getInstance(hadoopConf, "requests-files-hadoop");
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(LongWritable.class);
     job.setMapperClass(RequestFileMapper.class);
