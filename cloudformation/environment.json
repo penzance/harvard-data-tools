@@ -916,7 +916,7 @@
                                 "/bootstrap$DATASETNUM.sh\n",
                                 "\n",
                                 "# Invoke the Lambda function to kickoff the Data Pipeline\n",
-                                "#aws lambda invoke --function-name ",
+                                "aws lambda invoke --function-name ",
                                 {
                                     "Ref": "DataPipelineInitLambda"
                                 },
