@@ -1038,7 +1038,7 @@
                     ]
                 },
                 "Runtime": "nodejs",
-                "Timeout": 15
+                "Timeout": 20
             }
         },
         "DataPipelineInitLambdaInvokePermission": {
