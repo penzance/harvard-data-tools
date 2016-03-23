@@ -86,7 +86,7 @@ public class CanvasCodeGenerator {
 
     // Generate the bindings.
     log.info("Generating Java bindings in " + dir);
-    new JavaBindingGenerator(spec, "canvas_data_schema_bindings").generate();
+    new JavaBindingGenerator(spec, "canvas_generated_code").generate();
 
     log.info("Generating Java identity Hadoop jobs in " + dir);
     new CanvasIdentityJobGenerator(spec, readIdentities(PHASE_ONE_IDENTIFIERS_JSON))

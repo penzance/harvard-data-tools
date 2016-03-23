@@ -21,7 +21,7 @@
     </dependency>
      <dependency>
       <groupId>edu.harvard</groupId>
-      <artifactId>canvas_data_schema_bindings</artifactId>
+      <artifactId>canvas_generated_code</artifactId>
       <version>1.0.0</version>
       <optional>true</optional>
     </dependency>

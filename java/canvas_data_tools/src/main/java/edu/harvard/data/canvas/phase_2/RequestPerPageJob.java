@@ -25,7 +25,7 @@ import edu.harvard.data.TableFormat;
 import edu.harvard.data.canvas.bindings.phase1.Phase1Requests;
 import edu.harvard.data.canvas.bindings.phase2.Phase2RequestsPerPage;
 
-public class RequestPerPageJob extends HadoopJob {
+class RequestPerPageJob extends HadoopJob {
 
   public RequestPerPageJob(final Configuration conf, final AwsUtils aws, final URI hdfsService,
       final String inputDir, final String outputDir) {

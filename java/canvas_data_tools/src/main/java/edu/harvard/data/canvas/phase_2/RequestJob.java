@@ -27,7 +27,7 @@ import edu.harvard.data.canvas.bindings.phase1.Phase1Requests;
 import edu.harvard.data.canvas.bindings.phase2.Phase2Requests;
 import net.sf.uadetector.ReadableUserAgent;
 
-public class RequestJob extends HadoopJob {
+class RequestJob extends HadoopJob {
 
   public RequestJob(final Configuration conf, final DataConfiguration dataConfig,
       final AwsUtils aws, final URI hdfsService, final String inputDir, final String outputDir) {

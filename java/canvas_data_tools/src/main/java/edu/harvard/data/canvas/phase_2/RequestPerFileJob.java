@@ -19,9 +19,9 @@ import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopJob;
 import edu.harvard.data.TableFormat;
-import edu.harvard.data.canvas.bindings.phase0.Phase0Requests;
+import edu.harvard.data.canvas.bindings.phase1.Phase1Requests;
 
-public class RequestPerFileJob extends HadoopJob {
+class RequestPerFileJob extends HadoopJob {
 
   public RequestPerFileJob(final Configuration conf, final AwsUtils aws, final URI hdfsService,
       final String inputDir, final String outputDir) {
@@ -56,7 +56,7 @@ class RequestFileMapper extends Mapper<Object, Text, Text, LongWritable> {
   public void map(final Object key, final Text value, final Context context) throws IOException, InterruptedException {
     final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
     for (final CSVRecord csvRecord : parser.getRecords()) {
-      final Phase0Requests request = new Phase0Requests(format, csvRecord);
+      final Phase1Requests request = new Phase1Requests(format, csvRecord);
 
       final String url = request.getUrl().toLowerCase();
       if (url.contains("/files/")) {
