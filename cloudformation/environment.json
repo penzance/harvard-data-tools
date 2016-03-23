@@ -1998,8 +1998,8 @@
                         ]
                     },
                     {
-                        "Id": "RunPhase1CopyCommand",
-                        "Name": "RunPhase1CopyCommand",
+                        "Id": "RunPhase1MoveCommand",
+                        "Name": "RunPhase1MoveCommand",
                         "Fields": [
                             {
                                 "Key": "type",
@@ -2007,7 +2007,7 @@
                             },
                             {
                                 "Key": "command",
-                                "StringValue": "/home/hadoop/phase_1_copy_unmodified_files.sh phase_0 phase_1"
+                                "StringValue": "/home/hadoop/phase_1_move_unmodified_files.sh phase_0 phase_1"
                             },
                             {
                                 "Key": "schedule",
@@ -2031,17 +2031,17 @@
                             },
                             {
                                 "Key": "onSuccess",
-                                "RefValue": "SendPhase1CopySuccessSNSMessage"
+                                "RefValue": "SendPhase1MoveSuccessSNSMessage"
                             },
                             {
                                 "Key": "onFail",
-                                "RefValue": "SendPhase1CopyFailureSNSMessage"
+                                "RefValue": "SendPhase1MoveFailureSNSMessage"
                             }
                         ]
                     },
                     {
-                        "Id": "SendPhase1CopySuccessSNSMessage",
-                        "Name": "SendPhase1CopySuccessSNSMessage",
+                        "Id": "SendPhase1MoveSuccessSNSMessage",
+                        "Name": "SendPhase1MoveSuccessSNSMessage",
                         "Fields": [
                             {
                                 "Key": "type",
@@ -2066,7 +2066,7 @@
                                             {
                                                 "Ref": "EnvironmentParameter"
                                             },
-                                            " Dataset dataset-id-placeholder - Phase 1 copy script succeeded"
+                                            " Dataset dataset-id-placeholder - Phase 1 move script succeeded"
                                         ]
                                     ]
                                 }
@@ -2084,8 +2084,8 @@
                         ]
                     },
                     {
-                        "Id": "SendPhase1CopyFailureSNSMessage",
-                        "Name": "SendPhase1CopyFailureSNSMessage",
+                        "Id": "SendPhase1MoveFailureSNSMessage",
+                        "Name": "SendPhase1MoveFailureSNSMessage",
                         "Fields": [
                             {
                                 "Key": "type",
@@ -2110,7 +2110,7 @@
                                             {
                                                 "Ref": "EnvironmentParameter"
                                             },
-                                            " Dataset dataset-id-placeholder - Phase 1 copy script failed"
+                                            " Dataset dataset-id-placeholder - Phase 1 move script failed"
                                         ]
                                     ]
                                 }
@@ -2393,7 +2393,7 @@
                             },
                             {
                                 "Key": "dependsOn",
-                                "RefValue": "RunPhase1CopyCommand"
+                                "RefValue": "RunPhase1MoveCommand"
                             },
                             {
                                 "Key": "runsOn",
@@ -2502,8 +2502,8 @@
                         ]
                     },
                     {
-                        "Id": "RunPhase2CopyCommand",
-                        "Name": "RunPhase2CopyCommand",
+                        "Id": "RunPhase2MoveCommand",
+                        "Name": "RunPhase2MoveCommand",
                         "Fields": [
                             {
                                 "Key": "type",
@@ -2511,7 +2511,7 @@
                             },
                             {
                                 "Key": "command",
-                                "StringValue": "/home/hadoop/phase_2_copy_unmodified_files.sh phase_1 phase_2"
+                                "StringValue": "/home/hadoop/phase_2_move_unmodified_files.sh phase_1 phase_2"
                             },
                             {
                                 "Key": "schedule",
@@ -2531,17 +2531,17 @@
                             },
                             {
                                 "Key": "onSuccess",
-                                "RefValue": "SendPhase2CopySuccessSNSMessage"
+                                "RefValue": "SendPhase2MoveSuccessSNSMessage"
                             },
                             {
                                 "Key": "onFail",
-                                "RefValue": "SendPhase2CopyFailureSNSMessage"
+                                "RefValue": "SendPhase2MoveFailureSNSMessage"
                             }
                         ]
                     },
                     {
-                        "Id": "SendPhase2CopySuccessSNSMessage",
-                        "Name": "SendPhase2CopySuccessSNSMessage",
+                        "Id": "SendPhase2MoveSuccessSNSMessage",
+                        "Name": "SendPhase2MoveSuccessSNSMessage",
                         "Fields": [
                             {
                                 "Key": "type",
@@ -2566,7 +2566,7 @@
                                             {
                                                 "Ref": "EnvironmentParameter"
                                             },
-                                            " Dataset dataset-id-placeholder - Phase 2 copy script succeeded"
+                                            " Dataset dataset-id-placeholder - Phase 2 move script succeeded"
                                         ]
                                     ]
                                 }
@@ -2584,8 +2584,8 @@
                         ]
                     },
                     {
-                        "Id": "SendPhase2CopyFailureSNSMessage",
-                        "Name": "SendPhase2CopyFailureSNSMessage",
+                        "Id": "SendPhase2MoveFailureSNSMessage",
+                        "Name": "SendPhase2MoveFailureSNSMessage",
                         "Fields": [
                             {
                                 "Key": "type",
@@ -2610,7 +2610,7 @@
                                             {
                                                 "Ref": "EnvironmentParameter"
                                             },
-                                            " Dataset dataset-id-placeholder - Phase 2 copy script failed"
+                                            " Dataset dataset-id-placeholder - Phase 2 move script failed"
                                         ]
                                     ]
                                 }
@@ -2912,7 +2912,7 @@
                             },
                             {
                                 "Key": "dependsOn",
-                                "RefValue": "RunPhase2CopyCommand"
+                                "RefValue": "RunPhase2MoveCommand"
                             },
                             {
                                 "Key": "dependsOn",
