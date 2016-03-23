@@ -27,7 +27,8 @@ Please note this CloudFormation spins up a number of resources, including IAM re
   * Copy `cloudformation/parameters.json.example` to `cloudformation/myparameters/my-custom-parameters.json` edit it to include your specific parameter values
 4. Create the CloudFormation stack by running:
 ```aws cloudformation create-stack --stack-name mystack --template-url https://my-awesome-bucket.s3.amazonaws.com/environment.json --parameters file:///path/to/cloudformation/myparameters/my-custom-parameters.json --region us-east-1 --capabilities CAPABILITY_IAM```
-5. Once the stack is up, cron functionality to process data sets on a schedule must be setup manually. To accomplish this:
+5. Edit the `secure.properties` file created above with updated values for some resources which were created during the CloudFormation spin up.
+6. Once the stack is up, cron functionality to process data sets on a schedule must be setup manually. To accomplish this:
   * Login to the AWS CloudWatch console, go to Events, then Rules
   * Click Create a Rule
   * Select Schedule for event source, create the desired schedule (e.g., a cron to run daily at 0700UTC - `00 07 * * ? *`)
