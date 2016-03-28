@@ -23,7 +23,7 @@ export HDFS_PHASE_0_DIR=hdfs:///phase_0
 export HDFS_PHASE_1_DIR=hdfs:///phase_1
 export HDFS_PHASE_2_DIR=hdfs:///phase_2
 
-# add github.com to known_hosts and run ansible-pull
+# add github.com to known_hosts
 ssh-keyscan github.com >> /home/hadoop/.ssh/known_hosts
 
 # install jdk and git
