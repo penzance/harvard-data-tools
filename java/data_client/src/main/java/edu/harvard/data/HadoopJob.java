@@ -13,15 +13,15 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 public abstract class HadoopJob {
 
-  protected Configuration conf;
+  protected Configuration hadoopConf;
   protected AwsUtils aws;
   protected String inputDir;
   protected String outputDir;
   protected URI hdfsService;
 
-  public HadoopJob(final Configuration conf, final AwsUtils aws, final URI hdfsService,
+  public HadoopJob(final Configuration hadoopConf, final AwsUtils aws, final URI hdfsService,
       final String inputDir, final String outputDir) {
-    this.conf = conf;
+    this.hadoopConf = hadoopConf;
     this.aws = aws;
     this.hdfsService = hdfsService;
     this.inputDir = inputDir;

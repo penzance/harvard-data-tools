@@ -18,6 +18,8 @@ import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.VerificationException;
+import edu.harvard.data.canvas.HadoopMultipleJobRunner;
+import edu.harvard.data.canvas.phase_1.Phase1HadoopManager;
 import edu.harvard.data.canvas.phase_2.Phase2HadoopManager;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
@@ -38,47 +40,37 @@ public class HadoopCommand implements Command {
   public ReturnStatus execute(final DataConfiguration config, final ExecutorService exec)
       throws IOException, UnexpectedApiResponseException, DataConfigurationException,
       VerificationException, ArgumentError {
-    final Configuration hadoopConfig = new Configuration();
     log.info("Setting up Canvas Hadoop job");
     log.info("Phase: " + phase);
     log.info("Input directory: " + inputDir);
     log.info("Output directory: " + outputDir);
 
-    final List<Job> jobs = setupJobs(hadoopConfig, config);
-
-    for (final Job job : jobs) {
-      job.setJarByClass(HadoopCommand.class);
-      try {
-        log.info("Submitted job " + job.getJobName());
-        job.submit();
-      } catch (final ClassNotFoundException e) {
-        throw new DataConfigurationException(e);
-      } catch (final InterruptedException e) {
-        log.error("Job submission interrupted", e);
-      }
-    }
-    for (final Job job : jobs) {
-      while (!job.isComplete()) {
-        try {
-          Thread.sleep(Job.getCompletionPollInterval(hadoopConfig));
-        } catch (final InterruptedException e) {
-          log.error("Interrupted while waiting for job to complete.", e);
-        }
-      }
-    }
-    log.info("All jobs complete");
-    return ReturnStatus.OK;
-  }
-
-  private List<Job> setupJobs(final Configuration hadoopConfig, final DataConfiguration config)
-      throws DataConfigurationException, IOException, ArgumentError {
-    final AwsUtils aws = new AwsUtils();
     final URI hdfsService;
     try {
       hdfsService = new URI("hdfs///");
     } catch (final URISyntaxException e) {
       throw new DataConfigurationException(e);
     }
+
+    final Configuration hadoopConfig = new Configuration();
+    if (phase == 1) {
+      final Phase1HadoopManager phase1 = new Phase1HadoopManager(inputDir,
+          outputDir, hdfsService);
+      phase1.runMapJobs(hadoopConfig);
+      phase1.runScrubJobs(hadoopConfig);
+    } else {
+      final HadoopMultipleJobRunner jobRunner = new HadoopMultipleJobRunner(hadoopConfig);
+      final List<Job> jobs = setupJobs(hadoopConfig, config, hdfsService);
+      jobRunner.runParallelJobs(jobs);
+    }
+
+    log.info("All jobs complete");
+    return ReturnStatus.OK;
+  }
+
+  private List<Job> setupJobs(final Configuration hadoopConfig, final DataConfiguration config, final URI hdfsService)
+      throws DataConfigurationException, IOException, ArgumentError {
+    final AwsUtils aws = new AwsUtils();
     final List<Job> jobs = new ArrayList<Job>();
     switch (phase) {
     case 0:

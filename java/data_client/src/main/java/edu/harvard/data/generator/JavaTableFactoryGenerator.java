@@ -43,7 +43,7 @@ public class JavaTableFactoryGenerator {
   public void generate(final PrintStream out) {
     log.info("Generating TableFactory");
     JavaBindingGenerator.writeFileHeader(out, schemaVersion);
-    out.println("package " + tableVersion.getJavaPackage() + ";");
+    out.println("package " + tableVersion.getJavaBindingPackage() + ";");
     out.println();
 
     outputImportStatements(out);

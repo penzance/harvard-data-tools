@@ -28,14 +28,14 @@ import edu.harvard.data.canvas.bindings.phase2.Phase2Requests;
 
 public class AdminRequestJob extends HadoopJob {
 
-  public AdminRequestJob(final Configuration conf, final DataConfiguration dataConfig,
+  public AdminRequestJob(final Configuration hadoopConf, final DataConfiguration dataConfig,
       final AwsUtils aws, final URI hdfsService, final String inputDir, final String outputDir) {
-    super(conf, aws, hdfsService, inputDir, outputDir);
+    super(hadoopConf, aws, hdfsService, inputDir, outputDir);
   }
 
   @Override
   public Job getJob() throws IOException {
-    final Job job = Job.getInstance(conf, "admin-requests");
+    final Job job = Job.getInstance(hadoopConf, "admin-requests");
     job.setMapperClass(AdminRequestMapper.class);
     job.setMapOutputKeyClass(Text.class);
     job.setMapOutputValueClass(NullWritable.class);
@@ -63,15 +63,15 @@ class AdminRequestMapper extends Mapper<Object, Text, Text, NullWritable> {
     for (final CSVRecord csvRecord : parser.getRecords()) {
       final Phase2Requests request = new Phase2Requests(new Phase1Requests(format, csvRecord));
 
-      if (request.getUserId() != null && (request.getUserId() == -262295411484124942L
-          || request.getUserId() == 134926641248969922L)) {
-        final StringWriter writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
-          printer.printRecord(new Phase2AdminRequests(request).getFieldsAsList(format));
-        }
-        final Text csvText = new Text(writer.toString().trim());
-        context.write(csvText, NullWritable.get());
+      //      if (request.getUserId() != null && (request.getUserId() == -262295411484124942L
+      //          || request.getUserId() == 134926641248969922L)) {
+      final StringWriter writer = new StringWriter();
+      try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
+        printer.printRecord(new Phase2AdminRequests(request).getFieldsAsList(format));
       }
+      final Text csvText = new Text(writer.toString().trim());
+      context.write(csvText, NullWritable.get());
+      //      }
     }
   }
 

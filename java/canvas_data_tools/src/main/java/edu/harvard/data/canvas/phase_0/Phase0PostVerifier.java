@@ -34,7 +34,7 @@ import edu.harvard.data.DumpInfo;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
-import edu.harvard.data.canvas.bindings.phase0.CanvasTable;
+import edu.harvard.data.canvas.bindings.phase0.Phase0CanvasTable;
 
 public class Phase0PostVerifier implements Verifier {
 
@@ -77,7 +77,7 @@ public class Phase0PostVerifier implements Verifier {
     final Set<Future<Long>> futures = new HashSet<Future<Long>>();
     for (final S3ObjectId dir : aws.listDirectories(dumpObj)) {
       final String tableName = dir.getKey().substring(dir.getKey().lastIndexOf("/") + 1);
-      final CanvasTable table = CanvasTable.fromSourceName(tableName);
+      final Phase0CanvasTable table = Phase0CanvasTable.fromSourceName(tableName);
       for (final S3ObjectSummary file : aws.listKeys(dir)) {
         final S3ObjectId awsFile = AwsUtils.key(file.getBucketName(), file.getKey());
         log.info("Verifying S3 file " + file.getBucketName() + "/" + file.getKey()
@@ -115,13 +115,13 @@ class CanvasPhase0VerifierJob2 implements Callable<Long> {
   private static final int MAX_LOG_LINES = 100;
   private static final Logger log = LogManager.getLogger();
   private final S3ObjectId awsFile;
-  private final CanvasTable table;
+  private final Phase0CanvasTable table;
   private final File tmpDir;
   private final AwsUtils aws;
   private final TableFormat format;
 
   public CanvasPhase0VerifierJob2(final AwsUtils aws, final S3ObjectId awsFile,
-      final TableFormat format, final CanvasTable table, final File tmpDir) {
+      final TableFormat format, final Phase0CanvasTable table, final File tmpDir) {
     this.aws = aws;
     this.awsFile = awsFile;
     this.format = format;

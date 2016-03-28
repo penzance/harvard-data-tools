@@ -49,7 +49,7 @@ public class JavaModelClassGenerator {
     log.info("Generating table " + className);
     JavaBindingGenerator.writeFileHeader(out, schemaVersion);
 
-    out.println("package " + tableVersion.getJavaPackage() + ";");
+    out.println("package " + tableVersion.getJavaBindingPackage() + ";");
     out.println();
 
     outputImportStatements(out);
@@ -137,7 +137,7 @@ public class JavaModelClassGenerator {
     out.println("import " + TableFormat.class.getName() + ";");
     out.println();
     if (previousVersion != null && !table.getNewlyGenerated()) {
-      out.println("import " + previousVersion.getJavaPackage() + "." + previousClassName + ";");
+      out.println("import " + previousVersion.getJavaBindingPackage() + "." + previousClassName + ";");
       out.println();
     }
   }

@@ -17,6 +17,7 @@ public class GenerationSpec {
   private final List<SchemaPhase> phases;
   private File outputBase;
   private String tableEnumName;
+  private String identityHadoopPackage;
 
   public GenerationSpec(final int phaseCount) {
     this.phases = new ArrayList<SchemaPhase>();
@@ -41,17 +42,25 @@ public class GenerationSpec {
     return phases.get(phases.size() - 1);
   }
 
+  public String getIdentityHadoopPackage() {
+    return identityHadoopPackage;
+  }
+
   public void setOutputBaseDirectory(final File outputBase) {
     this.outputBase = outputBase;
   }
 
-  public void setJavaPackages(final String... packageList) {
+  public void setJavaHadoopPackage(final String identityHadoopPackage) {
+    this.identityHadoopPackage = identityHadoopPackage;
+  }
+
+  public void setJavaBindingPackages(final String... packageList) {
     if (packageList.length != phases.size()) {
       throw new RuntimeException(
           "Expected " + phases.size() + " packages, got " + packageList.length);
     }
     for (int i = 0; i < packageList.length; i++) {
-      phases.get(i).setJavaPackage(packageList[i]);
+      phases.get(i).setJavaBindingPackage(packageList[i]);
     }
   }
 
@@ -88,5 +97,4 @@ public class GenerationSpec {
       phases.get(i).setHDFSDir(hdfsDirs[i]);
     }
   }
-
 }

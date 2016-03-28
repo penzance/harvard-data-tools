@@ -19,18 +19,18 @@ import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopJob;
 import edu.harvard.data.TableFormat;
-import edu.harvard.data.canvas.bindings.phase0.Requests;
+import edu.harvard.data.canvas.bindings.phase1.Phase1Requests;
 
-public class RequestPerFileJob extends HadoopJob {
+class RequestPerFileJob extends HadoopJob {
 
-  public RequestPerFileJob(final Configuration conf, final AwsUtils aws, final URI hdfsService,
+  public RequestPerFileJob(final Configuration hadoopConf, final AwsUtils aws, final URI hdfsService,
       final String inputDir, final String outputDir) {
-    super(conf, aws, hdfsService, inputDir, outputDir);
+    super(hadoopConf, aws, hdfsService, inputDir, outputDir);
   }
 
   @Override
   public Job getJob() throws IOException {
-    final Job job = Job.getInstance(conf, "requests-files-hadoop");
+    final Job job = Job.getInstance(hadoopConf, "requests-files-hadoop");
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(LongWritable.class);
     job.setMapperClass(RequestFileMapper.class);
@@ -56,7 +56,7 @@ class RequestFileMapper extends Mapper<Object, Text, Text, LongWritable> {
   public void map(final Object key, final Text value, final Context context) throws IOException, InterruptedException {
     final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
     for (final CSVRecord csvRecord : parser.getRecords()) {
-      final Requests request = new Requests(format, csvRecord);
+      final Phase1Requests request = new Phase1Requests(format, csvRecord);
 
       final String url = request.getUrl().toLowerCase();
       if (url.contains("/files/")) {

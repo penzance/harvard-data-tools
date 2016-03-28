@@ -27,16 +27,16 @@ import edu.harvard.data.canvas.bindings.phase1.Phase1Requests;
 import edu.harvard.data.canvas.bindings.phase2.Phase2Requests;
 import net.sf.uadetector.ReadableUserAgent;
 
-public class RequestJob extends HadoopJob {
+class RequestJob extends HadoopJob {
 
-  public RequestJob(final Configuration conf, final DataConfiguration dataConfig,
+  public RequestJob(final Configuration hadoopConf, final DataConfiguration dataConfig,
       final AwsUtils aws, final URI hdfsService, final String inputDir, final String outputDir) {
-    super(conf, aws, hdfsService, inputDir, outputDir);
+    super(hadoopConf, aws, hdfsService, inputDir, outputDir);
   }
 
   @Override
   public Job getJob() throws IOException {
-    final Job job = Job.getInstance(conf, "requests-hadoop");
+    final Job job = Job.getInstance(hadoopConf, "requests-hadoop");
     job.setMapperClass(RequestMapper.class);
     job.setMapOutputKeyClass(Text.class);
     job.setMapOutputValueClass(NullWritable.class);
@@ -65,18 +65,18 @@ class RequestMapper extends Mapper<Object, Text, Text, NullWritable> {
     final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
     for (final CSVRecord csvRecord : parser.getRecords()) {
       final Phase1Requests request = new Phase1Requests(format, csvRecord);
-      if (request.getUserId() == null || (request.getUserId() != -262295411484124942L
-          || request.getUserId() == 134926641248969922L)) {
-        final Phase2Requests extended = new Phase2Requests(request);
-        parseUserAgent(extended);
+      //      if (request.getUserId() == null || (request.getUserId() != -262295411484124942L
+      //          || request.getUserId() == 134926641248969922L)) {
+      final Phase2Requests extended = new Phase2Requests(request);
+      parseUserAgent(extended);
 
-        final StringWriter writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
-          printer.printRecord(extended.getFieldsAsList(format));
-        }
-        final Text csvText = new Text(writer.toString().trim());
-        context.write(csvText, NullWritable.get());
+      final StringWriter writer = new StringWriter();
+      try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
+        printer.printRecord(extended.getFieldsAsList(format));
       }
+      final Text csvText = new Text(writer.toString().trim());
+      context.write(csvText, NullWritable.get());
+      //      }
     }
   }
 

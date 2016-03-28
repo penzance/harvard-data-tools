@@ -86,7 +86,7 @@ public class JavaBindingGenerator {
   private void generateTableSet(final SchemaPhase phase, final SchemaPhase previousVersion)
       throws IOException {
     final File srcDir = new File(javaSrcBase,
-        phase.getJavaPackage().replaceAll("\\.", File.separator));
+        phase.getJavaBindingPackage().replaceAll("\\.", File.separator));
     final String classPrefix = phase.getPrefix();
     final String version = phase.getSchema().getVersion();
     final Map<String, DataSchemaTable> tables = phase.getSchema().getTables();
@@ -104,8 +104,7 @@ public class JavaBindingGenerator {
     // Generate the Table enum.
     final File tableEnumFile = new File(srcDir, classPrefix + tableEnumName + ".java");
     try (final PrintStream out = new PrintStream(new FileOutputStream(tableEnumFile))) {
-      new JavaTableEnumGenerator(version, tableNames, phase, tableEnumName)
-      .generate(out);
+      new JavaTableEnumGenerator(version, tableNames, phase, tableEnumName).generate(out);
     }
 
     // Generate the TableFactory class.
@@ -157,7 +156,7 @@ public class JavaBindingGenerator {
 
   // Write a standard file header to warn future developers against editing the
   // generated files.
-  static void writeFileHeader(final PrintStream out, final String version) {
+  public static void writeFileHeader(final PrintStream out, final String version) {
     writeComment("This file was generated on "
         + new SimpleDateFormat("M-dd-yyyy hh:mm:ss").format(new Date()) + ". Do not manually edit.",
         0, out, false);
@@ -219,7 +218,7 @@ public class JavaBindingGenerator {
   }
 
   // Format a String into the CorrectJavaClassName format.
-  static String javaClass(final String str, final String classPrefix) {
+  public static String javaClass(final String str, final String classPrefix) {
     String className = classPrefix;
     for (final String part : str.split("_")) {
       if (part.length() > 0) {
@@ -230,8 +229,18 @@ public class JavaBindingGenerator {
     return className;
   }
 
+  // Borrow the javaClass method to easily produce properly-formatted getters
+  // and setters.
+  public static String javaGetter(final String fieldName) {
+    return javaClass(fieldName, "get");
+  }
+
+  public static String javaSetter(final String fieldName) {
+    return javaClass(fieldName, "set");
+  }
+
   // Format a String into the correctJavaVariableName format.
-  static String javaVariable(final String name) {
+  public static String javaVariable(final String name) {
     final String[] parts = name.split("_");
     String variableName = parts[0].substring(0, 1).toLowerCase() + parts[0].substring(1);
     for (int i = 1; i < parts.length; i++) {
@@ -248,7 +257,7 @@ public class JavaBindingGenerator {
   }
 
   // Convert the types specified in the schema.json format into Java types.
-  static String javaType(final DataSchemaColumn column) {
+  public static String javaType(final DataSchemaColumn column) {
     switch (column.getType()) {
     case BigInt:
       return Long.class.getSimpleName();
