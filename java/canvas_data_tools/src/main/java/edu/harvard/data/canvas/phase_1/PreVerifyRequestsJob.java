@@ -16,7 +16,6 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
-import org.mortbay.log.Log;
 
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
@@ -89,7 +88,6 @@ class PreVerifyRequestReducer extends Reducer<LongWritable, Text, Text, NullWrit
   public void reduce(final LongWritable canvasDataId, final Iterable<Text> values,
       final Context context) throws IOException, InterruptedException {
     final String outputName = "requestpreverify" + canvasDataId.toString().replaceAll("-", "");
-    Log.info("Writing output to file " + outputName);
     for (final Text value : values) {
       outputs.write(outputName, value, NullWritable.get());
     }

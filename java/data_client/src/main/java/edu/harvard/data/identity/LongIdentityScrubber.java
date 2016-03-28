@@ -15,6 +15,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.DataTable;
 import edu.harvard.data.FormatLibrary;
@@ -23,6 +25,7 @@ import edu.harvard.data.TableFormat;
 import edu.harvard.data.io.FileTableReader;
 
 public abstract class LongIdentityScrubber extends Mapper<Object, Text, Text, NullWritable> {
+  private static final Logger log = LogManager.getLogger();
 
   protected final TableFormat format;
   protected final Map<Long, IdentityMap> identities;
@@ -49,6 +52,7 @@ public abstract class LongIdentityScrubber extends Mapper<Object, Text, Text, Nu
         }
       }
     }
+    log.info("Completed setup for " + this);
   }
 
   @Override

@@ -13,7 +13,6 @@ import org.apache.logging.log4j.Logger;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
-import edu.harvard.data.canvas.HadoopMultipleJobRunner;
 
 public class Phase1PreVerifier implements Verifier {
   private static final Logger log = LogManager.getLogger();
@@ -34,9 +33,9 @@ public class Phase1PreVerifier implements Verifier {
     log.info("Running pre-verifier for phase 1");
     log.info("Input directory: " + inputDir);
     log.info("Output directory: " + outputDir);
-    final HadoopMultipleJobRunner jobRunner = new HadoopMultipleJobRunner(hadoopConfig);
-    final List<Job> jobs = setupJobs();
-    jobRunner.runParallelJobs(jobs);
+    //    final HadoopMultipleJobRunner jobRunner = new HadoopMultipleJobRunner(hadoopConfig);
+    //    final List<Job> jobs = setupJobs();
+    //    jobRunner.runParallelJobs(jobs);
   }
 
   private List<Job> setupJobs() throws IOException {
