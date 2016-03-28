@@ -113,30 +113,8 @@ public class CanvasDataCli {
   }
 
   private static void printUsage(final CmdLineParser cli) {
-    log.info(
-        "usage: java -jar " + CanvasDataCli.class.getCanonicalName() + " <data_set> <operation> <args>");
-    logUsage(cli);
-    try {
-      final SubCommands commands = CanvasDataCli.class.getField("cmd").getAnnotation(SubCommands.class);
-      for (final SubCommand command : commands.value()) {
-        log.info(command.name() + " commands: ");
-        final Command c = (Command) command.impl().newInstance();
-        logUsage(new CmdLineParser(c));
-        final SubCommands subCommands = c.getClass().getField("cmd")
-            .getAnnotation(SubCommands.class);
-        for (final SubCommand subCommand : subCommands.value()) {
-          final Command sc = (Command) subCommand.impl().newInstance();
-          log.info(command.name() + " " + subCommand.name() + ": " + sc.getDescription());
-          logUsage(new CmdLineParser(sc));
-        }
-      }
-    } catch (NoSuchFieldException | SecurityException | InstantiationException
-        | IllegalAccessException e) {
-      e.printStackTrace();
-    }
-  }
-
-  private static void logUsage(final CmdLineParser cli) {
+    log.info("usage: java -jar " + CanvasDataCli.class.getCanonicalName()
+        + " <data_set> <operation> <args>");
     final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
     final PrintStream out = new PrintStream(bytes);
     cli.printUsage(out);

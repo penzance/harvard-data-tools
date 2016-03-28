@@ -28,8 +28,6 @@ import edu.harvard.data.identity.IdentityReducer;
 
 public class Phase1HadoopManager {
 
-  private static final Path TEMP_HDFS_DIR = new Path("/identity/unknown");
-
   private final String inputDir;
   private final String outputDir;
   private final URI hdfsService;
@@ -64,7 +62,7 @@ public class Phase1HadoopManager {
       final Path path = new Path(inputDir + "/" + tables.get(i) + "/");
       MultipleInputs.addInputPath(job, path, TextInputFormat.class, mapperClasses.get(i));
     }
-    FileOutputFormat.setOutputPath(job, TEMP_HDFS_DIR);
+    FileOutputFormat.setOutputPath(job, new Path(outputDir + "/identity_map"));
     try {
       job.waitForCompletion(true);
     } catch (ClassNotFoundException | InterruptedException e) {
@@ -98,7 +96,7 @@ public class Phase1HadoopManager {
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
     setPaths(job, hdfsService, inputDir + "/" + tableName, outputDir + "/" + tableName);
-    for (final Path path : listHdfsFiles(hadoopConfig, TEMP_HDFS_DIR)) {
+    for (final Path path : listHdfsFiles(hadoopConfig, new Path(outputDir + "/identity_map"))) {
       job.addCacheFile(path.toUri());
     }
     return job;
