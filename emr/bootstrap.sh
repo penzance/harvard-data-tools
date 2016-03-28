@@ -26,6 +26,10 @@ export HDFS_PHASE_2_DIR=hdfs:///phase_2
 # add github.com to known_hosts
 ssh-keyscan github.com >> /home/hadoop/.ssh/known_hosts
 
+# copy extra keys from S3 to the local FS, add to ~/.ssh/authorized_keys
+aws s3 cp s3://<code_s3_bucket>/extra_keys /home/hadoop/.
+cat /home/hadoop/extra_keys >> ~/.ssh/authorized_keys
+
 # install jdk and git
 sudo yum install -y java-devel git-core
 
