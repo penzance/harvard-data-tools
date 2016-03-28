@@ -88,7 +88,7 @@ class PreVerifyRequestReducer extends Reducer<LongWritable, Text, Text, NullWrit
   @Override
   public void reduce(final LongWritable canvasDataId, final Iterable<Text> values,
       final Context context) throws IOException, InterruptedException {
-    final String outputName = "request_preverify" + canvasDataId.toString().replaceAll("-", "_");
+    final String outputName = "requestpreverify" + canvasDataId.toString().replaceAll("-", "");
     Log.info("Writing output to file " + outputName);
     for (final Text value : values) {
       outputs.write(outputName, value, NullWritable.get());
