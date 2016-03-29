@@ -31,7 +31,7 @@ public class MoveUnmodifiedTableGenerator {
       final File file = new File(dir, fileBase + ".sh");
       log.info("Generating move unmodified files for phase " + i + ". file: " + file);
       try (final PrintStream out = new PrintStream(new FileOutputStream(file))) {
-        moveUnmodifiedFiles(out, schemaVersions.getPhase(1), schemaVersions.getPhase(i+1),
+        moveUnmodifiedFiles(out, schemaVersions.getPhase(i), schemaVersions.getPhase(i+1),
             "/home/hadoop/" + fileBase + ".out");
       }
     }
