@@ -52,7 +52,7 @@ public class Phase1HadoopManager {
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
 
-    for (final Path path : listHdfsFiles(hadoopConfig, new Path(inputDir + "/id"))) {
+    for (final Path path : listHdfsFiles(hadoopConfig, new Path(inputDir + "/identity_map"))) {
       job.addCacheFile(path.toUri());
     }
 
