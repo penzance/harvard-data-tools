@@ -651,7 +651,7 @@
                 ]
             }
         },
-        "S3toRedshiftLoadUser": {
+        "RedshiftOperationsUser": {
             "Type": "AWS::IAM::User",
             "Properties": {
                 "Policies": [
@@ -705,6 +705,39 @@
                                             ]
                                         }
                                     ]
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:Get*",
+                                        "s3:List*",
+                                        "s3:Put*"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    "arn:aws:s3:::",
+                                                    {
+                                                        "Ref": "IncomingS3Bucket"
+                                                    }
+                                                ]
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    "arn:aws:s3:::",
+                                                    {
+                                                        "Ref": "IncomingS3Bucket"
+                                                    },
+                                                    "/*"
+                                                ]
+                                            ]
+                                        }
+                                    ]
                                 }
                             ]
                         }
@@ -712,12 +745,12 @@
                 ]
             }
         },
-        "S3toRedshiftLoadAccessKey": {
+        "RedshiftOperationsAccessKey": {
             "Type": "AWS::IAM::AccessKey",
             "Properties": {
                 "Status": "Active",
                 "UserName": {
-                    "Ref": "S3toRedshiftLoadUser"
+                    "Ref": "RedshiftOperationsUser"
                 }
             }
         },
@@ -853,12 +886,12 @@
                                 "# Replace <awskeyandsecret> placeholder with real creds\n",
                                 "sed -i \"s@<awskeyandsecret>@aws_access_key_id=",
                                 {
-                                    "Ref": "S3toRedshiftLoadAccessKey"
+                                    "Ref": "RedshiftOperationsAccessKey"
                                 },
                                 ";aws_secret_access_key=",
                                 {
                                     "Fn::GetAtt": [
-                                        "S3toRedshiftLoadAccessKey",
+                                        "RedshiftOperationsAccessKey",
                                         "SecretAccessKey"
                                     ]
                                 },
@@ -1038,7 +1071,7 @@
                     ]
                 },
                 "Runtime": "nodejs",
-                "Timeout": 20
+                "Timeout": 25
             }
         },
         "DataPipelineInitLambdaInvokePermission": {
@@ -1739,6 +1772,154 @@
                         ]
                     },
                     {
+                        "Id": "RedshiftIdentityUnload",
+                        "Name": "RedshiftIdentityUnload",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SqlActivity"
+                            },
+                            {
+                                "Key": "database",
+                                "RefValue": "RedshiftDatabase"
+                            },
+                            {
+                                "Key": "script",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "UNLOAD ('SELECT * FROM identity_map') TO 's3://",
+                                            {
+                                                "Ref": "IncomingS3Bucket"
+                                            },
+                                            "/dataset-path-placeholder/identity_map/' CREDENTIALS 'aws_access_key_id=",
+											{
+												"Ref": "RedshiftOperationsAccessKey"
+											},
+                                            ";aws_secret_access_key=",
+											{
+												"Fn::GetAtt": [
+													"RedshiftOperationsAccessKey",
+													"SecretAccessKey"
+												]
+											},
+                                            "' DELIMITER '\t' GZIP;"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendRedshiftIdentityUnloadSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendRedshiftIdentityUnloadFailureSNSMessage"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendRedshiftIdentityUnloadSuccessSNSMessage",
+                        "Name": "SendRedshiftIdentityUnloadSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Redshift identity unload succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendRedshiftIdentityUnloadFailureSNSMessage",
+                        "Name": "SendRedshiftIdentityUnloadFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Redshift identity unload failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
                         "Id": "MoveDataToHDFS",
                         "Name": "MoveDataToHDFS",
                         "Fields": [
@@ -1768,6 +1949,10 @@
                             {
                                 "Key": "runsOn",
                                 "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RedshiftIdentityUnload"
                             },
                             {
                                 "Key": "retryDelay",
@@ -1901,7 +2086,7 @@
                             },
                             {
                                 "Key": "step",
-                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,preverify,1,-d,hdfs:///phase_0"
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,preverify,1,-in,hdfs:///phase_0,-out,hdfs:///verify/phase_1"
                             }
                         ]
                     },
@@ -2527,7 +2712,7 @@
                             },
                             {
                                 "Key": "step",
-                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,preverify,2,-d,hdfs:///phase_1"
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,preverify,2,-in,hdfs:///phase_1,-out,hdfs:///verify/phase_2"
                             }
                         ]
                     },
@@ -2901,7 +3086,7 @@
                             },
                             {
                                 "Key": "step",
-                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.canvas.cli.CanvasDataCli,hadoop,2,/phase_1,/phase_2"
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,hadoop,2,/phase_1,/phase_2"
                             }
                         ]
                     },
@@ -3153,7 +3338,7 @@
                             },
                             {
                                 "Key": "step",
-                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,preverify,3,-d,hdfs:///phase_2"
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,preverify,3,-in,hdfs:///phase_2,-out,hdfs:///verify/phase_3"
                             }
                         ]
                     },
@@ -3393,7 +3578,7 @@
                             },
                             {
                                 "Key": "dependsOn",
-                                "RefValue": "RunPhase2CreateCommand"
+                                "RefValue": "RunPhase3CreateCommand"
                             },
                             {
                                 "Key": "retryDelay",
@@ -3527,7 +3712,7 @@
                             },
                             {
                                 "Key": "step",
-                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.canvas.cli.CanvasDataCli,hadoop,3,/phase_2,/phase_3"
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,hadoop,3,/phase_2,/phase_3"
                             }
                         ]
                     },
@@ -3779,7 +3964,7 @@
                             },
                             {
                                 "Key": "step",
-                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.canvas.cli.CanvasDataCli,cleanup"
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,cleanup"
                             }
                         ]
                     },
@@ -3885,7 +4070,7 @@
                                     "Fn::Join": [
                                         "",
                                         [
-                                            "s3-dist-cp --src=hdfs:///phase_2 --outputCodec=gzip --dest=s3://",
+                                            "s3-dist-cp --src=hdfs:///phase_3 --outputCodec=gzip --dest=s3://",
                                             {
                                                 "Ref": "IntermediateS3Bucket"
                                             },
