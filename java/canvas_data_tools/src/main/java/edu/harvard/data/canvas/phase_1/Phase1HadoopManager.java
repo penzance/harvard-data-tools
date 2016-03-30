@@ -19,6 +19,8 @@ import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.canvas.HadoopMultipleJobRunner;
@@ -27,6 +29,7 @@ import edu.harvard.data.identity.HadoopIdentityKey;
 import edu.harvard.data.identity.IdentityReducer;
 
 public class Phase1HadoopManager {
+  private static final Logger log = LogManager.getLogger();
 
   private final String inputDir;
   private final String outputDir;
@@ -61,6 +64,7 @@ public class Phase1HadoopManager {
     for (int i = 0; i < mapperClasses.size(); i++) {
       final Path path = new Path(inputDir + "/" + tables.get(i) + "/");
       MultipleInputs.addInputPath(job, path, TextInputFormat.class, mapperClasses.get(i));
+      log.info("Adding mapper for path " + path);
     }
     FileOutputFormat.setOutputPath(job, new Path(outputDir + "/identity_map"));
     try {
