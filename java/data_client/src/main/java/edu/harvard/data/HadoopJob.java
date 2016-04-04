@@ -34,8 +34,13 @@ public abstract class HadoopJob {
     final FileSystem fs = FileSystem.get(hdfsService, conf);
     final FileStatus[] fileStatus = fs.listStatus(new Path(in));
     for(final FileStatus status : fileStatus){
-      FileInputFormat.addInputPath(job, status.getPath());
-      System.out.println("Input path: " + status.getPath().toString());
+      String filename = status.getPath().toString();
+      filename = filename.substring(filename.lastIndexOf("/"), filename.length());
+      System.out.println("Filename: " + filename);
+      if (!filename.startsWith("_")) {
+        FileInputFormat.addInputPath(job, status.getPath());
+        System.out.println("Input path: " + status.getPath().toString());
+      }
     }
 
     if (out != null) {
