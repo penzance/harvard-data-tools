@@ -212,8 +212,10 @@ public class JavaModelClassGenerator {
     final String methodName = "get" + JavaBindingGenerator.javaClass(variableName, "");
     if (column.getType() == DataSchemaType.Enum) {
       final String enumName = JavaBindingGenerator.javaEnum(column);
-      out.println("    this." + variableName + " = " + enumName + ".parse(" + originalField + "."
+      out.println("    if (" + originalField + "." + methodName + "() != null) {");
+      out.println("      this." + variableName + " = " + enumName + ".parse(" + originalField + "."
           + methodName + "().getValue());");
+      out.println("    }");
     } else {
       out.println("    this." + variableName + " = " + originalField + "." + methodName + "();");
     }
