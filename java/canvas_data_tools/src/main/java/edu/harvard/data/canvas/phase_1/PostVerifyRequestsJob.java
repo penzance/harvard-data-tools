@@ -27,9 +27,12 @@ import edu.harvard.data.canvas.bindings.phase1.Phase1Requests;
 
 public class PostVerifyRequestsJob extends HadoopJob {
 
+  private final String verifyDir;
+
   public PostVerifyRequestsJob(final Configuration hadoopConf, final AwsUtils aws,
       final URI hdfsService, final String dataDir, final String verifyDir) {
     super(hadoopConf, aws, hdfsService, dataDir, null);
+    this.verifyDir = verifyDir;
   }
 
   @Override
@@ -43,6 +46,7 @@ public class PostVerifyRequestsJob extends HadoopJob {
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
     setPaths(job, aws, hdfsService, inputDir + "/requests", null);
+    addToCache(job, verifyDir + "/requests");
     return job;
   }
 
