@@ -47,6 +47,7 @@ public abstract class LongIdentityScrubber extends Mapper<Object, Text, Text, Nu
       try (final FSDataInputStream inStream = fs.open(path);
           FileTableReader<IdentityMap> in = new FileTableReader<IdentityMap>(IdentityMap.class,
               format, inStream)) {
+        log.info("Loading IDs for " + this);
         for (final IdentityMap id : in) {
           identities.put(getHadoopKey(id), id);
         }

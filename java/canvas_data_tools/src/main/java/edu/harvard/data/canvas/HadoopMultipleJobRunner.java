@@ -27,6 +27,7 @@ public class HadoopMultipleJobRunner {
       try {
         log.info("Submitted job " + job.getJobName());
         job.submit();
+        job.waitForCompletion(true);
       } catch (final ClassNotFoundException e) {
         throw new DataConfigurationException(e);
       } catch (final InterruptedException e) {

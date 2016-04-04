@@ -2,6 +2,7 @@ package edu.harvard.data.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -19,23 +20,35 @@ public class FileTableWriter<T extends DataTable> implements TableWriter<T> {
   private final List<T> buffer;
   private int bufferSize;
   private final String tableName;
-  private final File file;
+  private File file;
   private final TableFormat format;
   private final Class<T> tableType;
-  CSVPrinter printer;
+  private OutputStream outStream;
+  private CSVPrinter printer;
 
-  public FileTableWriter(final Class<T> tableType, final TableFormat format, final String tableName,
-      final File file) {
+
+  public FileTableWriter(final Class<T> tableType, final TableFormat format, final String tableName) {
     this.tableName = tableName;
     this.buffer = new ArrayList<T>();
     this.bufferSize = DEFAULT_BUFFER_SIZE;
-    this.file = file;
     this.tableType = tableType;
     this.format = format;
+  }
+
+  public FileTableWriter(final Class<T> tableType, final TableFormat format, final String tableName,
+      final File file) {
+    this(tableType, format, tableName);
+    this.file = file;
     if (file.exists()) {
       file.delete();
     }
     file.getParentFile().mkdirs();
+  }
+
+  public FileTableWriter(final Class<T> tableType, final TableFormat format, final String tableName,
+      final OutputStream outStream) {
+    this(tableType, format, tableName);
+    this.outStream = outStream;
   }
 
   public void setBufferSize(final int size) {
@@ -53,7 +66,7 @@ public class FileTableWriter<T extends DataTable> implements TableWriter<T> {
 
   @Override
   public void close() throws IOException {
-    if (printer != null) {
+    if (!buffer.isEmpty()) {
       flush();
       printer.close();
     }
@@ -67,7 +80,7 @@ public class FileTableWriter<T extends DataTable> implements TableWriter<T> {
   @Override
   public void flush() throws IOException {
     if (printer == null) {
-      printer = new CSVPrinter(new OutputStreamWriter(format.getOutputStream(file)),format.getCsvFormat());
+      getPrinter();
       if (format.includeHeaders()) {
         writeHeaders(printer);
       }
@@ -76,6 +89,16 @@ public class FileTableWriter<T extends DataTable> implements TableWriter<T> {
       printer.printRecord(row.getFieldsAsList(format));
     }
     buffer.clear();
+  }
+
+  private void getPrinter() throws IOException {
+    final OutputStream out;
+    if (outStream == null) {
+      out = format.getOutputStream(file);
+    } else {
+      out = outStream;
+    }
+    printer = new CSVPrinter(new OutputStreamWriter(out),format.getCsvFormat());
   }
 
   @SuppressWarnings("unchecked")

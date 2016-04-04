@@ -68,7 +68,7 @@ public class PreVerifyCommand implements Command {
     case 0:
       return new Phase0PreVerifier();
     case 1:
-      return new Phase1PreVerifier(hadoopConfig, hdfsService, inputDir, outputDir);
+      return new Phase1PreVerifier(config, hadoopConfig, hdfsService, inputDir, outputDir);
     case 2:
       return new Phase2PreVerifier();
     case 3:

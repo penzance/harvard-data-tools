@@ -56,7 +56,7 @@ public class HadoopCommand implements Command {
     if (phase == 1) {
       final Phase1HadoopManager phase1 = new Phase1HadoopManager(inputDir,
           outputDir, hdfsService);
-      phase1.runMapJobs(hadoopConfig);
+      //      phase1.runMapJobs(hadoopConfig);
       phase1.runScrubJobs(hadoopConfig);
     } else {
       final HadoopMultipleJobRunner jobRunner = new HadoopMultipleJobRunner(hadoopConfig);

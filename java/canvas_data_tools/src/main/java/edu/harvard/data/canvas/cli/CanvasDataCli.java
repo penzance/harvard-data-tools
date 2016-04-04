@@ -37,6 +37,8 @@ public class CanvasDataCli {
     @SubCommand(name = "cleanup", impl = CleanupCommand.class),
     @SubCommand(name = "fulldumps", impl = GetCompleteTableInfoCommand.class),
     @SubCommand(name = "listdumps", impl = ListDumpsCommand.class),
+    @SubCommand(name = "dumpinfo", impl = DumpInfoCommand.class),
+    @SubCommand(name = "diffschemas", impl = DiffSchemaCommand.class),
     @SubCommand(name = "compareschemas", impl = CompareSchemasCommand.class), })
   public Command cmd;
 
