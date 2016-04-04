@@ -61,7 +61,7 @@ public class Phase1PostVerifier implements Verifier {
     log.info("Verify directory: " + verifyDir);
 
     new PostVerifyIdentityMap(hadoopConfig, hdfsService, inputDir + "/identity_map",
-        outputDir + "/identity_map");
+        outputDir + "/identity_map").verify();
     updateInterestingTables();
 
     final HadoopMultipleJobRunner jobRunner = new HadoopMultipleJobRunner(hadoopConfig);
