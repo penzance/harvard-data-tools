@@ -42,7 +42,10 @@ public abstract class HadoopJob {
       }
     }
 
-    if (out != null) {
+    if (out == null) {
+      System.out.println("Job has not specified an output path. Sending to dummy location.");
+      FileOutputFormat.setOutputPath(job, new Path("/dev/null"));
+    } else {
       System.out.println("Output path: " + out);
       FileOutputFormat.setOutputPath(job, new Path(out));
     }
