@@ -38,8 +38,10 @@ public abstract class HadoopJob {
       System.out.println("Input path: " + status.getPath().toString());
     }
 
-    System.out.println("Output path: " + out);
-    FileOutputFormat.setOutputPath(job, new Path(out));
+    if (out != null) {
+      System.out.println("Output path: " + out);
+      FileOutputFormat.setOutputPath(job, new Path(out));
+    }
   }
 
   public abstract Job getJob() throws IOException;

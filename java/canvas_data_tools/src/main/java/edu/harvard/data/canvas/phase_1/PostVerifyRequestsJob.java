@@ -28,8 +28,8 @@ import edu.harvard.data.canvas.bindings.phase1.Phase1Requests;
 public class PostVerifyRequestsJob extends HadoopJob {
 
   public PostVerifyRequestsJob(final Configuration hadoopConf, final AwsUtils aws,
-      final URI hdfsService, final String inputDir, final String outputDir) {
-    super(hadoopConf, aws, hdfsService, inputDir, outputDir);
+      final URI hdfsService, final String dataDir, final String verifyDir) {
+    super(hadoopConf, aws, hdfsService, dataDir, null);
   }
 
   @Override

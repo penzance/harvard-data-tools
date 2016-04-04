@@ -2,6 +2,7 @@ package edu.harvard.data.canvas.phase_1;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
@@ -9,6 +10,7 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.VerificationException;
@@ -42,9 +44,11 @@ public class Phase1PostVerifier implements Verifier {
     jobRunner.runParallelJobs(jobs);
   }
 
-  private List<Job> setupJobs() {
-    // TODO Auto-generated method stub
-    return null;
+  private List<Job> setupJobs() throws IOException {
+    final AwsUtils aws = new AwsUtils();
+    final List<Job> jobs = new ArrayList<Job>();
+    jobs.add(new PostVerifyRequestsJob(hadoopConfig, aws, hdfsService, dataDir, verifyDir).getJob());
+    return jobs;
   }
 
 }
