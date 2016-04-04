@@ -71,10 +71,11 @@ class PostVerifyRequestMapper extends Mapper<Object, Text, Text, LongWritable> {
     for (final URI uri : context.getCacheFiles()) {
       final Path path = new Path(uri.toString());
       try (FSDataInputStream in = fs.open(path);) {
-        final String line = in.readLine();
+        String line = in.readLine();
         while (line != null) {
           final String[] parts = line.split("\t");
           interestingRequests.put(parts[0], Long.parseLong(parts[1]));
+          line = in.readLine();
         }
       }
     }
