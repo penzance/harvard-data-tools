@@ -94,8 +94,6 @@ public class VerificationPeople {
     for (int i = 0; i < MAX_INTERESTING_PEOPLE; i++) {
       if (maxKeys.hasNext()) {
         final Long person = maxKeys.next();
-        log.debug("Marking person " + person + " as interesting. Visited "
-            + userOperations.get(person).size() + " unique handlers");
         people.add(person);
       }
     }
