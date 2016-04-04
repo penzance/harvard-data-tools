@@ -54,13 +54,16 @@ public abstract class HadoopJob {
     final Configuration conf = new Configuration();
     final FileSystem fs = FileSystem.get(hdfsService, conf);
     for (final FileStatus status : fs.listStatus(new Path(dir))) {
-      String filename = status.getPath().toString();
-      filename = filename.substring(filename.lastIndexOf("/") + 1, filename.length());
-      if (!filename.startsWith("_")) {
+      if (!getFileName(status.getPath()).startsWith("_")) {
         paths.add(status.getPath());
       }
     }
     return paths;
+  }
+
+  public static String getFileName(final Path path) {
+    final String filename = path.toString();
+    return filename.substring(filename.lastIndexOf("/") + 1, filename.length());
   }
 
   protected void addToCache(final Job job, final String dir) throws IOException {

@@ -85,13 +85,15 @@ public class Phase1PostVerifier implements Verifier {
 
     for (final Path path : HadoopJob.listFiles(hdfsService, verifyDir + "/requests")) {
       try (FSDataInputStream in = fs.open(path);
-          FSDataOutputStream out = fs.create(new Path(path.toString() + "_updated"))) {
+          FSDataOutputStream out = fs
+              .create(new Path(verifyDir + "/updated/requests/" + HadoopJob.getFileName(path)))) {
         String line = in.readLine();
         while (line != null) {
           final String[] parts = line.split("\t");
           final Long oldId = Long.parseLong(parts[1]);
           if (!identities.containsKey(oldId)) {
-            throw new RuntimeException("Verification error: Canvas Data ID " + oldId + " missing from identity map");
+            throw new RuntimeException(
+                "Verification error: Canvas Data ID " + oldId + " missing from identity map");
           }
           final Long newId = identities.get(oldId).getCanvasDataID();
           out.writeBytes(parts[0] + "\t" + newId + "\n");

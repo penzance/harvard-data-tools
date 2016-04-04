@@ -46,7 +46,7 @@ public class PostVerifyRequestsJob extends HadoopJob {
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
     setPaths(job, aws, hdfsService, inputDir + "/requests", null);
-    addToCache(job, verifyDir + "/requests");
+    addToCache(job, verifyDir + "/updated/requests");
     return job;
   }
 
@@ -87,13 +87,11 @@ class PostVerifyRequestMapper extends Mapper<Object, Text, Text, LongWritable> {
       final Phase1Requests request = new Phase1Requests(format, csvRecord);
       if (interestingRequests.containsKey(request.getId())) {
         final Long originalId = interestingRequests.get(request.getId());
-        //        if (!observedIds.containsKey(originalId)) {
-        //          observedIds.put(originalId, request.getUserIdResearchUuid());
-        //        }
-        //        if (!request.getUserIdResearchUuid().equals(observedIds.get(originalId))) {
-        //          throw new RuntimeException("Validation error: Original user ID " + originalId
-        //              + " maps to more than one research ID in the requests table");
-        //        }
+        if (!request.getUserIdResearchUuid().equals(originalId)) {
+          throw new RuntimeException("Validation error: Expected to find research ID " + originalId
+              + ", but instead found " + request.getUserIdResearchUuid() + " in request "
+              + request.getId());
+        }
       }
     }
   }
