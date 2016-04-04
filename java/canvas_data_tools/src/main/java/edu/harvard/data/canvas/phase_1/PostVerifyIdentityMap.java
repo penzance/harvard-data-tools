@@ -47,7 +47,6 @@ public class PostVerifyIdentityMap implements Verifier {
     final Map<Long, String> updatedIds = readIdMap(updatedDir);
 
     for (final Entry<Long, String> entry : originalIds.entrySet()) {
-      log.debug("Checking Canvas data ID: " + entry.getKey() + ". Updated version: " + updatedIds.get(entry.getKey()));
       if (!updatedIds.containsKey(entry.getKey())) {
         throw new VerificationException(
             "Canvas data ID " + entry.getKey() + " not found in updated identity map.");
