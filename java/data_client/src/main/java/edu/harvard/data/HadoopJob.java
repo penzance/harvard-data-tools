@@ -35,7 +35,7 @@ public abstract class HadoopJob {
 
   protected void setPaths(final Job job, final AwsUtils aws, final URI hdfsService,
       final String in, final String out) throws IOException {
-    for(final Path path : listFiles(in)){
+    for(final Path path : listFiles(hdfsService, in)){
       FileInputFormat.addInputPath(job, path);
       log.debug("Input path: " + path.toString());
     }
@@ -49,7 +49,7 @@ public abstract class HadoopJob {
     }
   }
 
-  List<Path> listFiles(final String dir) throws IOException {
+  public static List<Path> listFiles(final URI hdfsService, final String dir) throws IOException {
     final List<Path> paths = new ArrayList<Path>();
     final Configuration conf = new Configuration();
     final FileSystem fs = FileSystem.get(hdfsService, conf);
@@ -64,7 +64,7 @@ public abstract class HadoopJob {
   }
 
   protected void addToCache(final Job job, final String dir) throws IOException {
-    for(final Path path : listFiles(dir)){
+    for(final Path path : listFiles(hdfsService, dir)){
       job.addCacheFile(URI.create(path.toString()));
       log.debug("Adding cache file: " + path.toString());
     }

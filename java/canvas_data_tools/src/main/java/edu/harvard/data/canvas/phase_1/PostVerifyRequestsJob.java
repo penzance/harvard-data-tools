@@ -55,12 +55,10 @@ public class PostVerifyRequestsJob extends HadoopJob {
 class PostVerifyRequestMapper extends Mapper<Object, Text, Text, LongWritable> {
 
   private final Map<String, Long> interestingRequests;
-  private final Map<Long, String> observedIds;
   private final TableFormat format;
 
   public PostVerifyRequestMapper() {
     this.interestingRequests = new HashMap<String, Long>();
-    this.observedIds = new HashMap<Long, String>();
     this.format = new FormatLibrary().getFormat(Format.CanvasDataFlatFiles);
   }
 
@@ -89,15 +87,14 @@ class PostVerifyRequestMapper extends Mapper<Object, Text, Text, LongWritable> {
       final Phase1Requests request = new Phase1Requests(format, csvRecord);
       if (interestingRequests.containsKey(request.getId())) {
         final Long originalId = interestingRequests.get(request.getId());
-        if (!observedIds.containsKey(originalId)) {
-          observedIds.put(originalId, request.getUserIdResearchUuid());
-        }
-        if (!request.getUserIdResearchUuid().equals(observedIds.get(originalId))) {
-          throw new RuntimeException("Validation error: Original user ID " + originalId
-              + " maps to more than one research ID in the requests table");
-        }
+        //        if (!observedIds.containsKey(originalId)) {
+        //          observedIds.put(originalId, request.getUserIdResearchUuid());
+        //        }
+        //        if (!request.getUserIdResearchUuid().equals(observedIds.get(originalId))) {
+        //          throw new RuntimeException("Validation error: Original user ID " + originalId
+        //              + " maps to more than one research ID in the requests table");
+        //        }
       }
     }
   }
-
 }
