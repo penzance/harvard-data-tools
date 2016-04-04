@@ -42,10 +42,12 @@ public class PostVerifyIdentityMap implements Verifier {
 
   @Override
   public void verify() throws VerificationException, IOException, DataConfigurationException {
+    log.info("Verifying identity map. Original dir: " + originalDir + ", updated dir: " + updatedDir);
     final Map<Long, String> originalIds = readIdMap(originalDir);
     final Map<Long, String> updatedIds = readIdMap(updatedDir);
 
     for (final Entry<Long, String> entry : originalIds.entrySet()) {
+      log.debug("Checking Canvas data ID: " + entry.getKey() + ". Updated version: " + updatedIds.get(entry.getKey()));
       if (!updatedIds.containsKey(entry.getKey())) {
         throw new VerificationException(
             "Canvas data ID " + entry.getKey() + " not found in updated identity map.");
