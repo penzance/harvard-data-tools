@@ -1,6 +1,8 @@
 package edu.harvard.data.canvas.phase_1;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,16 +36,19 @@ public class Phase1PostVerifier implements Verifier {
   private final DataConfiguration config;
   private final Configuration hadoopConfig;
   private final URI hdfsService;
-  private final String dataDir;
+  private final String inputDir;
+  private final String outputDir;
   private final String verifyDir;
   private final TableFormat format;
 
   public Phase1PostVerifier(final DataConfiguration config, final Configuration hadoopConfig,
-      final URI hdfsService, final String dataDir, final String verifyDir) {
+      final URI hdfsService, final String inputDir, final String outputDir,
+      final String verifyDir) {
     this.config = config;
     this.hadoopConfig = hadoopConfig;
     this.hdfsService = hdfsService;
-    this.dataDir = dataDir;
+    this.inputDir = inputDir;
+    this.outputDir = outputDir;
     this.verifyDir = verifyDir;
     this.format = new FormatLibrary().getFormat(Format.CanvasDataFlatFiles);
   }
@@ -51,9 +56,12 @@ public class Phase1PostVerifier implements Verifier {
   @Override
   public void verify() throws VerificationException, IOException, DataConfigurationException {
     log.info("Running post-verifier for phase 1");
-    log.info("Data directory: " + dataDir);
+    log.info("Input directory: " + inputDir);
+    log.info("Output directory: " + outputDir);
     log.info("Verify directory: " + verifyDir);
 
+    new PostVerifyIdentityMap(hadoopConfig, hdfsService, inputDir + "/identity_map",
+        outputDir + "/identity_map");
     updateInterestingTables();
 
     final HadoopMultipleJobRunner jobRunner = new HadoopMultipleJobRunner(hadoopConfig);
@@ -65,14 +73,14 @@ public class Phase1PostVerifier implements Verifier {
     final AwsUtils aws = new AwsUtils();
     final List<Job> jobs = new ArrayList<Job>();
     jobs.add(
-        new PostVerifyRequestsJob(hadoopConfig, aws, hdfsService, dataDir, verifyDir).getJob());
+        new PostVerifyRequestsJob(hadoopConfig, aws, hdfsService, outputDir, verifyDir).getJob());
     return jobs;
   }
 
   private void updateInterestingTables() throws IOException {
     final FileSystem fs = FileSystem.get(hdfsService, hadoopConfig);
     final Map<Long, IdentityMap> identities = new HashMap<Long, IdentityMap>();
-    for (final Path path : HadoopJob.listFiles(hdfsService, dataDir + "/identity_map")) {
+    for (final Path path : HadoopJob.listFiles(hdfsService, outputDir + "/identity_map")) {
       try (final FSDataInputStream inStream = fs.open(path);
           FileTableReader<IdentityMap> in = new FileTableReader<IdentityMap>(IdentityMap.class,
               format, inStream)) {
@@ -84,7 +92,8 @@ public class Phase1PostVerifier implements Verifier {
     }
 
     for (final Path path : HadoopJob.listFiles(hdfsService, verifyDir + "/requests")) {
-      try (FSDataInputStream in = fs.open(path);
+      try (FSDataInputStream fsin = fs.open(path);
+          BufferedReader in = new BufferedReader(new InputStreamReader(fsin));
           FSDataOutputStream out = fs
               .create(new Path(verifyDir + "/updated/requests/" + HadoopJob.getFileName(path)))) {
         String line = in.readLine();

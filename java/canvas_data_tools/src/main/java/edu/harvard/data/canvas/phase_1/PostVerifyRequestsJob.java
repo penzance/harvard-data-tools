@@ -1,6 +1,8 @@
 package edu.harvard.data.canvas.phase_1;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -68,7 +70,8 @@ class PostVerifyRequestMapper extends Mapper<Object, Text, Text, LongWritable> {
     final FileSystem fs = FileSystem.get(context.getConfiguration());
     for (final URI uri : context.getCacheFiles()) {
       final Path path = new Path(uri.toString());
-      try (FSDataInputStream in = fs.open(path);) {
+      try (FSDataInputStream fsin = fs.open(path);
+          BufferedReader in = new BufferedReader(new InputStreamReader(fsin))) {
         String line = in.readLine();
         while (line != null) {
           final String[] parts = line.split("\t");
