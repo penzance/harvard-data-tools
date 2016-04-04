@@ -54,11 +54,11 @@ public class PostVerifyRequestsJob extends HadoopJob {
 
 class PostVerifyRequestMapper extends Mapper<Object, Text, Text, LongWritable> {
 
-  private final Map<String, Long> interestingRequests;
+  private final Map<String, String> interestingRequests;
   private final TableFormat format;
 
   public PostVerifyRequestMapper() {
-    this.interestingRequests = new HashMap<String, Long>();
+    this.interestingRequests = new HashMap<String, String>();
     this.format = new FormatLibrary().getFormat(Format.CanvasDataFlatFiles);
   }
 
@@ -72,7 +72,7 @@ class PostVerifyRequestMapper extends Mapper<Object, Text, Text, LongWritable> {
         String line = in.readLine();
         while (line != null) {
           final String[] parts = line.split("\t");
-          interestingRequests.put(parts[0], Long.parseLong(parts[1]));
+          interestingRequests.put(parts[0], parts[1]);
           line = in.readLine();
         }
       }
@@ -86,9 +86,9 @@ class PostVerifyRequestMapper extends Mapper<Object, Text, Text, LongWritable> {
     for (final CSVRecord csvRecord : parser.getRecords()) {
       final Phase1Requests request = new Phase1Requests(format, csvRecord);
       if (interestingRequests.containsKey(request.getId())) {
-        final Long originalId = interestingRequests.get(request.getId());
-        if (!request.getUserIdResearchUuid().equals(originalId)) {
-          throw new RuntimeException("Validation error: Expected to find research ID " + originalId
+        final String researchId = interestingRequests.get(request.getId());
+        if (!request.getUserIdResearchUuid().equals(researchId)) {
+          throw new RuntimeException("Validation error: Expected to find research ID " + researchId
               + ", but instead found " + request.getUserIdResearchUuid() + " in request "
               + request.getId());
         }
