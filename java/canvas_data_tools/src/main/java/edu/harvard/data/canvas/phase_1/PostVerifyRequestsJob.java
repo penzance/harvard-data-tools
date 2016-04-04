@@ -42,7 +42,7 @@ public class PostVerifyRequestsJob extends HadoopJob {
 
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
-    setPaths(job, aws, hdfsService, inputDir + "/requests", outputDir + "/requests");
+    setPaths(job, aws, hdfsService, inputDir + "/requests", null);
     return job;
   }
 
