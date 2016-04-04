@@ -94,10 +94,7 @@ public class Phase1PostVerifier implements Verifier {
             throw new RuntimeException("Verification error: Canvas Data ID " + oldId + " missing from identity map");
           }
           final Long newId = identities.get(oldId).getCanvasDataID();
-          out.writeBytes(parts[0]);
-          out.writeBytes("\t");
-          out.writeLong(newId);
-          out.writeBytes("\n");
+          out.writeBytes(parts[0] + "\t" + newId + "\n");
           line = in.readLine();
         }
       }
