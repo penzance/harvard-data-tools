@@ -15,8 +15,7 @@ import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.identity.IdentityMap;
-import edu.harvard.data.io.FileTableReader;
-import edu.harvard.data.io.TableReader;
+import edu.harvard.data.io.HdfsTableReader;
 
 abstract class PreVerifyMapper extends Mapper<Object, Text, Text, LongWritable> {
 
@@ -34,8 +33,8 @@ abstract class PreVerifyMapper extends Mapper<Object, Text, Text, LongWritable> 
     final FileSystem fs = FileSystem.get(context.getConfiguration());
     for (final URI uri : context.getCacheFiles()) {
       final Path path = new Path(uri.toString());
-      try (TableReader<IdentityMap> in = new FileTableReader<IdentityMap>(IdentityMap.class, format,
-          fs.open(path));) {
+      try (HdfsTableReader<IdentityMap> in = new HdfsTableReader<IdentityMap>(IdentityMap.class,
+          format, fs, path)) {
         for (final IdentityMap id : in) {
           idByCanvasDataId.put(id.getCanvasDataID(), id);
         }

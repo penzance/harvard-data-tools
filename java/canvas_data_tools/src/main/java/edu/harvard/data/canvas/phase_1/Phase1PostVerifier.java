@@ -29,7 +29,7 @@ import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
 import edu.harvard.data.canvas.HadoopMultipleJobRunner;
 import edu.harvard.data.identity.IdentityMap;
-import edu.harvard.data.io.FileTableReader;
+import edu.harvard.data.io.HdfsTableReader;
 
 public class Phase1PostVerifier implements Verifier {
   private static final Logger log = LogManager.getLogger();
@@ -81,9 +81,8 @@ public class Phase1PostVerifier implements Verifier {
     final FileSystem fs = FileSystem.get(hdfsService, hadoopConfig);
     final Map<Long, IdentityMap> identities = new HashMap<Long, IdentityMap>();
     for (final Path path : HadoopJob.listFiles(hdfsService, outputDir + "/identity_map")) {
-      try (final FSDataInputStream inStream = fs.open(path);
-          FileTableReader<IdentityMap> in = new FileTableReader<IdentityMap>(IdentityMap.class,
-              format, inStream)) {
+      try (HdfsTableReader<IdentityMap> in = new HdfsTableReader<IdentityMap>(IdentityMap.class,
+          format, fs, path)) {
         log.info("Loading IDs for " + this);
         for (final IdentityMap id : in) {
           identities.put(id.getCanvasDataID(), id);
