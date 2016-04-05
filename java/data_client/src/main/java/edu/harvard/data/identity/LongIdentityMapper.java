@@ -16,11 +16,7 @@ import edu.harvard.data.TableFormat;
 public abstract class LongIdentityMapper
 extends Mapper<Object, Text, LongWritable, HadoopIdentityKey> {
 
-  protected final TableFormat format;
-
-  public LongIdentityMapper() {
-    this.format = new FormatLibrary().getFormat(Format.CanvasDataFlatFiles);
-  }
+  protected TableFormat format;
 
   protected abstract void readRecord(CSVRecord csvRecord);
 
@@ -30,6 +26,12 @@ extends Mapper<Object, Text, LongWritable, HadoopIdentityKey> {
   protected abstract Map<String, Long> getHadoopKeys();
 
   protected abstract boolean populateIdentityMap(IdentityMap id);
+
+  @Override
+  protected void setup(final Context context) {
+    final Format formatName = Format.valueOf(context.getConfiguration().get("format"));
+    this.format = new FormatLibrary().getFormat(formatName);
+  }
 
   @Override
   public void map(final Object key, final Text value, final Context context)

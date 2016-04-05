@@ -5,7 +5,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutorService;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.kohsuke.args4j.Argument;
@@ -63,12 +62,11 @@ public class PreVerifyCommand implements Command {
     } catch (final URISyntaxException e) {
       throw new DataConfigurationException(e);
     }
-    final Configuration hadoopConfig = new Configuration();
     switch (phase) {
     case 0:
       return new Phase0PreVerifier();
     case 1:
-      return new Phase1PreVerifier(config, hadoopConfig, hdfsService, inputDir, outputDir);
+      return new Phase1PreVerifier(config, hdfsService, inputDir, outputDir);
     case 2:
       return new Phase2PreVerifier();
     case 3:

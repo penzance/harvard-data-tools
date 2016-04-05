@@ -29,14 +29,14 @@ public class Phase1PreVerifier implements Verifier {
   private final TableFormat format;
   private final DataConfiguration dataConfig;
 
-  public Phase1PreVerifier(final DataConfiguration dataConfig, final Configuration hadoopConfig,
-      final URI hdfsService, final String inputDir, final String outputDir) {
-    this.hadoopConfig = hadoopConfig;
+  public Phase1PreVerifier(final DataConfiguration dataConfig, final URI hdfsService,
+      final String inputDir, final String outputDir) {
     this.dataConfig = dataConfig;
     this.hdfsService = hdfsService;
     this.inputDir = inputDir;
     this.outputDir = outputDir;
-    this.format = new FormatLibrary().getFormat(Format.CanvasDataFlatFiles);
+    this.hadoopConfig = new Configuration();
+    this.format = new FormatLibrary().getFormat(Format.DecompressedCanvasDataFlatFiles);
   }
 
   @Override
@@ -54,6 +54,7 @@ public class Phase1PreVerifier implements Verifier {
     }
 
     final HadoopMultipleJobRunner jobRunner = new HadoopMultipleJobRunner(hadoopConfig);
+    hadoopConfig.set("format", format.getFormat().toString());
     final List<Job> jobs = setupJobs();
     for (final Job job : jobs) {
       job.addCacheFile(URI.create(interestingIdFile));

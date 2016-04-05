@@ -51,22 +51,22 @@ public class PostVerifyRequestsJob extends HadoopJob {
     addToCache(job, verifyDir + "/updated/requests");
     return job;
   }
-
 }
 
 class PostVerifyRequestMapper extends Mapper<Object, Text, Text, LongWritable> {
 
   private final Map<String, String> interestingRequests;
-  private final TableFormat format;
+  private TableFormat format;
 
   public PostVerifyRequestMapper() {
     this.interestingRequests = new HashMap<String, String>();
-    this.format = new FormatLibrary().getFormat(Format.CanvasDataFlatFiles);
   }
 
   @Override
   protected void setup(final Context context) throws IOException, InterruptedException {
     super.setup(context);
+    final Format formatName = Format.valueOf(context.getConfiguration().get("format"));
+    this.format = new FormatLibrary().getFormat(formatName);
     final FileSystem fs = FileSystem.get(context.getConfiguration());
     for (final URI uri : context.getCacheFiles()) {
       final Path path = new Path(uri.toString());

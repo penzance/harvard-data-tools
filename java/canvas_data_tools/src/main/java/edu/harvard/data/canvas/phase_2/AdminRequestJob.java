@@ -17,7 +17,6 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfiguration;
-import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopJob;
@@ -50,10 +49,12 @@ public class AdminRequestJob extends HadoopJob {
 
 class AdminRequestMapper extends Mapper<Object, Text, Text, NullWritable> {
 
-  private final TableFormat format;
+  private TableFormat format;
 
-  public AdminRequestMapper() throws IOException, DataConfigurationException {
-    this.format = new FormatLibrary().getFormat(Format.CanvasDataFlatFiles);
+  @Override
+  protected void setup(final Context context) {
+    final Format formatName = Format.valueOf(context.getConfiguration().get("format"));
+    this.format = new FormatLibrary().getFormat(formatName);
   }
 
   @Override

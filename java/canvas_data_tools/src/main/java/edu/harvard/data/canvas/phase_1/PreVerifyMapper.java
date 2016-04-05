@@ -20,16 +20,17 @@ import edu.harvard.data.io.HdfsTableReader;
 abstract class PreVerifyMapper extends Mapper<Object, Text, Text, LongWritable> {
 
   protected final Map<Long, IdentityMap> idByCanvasDataId;
-  protected final TableFormat format;
+  protected TableFormat format;
 
   public PreVerifyMapper() {
     this.idByCanvasDataId = new HashMap<Long, IdentityMap>();
-    this.format = new FormatLibrary().getFormat(Format.CanvasDataFlatFiles);
   }
 
   @Override
   protected void setup(final Context context) throws IOException, InterruptedException {
     super.setup(context);
+    final Format formatName = Format.valueOf(context.getConfiguration().get("format"));
+    this.format = new FormatLibrary().getFormat(formatName);
     final FileSystem fs = FileSystem.get(context.getConfiguration());
     for (final URI uri : context.getCacheFiles()) {
       final Path path = new Path(uri.toString());

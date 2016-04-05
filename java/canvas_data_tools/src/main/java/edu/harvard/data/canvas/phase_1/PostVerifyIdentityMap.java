@@ -13,8 +13,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.DataConfigurationException;
-import edu.harvard.data.FormatLibrary;
-import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopJob;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
@@ -31,12 +29,12 @@ public class PostVerifyIdentityMap implements Verifier {
   private final TableFormat format;
 
   public PostVerifyIdentityMap(final Configuration hadoopConfig, final URI hdfsService,
-      final String originalDir, final String updatedDir) {
+      final String originalDir, final String updatedDir, final TableFormat format) {
     this.hadoopConfig = hadoopConfig;
     this.hdfsService = hdfsService;
     this.originalDir = originalDir;
     this.updatedDir = updatedDir;
-    this.format = new FormatLibrary().getFormat(Format.CanvasDataFlatFiles);
+    this.format = format;
   }
 
   @Override

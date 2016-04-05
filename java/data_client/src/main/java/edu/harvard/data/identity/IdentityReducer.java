@@ -22,17 +22,18 @@ import edu.harvard.data.io.HdfsTableReader;
 
 public class IdentityReducer extends Reducer<LongWritable, HadoopIdentityKey, Text, NullWritable> {
 
-  protected final TableFormat format;
   protected final Map<Long, IdentityMap> identities;
+  private TableFormat format;
 
   public IdentityReducer() {
-    this.format = new FormatLibrary().getFormat(Format.CanvasDataFlatFiles);
     this.identities = new HashMap<Long, IdentityMap>();
   }
 
   @Override
   protected void setup(final Context context) throws IOException, InterruptedException {
     super.setup(context);
+    final Format formatName = Format.valueOf(context.getConfiguration().get("format"));
+    this.format = new FormatLibrary().getFormat(formatName);
     final FileSystem fs = FileSystem.get(context.getConfiguration());
     for (final URI uri : context.getCacheFiles()) {
       final Path path = new Path(uri.toString());

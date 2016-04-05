@@ -19,7 +19,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.AwsUtils;
-import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
@@ -33,7 +32,6 @@ import edu.harvard.data.io.HdfsTableReader;
 
 public class Phase1PostVerifier implements Verifier {
   private static final Logger log = LogManager.getLogger();
-  private final DataConfiguration config;
   private final Configuration hadoopConfig;
   private final URI hdfsService;
   private final String inputDir;
@@ -41,16 +39,14 @@ public class Phase1PostVerifier implements Verifier {
   private final String verifyDir;
   private final TableFormat format;
 
-  public Phase1PostVerifier(final DataConfiguration config, final Configuration hadoopConfig,
-      final URI hdfsService, final String inputDir, final String outputDir,
+  public Phase1PostVerifier(final URI hdfsService, final String inputDir, final String outputDir,
       final String verifyDir) {
-    this.config = config;
-    this.hadoopConfig = hadoopConfig;
     this.hdfsService = hdfsService;
     this.inputDir = inputDir;
     this.outputDir = outputDir;
     this.verifyDir = verifyDir;
-    this.format = new FormatLibrary().getFormat(Format.CanvasDataFlatFiles);
+    this.hadoopConfig = new Configuration();
+    this.format = new FormatLibrary().getFormat(Format.DecompressedCanvasDataFlatFiles);
   }
 
   @Override
@@ -61,9 +57,10 @@ public class Phase1PostVerifier implements Verifier {
     log.info("Verify directory: " + verifyDir);
 
     new PostVerifyIdentityMap(hadoopConfig, hdfsService, inputDir + "/identity_map",
-        outputDir + "/identity_map").verify();
+        outputDir + "/identity_map", format).verify();
     updateInterestingTables();
 
+    hadoopConfig.set("format", format.getFormat().toString());
     final HadoopMultipleJobRunner jobRunner = new HadoopMultipleJobRunner(hadoopConfig);
     final List<Job> jobs = setupJobs();
     jobRunner.runParallelJobs(jobs);

@@ -26,11 +26,10 @@ import edu.harvard.data.io.HdfsTableReader;
 public abstract class LongIdentityScrubber extends Mapper<Object, Text, Text, NullWritable> {
   private static final Logger log = LogManager.getLogger();
 
-  protected final TableFormat format;
+  protected TableFormat format;
   protected final Map<Long, IdentityMap> identities;
 
   public LongIdentityScrubber() {
-    this.format = new FormatLibrary().getFormat(Format.CanvasDataFlatFiles);
     this.identities = new HashMap<Long, IdentityMap>();
   }
 
@@ -40,6 +39,8 @@ public abstract class LongIdentityScrubber extends Mapper<Object, Text, Text, Nu
   @Override
   protected void setup(final Context context) throws IOException, InterruptedException {
     super.setup(context);
+    final Format formatName = Format.valueOf(context.getConfiguration().get("format"));
+    this.format = new FormatLibrary().getFormat(formatName);
     final FileSystem fs = FileSystem.get(context.getConfiguration());
     for (final URI uri : context.getCacheFiles()) {
       final Path path = new Path(uri.toString());

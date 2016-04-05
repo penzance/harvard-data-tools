@@ -55,10 +55,12 @@ class RequestPerPageJob extends HadoopJob {
 
 class RequestPageMapper extends Mapper<Object, Text, Text, LongWritable> {
 
-  private final TableFormat format;
+  private TableFormat format;
 
-  public RequestPageMapper() {
-    this.format = new FormatLibrary().getFormat(Format.CanvasDataFlatFiles);
+  @Override
+  protected void setup(final Context context) {
+    final Format formatName = Format.valueOf(context.getConfiguration().get("format"));
+    this.format = new FormatLibrary().getFormat(formatName);
   }
 
   @Override
@@ -82,10 +84,12 @@ class RequestPageMapper extends Mapper<Object, Text, Text, LongWritable> {
 
 class RequestPageReducer extends Reducer<Text, LongWritable, Text, NullWritable> {
 
-  private final TableFormat format;
+  private TableFormat format;
 
-  public RequestPageReducer() {
-    this.format = new FormatLibrary().getFormat(Format.CanvasDataFlatFiles);
+  @Override
+  protected void setup(final Context context) {
+    final Format formatName = Format.valueOf(context.getConfiguration().get("format"));
+    this.format = new FormatLibrary().getFormat(formatName);
   }
 
   @Override
