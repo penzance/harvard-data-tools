@@ -215,7 +215,7 @@
         "EMRReleaseLabelParameter": {
             "Type": "String",
             "Description": "EMR release label to be used",
-            "Default": "emr-4.3.0"
+            "Default": "emr-4.5.0"
         }
     },
     "Mappings": {},
@@ -2754,7 +2754,7 @@
                             },
                             {
                                 "Key": "step",
-                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,postverify,1,-in,hdfs:///verify/phase_1"
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,postverify,1,-in,hdfs:///phase_0,-out,hdfs:///phase_1,-verify,hdfs:///verify/phase_1"
                             }
                         ]
                     },
@@ -3800,7 +3800,7 @@
                             },
                             {
                                 "Key": "step",
-                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,postverify,2,-in,hdfs:///verify/phase_2"
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,postverify,2,-in,hdfs:///phase_1,-out,hdfs:///phase_2,-verify,hdfs:///verify/phase_2"
                             }
                         ]
                     },
@@ -4548,7 +4548,7 @@
                             },
                             {
                                 "Key": "step",
-                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,postverify,3,-in,hdfs:///verify/phase_3"
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,postverify,3,-in,hdfs:///phase_2,-out,hdfs:///phase_3,-verify,hdfs:///verify/phase_3"
                             }
                         ]
                     },
