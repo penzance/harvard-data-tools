@@ -53,10 +53,11 @@ public class IdentityReducer extends Reducer<LongWritable, HadoopIdentityKey, Te
   }
 
   @Override
-  public void reduce(final LongWritable canvasDataId, final Iterable<HadoopIdentityKey> values,
+  public void reduce(final LongWritable key, final Iterable<HadoopIdentityKey> values,
       final Context context) throws IOException, InterruptedException {
     final IdentityMap id = new IdentityMap();
-    id.setCanvasDataID(canvasDataId.get());
+    final Long canvasDataId = key.get();
+    id.setCanvasDataID(canvasDataId);
     if (identities.containsKey(canvasDataId)) {
       id.setResearchId(identities.get(canvasDataId).getResearchId());
       log.info("Canvas data ID " + canvasDataId + " exists in identity map. Setting RID to " + id.getResearchId());
