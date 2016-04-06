@@ -14,6 +14,8 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
@@ -21,6 +23,7 @@ import edu.harvard.data.TableFormat;
 import edu.harvard.data.io.HdfsTableReader;
 
 public class IdentityReducer extends Reducer<LongWritable, HadoopIdentityKey, Text, NullWritable> {
+  private static final Logger log = LogManager.getLogger();
 
   protected final Map<Long, IdentityMap> identities;
   private TableFormat format;
@@ -37,6 +40,7 @@ public class IdentityReducer extends Reducer<LongWritable, HadoopIdentityKey, Te
     final FileSystem fs = FileSystem.get(context.getConfiguration());
     for (final URI uri : context.getCacheFiles()) {
       final Path path = new Path(uri.toString());
+      log.info("Reading existing identities from " + path);
       try (HdfsTableReader<IdentityMap> in = new HdfsTableReader<IdentityMap>(IdentityMap.class,
           format, fs, path)) {
         for (final IdentityMap id : in) {
@@ -44,6 +48,7 @@ public class IdentityReducer extends Reducer<LongWritable, HadoopIdentityKey, Te
         }
       }
     }
+    log.info("Read " + identities.size() + " existing identities in identity reducer");
   }
 
   @Override

@@ -16,7 +16,6 @@ import org.kohsuke.args4j.Argument;
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
-import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.canvas.HadoopMultipleJobRunner;
@@ -55,11 +54,9 @@ public class HadoopCommand implements Command {
 
     final Configuration hadoopConfig = new Configuration();
     if (phase == 1) {
-      hadoopConfig.set("format", Format.DecompressedCanvasDataFlatFiles.toString());
       final Phase1HadoopManager phase1 = new Phase1HadoopManager(inputDir,
           outputDir, hdfsService);
-      phase1.runMapJobs(hadoopConfig);
-      phase1.runScrubJobs(hadoopConfig);
+      phase1.runJobs(hadoopConfig);
     } else {
       final HadoopMultipleJobRunner jobRunner = new HadoopMultipleJobRunner(hadoopConfig);
       final List<Job> jobs = setupJobs(hadoopConfig, config, hdfsService);

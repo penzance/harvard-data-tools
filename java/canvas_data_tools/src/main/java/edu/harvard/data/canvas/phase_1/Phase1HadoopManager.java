@@ -23,6 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.DataConfigurationException;
+import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.canvas.HadoopMultipleJobRunner;
 import edu.harvard.data.canvas.identity.CanvasIdentityHadoopManager;
 import edu.harvard.data.identity.HadoopIdentityKey;
@@ -43,8 +44,14 @@ public class Phase1HadoopManager {
     hadoopManager = new CanvasIdentityHadoopManager();
   }
 
+  public void runJobs(final Configuration hadoopConfig) throws IOException, DataConfigurationException {
+    hadoopConfig.set("format", Format.DecompressedCanvasDataFlatFiles.toString());
+    runMapJobs(hadoopConfig);
+    runScrubJobs(hadoopConfig);
+  }
+
   @SuppressWarnings("rawtypes")
-  public void runMapJobs(final Configuration hadoopConfig) throws IOException {
+  private void runMapJobs(final Configuration hadoopConfig) throws IOException {
     final Job job = Job.getInstance(hadoopConfig, "canvas-identity-map");
     job.setJarByClass(Phase1HadoopManager.class);
     job.setOutputKeyClass(Text.class);
@@ -56,6 +63,7 @@ public class Phase1HadoopManager {
     job.setOutputFormatClass(TextOutputFormat.class);
 
     for (final Path path : listHdfsFiles(hadoopConfig, new Path(inputDir + "/identity_map"))) {
+      log.info("Adding identity file " + path + " to map job cache");
       job.addCacheFile(path.toUri());
     }
 
@@ -75,7 +83,7 @@ public class Phase1HadoopManager {
   }
 
   @SuppressWarnings("rawtypes")
-  public void runScrubJobs(final Configuration hadoopConfig)
+  private void runScrubJobs(final Configuration hadoopConfig)
       throws IOException, DataConfigurationException {
     final List<String> tables = hadoopManager.getIdentityTableNames();
     final List<Class<? extends Mapper>> scrubberClasses = hadoopManager.getScrubberClasses();
