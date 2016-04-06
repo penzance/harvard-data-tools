@@ -44,14 +44,12 @@ public class PostVerifyIdentityMap implements Verifier {
     final Map<Long, String> updatedIds = readIdMap(updatedDir);
 
     for (final Entry<Long, String> entry : originalIds.entrySet()) {
-      if (!updatedIds.containsKey(entry.getKey())) {
-        throw new VerificationException(
-            "Canvas data ID " + entry.getKey() + " not found in updated identity map.");
-      }
-      final String updatedRid = updatedIds.get(entry.getKey());
-      if (!updatedRid.equals(entry.getValue())) {
-        throw new VerificationException("Canvas data ID " + entry.getKey() + " should map to "
-            + entry.getValue() + " but actually mapped to Research ID " + updatedRid + "");
+      if (updatedIds.containsKey(entry.getKey())) {
+        final String updatedRid = updatedIds.get(entry.getKey());
+        if (!updatedRid.equals(entry.getValue())) {
+          throw new VerificationException("Canvas data ID " + entry.getKey() + " should map to "
+              + entry.getValue() + " but actually mapped to Research ID " + updatedRid + "");
+        }
       }
     }
   }
@@ -62,7 +60,7 @@ public class PostVerifyIdentityMap implements Verifier {
     for (final Path path : HadoopJob.listFiles(hdfsService, dir)) {
       try (HdfsTableReader<IdentityMap> in = new HdfsTableReader<IdentityMap>(IdentityMap.class,
           format, fs, path)) {
-        log.info("Loading IDs for " + this);
+        log.info("Loading IDs from path " + path);
         for (final IdentityMap id : in) {
           ids.put(id.getCanvasDataID(), id.getResearchId());
         }
