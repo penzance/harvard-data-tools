@@ -48,7 +48,7 @@ public class S3ToRedshiftLoaderGenerator {
 
       // Create a stage table based on the structure of the real table"
       out.println("DROP TABLE IF EXISTS " + stageTableName + ";");
-      out.println("CREATE TABLE " + stageTableName + " (LIKE " + tableName + ");");
+      out.println("CREATE TEMPORARY TABLE " + stageTableName + " (LIKE " + tableName + ");");
 
       // Copy the final incoming data into final the stage table
       out.println("COPY " + stageTableName + " " + columnList + " FROM '<intermediates3bucketandpath>/" + tableName
