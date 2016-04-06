@@ -53,3 +53,5 @@ You may also consider increasing the type and number of nodes in your Redshift c
 * Consider using Redshift reserved instances to decrease cost
 
 If you can estimate your average Redshift configuration -- e.g., after doing some baseline analysis, you determine 5 dc1.large nodes should adequately serve the requirements for the next year -- you should consider using reserved instances to minimize cost (probably at a 20-30% discount)
+
+* Consider Redshift optimizations, see https://blogs.aws.amazon.com/bigdata/post/Tx31034QG0G3ED1/Top-10-Performance-Tuning-Techniques-for-Amazon-Redshift for suggestions
