@@ -45,7 +45,6 @@ public class IdentityReducer extends Reducer<LongWritable, HadoopIdentityKey, Te
           format, fs, path)) {
         for (final IdentityMap id : in) {
           identities.put(id.getCanvasDataID(), id);
-          log.info("Added " + id.getCanvasDataID() + " to identity map");
         }
       }
     }
@@ -60,10 +59,8 @@ public class IdentityReducer extends Reducer<LongWritable, HadoopIdentityKey, Te
     id.setCanvasDataID(canvasDataId);
     if (identities.containsKey(canvasDataId)) {
       id.setResearchId(identities.get(canvasDataId).getResearchId());
-      log.info("Canvas data ID " + canvasDataId + " exists in identity map. Setting RID to " + id.getResearchId());
     } else {
       id.setResearchId(UUID.randomUUID().toString());
-      log.info("Can't find " + canvasDataId + " in identity map. Setting random RID to " + id.getResearchId());
     }
     for (final HadoopIdentityKey value : values) {
       final Long canvasId = value.getIdentityMap().getCanvasID();
