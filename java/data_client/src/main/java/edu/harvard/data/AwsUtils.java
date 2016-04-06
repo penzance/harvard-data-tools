@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
@@ -119,6 +120,10 @@ public class AwsUtils {
     return new S3ObjectId(bucket, key.substring(1));
   }
 
+  public static S3ObjectId key(final S3ObjectSummary obj) {
+    return key(obj.getBucketName(), obj.getKey());
+  }
+
   public static S3ObjectId key(final S3ObjectId obj, final String... keys) {
     String key = obj.getKey();
     for (final String k : keys) {
@@ -149,11 +154,19 @@ public class AwsUtils {
     client.putObject(obj.getBucket(), obj.getKey(), new ByteArrayInputStream(bytes), metadata);
   }
 
-  public void getFile(final S3ObjectId objId, final File tempFile) throws IOException {
+  public void getFile(final S3ObjectId objId, final File file) throws IOException {
+    getFile(objId, file, false);
+  }
+
+  public void getFile(final S3ObjectId objId, final File file, final boolean gunzip) throws IOException {
+    log.debug("Downloading " + objId + " to " + file);
     final S3Object obj = client.getObject(new GetObjectRequest(objId.getBucket(), objId.getKey()));
-    tempFile.getParentFile().mkdirs();
-    final InputStream in = obj.getObjectContent();
-    final OutputStream out = new FileOutputStream(tempFile);
+    file.getParentFile().mkdirs();
+    InputStream in = obj.getObjectContent();
+    if (gunzip) {
+      in = new GZIPInputStream(in);
+    }
+    final OutputStream out = new FileOutputStream(file);
     IOUtils.copy(in, out);
   }
 

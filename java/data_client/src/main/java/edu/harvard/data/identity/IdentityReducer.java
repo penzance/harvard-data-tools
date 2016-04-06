@@ -45,6 +45,7 @@ public class IdentityReducer extends Reducer<LongWritable, HadoopIdentityKey, Te
           format, fs, path)) {
         for (final IdentityMap id : in) {
           identities.put(id.getCanvasDataID(), id);
+          log.info("Added " + id.getCanvasDataID() + " to identity map");
         }
       }
     }
