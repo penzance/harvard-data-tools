@@ -31,11 +31,6 @@ public class FileTableReader<T extends DataTable> implements TableReader<T> {
     iterator = new DelimitedFileIterator<T>(tableType, format, file);
   }
 
-  public FileTableReader(final Class<T> tableType, final TableFormat format, final InputStream inStream) throws IOException {
-    this.tableType = tableType;
-    iterator = new DelimitedFileIterator<T>(tableType, format, inStream);
-  }
-
   @Override
   public Iterator<T> iterator() {
     return iterator;
@@ -57,10 +52,10 @@ class DelimitedFileIterator<T extends DataTable> implements Iterator<T>, Closeab
 
   private Iterator<CSVRecord> iterator;
   private CSVParser requestParser;
-  private final Class<T> table;
-  private final TableFormat format;
-  private File file;
-  private InputStream inStream;
+  protected final Class<T> table;
+  protected final TableFormat format;
+  private final File file;
+  protected InputStream inStream;
   private int line;
 
   public DelimitedFileIterator(final Class<T> table, final TableFormat format, final File file)
@@ -74,12 +69,6 @@ class DelimitedFileIterator<T extends DataTable> implements Iterator<T>, Closeab
     } else {
       line = 0;
     }
-  }
-
-  public DelimitedFileIterator(final Class<T> table, final TableFormat format, final InputStream inStream)
-      throws IOException {
-    this(table, format, (File) null);
-    this.inStream = inStream;
   }
 
   private void createIterator() {

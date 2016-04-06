@@ -31,6 +31,8 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataTable;
 import edu.harvard.data.DumpInfo;
+import edu.harvard.data.FormatLibrary;
+import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
@@ -45,13 +47,13 @@ public class Phase0PostVerifier implements Verifier {
   private final File tmpDir;
   private final TableFormat format;
 
-  public Phase0PostVerifier(final String dumpId, final AwsUtils aws, final TableFormat format,
-      final File tmpDir, final ExecutorService exec) {
+  public Phase0PostVerifier(final String dumpId, final AwsUtils aws, final File tmpDir,
+      final ExecutorService exec) {
     this.dumpId = dumpId;
     this.aws = aws;
-    this.format = format;
     this.tmpDir = tmpDir;
     this.exec = exec;
+    this.format = new FormatLibrary().getFormat(Format.CanvasDataFlatFiles);
   }
 
   @Override

@@ -19,7 +19,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.AwsUtils;
-import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
@@ -29,11 +28,10 @@ import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
 import edu.harvard.data.canvas.HadoopMultipleJobRunner;
 import edu.harvard.data.identity.IdentityMap;
-import edu.harvard.data.io.FileTableReader;
+import edu.harvard.data.io.HdfsTableReader;
 
 public class Phase1PostVerifier implements Verifier {
   private static final Logger log = LogManager.getLogger();
-  private final DataConfiguration config;
   private final Configuration hadoopConfig;
   private final URI hdfsService;
   private final String inputDir;
@@ -41,16 +39,14 @@ public class Phase1PostVerifier implements Verifier {
   private final String verifyDir;
   private final TableFormat format;
 
-  public Phase1PostVerifier(final DataConfiguration config, final Configuration hadoopConfig,
-      final URI hdfsService, final String inputDir, final String outputDir,
+  public Phase1PostVerifier(final URI hdfsService, final String inputDir, final String outputDir,
       final String verifyDir) {
-    this.config = config;
-    this.hadoopConfig = hadoopConfig;
     this.hdfsService = hdfsService;
     this.inputDir = inputDir;
     this.outputDir = outputDir;
     this.verifyDir = verifyDir;
-    this.format = new FormatLibrary().getFormat(Format.CanvasDataFlatFiles);
+    this.hadoopConfig = new Configuration();
+    this.format = new FormatLibrary().getFormat(Format.DecompressedCanvasDataFlatFiles);
   }
 
   @Override
@@ -61,9 +57,10 @@ public class Phase1PostVerifier implements Verifier {
     log.info("Verify directory: " + verifyDir);
 
     new PostVerifyIdentityMap(hadoopConfig, hdfsService, inputDir + "/identity_map",
-        outputDir + "/identity_map").verify();
+        outputDir + "/identity_map", format).verify();
     updateInterestingTables();
 
+    hadoopConfig.set("format", format.getFormat().toString());
     final HadoopMultipleJobRunner jobRunner = new HadoopMultipleJobRunner(hadoopConfig);
     final List<Job> jobs = setupJobs();
     jobRunner.runParallelJobs(jobs);
@@ -81,9 +78,8 @@ public class Phase1PostVerifier implements Verifier {
     final FileSystem fs = FileSystem.get(hdfsService, hadoopConfig);
     final Map<Long, IdentityMap> identities = new HashMap<Long, IdentityMap>();
     for (final Path path : HadoopJob.listFiles(hdfsService, outputDir + "/identity_map")) {
-      try (final FSDataInputStream inStream = fs.open(path);
-          FileTableReader<IdentityMap> in = new FileTableReader<IdentityMap>(IdentityMap.class,
-              format, inStream)) {
+      try (HdfsTableReader<IdentityMap> in = new HdfsTableReader<IdentityMap>(IdentityMap.class,
+          format, fs, path)) {
         log.info("Loading IDs for " + this);
         for (final IdentityMap id : in) {
           identities.put(id.getCanvasDataID(), id);

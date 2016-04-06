@@ -46,10 +46,12 @@ class RequestPerFileJob extends HadoopJob {
 
 class RequestFileMapper extends Mapper<Object, Text, Text, LongWritable> {
 
-  private final TableFormat format;
+  private TableFormat format;
 
-  public RequestFileMapper() {
-    this.format = new FormatLibrary().getFormat(Format.CanvasDataFlatFiles);
+  @Override
+  protected void setup(final Context context) {
+    final Format formatName = Format.valueOf(context.getConfiguration().get("format"));
+    this.format = new FormatLibrary().getFormat(formatName);
   }
 
   @Override

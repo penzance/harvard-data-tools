@@ -51,12 +51,17 @@ class RequestJob extends HadoopJob {
 
 class RequestMapper extends Mapper<Object, Text, Text, NullWritable> {
 
-  private final TableFormat format;
+  private TableFormat format;
   private final UserAgentParser uaParser;
 
   public RequestMapper() throws IOException, DataConfigurationException {
-    this.format = new FormatLibrary().getFormat(Format.CanvasDataFlatFiles);
     this.uaParser = new UserAgentParser();
+  }
+
+  @Override
+  protected void setup(final Context context) {
+    final Format formatName = Format.valueOf(context.getConfiguration().get("format"));
+    this.format = new FormatLibrary().getFormat(formatName);
   }
 
   @Override

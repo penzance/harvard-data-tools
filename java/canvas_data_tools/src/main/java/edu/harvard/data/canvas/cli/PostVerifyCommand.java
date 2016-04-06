@@ -5,7 +5,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutorService;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.kohsuke.args4j.Argument;
@@ -16,7 +15,6 @@ import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.ReturnStatus;
-import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
 import edu.harvard.data.canvas.phase_0.Phase0PostVerifier;
@@ -69,15 +67,13 @@ public class PostVerifyCommand implements Command {
     } catch (final URISyntaxException e) {
       throw new DataConfigurationException(e);
     }
-    final Configuration hadoopConfig = new Configuration();
     final AwsUtils aws = new AwsUtils();
     final FormatLibrary formats = new FormatLibrary();
-    final TableFormat format = formats.getFormat(FormatLibrary.Format.CanvasDataFlatFiles);
     switch (phase) {
     case 0:
-      return new Phase0PostVerifier(dumpId, aws, format, config.getScratchDir(), exec);
+      return new Phase0PostVerifier(dumpId, aws, config.getScratchDir(), exec);
     case 1:
-      return new Phase1PostVerifier(config, hadoopConfig, hdfsService, inputDir, outputDir, verifyDir);
+      return new Phase1PostVerifier(hdfsService, inputDir, outputDir, verifyDir);
     case 2:
       return new Phase2PostVerifier();
     case 3:

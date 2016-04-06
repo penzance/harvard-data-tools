@@ -31,9 +31,8 @@ import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.canvas.bindings.phase0.Phase0Requests;
 import edu.harvard.data.identity.IdentityMap;
-import edu.harvard.data.io.FileTableReader;
 import edu.harvard.data.io.FileTableWriter;
-import edu.harvard.data.io.TableReader;
+import edu.harvard.data.io.HdfsTableReader;
 import edu.harvard.data.io.TableWriter;
 
 public class VerificationPeople {
@@ -101,8 +100,8 @@ public class VerificationPeople {
 
   private void scanRequestTable(final Path path) throws IOException {
     log.info("Scanning request table at path " + path);
-    try (TableReader<Phase0Requests> in = new FileTableReader<Phase0Requests>(Phase0Requests.class,
-        format, fs.open(path));) {
+    try (HdfsTableReader<Phase0Requests> in = new HdfsTableReader<Phase0Requests>(
+        Phase0Requests.class, format, fs, path)) {
       for (final Phase0Requests request : in) {
         processRequest(request);
       }
