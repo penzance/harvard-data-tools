@@ -44,8 +44,8 @@ public class DumpManager {
 
   public boolean needToSaveDump(final DataDump dump) throws IOException {
     final DumpInfo info = DumpInfo.find(dump.getDumpId());
-    if (dump.getSequence() < 143) {
-      log.warn("Dump downloader set to ignore dumps with sequence < 143");
+    if (dump.getSequence() < 169) {
+      log.warn("Dump downloader set to ignore dumps with sequence < 169");
       return false;
     }
     if (info == null) {
