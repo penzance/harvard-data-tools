@@ -58,34 +58,6 @@
           "type" : "bigint"
         }
       ]
-    },
-    "course": {
-      "owner": "hive",
-      "tableName" : "course_dim",
-      "columns" : [ 
-        {
-          "name" : "student_enrollments",
-          "description" : "Number of enrolled users with the student_enrollment type",
-          "type" : "integer"
-        }
-      ]
-    },
-    "requests_per_user": {
-      "owner": "hive",
-      "tableName" : "requests_per_user",
-      "columns" : [ 
-        {
-          "name" : "user_id",
-          "description" : "Unique user ID, as defined in user_dim table.",
-          "type" : "bigint"
-        },
-        {
-          "name" : "requests",
-          "description" : "Count of requests by the user.",
-          "type" : "bigint"
-        }
-      ]
-    } 
-    
+    }
   }
 }
