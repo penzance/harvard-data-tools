@@ -31,11 +31,8 @@ public class S3ToRedshiftLoaderGenerator {
   private void generateRedshiftLoaderFile(final PrintStream out, final SchemaPhase phase) {
     outputComments(out, phase.getSchema().getVersion());
     for (final DataSchemaTable table : phase.getSchema().getTables().values()) {
-      final String tableName = table.getTableName();
-      final String stageTableName = table.getTableName() + "_stage";
-      final String joinField = table.getColumns().get(0).getName();
       String columnList = "(";
-      for (int i=0; i<table.getColumns().size(); i++) {
+      for (int i = 0; i < table.getColumns().size(); i++) {
         final DataSchemaColumn column = table.getColumns().get(i);
         if (i > 0) {
           columnList += ",";
@@ -44,37 +41,67 @@ public class S3ToRedshiftLoaderGenerator {
       }
       columnList += ")";
 
-      out.println("------- Table " + tableName + "-------");
-
-      // Create a stage table based on the structure of the real table"
-      out.println("DROP TABLE IF EXISTS " + stageTableName + ";");
-      out.println("CREATE TEMPORARY TABLE " + stageTableName + " (LIKE " + tableName + ");");
-
-      // Copy the final incoming data into final the stage table
-      out.println("COPY " + stageTableName + " " + columnList + " FROM '<intermediates3bucketandpath>/" + tableName
-          + "/' CREDENTIALS '<awskeyandsecret>' DELIMITER '\\t' TRUNCATECOLUMNS GZIP;");
-
-      // Use an inner join with the staging table to delete the rows from the
-      // target table that are being updated.
-      // Put the delete and insert operations in a single transaction block so
-      // that if there is a problem, everything will be rolled back.
-      out.println("BEGIN TRANSACTION;");
-      out.println("DELETE FROM " + tableName + " USING " + stageTableName + " WHERE " + tableName
-          + "." + joinField + " = " + stageTableName + "." + joinField + ";");
-
-      // Insert all of the rows from the staging table.
-      out.println("INSERT INTO " + tableName + " SELECT * FROM " + stageTableName + ";");
-      out.println("END TRANSACTION;");
-
-      // Drop the staging table.
-      out.println("DROP TABLE " + stageTableName + ";");
-
-      // Vacuum and analyze table for optimal performance.
-      out.println("VACUUM " + tableName + ";");
-      out.println("ANALYZE " + tableName + ";");
-      out.println();
-      out.println();
+      if (table.getTableName().equals("requests")) { // TODO: Make this dynamic for the dump being processed.
+        outputPartialTableUpdate(out, table, columnList);
+      } else {
+        outputTableOverwrite(out, table, columnList);
+      }
     }
+  }
+
+  private void outputPartialTableUpdate(final PrintStream out, final DataSchemaTable table,
+      final String columnList) {
+    final String tableName = table.getTableName();
+    final String stageTableName = tableName + "_stage";
+    final String joinField = table.getColumns().get(0).getName();
+
+    out.println("------- Table " + tableName + "-------");
+    // Create a stage table based on the structure of the real table"
+    out.println("DROP TABLE IF EXISTS " + stageTableName + ";");
+    out.println("CREATE TEMPORARY TABLE " + stageTableName + " (LIKE " + tableName + ");");
+
+    // Copy the final incoming data into final the stage table
+    out.println("COPY " + stageTableName + " " + columnList
+        + " FROM '<intermediates3bucketandpath>/" + tableName
+        + "/' CREDENTIALS '<awskeyandsecret>' DELIMITER '\\t' TRUNCATECOLUMNS GZIP;");
+
+    // Use an inner join with the staging table to delete the rows from the
+    // target table that are being updated.
+    // Put the delete and insert operations in a single transaction block so
+    // that if there is a problem, everything will be rolled back.
+    out.println("BEGIN TRANSACTION;");
+    out.println("DELETE FROM " + tableName + " USING " + stageTableName + " WHERE " + tableName
+        + "." + joinField + " = " + stageTableName + "." + joinField + ";");
+
+    // Insert all of the rows from the staging table.
+    out.println("INSERT INTO " + tableName + " SELECT * FROM " + stageTableName + ";");
+    out.println("END TRANSACTION;");
+
+    // Drop the staging table.
+    out.println("DROP TABLE " + stageTableName + ";");
+
+    // Vacuum and analyze table for optimal performance.
+    out.println("VACUUM " + tableName + ";");
+    out.println("ANALYZE " + tableName + ";");
+    out.println();
+    out.println();
+  }
+
+  private void outputTableOverwrite(final PrintStream out, final DataSchemaTable table,
+      final String columnList) {
+    final String tableName = table.getTableName();
+
+    out.println("------- Table " + tableName + "-------");
+
+    out.println("TRUNCATE " + tableName + ";");
+    out.println("VACUUM " + tableName + ";");
+    out.println("ANALYZE " + tableName + ";");
+    out.println("COPY " + tableName + " " + columnList + " FROM '<intermediates3bucketandpath>/"
+        + tableName + "/' CREDENTIALS '<awskeyandsecret>' DELIMITER '\t' TRUNCATECOLUMNS GZIP;");
+    out.println("VACUUM " + tableName + ";");
+    out.println("ANALYZE " + tableName + ";");
+    out.println();
+    out.println();
   }
 
   private void outputComments(final PrintStream out, final String version) {
