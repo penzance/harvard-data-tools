@@ -17,7 +17,6 @@ public class MatterhornDataConfiguration implements RedshiftConfiguration {
   private String redshiftPort;
   private String redshiftUser;
   private String redshiftPassword;
-  private String tableInfoDynamoTable;
 
   public static MatterhornDataConfiguration getConfiguration(final String propertiesFileName)
       throws IOException, DataConfigurationException {
@@ -32,7 +31,6 @@ public class MatterhornDataConfiguration implements RedshiftConfiguration {
     }
     final MatterhornDataConfiguration config = new MatterhornDataConfiguration();
     config.scratchDir = new File(getConfigParameter(properties, "scratch_dir"));
-    config.tableInfoDynamoTable = getConfigParameter(properties, "table_info_dynamo_table");
     config.redshiftDb = getConfigParameter(properties, "redshift_database");
     config.redshiftHost = getConfigParameter(properties, "redshift_host");
     config.redshiftPort = getConfigParameter(properties, "redshift_port");
@@ -55,10 +53,6 @@ public class MatterhornDataConfiguration implements RedshiftConfiguration {
 
   public File getScratchDir() {
     return scratchDir;
-  }
-
-  public String getTableInfoDynamoTable() {
-    return tableInfoDynamoTable;
   }
 
   @Override
