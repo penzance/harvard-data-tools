@@ -1,4 +1,4 @@
-package edu.harvard.data.canvas.cli;
+package edu.harvard.data.matterhorn.cli;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;

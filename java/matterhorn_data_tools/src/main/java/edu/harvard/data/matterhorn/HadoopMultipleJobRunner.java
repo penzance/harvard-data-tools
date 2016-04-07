@@ -1,4 +1,4 @@
-package edu.harvard.data.canvas;
+package edu.harvard.data.matterhorn;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -9,7 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.DataConfigurationException;
-import edu.harvard.data.canvas.cli.HadoopCommand;
+import edu.harvard.data.matterhorn.cli.HadoopCommand;
 
 public class HadoopMultipleJobRunner {
   private static final Logger log = LogManager.getLogger();

@@ -1,4 +1,4 @@
-package edu.harvard.data.canvas.cli;
+package edu.harvard.data.matterhorn.cli;
 
 public class ArgumentError extends Exception {
 

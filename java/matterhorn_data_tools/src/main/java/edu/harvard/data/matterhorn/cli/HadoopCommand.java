@@ -1,4 +1,4 @@
-package edu.harvard.data.canvas.cli;
+package edu.harvard.data.matterhorn.cli;
 
 import java.io.IOException;
 import java.net.URI;
@@ -18,9 +18,9 @@ import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.VerificationException;
-import edu.harvard.data.canvas.HadoopMultipleJobRunner;
-import edu.harvard.data.canvas.phase_1.Phase1HadoopManager;
-import edu.harvard.data.canvas.phase_2.Phase2HadoopManager;
+import edu.harvard.data.matterhorn.HadoopMultipleJobRunner;
+import edu.harvard.data.matterhorn.phase_1.Phase1HadoopManager;
+import edu.harvard.data.matterhorn.phase_2.Phase2HadoopManager;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class HadoopCommand implements Command {

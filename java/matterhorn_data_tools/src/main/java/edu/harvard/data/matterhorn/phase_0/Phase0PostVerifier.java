@@ -1,4 +1,4 @@
-package edu.harvard.data.canvas.phase_0;
+package edu.harvard.data.matterhorn.phase_0;
 
 import java.io.File;
 import java.io.IOException;

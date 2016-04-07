@@ -1,4 +1,4 @@
-package edu.harvard.data.canvas;
+package edu.harvard.data.matterhorn;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
