@@ -11,12 +11,12 @@ import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 
 import edu.harvard.data.AwsUtils;
-import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
+import edu.harvard.data.matterhorn.MatterhornDataConfiguration;
 import edu.harvard.data.matterhorn.phase_0.Phase0PostVerifier;
 import edu.harvard.data.matterhorn.phase_1.Phase1PostVerifier;
 import edu.harvard.data.matterhorn.phase_2.Phase2PostVerifier;
@@ -43,7 +43,7 @@ public class PostVerifyCommand implements Command {
   public String verifyDir;
 
   @Override
-  public ReturnStatus execute(final DataConfiguration config, final ExecutorService exec)
+  public ReturnStatus execute(final MatterhornDataConfiguration config, final ExecutorService exec)
       throws IOException, DataConfigurationException, UnexpectedApiResponseException,
       ArgumentError {
     if (!checkArguments()) {
@@ -59,7 +59,7 @@ public class PostVerifyCommand implements Command {
     return ReturnStatus.OK;
   }
 
-  private Verifier getVerifier(final DataConfiguration config, final ExecutorService exec)
+  private Verifier getVerifier(final MatterhornDataConfiguration config, final ExecutorService exec)
       throws ArgumentError, DataConfigurationException {
     final URI hdfsService;
     try {

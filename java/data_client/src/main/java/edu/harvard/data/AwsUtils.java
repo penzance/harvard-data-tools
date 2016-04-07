@@ -186,7 +186,7 @@ public class AwsUtils {
     client.putObject(obj.getBucket(), obj.getKey(), new ByteArrayInputStream(bytes), metadata);
   }
 
-  public RedshiftSchema getRedshiftSchema(final DataConfiguration config) throws SQLException {
+  public RedshiftSchema getRedshiftSchema(final RedshiftConfiguration config) throws SQLException {
     final String query = "SELECT * FROM information_schema.columns WHERE table_schema='public'";
     final String url = config.getRedshiftUrl();
     try (
@@ -198,7 +198,7 @@ public class AwsUtils {
     }
   }
 
-  public void executeRedshiftQuery(final String query, final DataConfiguration config)
+  public void executeRedshiftQuery(final String query, final RedshiftConfiguration config)
       throws SQLException {
     final String url = config.getRedshiftUrl();
     log.info("Executing query \n" + query + "\n on " + url);

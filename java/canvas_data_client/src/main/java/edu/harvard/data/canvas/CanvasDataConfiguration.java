@@ -1,4 +1,4 @@
-package edu.harvard.data;
+package edu.harvard.data.canvas;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,7 +8,10 @@ import java.util.Properties;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
 
-public class DataConfiguration {
+import edu.harvard.data.DataConfigurationException;
+import edu.harvard.data.RedshiftConfiguration;
+
+public class CanvasDataConfiguration implements RedshiftConfiguration {
 
   private String canvasApiKey;
   private String canvasApiSecret;
@@ -23,9 +26,9 @@ public class DataConfiguration {
   private String redshiftPassword;
   private String tableInfoDynamoTable;
 
-  public static DataConfiguration getConfiguration(final String propertiesFileName)
+  public static CanvasDataConfiguration getConfiguration(final String propertiesFileName)
       throws IOException, DataConfigurationException {
-    final ClassLoader cl = DataConfiguration.class.getClassLoader();
+    final ClassLoader cl = CanvasDataConfiguration.class.getClassLoader();
     Properties properties;
     try (final InputStream in = cl.getResourceAsStream(propertiesFileName)) {
       if (in == null) {
@@ -34,7 +37,7 @@ public class DataConfiguration {
       properties = new Properties();
       properties.load(in);
     }
-    final DataConfiguration config = new DataConfiguration();
+    final CanvasDataConfiguration config = new CanvasDataConfiguration();
     config.canvasApiKey = getConfigParameter(properties, "canvas_data_api_key");
     config.canvasApiSecret = getConfigParameter(properties, "canvas_data_api_secret");
     config.canvasDataHost = getConfigParameter(properties, "canvas_data_host");
@@ -61,7 +64,7 @@ public class DataConfiguration {
     return param;
   }
 
-  private DataConfiguration() {
+  private CanvasDataConfiguration() {
   }
 
   public String getCanvasApiKey() {
@@ -92,26 +95,32 @@ public class DataConfiguration {
     return tableInfoDynamoTable;
   }
 
+  @Override
   public String getRedshiftHost() {
     return redshiftHost;
   }
 
+  @Override
   public String getRedshiftPort() {
     return redshiftPort;
   }
 
+  @Override
   public String getRedshiftDatabase() {
     return redshiftDb;
   }
 
+  @Override
   public String getRedshiftUser() {
     return redshiftUser;
   }
 
+  @Override
   public String getRedshiftPassword() {
     return redshiftPassword;
   }
 
+  @Override
   public String getRedshiftUrl() {
     return "jdbc:postgresql://" + redshiftHost + ":" + redshiftPort + "/" + redshiftDb;
   }

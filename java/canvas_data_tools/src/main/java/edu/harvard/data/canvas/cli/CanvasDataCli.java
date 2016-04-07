@@ -17,12 +17,12 @@ import org.kohsuke.args4j.spi.SubCommand;
 import org.kohsuke.args4j.spi.SubCommandHandler;
 import org.kohsuke.args4j.spi.SubCommands;
 
-import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.DumpInfo;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.TableInfo;
 import edu.harvard.data.VerificationException;
+import edu.harvard.data.canvas.CanvasDataConfiguration;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class CanvasDataCli {
@@ -62,9 +62,9 @@ public class CanvasDataCli {
       System.exit(ReturnStatus.ARGUMENT_ERROR.getCode());
     } else {
       // Config is set or System.exit is called.
-      DataConfiguration config = null;
+      CanvasDataConfiguration config = null;
       try {
-        config = DataConfiguration.getConfiguration("secure.properties");
+        config = CanvasDataConfiguration.getConfiguration("secure.properties");
         DumpInfo.init(config.getDumpInfoDynamoTable());
         TableInfo.init(config.getTableInfoDynamoTable());
         log.info("Using table " + config.getDumpInfoDynamoTable() + " for dump info.");
@@ -126,7 +126,7 @@ public class CanvasDataCli {
   }
 
   public static void bail(final ReturnStatus status, final String[] args,
-      final DataConfiguration config, final String message, final Throwable t) {
+      final CanvasDataConfiguration config, final String message, final Throwable t) {
     log.error("Exiting with error status " + status);
     if (t == null) {
       log.error(message);

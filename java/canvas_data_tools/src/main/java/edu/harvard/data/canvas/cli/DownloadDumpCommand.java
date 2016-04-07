@@ -21,11 +21,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import edu.harvard.data.AwsUtils;
-import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.DumpInfo;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.VerificationException;
+import edu.harvard.data.canvas.CanvasDataConfiguration;
 import edu.harvard.data.canvas.data_api.ApiClient;
 import edu.harvard.data.canvas.data_api.CanvasDataSchema;
 import edu.harvard.data.canvas.data_api.DataDump;
@@ -40,7 +40,7 @@ public class DownloadDumpCommand implements Command {
   private File output;
 
   @Override
-  public ReturnStatus execute(final DataConfiguration config, final ExecutorService exec) throws IOException,
+  public ReturnStatus execute(final CanvasDataConfiguration config, final ExecutorService exec) throws IOException,
   DataConfigurationException, UnexpectedApiResponseException,
   VerificationException, ArgumentError {
     final AwsUtils aws = new AwsUtils();

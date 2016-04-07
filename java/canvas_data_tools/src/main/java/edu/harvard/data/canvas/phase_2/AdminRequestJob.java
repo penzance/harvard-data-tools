@@ -16,18 +16,18 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 import edu.harvard.data.AwsUtils;
-import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopJob;
 import edu.harvard.data.TableFormat;
+import edu.harvard.data.canvas.CanvasDataConfiguration;
 import edu.harvard.data.canvas.bindings.phase1.Phase1Requests;
 import edu.harvard.data.canvas.bindings.phase2.Phase2AdminRequests;
 import edu.harvard.data.canvas.bindings.phase2.Phase2Requests;
 
 public class AdminRequestJob extends HadoopJob {
 
-  public AdminRequestJob(final Configuration hadoopConf, final DataConfiguration dataConfig,
+  public AdminRequestJob(final Configuration hadoopConf, final CanvasDataConfiguration dataConfig,
       final AwsUtils aws, final URI hdfsService, final String inputDir, final String outputDir) {
     super(hadoopConf, aws, hdfsService, inputDir, outputDir);
   }

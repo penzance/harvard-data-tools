@@ -11,13 +11,13 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
+import edu.harvard.data.canvas.CanvasDataConfiguration;
 import edu.harvard.data.canvas.HadoopMultipleJobRunner;
 
 public class Phase1PreVerifier implements Verifier {
@@ -27,9 +27,9 @@ public class Phase1PreVerifier implements Verifier {
   private final URI hdfsService;
   private final Configuration hadoopConfig;
   private final TableFormat format;
-  private final DataConfiguration dataConfig;
+  private final CanvasDataConfiguration dataConfig;
 
-  public Phase1PreVerifier(final DataConfiguration dataConfig, final URI hdfsService,
+  public Phase1PreVerifier(final CanvasDataConfiguration dataConfig, final URI hdfsService,
       final String inputDir, final String outputDir) {
     this.dataConfig = dataConfig;
     this.hdfsService = hdfsService;

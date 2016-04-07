@@ -14,7 +14,6 @@ import org.apache.logging.log4j.Logger;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.VerificationException;
@@ -77,7 +76,7 @@ public class CanvasCodeGenerator {
     spec.setMainIdentifier(IdentifierType.CanvasDataID);
 
     // Get the specified schema version (or fail if that version doesn't exist).
-    final DataConfiguration config = DataConfiguration.getConfiguration("secure.properties");
+    final CanvasDataConfiguration config = CanvasDataConfiguration.getConfiguration("secure.properties");
     final String host = config.getCanvasDataHost();
     final String key = config.getCanvasApiKey();
     final String secret = config.getCanvasApiSecret();

@@ -6,15 +6,15 @@ import java.net.URI;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
+import edu.harvard.data.matterhorn.MatterhornDataConfiguration;
 
 public class Phase1PreVerifier implements Verifier {
   private static final Logger log = LogManager.getLogger();
 
-  public Phase1PreVerifier(final DataConfiguration dataConfig, final URI hdfsService,
+  public Phase1PreVerifier(final MatterhornDataConfiguration dataConfig, final URI hdfsService,
       final String inputDir, final String outputDir) {
   }
 

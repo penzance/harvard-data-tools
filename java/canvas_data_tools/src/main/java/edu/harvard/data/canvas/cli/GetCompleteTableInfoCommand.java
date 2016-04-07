@@ -15,11 +15,11 @@ import org.kohsuke.args4j.Argument;
 import com.amazonaws.services.s3.model.S3ObjectId;
 
 import edu.harvard.data.AwsUtils;
-import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.TableInfo;
 import edu.harvard.data.VerificationException;
+import edu.harvard.data.canvas.CanvasDataConfiguration;
 import edu.harvard.data.canvas.data_api.ApiClient;
 import edu.harvard.data.canvas.data_api.DataArtifact;
 import edu.harvard.data.canvas.data_api.DataDump;
@@ -46,7 +46,7 @@ public class GetCompleteTableInfoCommand implements Command {
   public long latestSequence;
 
   @Override
-  public ReturnStatus execute(final DataConfiguration config, final ExecutorService exec)
+  public ReturnStatus execute(final CanvasDataConfiguration config, final ExecutorService exec)
       throws IOException, UnexpectedApiResponseException, DataConfigurationException,
       VerificationException {
     final ApiClient api = new ApiClient(config.getCanvasDataHost(),

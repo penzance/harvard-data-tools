@@ -27,8 +27,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.TableFormat;
+import edu.harvard.data.canvas.CanvasDataConfiguration;
 import edu.harvard.data.canvas.bindings.phase0.Phase0Requests;
 import edu.harvard.data.identity.IdentityMap;
 import edu.harvard.data.io.FileTableWriter;
@@ -50,9 +50,9 @@ public class VerificationPeople {
   private List<Long> people;
   private final Map<Long, IdentityMap> originalIdentities;
 
-  private final DataConfiguration dataConfig;
+  private final CanvasDataConfiguration dataConfig;
 
-  public VerificationPeople(final DataConfiguration dataConfig, final Configuration hadoopConfig,
+  public VerificationPeople(final CanvasDataConfiguration dataConfig, final Configuration hadoopConfig,
       final URI hdfsService, final String inputDir, final TableFormat format) throws IOException {
     this.dataConfig = dataConfig;
     this.inputDir = inputDir;
@@ -141,7 +141,7 @@ public class VerificationPeople {
     return chosen;
   }
 
-  private void getIdMapsFromRedshift(final DataConfiguration config) throws SQLException {
+  private void getIdMapsFromRedshift(final CanvasDataConfiguration config) throws SQLException {
     final Long start = System.currentTimeMillis();
     final String url = config.getRedshiftUrl();
     String queryString = "SELECT * FROM identity_map WHERE identity_map.canvas_data_id IN (";

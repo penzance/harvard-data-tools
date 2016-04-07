@@ -14,11 +14,11 @@ import org.apache.logging.log4j.Logger;
 import org.kohsuke.args4j.Argument;
 
 import edu.harvard.data.AwsUtils;
-import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.matterhorn.HadoopMultipleJobRunner;
+import edu.harvard.data.matterhorn.MatterhornDataConfiguration;
 import edu.harvard.data.matterhorn.phase_1.Phase1HadoopManager;
 import edu.harvard.data.matterhorn.phase_2.Phase2HadoopManager;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
@@ -37,7 +37,7 @@ public class HadoopCommand implements Command {
   public String outputDir;
 
   @Override
-  public ReturnStatus execute(final DataConfiguration config, final ExecutorService exec)
+  public ReturnStatus execute(final MatterhornDataConfiguration config, final ExecutorService exec)
       throws IOException, UnexpectedApiResponseException, DataConfigurationException,
       VerificationException, ArgumentError {
     log.info("Setting up Canvas Hadoop job");
@@ -66,7 +66,7 @@ public class HadoopCommand implements Command {
     return ReturnStatus.OK;
   }
 
-  private List<Job> setupJobs(final Configuration hadoopConfig, final DataConfiguration config,
+  private List<Job> setupJobs(final Configuration hadoopConfig, final MatterhornDataConfiguration config,
       final URI hdfsService) throws DataConfigurationException, IOException, ArgumentError {
     final AwsUtils aws = new AwsUtils();
     final List<Job> jobs = new ArrayList<Job>();
