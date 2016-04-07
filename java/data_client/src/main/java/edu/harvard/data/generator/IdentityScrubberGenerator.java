@@ -1,7 +1,6 @@
-package edu.harvard.data.canvas;
+package edu.harvard.data.generator;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -11,15 +10,12 @@ import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.DataTable;
 import edu.harvard.data.VerificationException;
-import edu.harvard.data.generator.JavaBindingGenerator;
-import edu.harvard.data.generator.SchemaPhase;
 import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.identity.IdentityMap;
 import edu.harvard.data.identity.IdentitySchemaTransformer;
-import edu.harvard.data.identity.LongIdentityScrubber;
 import edu.harvard.data.schema.DataSchemaTable;
 
-public class CanvasIdentityScrubberGenerator {
+public class IdentityScrubberGenerator {
 
   private static final Logger log = LogManager.getLogger();
 
@@ -32,16 +28,18 @@ public class CanvasIdentityScrubberGenerator {
   private final String phase0ModelClass;
   private final String phase1ModelPackage;
   private final String phase1ModelClass;
+  private final IdentifierType mainIdentifier;
 
-  public CanvasIdentityScrubberGenerator(final DataSchemaTable table,
+  public IdentityScrubberGenerator(final DataSchemaTable table,
       final Map<String, List<IdentifierType>> identities, final String className,
       final String schemaVersion, final String hadoopPackage, final SchemaPhase phase0,
-      final SchemaPhase phase1) {
+      final SchemaPhase phase1, final IdentifierType mainIdentifier) {
     this.table = table;
     this.identities = identities;
     this.className = className;
     this.schemaVersion = schemaVersion;
     this.hadoopPackage = hadoopPackage;
+    this.mainIdentifier = mainIdentifier;
     this.phase0ModelPackage = phase0.getJavaBindingPackage();
     this.phase0ModelClass = JavaBindingGenerator.javaClass(table.getTableName(),
         phase0.getPrefix());
@@ -54,23 +52,24 @@ public class CanvasIdentityScrubberGenerator {
     log.info("Generating Hadoop Scrubber " + className);
     JavaBindingGenerator.writeFileHeader(out, schemaVersion);
 
+    final String idType = mainIdentifier.getType().getSimpleName();
     out.println("package " + hadoopPackage + ";");
     out.println();
-    outputImportStatements(out);
+    outputImportStatements(out, idType);
     out.println();
-    out.println("public class " + className + " extends LongIdentityScrubber {");
+    out.println("public class " + className + " extends " + idType + "IdentityScrubber {");
     out.println();
-    outputGetHadoopKey(out);
+    outputGetHadoopKey(out, idType);
     out.println();
     outputPopulateRecord(out);
     out.println("}");
   }
 
-  private void outputImportStatements(final PrintStream out) {
+  private void outputImportStatements(final PrintStream out, final String idType) {
     out.println("import " + CSVRecord.class.getCanonicalName() + ";");
     out.println("import " + IdentityMap.class.getCanonicalName() + ";");
     out.println("import " + DataTable.class.getCanonicalName() + ";");
-    out.println("import " + LongIdentityScrubber.class.getCanonicalName() + ";");
+    out.println("import edu.harvard.data.identity." + idType + "IdentityScrubber;");
     out.println("import " + phase0ModelPackage + "." + phase0ModelClass + ";");
     out.println("import " + phase1ModelPackage + "." + phase1ModelClass + ";");
   }
@@ -82,7 +81,7 @@ public class CanvasIdentityScrubberGenerator {
         + "(format, csvRecord);");
     out.println(
         "    final " + phase1ModelClass + " phase1 = new " + phase1ModelClass + "(phase0);");
-    for (final String idColumn : getCanvasDataIdColumns()) {
+    for (final String idColumn : IdentityJobGenerator.getMainIdColumns(identities, table, mainIdentifier)) {
       final String getter = JavaBindingGenerator.javaGetter(idColumn);
       final String setter = JavaBindingGenerator
           .javaSetter(idColumn + IdentitySchemaTransformer.RESEARCH_UUID_SUFFIX);
@@ -95,25 +94,12 @@ public class CanvasIdentityScrubberGenerator {
     out.println("  }");
   }
 
-  private void outputGetHadoopKey(final PrintStream out) throws VerificationException {
+  private void outputGetHadoopKey(final PrintStream out, final String idType) throws VerificationException {
+    final String getter = JavaBindingGenerator.javaGetter(mainIdentifier.toString());
     out.println("  @Override");
-    out.println("  protected Long getHadoopKey(final IdentityMap id) {");
-    out.println("    return id.getCanvasDataID();");
+    out.println("  protected " + idType + " getHadoopKey(final IdentityMap id) {");
+    out.println("    return id." + getter + "();");
     out.println("  }");
-  }
-
-  private List<String> getCanvasDataIdColumns() throws VerificationException {
-    final List<String> ids = new ArrayList<String>();
-    for (final String columnName : identities.keySet()) {
-      if (identities.get(columnName).contains(IdentifierType.CanvasDataID)) {
-        ids.add(columnName);
-      }
-    }
-    if (ids.size() == 0) {
-      throw new VerificationException(
-          "Table " + table.getTableName() + " does not have a CanvasDataID field");
-    }
-    return ids;
   }
 
 }

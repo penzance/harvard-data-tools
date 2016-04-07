@@ -23,6 +23,7 @@ import edu.harvard.data.generator.CreateHiveTableGenerator;
 import edu.harvard.data.generator.CreateRedshiftTableGenerator;
 import edu.harvard.data.generator.GenerationSpec;
 import edu.harvard.data.generator.HiveQueryManifestGenerator;
+import edu.harvard.data.generator.IdentityJobGenerator;
 import edu.harvard.data.generator.JavaBindingGenerator;
 import edu.harvard.data.generator.MoveUnmodifiedTableGenerator;
 import edu.harvard.data.generator.S3ToRedshiftLoaderGenerator;
@@ -73,6 +74,8 @@ public class MatterhornCodeGenerator {
     spec.setJavaBindingPackages(PHASE_ZERO_PACKAGE, PHASE_ONE_PACKAGE, PHASE_TWO_PACKAGE,
         PHASE_THREE_PACKAGE);
     spec.setJavaHadoopPackage(IDENTITY_HADOOP_PACKAGE);
+    spec.setHadoopIdentityManagerClass("MatterhornIdentityHadoopManager");
+    spec.setMainIdentifier(IdentifierType.HUID);
 
     // Set the four schema versions in the spec.
     final DataSchema schema0 = readSchema(schemaVersion);
@@ -83,10 +86,8 @@ public class MatterhornCodeGenerator {
     log.info("Generating Java bindings in " + dir);
     new JavaBindingGenerator(spec, "matterhorn_generated_code").generate();
 
-    // log.info("Generating Java identity Hadoop jobs in " + dir);
-    // new MatterhornIdentityJobGenerator(spec,
-    // readIdentities(PHASE_ONE_IDENTIFIERS_JSON))
-    // .generate();
+    log.info("Generating Java identity Hadoop jobs in " + dir);
+    new IdentityJobGenerator(spec, readIdentities(PHASE_ONE_IDENTIFIERS_JSON)).generate();
 
     log.info("Generating Hive table definitions in " + dir);
     new CreateHiveTableGenerator(dir, spec).generate();

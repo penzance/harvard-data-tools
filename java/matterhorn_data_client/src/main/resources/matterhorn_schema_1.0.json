@@ -1,8 +1,8 @@
 { "tables": 
-  { "events": {
+  { "event": {
       "columns" : [ 
         {
-          "name" : "id",
+          "name" : "action_id",
           "description" : "Action identifier.",
           "type" : "bigint"
         },
@@ -30,6 +30,18 @@
           "length" : 255
         },
         {
+          "name" : "proxy1",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "proxy2",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
           "name" : "session_id",
           "description" : "Tracking identifier for a per-user session.",
           "type" : "varchar",
@@ -41,28 +53,28 @@
           "type" : "boolean"
         },
         {
-          "name" : "inpoint",
+          "name" : "action.inpoint",
           "description" : "Timestamp within the video when the event occurred.",
           "type" : "integer"
         },
         {
-          "name" : "outpoint",
-          "description" : "Timestamp within the video when the event occurred.",
-          "type" : "integer"
-        },
-        {
-          "name" : "type",
+          "name" : "action.type",
           "description" : "Type of event.",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "length",
+          "name" : "action.length",
           "description" : "",
           "type" : "integer"
         },
         {
-          "name" : "is_playing",
+          "name" : "action.outpoint",
+          "description" : "Timestamp within the video when the event occurred.",
+          "type" : "integer"
+        },
+        {
+          "name" : "action.is_playing",
           "description" : "True if the video is currently playing, false if not.",
           "type" : "boolean"
         },
@@ -74,7 +86,7 @@
         }
       ]
     },
-    "videos": {
+    "video": {
       "columns" : [ 
         {
           "name" : "id",
@@ -109,7 +121,8 @@
         {
           "name" : "year",
           "description" : "",
-          "type" : "integer"
+          "type" : "varchar",
+          "length" : 255
         },
         {
           "name" : "term",

@@ -30,7 +30,6 @@ public class MatterhornDataCli {
 
   @Argument(handler = SubCommandHandler.class, usage = "Canvas data operation.")
   @SubCommands({
-    @SubCommand(name = "parse", impl = ParseCommand.class),
     @SubCommand(name = "preverify", impl = PreVerifyCommand.class),
     @SubCommand(name = "postverify", impl = PostVerifyCommand.class),
     @SubCommand(name = "hadoop", impl = HadoopCommand.class),

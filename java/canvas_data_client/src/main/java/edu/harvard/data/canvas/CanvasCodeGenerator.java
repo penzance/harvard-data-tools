@@ -23,6 +23,7 @@ import edu.harvard.data.generator.CreateHiveTableGenerator;
 import edu.harvard.data.generator.CreateRedshiftTableGenerator;
 import edu.harvard.data.generator.GenerationSpec;
 import edu.harvard.data.generator.HiveQueryManifestGenerator;
+import edu.harvard.data.generator.IdentityJobGenerator;
 import edu.harvard.data.generator.JavaBindingGenerator;
 import edu.harvard.data.generator.MoveUnmodifiedTableGenerator;
 import edu.harvard.data.generator.S3ToRedshiftLoaderGenerator;
@@ -72,6 +73,8 @@ public class CanvasCodeGenerator {
     spec.setJavaBindingPackages(PHASE_ZERO_PACKAGE, PHASE_ONE_PACKAGE, PHASE_TWO_PACKAGE,
         PHASE_THREE_PACKAGE);
     spec.setJavaHadoopPackage(IDENTITY_HADOOP_PACKAGE);
+    spec.setHadoopIdentityManagerClass("CanvasIdentityHadoopManager");
+    spec.setMainIdentifier(IdentifierType.CanvasDataID);
 
     // Get the specified schema version (or fail if that version doesn't exist).
     final DataConfiguration config = DataConfiguration.getConfiguration("secure.properties");
@@ -89,7 +92,7 @@ public class CanvasCodeGenerator {
     new JavaBindingGenerator(spec, "canvas_generated_code").generate();
 
     log.info("Generating Java identity Hadoop jobs in " + dir);
-    new CanvasIdentityJobGenerator(spec, readIdentities(PHASE_ONE_IDENTIFIERS_JSON)).generate();
+    new IdentityJobGenerator(spec, readIdentities(PHASE_ONE_IDENTIFIERS_JSON)).generate();
 
     log.info("Generating Hive table definitions in " + dir);
     new CreateHiveTableGenerator(dir, spec).generate();

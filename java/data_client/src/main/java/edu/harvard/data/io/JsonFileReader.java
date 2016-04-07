@@ -5,37 +5,31 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Map;
 
 import edu.harvard.data.DataTable;
 import edu.harvard.data.TableFormat;
 
-public class FileTableReader<T extends DataTable> implements TableReader<T> {
+public class JsonFileReader implements Closeable, Iterable<Map<String, ? extends DataTable>> {
 
-  private final Class<T> tableType;
-  private final Iterator<T> iterator;
+  private final JsonFileIterator iterator;
 
-  public FileTableReader(final Class<T> tableType, final TableFormat format, final File file)
+  public JsonFileReader(final TableFormat format, final File file, final JsonDocumentParser parser)
       throws IOException {
-    this.tableType = tableType;
     if (!file.exists() || file.isDirectory()) {
       throw new FileNotFoundException(file.toString());
     }
-    iterator = new DelimitedFileIterator<T>(tableType, format, file);
+    iterator = new JsonFileIterator(format, file, parser);
   }
 
   @Override
-  public Iterator<T> iterator() {
+  public Iterator<Map<String, ? extends DataTable>> iterator() {
     return iterator;
   }
 
   @Override
   public void close() throws IOException {
     ((Closeable) iterator).close();
-  }
-
-  @Override
-  public Class<T> getTableType() {
-    return tableType;
   }
 
 }
