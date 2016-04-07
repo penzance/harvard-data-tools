@@ -7,6 +7,8 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
@@ -14,6 +16,7 @@ import edu.harvard.data.TableFormat;
 
 public abstract class StringIdentityMapper
 extends Mapper<Object, Text, Text, HadoopIdentityKey> {
+  private static final Logger log = LogManager.getLogger();
 
   protected TableFormat format;
 
@@ -39,17 +42,19 @@ extends Mapper<Object, Text, Text, HadoopIdentityKey> {
     for (final CSVRecord csvRecord : parser.getRecords()) {
       readRecord(csvRecord);
       final Map<String, String> hadoopKeys = getHadoopKeys();
+      log.info("Hadoop keys: " + hadoopKeys);
       if (hadoopKeys.size() == 1) {
-        // If there's only one Canvas data ID, we can use this table to figure
+        // If there's only one main ID, we can use this table to figure
         // out other identities for that individual.
         final String hadoopKey = hadoopKeys.entrySet().iterator().next().getValue();
         final IdentityMap id = new IdentityMap();
         final boolean populated = populateIdentityMap(id);
         if (populated) {
+          log.info("Writing identity " + hadoopKey);
           context.write(new Text(hadoopKey), new HadoopIdentityKey(id));
         }
       } else {
-        // If there are multiple Canvas data IDs in the table, it's ambiguous as
+        // If there are multiple main IDs in the table, it's ambiguous as
         // to which individual other identifier fields may refer. We just log
         // the identifier and leave it at that.
         for (final String hadoopKey : hadoopKeys.values()) {

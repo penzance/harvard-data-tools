@@ -22,13 +22,13 @@ import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.io.HdfsTableReader;
 
-public class IdentityReducer extends Reducer<LongWritable, HadoopIdentityKey, Text, NullWritable> {
+public class CanvasIdentityReducer extends Reducer<LongWritable, HadoopIdentityKey, Text, NullWritable> {
   private static final Logger log = LogManager.getLogger();
 
   protected final Map<Long, IdentityMap> identities;
   private TableFormat format;
 
-  public IdentityReducer() {
+  public CanvasIdentityReducer() {
     this.identities = new HashMap<Long, IdentityMap>();
   }
 

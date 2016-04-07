@@ -9,7 +9,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -25,7 +24,7 @@ import org.apache.logging.log4j.Logger;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.identity.HadoopIdentityKey;
-import edu.harvard.data.identity.IdentityReducer;
+import edu.harvard.data.identity.MatterhornIdentityReducer;
 import edu.harvard.data.matterhorn.HadoopMultipleJobRunner;
 import edu.harvard.data.matterhorn.identity.MatterhornIdentityHadoopManager;
 
@@ -56,8 +55,8 @@ public class Phase1HadoopManager {
     job.setJarByClass(Phase1HadoopManager.class);
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(NullWritable.class);
-    job.setReducerClass(IdentityReducer.class);
-    job.setMapOutputKeyClass(LongWritable.class);
+    job.setReducerClass(MatterhornIdentityReducer.class);
+    job.setMapOutputKeyClass(Text.class);
     job.setMapOutputValueClass(HadoopIdentityKey.class);
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
