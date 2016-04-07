@@ -1,6 +1,9 @@
 package edu.harvard.data.schema.extension;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -48,6 +51,17 @@ public class ExtensionSchema implements DataSchema {
   @Override
   public DataSchemaTable getTableByName(final String name) {
     return tables.get(name);
+  }
+
+  @Override
+  public String toString() {
+    String s = "";
+    final List<String> tableNames = new ArrayList<String>(tables.keySet());
+    Collections.sort(tableNames);
+    for (final String t : tableNames) {
+      s += tables.get(t) + "\n";
+    }
+    return s.trim();
   }
 
 }

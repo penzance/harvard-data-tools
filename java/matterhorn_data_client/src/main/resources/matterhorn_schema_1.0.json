@@ -1,0 +1,129 @@
+{ "tables": 
+  { "events": {
+      "columns" : [ 
+        {
+          "name" : "id",
+          "description" : "Action identifier.",
+          "type" : "bigint"
+        },
+        {
+          "name" : "mpid",
+          "description" : "Video identifer. Foreign key relation with videos.id.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "created",
+          "description" : "Timestamp for when this event occurred.",
+          "type" : "datetime"
+        },
+        {
+          "name" : "ip",
+          "description" : "Originating IP address for this event.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "huid",
+          "description" : "Harvard ID of the user who initiated this event, or 'anonymous'.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "session_id",
+          "description" : "Tracking identifier for a per-user session.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "is_live",
+          "description" : "True if the user is watching a live video, false if the video is recorded.",
+          "type" : "boolean"
+        },
+        {
+          "name" : "inpoint",
+          "description" : "Timestamp within the video when the event occurred.",
+          "type" : "integer"
+        },
+        {
+          "name" : "outpoint",
+          "description" : "Timestamp within the video when the event occurred.",
+          "type" : "integer"
+        },
+        {
+          "name" : "type",
+          "description" : "Type of event.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "length",
+          "description" : "",
+          "type" : "integer"
+        },
+        {
+          "name" : "is_playing",
+          "description" : "True if the video is currently playing, false if not.",
+          "type" : "boolean"
+        },
+        {
+          "name" : "useragent",
+          "description" : "Content of the user-agent header from the HTTP request.",
+          "type" : "varchar",
+          "length" : 255
+        }
+      ]
+    },
+    "videos": {
+      "columns" : [ 
+        {
+          "name" : "id",
+          "description" : "Video identifer.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "series",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "course",
+          "description" : "Title of the course in which the video is embedded.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "type",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "title",
+          "description" : "Video title.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "year",
+          "description" : "",
+          "type" : "integer"
+        },
+        {
+          "name" : "term",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "cdn",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        }
+      ]
+    }
+  }
+}

@@ -11,14 +11,15 @@ import org.apache.logging.log4j.Logger;
 public class HiveQueryManifestGenerator {
   private static final Logger log = LogManager.getLogger();
 
-  private final File gitDir;
+  private final File hiveBase;
   private final GenerationSpec schemaVersions;
   private final File dir;
 
-  public HiveQueryManifestGenerator(final File gitDir, final File dir,
+
+  public HiveQueryManifestGenerator(final File dir, final File hiveDir,
       final GenerationSpec schemaVersions) {
-    this.gitDir = gitDir;
     this.dir = dir;
+    this.hiveBase = hiveDir;
     this.schemaVersions = schemaVersions;
   }
 
@@ -26,7 +27,7 @@ public class HiveQueryManifestGenerator {
     for (int i = 1; i <= 3; i++) {
       final String fileBase = "phase_" + i + "_hive";
       final File file = new File(dir, fileBase + ".sh");
-      final File hiveDir = new File(gitDir, "hive/phase_" + i);
+      final File hiveDir = new File(hiveBase, "phase_" + i);
       log.info("Generating hive mainifest for phase " + i + ". file: " + file);
       log.info("Phase " + i + " hive directory: " + hiveDir);
 

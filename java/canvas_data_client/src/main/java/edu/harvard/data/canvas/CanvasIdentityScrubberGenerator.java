@@ -85,7 +85,7 @@ public class CanvasIdentityScrubberGenerator {
     for (final String idColumn : getCanvasDataIdColumns()) {
       final String getter = JavaBindingGenerator.javaGetter(idColumn);
       final String setter = JavaBindingGenerator
-          .javaSetter(idColumn + IdentitySchemaTransformer.RESARCH_UUID_SUFFIX);
+          .javaSetter(idColumn + IdentitySchemaTransformer.RESEARCH_UUID_SUFFIX);
       out.println("    if (phase0." + getter + "() != null) {");
       out.println(
           "      phase1." + setter + "(identities.get(phase0." + getter + "()).getResearchId());");
