@@ -21,13 +21,13 @@ import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.io.HdfsTableReader;
 
-public class MatterhornIdentityReducer extends Reducer<Text, HadoopIdentityKey, Text, NullWritable> {
+public class HuidIdentityReducer extends Reducer<Text, HadoopIdentityKey, Text, NullWritable> {
   private static final Logger log = LogManager.getLogger();
 
   protected final Map<String, IdentityMap> identities;
   private TableFormat format;
 
-  public MatterhornIdentityReducer() {
+  public HuidIdentityReducer() {
     this.identities = new HashMap<String, IdentityMap>();
   }
 
@@ -43,7 +43,6 @@ public class MatterhornIdentityReducer extends Reducer<Text, HadoopIdentityKey, 
       try (HdfsTableReader<IdentityMap> in = new HdfsTableReader<IdentityMap>(IdentityMap.class,
           format, fs, path)) {
         for (final IdentityMap id : in) {
-          log.info("Added HUID " + id.getHUID());
           identities.put(id.getHUID(), id);
         }
       }
@@ -54,15 +53,14 @@ public class MatterhornIdentityReducer extends Reducer<Text, HadoopIdentityKey, 
   @Override
   public void reduce(final Text key, final Iterable<HadoopIdentityKey> values,
       final Context context) throws IOException, InterruptedException {
-    final IdentityMap id = new IdentityMap();
     final String huid = key.toString();
-    id.setHUID(huid);
+    final IdentityMap id;
     if (identities.containsKey(huid)) {
-      log.info("Identities does not contain " + huid);
-      id.setResearchId(identities.get(huid).getResearchId());
+      id = identities.get(huid);
     } else {
-      log.info("Identities contains " + huid);
+      id = new IdentityMap();
       id.setResearchId(UUID.randomUUID().toString());
+      id.setHUID(huid);
     }
     for (final HadoopIdentityKey value : values) {
       final Long canvasId = value.getIdentityMap().getCanvasID();

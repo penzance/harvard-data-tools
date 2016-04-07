@@ -24,7 +24,7 @@ import org.apache.logging.log4j.Logger;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.identity.HadoopIdentityKey;
-import edu.harvard.data.identity.MatterhornIdentityReducer;
+import edu.harvard.data.identity.HuidIdentityReducer;
 import edu.harvard.data.matterhorn.HadoopMultipleJobRunner;
 import edu.harvard.data.matterhorn.identity.MatterhornIdentityHadoopManager;
 
@@ -55,7 +55,7 @@ public class Phase1HadoopManager {
     job.setJarByClass(Phase1HadoopManager.class);
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(NullWritable.class);
-    job.setReducerClass(MatterhornIdentityReducer.class);
+    job.setReducerClass(HuidIdentityReducer.class);
     job.setMapOutputKeyClass(Text.class);
     job.setMapOutputValueClass(HadoopIdentityKey.class);
     job.setInputFormatClass(TextInputFormat.class);
