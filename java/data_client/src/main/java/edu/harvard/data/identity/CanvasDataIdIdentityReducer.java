@@ -22,13 +22,13 @@ import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.io.HdfsTableReader;
 
-public class IdentityReducer extends Reducer<LongWritable, HadoopIdentityKey, Text, NullWritable> {
+public class CanvasDataIdIdentityReducer extends Reducer<LongWritable, HadoopIdentityKey, Text, NullWritable> {
   private static final Logger log = LogManager.getLogger();
 
   protected final Map<Long, IdentityMap> identities;
   private TableFormat format;
 
-  public IdentityReducer() {
+  public CanvasDataIdIdentityReducer() {
     this.identities = new HashMap<Long, IdentityMap>();
   }
 
@@ -54,12 +54,13 @@ public class IdentityReducer extends Reducer<LongWritable, HadoopIdentityKey, Te
   @Override
   public void reduce(final LongWritable key, final Iterable<HadoopIdentityKey> values,
       final Context context) throws IOException, InterruptedException {
-    final IdentityMap id = new IdentityMap();
     final Long canvasDataId = key.get();
-    id.setCanvasDataID(canvasDataId);
+    final IdentityMap id;
     if (identities.containsKey(canvasDataId)) {
-      id.setResearchId(identities.get(canvasDataId).getResearchId());
+      id = identities.get(canvasDataId);
     } else {
+      id = new IdentityMap();
+      id.setCanvasDataID(canvasDataId);
       id.setResearchId(UUID.randomUUID().toString());
     }
     for (final HadoopIdentityKey value : values) {

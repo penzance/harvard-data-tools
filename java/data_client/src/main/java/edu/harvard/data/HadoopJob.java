@@ -76,6 +76,15 @@ public abstract class HadoopJob {
     }
   }
 
+  public static Text convertToText(final DataTable record, final TableFormat format)
+      throws IOException {
+    final StringWriter writer = new StringWriter();
+    try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
+      printer.printRecord(record.getFieldsAsList(format));
+    }
+    return new Text(writer.toString().trim());
+  }
+
   public abstract Job getJob() throws IOException;
 
   public static Text recordToText(final DataTable record, final TableFormat format)

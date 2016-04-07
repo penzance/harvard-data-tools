@@ -214,7 +214,11 @@ public class JavaBindingGenerator {
   }
 
   public static String javaEnum(final DataSchemaColumn column) {
-    return javaClass(column.getName() + "Enum", "");
+    String columnName = column.getName();
+    if (columnName.contains(".")) {
+      columnName = columnName.substring(columnName.lastIndexOf(".") + 1);
+    }
+    return javaClass(columnName + "Enum", "");
   }
 
   // Format a String into the CorrectJavaClassName format.
@@ -232,16 +236,29 @@ public class JavaBindingGenerator {
   // Borrow the javaClass method to easily produce properly-formatted getters
   // and setters.
   public static String javaGetter(final String fieldName) {
-    return javaClass(fieldName, "get");
+    String name = fieldName;
+    if (name.contains(".")) {
+      name = name.substring(name.lastIndexOf(".") + 1);
+    }
+    return javaClass(name, "get");
   }
 
   public static String javaSetter(final String fieldName) {
-    return javaClass(fieldName, "set");
+    String name = fieldName;
+    if (name.contains(".")) {
+      name = name.substring(name.lastIndexOf(".") + 1);
+    }
+    return javaClass(name, "set");
   }
 
   // Format a String into the correctJavaVariableName format.
   public static String javaVariable(final String name) {
-    final String[] parts = name.split("_");
+    String fieldName = name;
+    // Dots are used in the schema to indicate nested JSON values
+    if (fieldName.contains(".")) {
+      fieldName = fieldName.substring(fieldName.lastIndexOf(".") + 1);
+    }
+    final String[] parts = fieldName.split("_");
     String variableName = parts[0].substring(0, 1).toLowerCase() + parts[0].substring(1);
     for (int i = 1; i < parts.length; i++) {
       final String part = parts[i];

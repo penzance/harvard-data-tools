@@ -11,12 +11,11 @@ import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 
 import edu.harvard.data.AwsUtils;
-import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
-import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
+import edu.harvard.data.canvas.CanvasDataConfiguration;
 import edu.harvard.data.canvas.phase_0.Phase0PostVerifier;
 import edu.harvard.data.canvas.phase_1.Phase1PostVerifier;
 import edu.harvard.data.canvas.phase_2.Phase2PostVerifier;
@@ -43,7 +42,7 @@ public class PostVerifyCommand implements Command {
   public String verifyDir;
 
   @Override
-  public ReturnStatus execute(final DataConfiguration config, final ExecutorService exec)
+  public ReturnStatus execute(final CanvasDataConfiguration config, final ExecutorService exec)
       throws IOException, DataConfigurationException, UnexpectedApiResponseException,
       ArgumentError {
     if (!checkArguments()) {
@@ -59,7 +58,7 @@ public class PostVerifyCommand implements Command {
     return ReturnStatus.OK;
   }
 
-  private Verifier getVerifier(final DataConfiguration config, final ExecutorService exec)
+  private Verifier getVerifier(final CanvasDataConfiguration config, final ExecutorService exec)
       throws ArgumentError, DataConfigurationException {
     final URI hdfsService;
     try {
@@ -68,7 +67,6 @@ public class PostVerifyCommand implements Command {
       throw new DataConfigurationException(e);
     }
     final AwsUtils aws = new AwsUtils();
-    final FormatLibrary formats = new FormatLibrary();
     switch (phase) {
     case 0:
       return new Phase0PostVerifier(dumpId, aws, config.getScratchDir(), exec);

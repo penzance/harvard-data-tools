@@ -16,11 +16,11 @@ import org.apache.logging.log4j.Logger;
 import com.amazonaws.services.s3.model.S3ObjectId;
 
 import edu.harvard.data.AwsUtils;
-import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.DumpInfo;
 import edu.harvard.data.TableInfo;
 import edu.harvard.data.VerificationException;
+import edu.harvard.data.canvas.CanvasDataConfiguration;
 import edu.harvard.data.canvas.cli.ArgumentError;
 import edu.harvard.data.canvas.data_api.ApiClient;
 import edu.harvard.data.canvas.data_api.CanvasDataSchema;
@@ -34,10 +34,10 @@ public class DumpManager {
 
   private static final Logger log = LogManager.getLogger();
 
-  private final DataConfiguration config;
+  private final CanvasDataConfiguration config;
   private final AwsUtils aws;
 
-  public DumpManager(final DataConfiguration config, final AwsUtils aws) {
+  public DumpManager(final CanvasDataConfiguration config, final AwsUtils aws) {
     this.config = config;
     this.aws = aws;
   }

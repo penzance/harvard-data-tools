@@ -11,11 +11,11 @@ import edu.harvard.data.schema.extension.ExtensionSchemaColumn;
 
 public class IdentitySchemaTransformer {
 
-  public static final String RESARCH_UUID_SUFFIX = "_research_uuid";
+  public static final String RESEARCH_UUID_SUFFIX = "_research_uuid";
 
   public DataSchema transform(final DataSchema base,
-      final Map<String, Map<String, List<IdentifierType>>> identifiers)
-          throws VerificationException {
+      final Map<String, Map<String, List<IdentifierType>>> identifiers,
+      final IdentifierType mainIdentifier) throws VerificationException {
     final DataSchema schema = base.copy();
     for (final String tableName : identifiers.keySet()) {
       final DataSchemaTable table = schema.getTableByName(tableName);
@@ -31,8 +31,8 @@ public class IdentitySchemaTransformer {
         }
         final DataSchemaColumn oldColumn = table.getColumn(columnName);
         columns.remove(oldColumn);
-        if (identifiers.get(tableName).get(columnName).contains(IdentifierType.CanvasDataID)) {
-          final String ridColumn = columnName + RESARCH_UUID_SUFFIX;
+        if (identifiers.get(tableName).get(columnName).contains(mainIdentifier)) {
+          final String ridColumn = columnName + RESEARCH_UUID_SUFFIX;
           final ExtensionSchemaColumn newColumn = new ExtensionSchemaColumn(ridColumn,
               oldColumn.getDescription()
               + ". Value replaced by a UUID generated for the research data set.",

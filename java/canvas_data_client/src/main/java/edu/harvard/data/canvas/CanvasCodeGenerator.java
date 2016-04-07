@@ -14,7 +14,6 @@ import org.apache.logging.log4j.Logger;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.VerificationException;
@@ -23,6 +22,7 @@ import edu.harvard.data.generator.CreateHiveTableGenerator;
 import edu.harvard.data.generator.CreateRedshiftTableGenerator;
 import edu.harvard.data.generator.GenerationSpec;
 import edu.harvard.data.generator.HiveQueryManifestGenerator;
+import edu.harvard.data.generator.IdentityJobGenerator;
 import edu.harvard.data.generator.JavaBindingGenerator;
 import edu.harvard.data.generator.MoveUnmodifiedTableGenerator;
 import edu.harvard.data.generator.S3ToRedshiftLoaderGenerator;
@@ -49,9 +49,9 @@ public class CanvasCodeGenerator {
   private static final String PHASE_THREE_PACKAGE = "edu.harvard.data.canvas.bindings.phase3";
   private static final String IDENTITY_HADOOP_PACKAGE = "edu.harvard.data.canvas.identity";
 
-  public static final String PHASE_ONE_IDENTIFIERS_JSON = "phase1_identifiers.json";
-  public static final String PHASE_TWO_ADDITIONS_JSON = "phase2_schema_additions.json";
-  public static final String PHASE_THREE_ADDITIONS_JSON = "phase3_schema_additions.json";
+  public static final String PHASE_ONE_IDENTIFIERS_JSON = "canvas/phase1_identifiers.json";
+  public static final String PHASE_TWO_ADDITIONS_JSON = "canvas/phase2_schema_additions.json";
+  public static final String PHASE_THREE_ADDITIONS_JSON = "canvas/phase3_schema_additions.json";
 
   public static void main(final String[] args) throws IOException, DataConfigurationException,
   UnexpectedApiResponseException, SQLException, VerificationException {
@@ -73,9 +73,11 @@ public class CanvasCodeGenerator {
     spec.setJavaBindingPackages(PHASE_ZERO_PACKAGE, PHASE_ONE_PACKAGE, PHASE_TWO_PACKAGE,
         PHASE_THREE_PACKAGE);
     spec.setJavaHadoopPackage(IDENTITY_HADOOP_PACKAGE);
+    spec.setHadoopIdentityManagerClass("CanvasIdentityHadoopManager");
+    spec.setMainIdentifier(IdentifierType.CanvasDataID);
 
     // Get the specified schema version (or fail if that version doesn't exist).
-    final DataConfiguration config = DataConfiguration.getConfiguration("secure.properties");
+    final CanvasDataConfiguration config = CanvasDataConfiguration.getConfiguration("secure.properties");
     final String host = config.getCanvasDataHost();
     final String key = config.getCanvasApiKey();
     final String secret = config.getCanvasApiSecret();
@@ -90,14 +92,13 @@ public class CanvasCodeGenerator {
     new JavaBindingGenerator(spec, "canvas_generated_code").generate();
 
     log.info("Generating Java identity Hadoop jobs in " + dir);
-    new CanvasIdentityJobGenerator(spec, readIdentities(PHASE_ONE_IDENTIFIERS_JSON))
-    .generate();
+    new IdentityJobGenerator(spec, readIdentities(PHASE_ONE_IDENTIFIERS_JSON)).generate();
 
     log.info("Generating Hive table definitions in " + dir);
     new CreateHiveTableGenerator(dir, spec).generate();
 
     log.info("Generating Hive query manifests in " + dir);
-    new HiveQueryManifestGenerator(gitDir, dir, spec).generate();
+    new HiveQueryManifestGenerator(new File(gitDir, "hive/canvas"), dir, spec).generate();
 
     log.info("Generating Redshift table definitions in " + dir);
     new CreateRedshiftTableGenerator(dir, spec).generate();
@@ -114,7 +115,8 @@ public class CanvasCodeGenerator {
       throws VerificationException, IOException {
     // Transform the schema to remove identifers
     final IdentitySchemaTransformer idTrans = new IdentitySchemaTransformer();
-    final DataSchema schema1 = idTrans.transform(base, readIdentities(PHASE_ONE_IDENTIFIERS_JSON));
+    final DataSchema schema1 = idTrans.transform(base, readIdentities(PHASE_ONE_IDENTIFIERS_JSON),
+        IdentifierType.CanvasDataID);
 
     // Transform the schema using the additions specified in json resources.
     final ExtensionSchema phase2 = readExtensionSchema(PHASE_TWO_ADDITIONS_JSON);
@@ -138,7 +140,8 @@ public class CanvasCodeGenerator {
     final ObjectMapper jsonMapper = new ObjectMapper();
     jsonMapper.setDateFormat(FormatLibrary.JSON_DATE_FORMAT);
     final ClassLoader classLoader = CanvasCodeGenerator.class.getClassLoader();
-    final TypeReference<Map<String, Map<String, List<IdentifierType>>>> identiferTypeRef = new TypeReference<Map<String, Map<String, List<IdentifierType>>>>() {
+    final TypeReference<Map<String, Map<String, List<IdentifierType>>>> identiferTypeRef =
+        new TypeReference<Map<String, Map<String, List<IdentifierType>>>>() {
     };
     try (final InputStream in = classLoader.getResourceAsStream(jsonResource)) {
       return jsonMapper.readValue(in, identiferTypeRef);

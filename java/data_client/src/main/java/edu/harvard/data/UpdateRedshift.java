@@ -21,7 +21,7 @@ public class UpdateRedshift {
     this.expectedSchema = expectedSchema;
   }
 
-  public void update(final AwsUtils aws, final DataConfiguration config) throws SQLException {
+  public void update(final AwsUtils aws, final RedshiftConfiguration config) throws SQLException {
     log.info("Connecting to Redshift to retrieve schema");
     final RedshiftSchema rs = aws.getRedshiftSchema(config);
     final SchemaComparison diff = new SchemaComparison(expectedSchema, rs);

@@ -5,7 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.csv.CSVRecord;
 
@@ -125,7 +127,8 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     return fields;
   }
 
-  public static List<String> getFieldNames() {
+  @Override
+  public List<String> getFieldNames() {
     final List<String> fields = new ArrayList<String>();
     fields.add("research_id");
     fields.add("huid");
@@ -190,5 +193,16 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
       }
     }
     return statement;
+  }
+
+  @Override
+  public Map<String, Object> getFieldsAsMap() {
+    final Map<String, Object> fields = new HashMap<String, Object>();
+    fields.put("research_id", researchId);
+    fields.put("huid", huid);
+    fields.put("xid", xid);
+    fields.put("canvas_id", canvasId);
+    fields.put("canvas_data_id", canvasDataId);
+    return fields;
   }
 }

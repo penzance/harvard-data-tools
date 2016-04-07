@@ -1,4 +1,4 @@
-package edu.harvard.data.canvas;
+package edu.harvard.data.generator;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.apache.hadoop.mapreduce.Mapper;
 
-public class CanvasIdentityManagerGenerator {
+public class IdentityManagerGenerator {
 
   private final String hadoopPackage;
   private final String className;
@@ -14,7 +14,7 @@ public class CanvasIdentityManagerGenerator {
   private final List<String> mapperNames;
   private final List<String> scrubberNames;
 
-  public CanvasIdentityManagerGenerator(final String hadoopPackage, final String className, final List<String> tableNames,
+  public IdentityManagerGenerator(final String hadoopPackage, final String className, final List<String> tableNames,
       final List<String> mapperNames, final List<String> scrubberNames) {
     this.hadoopPackage = hadoopPackage;
     this.className = className;
