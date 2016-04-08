@@ -9,6 +9,7 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
@@ -33,7 +34,10 @@ class EventTypeJob extends HadoopJob {
     job.setMapperClass(EventTypeMapper.class);
     job.setMapOutputKeyClass(Text.class);
     job.setMapOutputValueClass(NullWritable.class);
-    job.setNumReduceTasks(0);
+
+    job.setReducerClass(SessionReducer.class);
+    job.setOutputKeyClass(Text.class);
+    job.setOutputValueClass(NullWritable.class);
     job.setOutputFormatClass(TextOutputFormat.class);
     setPaths(job, aws, hdfsService, inputDir + "/event", outputDir + "/event_types");
     return job;
@@ -56,5 +60,14 @@ class EventTypeMapper extends Mapper<Object, Text, Text, NullWritable> {
     final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
     final Phase1Event event = new Phase1Event(format, parser.getRecords().get(0));
     context.write(new Text(event.getType()), NullWritable.get());
+  }
+}
+
+class EventTypeReducer extends Reducer<Text, Text, Text, NullWritable> {
+
+  @Override
+  public void reduce(final Text key, final Iterable<Text> values, final Context context)
+      throws IOException, InterruptedException {
+    context.write(key, NullWritable.get());
   }
 }
