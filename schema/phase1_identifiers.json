@@ -56,7 +56,8 @@
 		"user_id": ["CanvasDataID"]
 	},
 	"requests": {
-		"user_id": ["CanvasDataID"]
+		"user_id": ["CanvasDataID"],
+		"real_user_id": ["CanvasDataID"]
 	},
 	"submission_comment_dim": {
 		"recipient_id": ["CanvasDataID"],
@@ -71,7 +72,8 @@
 		"user_id": ["CanvasDataID"]
 	},
 	"submission_dim": {
-		"user_id": ["CanvasDataID"]
+		"user_id": ["CanvasDataID"],
+		"grader_id": ["CanvasDataID"]
 	},
 	"submission_fact": {
 		"user_id": ["CanvasDataID"],
@@ -80,6 +82,8 @@
 	"user_dim": {
 		"id": ["CanvasDataID"],
 		"canvas_id": ["CanvasID"],
+		"gender": ["Other"],
+		"birthdate": ["Other"],
 		"name": ["Other"],
 		"sortable_name": ["Other"]
 	},
