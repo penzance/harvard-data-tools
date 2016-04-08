@@ -35,7 +35,7 @@ class EventTypeJob extends HadoopJob {
     job.setMapOutputKeyClass(Text.class);
     job.setMapOutputValueClass(NullWritable.class);
 
-    job.setReducerClass(SessionReducer.class);
+    job.setReducerClass(EventTypeReducer.class);
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(NullWritable.class);
     job.setOutputFormatClass(TextOutputFormat.class);
