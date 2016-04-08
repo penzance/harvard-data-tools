@@ -921,37 +921,6 @@
                                 },
                                 "\" --message file:///root/the_result.json --subject \"Download and verify succeeded\" --region us-east-1\n",
                                 "\n",
-                                "# Setup the EMR bootstrap script before launching the Data Pipeline\n",
-                                "sed -i \"s@<canvas_data_schema_version>@",
-                                {
-                                    "Ref": "DownloadVerifyCanvasDataSchemaVersion"
-                                },
-                                "@g\" /root/harvard-data-tools/emr/bootstrap.sh\n",
-                                "\n",
-                                "sed -i \"s@<code_s3_bucket>@",
-                                {
-                                    "Ref": "CodeS3BucketParameter"
-                                },
-                                "@g\" /root/harvard-data-tools/emr/bootstrap.sh\n",
-                                "\n",
-                                "sed -i \"s@<new_code_s3_bucket>@",
-                                {
-                                    "Ref": "NewCodeS3Bucket"
-                                },
-                                "@g\" /root/harvard-data-tools/emr/bootstrap.sh\n",
-                                "\n",
-                                "sed -i \"s@<my_branch>@",
-                                {
-                                    "Ref": "HDTGitTagOrBranchParameter"
-                                },
-                                "@g\" /root/harvard-data-tools/emr/bootstrap.sh\n",
-                                "\n",
-                                "aws s3 cp /root/harvard-data-tools/emr/bootstrap.sh s3://",
-                                {
-                                    "Ref": "NewCodeS3Bucket"
-                                },
-                                "/bootstrap$DATASETNUM.sh\n",
-                                "\n",
                                 "# Invoke the Lambda function to kickoff the Data Pipeline\n",
                                 "aws lambda invoke --function-name ",
                                 {
@@ -1785,10 +1754,21 @@
                                         "",
                                         [
                                             "s3://",
-                                            {
-                                                "Ref": "NewCodeS3Bucket"
-                                            },
-                                            "/bootstrapdataset-id-placeholder.sh"
+											{
+												"Ref": "CodeS3BucketParameter"
+											},
+                                            "/bootstrap.sh,",
+											{
+												"Ref": "DownloadVerifyCanvasDataSchemaVersion"
+											},
+											",",
+											{
+												"Ref": "CodeS3BucketParameter"
+											},
+											",",
+											{
+												"Ref": "HDTGitTagOrBranchParameter"
+											}
                                         ]
                                     ]
                                 }
@@ -5178,143 +5158,6 @@
                         ]
                     },
                     {
-                        "Id": "DeleteBootstrapScript",
-                        "Name": "DeleteBootstrapScript",
-                        "Fields": [
-                            {
-                                "Key": "type",
-                                "StringValue": "ShellCommandActivity"
-                            },
-                            {
-                                "Key": "command",
-                                "StringValue": {
-                                    "Fn::Join": [
-                                        "",
-                                        [
-                                            "aws s3 rm s3://",
-                                            {
-                                                "Ref": "NewCodeS3Bucket"
-                                            },
-                                            "/bootstrapdataset-id-placeholder.sh"
-                                        ]
-                                    ]
-                                }
-                            },
-                            {
-                                "Key": "schedule",
-                                "RefValue": "DefaultSchedule"
-                            },
-                            {
-                                "Key": "runsOn",
-                                "RefValue": "EmrCluster"
-                            },
-                            {
-                                "Key": "retryDelay",
-                                "StringValue": "2 Minutes"
-                            },
-                            {
-                                "Key": "onSuccess",
-                                "RefValue": "SendDeleteBootstrapScriptSuccessSNSMessage"
-                            },
-                            {
-                                "Key": "onFail",
-                                "RefValue": "SendDeleteBootstrapScriptFailureSNSMessage"
-                            },
-                            {
-                                "Key": "dependsOn",
-                                "RefValue": "S3toRedshiftLoad"
-                            }
-                        ]
-                    },
-                    {
-                        "Id": "SendDeleteBootstrapScriptSuccessSNSMessage",
-                        "Name": "SendDeleteBootstrapScriptSuccessSNSMessage",
-                        "Fields": [
-                            {
-                                "Key": "type",
-                                "StringValue": "SnsAlarm"
-                            },
-                            {
-                                "Key": "role",
-                                "StringValue": {
-                                    "Ref": "DataPipelineRole"
-                                }
-                            },
-                            {
-                                "Key": "subject",
-                                "StringValue": {
-                                    "Fn::Join": [
-                                        "",
-                                        [
-                                            {
-                                                "Ref": "AWS::StackName"
-                                            },
-                                            "-",
-                                            {
-                                                "Ref": "EnvironmentParameter"
-                                            },
-                                            " Dataset dataset-id-placeholder - Delete bootstrap script succeeded"
-                                        ]
-                                    ]
-                                }
-                            },
-                            {
-                                "Key": "message",
-                                "StringValue": "Yay!"
-                            },
-                            {
-                                "Key": "topicArn",
-                                "StringValue": {
-                                    "Ref": "SuccessSNS"
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "Id": "SendDeleteBootstrapScriptFailureSNSMessage",
-                        "Name": "SendDeleteBootstrapScriptFailureSNSMessage",
-                        "Fields": [
-                            {
-                                "Key": "type",
-                                "StringValue": "SnsAlarm"
-                            },
-                            {
-                                "Key": "role",
-                                "StringValue": {
-                                    "Ref": "DataPipelineRole"
-                                }
-                            },
-                            {
-                                "Key": "subject",
-                                "StringValue": {
-                                    "Fn::Join": [
-                                        "",
-                                        [
-                                            {
-                                                "Ref": "AWS::StackName"
-                                            },
-                                            "-",
-                                            {
-                                                "Ref": "EnvironmentParameter"
-                                            },
-                                            " Datatset dataset-id-placeholder - Delete bootstrap script failed"
-                                        ]
-                                    ]
-                                }
-                            },
-                            {
-                                "Key": "message",
-                                "StringValue": "Yay!"
-                            },
-                            {
-                                "Key": "topicArn",
-                                "StringValue": {
-                                    "Ref": "FailureSNS"
-                                }
-                            }
-                        ]
-                    },
-                    {
                         "Id": "DeleteIntermediateS3Data",
                         "Name": "DeleteIntermediateS3Data",
                         "Fields": [
@@ -5478,10 +5321,6 @@
                             {
                                 "Key": "dependsOn",
                                 "RefValue": "DeleteS3toRedshiftLoadScript"
-                            },
-                            {
-                                "Key": "dependsOn",
-                                "RefValue": "DeleteBootstrapScript"
                             },
                             {
                                 "Key": "dependsOn",

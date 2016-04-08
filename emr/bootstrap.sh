@@ -16,7 +16,7 @@ export HARVARD_DATA_GENERATED_OUTPUT=/home/hadoop
 
 # - CANVAS_DATA_SCHEMA_VERSION: The version of the Canvas Data schema for which
 #     files will be generated. Format as a string, e.g. 1.2.0
-export CANVAS_DATA_SCHEMA_VERSION=<canvas_data_schema_version>
+export CANVAS_DATA_SCHEMA_VERSION=$1
 
 # - HDFS_PHASE_n_DIR: HDFS directories for data in each phase n
 export HDFS_PHASE_0_DIR=hdfs:///phase_0
@@ -27,14 +27,14 @@ export HDFS_PHASE_2_DIR=hdfs:///phase_2
 ssh-keyscan github.com >> /home/hadoop/.ssh/known_hosts
 
 # copy extra keys from S3 to the local FS, add to ~/.ssh/authorized_keys
-aws s3 cp s3://<code_s3_bucket>/extra_keys /home/hadoop/.
+aws s3 cp s3://$2/extra_keys /home/hadoop/.
 cat /home/hadoop/extra_keys >> ~/.ssh/authorized_keys
 
 # install jdk and git
 sudo yum install -y java-devel git-core
 
 # clone our repo
-git clone -b <my_branch> https://github.com/penzance/harvard-data-tools.git /home/hadoop/harvard-data-tools
+git clone -b $3 https://github.com/penzance/harvard-data-tools.git /home/hadoop/harvard-data-tools
 
 #Install maven via instructions at https://gist.github.com/sebsto/19b99f1fa1f32cae5d00
 sudo wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
@@ -42,7 +42,7 @@ sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
 sudo yum install -y apache-maven
 
 # copy DownloadVerifySecureProperties from S3 to the local FS
-aws s3 cp s3://<code_s3_bucket>/secure.properties /home/hadoop/.
+aws s3 cp s3://$2/secure.properties /home/hadoop/.
 
 # generate the tools
 python /home/hadoop/harvard-data-tools/python/canvas_generate_tools.py
