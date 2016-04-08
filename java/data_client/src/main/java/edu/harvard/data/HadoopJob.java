@@ -1,14 +1,17 @@
 package edu.harvard.data;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -71,6 +74,15 @@ public abstract class HadoopJob {
       job.addCacheFile(URI.create(path.toString()));
       log.debug("Adding cache file: " + path.toString());
     }
+  }
+
+  public static Text convertToText(final DataTable record, final TableFormat format)
+      throws IOException {
+    final StringWriter writer = new StringWriter();
+    try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
+      printer.printRecord(record.getFieldsAsList(format));
+    }
+    return new Text(writer.toString().trim());
   }
 
   public abstract Job getJob() throws IOException;

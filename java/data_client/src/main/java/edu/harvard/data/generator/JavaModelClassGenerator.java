@@ -64,6 +64,7 @@ public class JavaModelClassGenerator {
     out.println();
     outputEnumTypes(out);
     outputFields(out);
+    outputDefaultConstructor(out);
     outputCsvConstructor(out);
     outputMapConstructor(out);
     outputPreviousClassConstructor(out);
@@ -159,6 +160,12 @@ public class JavaModelClassGenerator {
       final String variableName = JavaBindingGenerator.javaVariable(column.getName());
       out.println("  private " + typeName + " " + variableName + ";");
     }
+    out.println();
+  }
+
+  // Generate a no-argument constructor.
+  private void outputDefaultConstructor(final PrintStream out) {
+    out.println("  public " + className + "() {}");
     out.println();
   }
 
@@ -408,16 +415,6 @@ public class JavaModelClassGenerator {
   private boolean hasDateColumn(final DataSchemaTable table) {
     for (final DataSchemaColumn c : table.getColumns()) {
       if (isDate(c)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  // Checks the whole table for any column that is of type Enum
-  private boolean hasEnumColumn(final DataSchemaTable table) {
-    for (final DataSchemaColumn c : table.getColumns()) {
-      if (c.getType() == DataSchemaType.Enum) {
         return true;
       }
     }

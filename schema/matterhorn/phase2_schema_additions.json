@@ -1,1 +1,23 @@
-{}
+{ "tables": { 
+  	"video": {
+        "owner": "java"
+    },
+    
+    "session": {
+        "owner": "java",
+        "columns" : [ 
+            {
+                "name" : "session_id",
+                "description" : "",
+                "type" : "varchar",
+                "length" : 255
+            },
+            {
+                "name" : "duration",
+                "description" : "Length of the session, in milliseconds.",
+                "type" : "bigint"
+            }
+        ]
+        }
+    }
+}

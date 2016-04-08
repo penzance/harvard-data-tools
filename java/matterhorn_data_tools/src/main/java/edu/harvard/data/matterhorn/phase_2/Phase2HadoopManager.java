@@ -19,6 +19,7 @@ public class Phase2HadoopManager {
       final String outputDir) throws DataConfigurationException, IOException {
     hadoopConfig.set("format", Format.DecompressedCanvasDataFlatFiles.toString());
     final List<Job> jobs = new ArrayList<Job>();
+    jobs.add(new VideoJob(hadoopConfig, aws, hdfsService, inputDir, outputDir).getJob());
     return jobs;
   }
 
