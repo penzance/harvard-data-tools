@@ -876,44 +876,6 @@
                                 "  exit\n",
                                 "fi\n",
                                 "\n",
-                                "# Create a SQLActivity script for the upcoming Data Pipeline that is customized for this data set\n",
-                                "# NOTE: It would have been preferrable to have a generic script which accepts scriptArguments,\n",
-                                "#       but after much troubleshooting, that appeared to be impossible, so this approach was created.\n",
-                                "\n",
-                                "# Credit for the following grep magic goes to http://stackoverflow.com/a/20488535\n",
-                                "# Get the path to the data files in the intermediate S3 bucket, assign to env variable\n",
-                                "DATASETPATH=$(grep -Po '(?<=\"AWS_KEY\" : \")[^\"]*' /root/the_result.json)\n",
-                                "# Get the data set number, assign to env variable\n",
-                                "DATASETNUM=$(grep -Po '(?<=\"DUMP_SEQUENCE\" : \")[^\"]*' /root/the_result.json)\n",
-                                "\n",
-                                "# Replace <intermediates3bucketandpath> placeholder with real intermediate bucket name and path\n",
-                                "sed -i \"s@<intermediates3bucketandpath>@s3://",
-                                {
-                                    "Ref": "IntermediateS3Bucket"
-                                },
-                                "/$DATASETPATH@g\" /root/s3_to_redshift_loader.sql\n",
-                                "\n",
-                                "# Replace <awskeyandsecret> placeholder with real creds\n",
-                                "sed -i \"s@<awskeyandsecret>@aws_access_key_id=",
-                                {
-                                    "Ref": "RedshiftOperationsAccessKey"
-                                },
-                                ";aws_secret_access_key=",
-                                {
-                                    "Fn::GetAtt": [
-                                        "RedshiftOperationsAccessKey",
-                                        "SecretAccessKey"
-                                    ]
-                                },
-                                "@g\" /root/s3_to_redshift_loader.sql\n",
-                                "\n",
-                                "# Copy modified file to code S3 bucket, name it with data set number.\n",
-                                "aws s3 cp /root/s3_to_redshift_loader.sql s3://",
-                                {
-                                    "Ref": "NewCodeS3Bucket"
-                                },
-                                "/$DATASETNUM.sql\n",
-                                "\n",
                                 "# Send an email that we completed download and verify\n",
                                 "aws sns publish --topic-arn \"",
                                 {
@@ -1768,7 +1730,26 @@
 											",",
 											{
 												"Ref": "HDTGitTagOrBranchParameter"
-											}
+											},
+											",",
+											{
+												"Ref": "IntermediateS3Bucket"
+											},
+											",",
+											{
+												"Ref": "RedshiftOperationsAccessKey"
+											},
+											",",
+											{
+												"Fn::GetAtt": [
+													"RedshiftOperationsAccessKey",
+													"SecretAccessKey"
+												]
+											},
+											",",
+                                            {
+                                                "Ref": "NewCodeS3Bucket"
+                                            }
                                         ]
                                     ]
                                 }

@@ -123,6 +123,10 @@ exports.handler = function(event, context) {
                                                     value: emrNames
                                                     },
                                                     {
+                                                    key: 'full-dump-path',
+                                                    value: fullObjectKey
+                                                    },
+                                                    {
                                                     key: 'dump-id',
                                                     value: fileKey
                                                 }, ]
