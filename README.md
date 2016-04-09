@@ -21,7 +21,7 @@ Please note this CloudFormation spins up a number of resources, including IAM re
   * `cloudformation/environment.json`
   * `emr/bootstrap.sh`
   * `lambda/download-verify/download-verify-lambda.zip` (NOTE: This file is the result of running `zip -r download-verify-lambda.zip .` inside the `lambda/download-verify` directory.)
-  * `lambda/data-pipeline-init/data-pipeline-init-lambda.zip` (NOTE: This file is the result of running `zip -r data-pipeline-init-lambda-code.zip .` inside the `lambda/data-pipeline-init` directory.)
+  * `lambda/data-pipeline-init/data-pipeline-init-lambda.zip` (NOTE: This file is the result of running `zip -r data-pipeline-init-lambda.zip .` inside the `lambda/data-pipeline-init` directory.)
   * `secure.properties` based on `java/aws_data_tools/src/main/resources/secure.properties.example`
   * `extra_keys`, a custom file containing SSH keys which should be installed on the EMR cluster, most useful for debugging
 3. Create a customized CloudFormation parameters file by doing the following:
