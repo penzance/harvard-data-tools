@@ -968,7 +968,7 @@
                         "Arn"
                     ]
                 },
-                "Runtime": "nodejs",
+                "Runtime": "nodejs4.3",
                 "Timeout": 10
             }
         },
@@ -1005,7 +1005,7 @@
                         "Arn"
                     ]
                 },
-                "Runtime": "nodejs",
+                "Runtime": "nodejs4.3",
                 "Timeout": 60
             }
         },
