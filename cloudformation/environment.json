@@ -52,11 +52,6 @@
             "Description": "Email address to receive failure messages",
             "Default": "failure@example.com"
         },
-        "FailureSNSEmailParameter": {
-            "Type": "String",
-            "Description": "Email address to receive failure messages",
-            "Default": "failure@example.com"
-        },
         "MonitoringSNSEmailParameter": {
             "Type": "String",
             "Description": "Email address to receive monitoring messages",
@@ -182,6 +177,11 @@
             "Description": "Instance type for the Master EMR Instance",
             "Default": "m3.xlarge"
         },
+        "EMRMasterInstanceBidPriceParameter": {
+            "Type": "String",
+            "Description": "Maximum dollar amount for a Spot Instance bid for the Master EMR Instance",
+            "Default": "0.00"
+        },
         "EMRCoreInstanceTypeParameter": {
             "Type": "String",
             "Description": "Instance type for Core EMR Instance(s)",
@@ -191,6 +191,11 @@
             "Type": "String",
             "Description": "Number of Core EMR Instances",
             "Default": "1"
+        },
+        "EMRCoreInstanceBidPriceParameter": {
+            "Type": "String",
+            "Description": "Maximum dollar amount for a Spot Instance bid for Core EMR Instance(s)",
+            "Default": "0.00"
         },
         "EMRTaskInstanceTypeParameter": {
             "Type": "String",
@@ -202,10 +207,15 @@
             "Description": "Number of Task EMR Instances",
             "Default": "1"
         },
+        "EMRTaskInstanceBidPriceParameter": {
+            "Type": "String",
+            "Description": "Maximum dollar amount for a Spot Instance bid for Task EMR Instance(s)",
+            "Default": "0.00"
+        },
         "EMRReleaseLabelParameter": {
             "Type": "String",
             "Description": "EMR release label to be used",
-            "Default": "emr-4.3.0"
+            "Default": "emr-4.5.0"
         }
     },
     "Mappings": {},
@@ -651,7 +661,7 @@
                 ]
             }
         },
-        "S3toRedshiftLoadUser": {
+        "RedshiftOperationsUser": {
             "Type": "AWS::IAM::User",
             "Properties": {
                 "Policies": [
@@ -705,6 +715,39 @@
                                             ]
                                         }
                                     ]
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:Get*",
+                                        "s3:List*",
+                                        "s3:Put*"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    "arn:aws:s3:::",
+                                                    {
+                                                        "Ref": "IncomingS3Bucket"
+                                                    }
+                                                ]
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    "arn:aws:s3:::",
+                                                    {
+                                                        "Ref": "IncomingS3Bucket"
+                                                    },
+                                                    "/*"
+                                                ]
+                                            ]
+                                        }
+                                    ]
                                 }
                             ]
                         }
@@ -712,12 +755,12 @@
                 ]
             }
         },
-        "S3toRedshiftLoadAccessKey": {
+        "RedshiftOperationsAccessKey": {
             "Type": "AWS::IAM::AccessKey",
             "Properties": {
                 "Status": "Active",
                 "UserName": {
-                    "Ref": "S3toRedshiftLoadUser"
+                    "Ref": "RedshiftOperationsUser"
                 }
             }
         },
@@ -777,7 +820,11 @@
                                 "yum install -y java-devel git-core\n",
                                 "\n",
                                 "# clone our repo\n",
-                                "git clone -b master https://github.com/penzance/harvard-data-tools.git /root/harvard-data-tools\n",
+                                "git clone -b ",
+                                {
+                                    "Ref": "HDTGitTagOrBranchParameter"
+                                },
+                                " https://github.com/penzance/harvard-data-tools.git /root/harvard-data-tools\n",
                                 "\n",
                                 "# setup CloudWatch logging\n",
                                 "yum install -y awslogs\n",
@@ -805,6 +852,13 @@
                                 "\n",
                                 "# setup some environment variables\n",
                                 "export CANVAS_DATA_RESULT_FILE=/root/the_result.json\n",
+                                "\n",
+                                "export CANVAS_DATA_THREAD_COUNT=32\n",
+                                "\n",
+                                "export CANVAS_DATA_THREAD_COUNT=32\n",
+                                "\n",
+                                "# TO DO: Implement a good way to parameterize this\n",
+                                "#export CANVAS_DATA_DUMP_ID=\n",
                                 "\n",
                                 "# Run the Python/JAR download and verify scripts\n",
                                 "python /root/harvard-data-tools/python/canvas_download_and_verify.py > /var/log/download-and-verify-output.log\n",
@@ -842,12 +896,12 @@
                                 "# Replace <awskeyandsecret> placeholder with real creds\n",
                                 "sed -i \"s@<awskeyandsecret>@aws_access_key_id=",
                                 {
-                                    "Ref": "S3toRedshiftLoadAccessKey"
+                                    "Ref": "RedshiftOperationsAccessKey"
                                 },
                                 ";aws_secret_access_key=",
                                 {
                                     "Fn::GetAtt": [
-                                        "S3toRedshiftLoadAccessKey",
+                                        "RedshiftOperationsAccessKey",
                                         "SecretAccessKey"
                                     ]
                                 },
@@ -886,18 +940,12 @@
                                 },
                                 "@g\" /root/harvard-data-tools/emr/bootstrap.sh\n",
                                 "\n",
-
-
                                 "sed -i \"s@<my_branch>@",
                                 {
                                     "Ref": "HDTGitTagOrBranchParameter"
                                 },
                                 "@g\" /root/harvard-data-tools/emr/bootstrap.sh\n",
                                 "\n",
-
-
-
-
                                 "aws s3 cp /root/harvard-data-tools/emr/bootstrap.sh s3://",
                                 {
                                     "Ref": "NewCodeS3Bucket"
@@ -905,7 +953,7 @@
                                 "/bootstrap$DATASETNUM.sh\n",
                                 "\n",
                                 "# Invoke the Lambda function to kickoff the Data Pipeline\n",
-                                "#aws lambda invoke --function-name ",
+                                "aws lambda invoke --function-name ",
                                 {
                                     "Ref": "DataPipelineInitLambda"
                                 },
@@ -1027,7 +1075,7 @@
                     ]
                 },
                 "Runtime": "nodejs",
-                "Timeout": 15
+                "Timeout": 60
             }
         },
         "DataPipelineInitLambdaInvokePermission": {
@@ -1416,42 +1464,58 @@
                 ]
             }
         },
-		"RedshiftDiskSpaceAlarm" : {
-		  "Type" : "AWS::CloudWatch::Alarm",
-		  "Properties" : {
-			"AlarmDescription" : "Alarm for Redshift disk space",
-			"AlarmActions" : [ { "Ref" : "MonitoringSNS" } ],
-			"MetricName" : "PercentageDiskSpaceUsed",
-			"Namespace" : "AWS/Redshift",
-			"Statistic" : "Average",
-			"Period" : "300",
-			"EvaluationPeriods" : "1",
-			"Threshold" : "90",
-			"ComparisonOperator" : "GreaterThanThreshold",
-			"Dimensions" : [ {
-			  "Name" : "ClusterIdentifier",
-			  "Value" : { "Ref" : "RedshiftCluster" }
-			} ]
-		  }
-		},
-		"RedshiftHealthStatusDownAlarm" : {
-		  "Type" : "AWS::CloudWatch::Alarm",
-		  "Properties" : {
-			"AlarmDescription" : "Alarm for Redshift health degradation",
-			"AlarmActions" : [ { "Ref" : "MonitoringSNS" } ],
-			"MetricName" : "HealthStatus",
-			"Namespace" : "AWS/Redshift",
-			"Statistic" : "Average",
-			"Period" : "60",
-			"EvaluationPeriods" : "2",
-			"Threshold" : "1",
-			"ComparisonOperator" : "LessThanThreshold",
-			"Dimensions" : [ {
-			  "Name" : "ClusterIdentifier",
-			  "Value" : { "Ref" : "RedshiftCluster" }
-			} ]
-		  }
-		},
+        "RedshiftDiskSpaceAlarm": {
+            "Type": "AWS::CloudWatch::Alarm",
+            "Properties": {
+                "AlarmDescription": "Alarm for Redshift disk space",
+                "AlarmActions": [
+                    {
+                        "Ref": "MonitoringSNS"
+                    }
+                ],
+                "MetricName": "PercentageDiskSpaceUsed",
+                "Namespace": "AWS/Redshift",
+                "Statistic": "Average",
+                "Period": "300",
+                "EvaluationPeriods": "1",
+                "Threshold": "90",
+                "ComparisonOperator": "GreaterThanThreshold",
+                "Dimensions": [
+                    {
+                        "Name": "ClusterIdentifier",
+                        "Value": {
+                            "Ref": "RedshiftCluster"
+                        }
+                    }
+                ]
+            }
+        },
+        "RedshiftHealthStatusDownAlarm": {
+            "Type": "AWS::CloudWatch::Alarm",
+            "Properties": {
+                "AlarmDescription": "Alarm for Redshift health degradation",
+                "AlarmActions": [
+                    {
+                        "Ref": "MonitoringSNS"
+                    }
+                ],
+                "MetricName": "HealthStatus",
+                "Namespace": "AWS/Redshift",
+                "Statistic": "Average",
+                "Period": "60",
+                "EvaluationPeriods": "2",
+                "Threshold": "1",
+                "ComparisonOperator": "LessThanThreshold",
+                "Dimensions": [
+                    {
+                        "Name": "ClusterIdentifier",
+                        "Value": {
+                            "Ref": "RedshiftCluster"
+                        }
+                    }
+                ]
+            }
+        },
         "Pipeline": {
             "Type": "AWS::DataPipeline::Pipeline",
             "Properties": {
@@ -1639,6 +1703,12 @@
                                 }
                             },
                             {
+                                "Key": "masterInstanceBidPrice",
+                                "StringValue": {
+                                    "Ref": "EMRMasterInstanceBidPriceParameter"
+                                }
+                            },
+                            {
                                 "Key": "coreInstanceType",
                                 "StringValue": {
                                     "Ref": "EMRCoreInstanceTypeParameter"
@@ -1648,6 +1718,12 @@
                                 "Key": "coreInstanceCount",
                                 "StringValue": {
                                     "Ref": "EMRCoreInstanceCountParameter"
+                                }
+                            },
+                            {
+                                "Key": "coreInstanceBidPrice",
+                                "StringValue": {
+                                    "Ref": "EMRCoreInstanceBidPriceParameter"
                                 }
                             },
                             {
@@ -1663,13 +1739,19 @@
                                 }
                             },
                             {
+                                "Key": "taskInstanceBidPrice",
+                                "StringValue": {
+                                    "Ref": "EMRTaskInstanceBidPriceParameter"
+                                }
+                            },
+                            {
                                 "Key": "type",
                                 "StringValue": "EmrCluster"
                             },
                             {
                                 "Key": "subnetId",
                                 "StringValue": {
-                                    "Ref": "PublicSubnetParameter"
+                                    "Ref": "PrivateSubnetParameter"
                                 }
                             },
                             {
@@ -1691,6 +1773,10 @@
                             {
                                 "Key": "terminateAfter",
                                 "StringValue": "4 Hours"
+                            },
+                            {
+                                "Key": "useOnDemandOnLastAttempt",
+                                "StringValue": "true"
                             },
                             {
                                 "Key": "bootstrapAction",
@@ -1728,6 +1814,154 @@
                         ]
                     },
                     {
+                        "Id": "RedshiftIdentityUnload",
+                        "Name": "RedshiftIdentityUnload",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SqlActivity"
+                            },
+                            {
+                                "Key": "database",
+                                "RefValue": "RedshiftDatabase"
+                            },
+                            {
+                                "Key": "script",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "UNLOAD ('SELECT * FROM identity_map') TO 's3://",
+                                            {
+                                                "Ref": "IncomingS3Bucket"
+                                            },
+                                            "/dataset-path-placeholder/identity_map/' CREDENTIALS 'aws_access_key_id=",
+											{
+												"Ref": "RedshiftOperationsAccessKey"
+											},
+                                            ";aws_secret_access_key=",
+											{
+												"Fn::GetAtt": [
+													"RedshiftOperationsAccessKey",
+													"SecretAccessKey"
+												]
+											},
+                                            "' DELIMITER '\t' GZIP;"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendRedshiftIdentityUnloadSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendRedshiftIdentityUnloadFailureSNSMessage"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendRedshiftIdentityUnloadSuccessSNSMessage",
+                        "Name": "SendRedshiftIdentityUnloadSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Redshift identity unload succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendRedshiftIdentityUnloadFailureSNSMessage",
+                        "Name": "SendRedshiftIdentityUnloadFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Redshift identity unload failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
                         "Id": "MoveDataToHDFS",
                         "Name": "MoveDataToHDFS",
                         "Fields": [
@@ -1757,6 +1991,10 @@
                             {
                                 "Key": "runsOn",
                                 "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RedshiftIdentityUnload"
                             },
                             {
                                 "Key": "retryDelay",
@@ -1861,6 +2099,128 @@
                         ]
                     },
                     {
+                        "Id": "RunPhase1PreVerifyJAR",
+                        "Name": "RunPhase1PreVerifyJAR",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "EmrActivity"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "MoveDataToHDFS"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendPhase1PreVerifySuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendPhase1PreVerifyFailureSNSMessage"
+                            },
+                            {
+                                "Key": "step",
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,preverify,1,-in,hdfs:///phase_0,-out,hdfs:///verify/phase_1"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase1PreVerifySuccessSNSMessage",
+                        "Name": "SendPhase1PreVerifySuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 1 Pre-Verify script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase1PreVerifyFailureSNSMessage",
+                        "Name": "SendPhase1PreVerifyFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 1 Pre-Verify script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
                         "Id": "RunPhase1CreateCommand",
                         "Name": "RunPhase1CreateCommand",
                         "Fields": [
@@ -1878,7 +2238,7 @@
                             },
                             {
                                 "Key": "dependsOn",
-                                "RefValue": "MoveDataToHDFS"
+                                "RefValue": "RunPhase1PreVerifyJAR"
                             },
                             {
                                 "Key": "runsOn",
@@ -1970,136 +2330,6 @@
                                                 "Ref": "EnvironmentParameter"
                                             },
                                             " Dataset dataset-id-placeholder - Phase 1 create tables script failed"
-                                        ]
-                                    ]
-                                }
-                            },
-                            {
-                                "Key": "message",
-                                "StringValue": "Boo!"
-                            },
-                            {
-                                "Key": "topicArn",
-                                "StringValue": {
-                                    "Ref": "FailureSNS"
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "Id": "RunPhase1CopyCommand",
-                        "Name": "RunPhase1CopyCommand",
-                        "Fields": [
-                            {
-                                "Key": "type",
-                                "StringValue": "ShellCommandActivity"
-                            },
-                            {
-                                "Key": "command",
-                                "StringValue": "/home/hadoop/phase_1_copy_unmodified_files.sh phase_0 phase_1"
-                            },
-                            {
-                                "Key": "schedule",
-                                "RefValue": "DefaultSchedule"
-                            },
-                            {
-                                "Key": "dependsOn",
-                                "RefValue": "RunPhase1HiveCommand"
-                            },
-                            {
-                                "Key": "dependsOn",
-                                "RefValue": "RunPhase1HadoopJAR"
-                            },
-                            {
-                                "Key": "runsOn",
-                                "RefValue": "EmrCluster"
-                            },
-                            {
-                                "Key": "retryDelay",
-                                "StringValue": "2 Minutes"
-                            },
-                            {
-                                "Key": "onSuccess",
-                                "RefValue": "SendPhase1CopySuccessSNSMessage"
-                            },
-                            {
-                                "Key": "onFail",
-                                "RefValue": "SendPhase1CopyFailureSNSMessage"
-                            }
-                        ]
-                    },
-                    {
-                        "Id": "SendPhase1CopySuccessSNSMessage",
-                        "Name": "SendPhase1CopySuccessSNSMessage",
-                        "Fields": [
-                            {
-                                "Key": "type",
-                                "StringValue": "SnsAlarm"
-                            },
-                            {
-                                "Key": "role",
-                                "StringValue": {
-                                    "Ref": "DataPipelineRole"
-                                }
-                            },
-                            {
-                                "Key": "subject",
-                                "StringValue": {
-                                    "Fn::Join": [
-                                        "",
-                                        [
-                                            {
-                                                "Ref": "AWS::StackName"
-                                            },
-                                            "-",
-                                            {
-                                                "Ref": "EnvironmentParameter"
-                                            },
-                                            " Dataset dataset-id-placeholder - Phase 1 copy script succeeded"
-                                        ]
-                                    ]
-                                }
-                            },
-                            {
-                                "Key": "message",
-                                "StringValue": "Yay!"
-                            },
-                            {
-                                "Key": "topicArn",
-                                "StringValue": {
-                                    "Ref": "SuccessSNS"
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "Id": "SendPhase1CopyFailureSNSMessage",
-                        "Name": "SendPhase1CopyFailureSNSMessage",
-                        "Fields": [
-                            {
-                                "Key": "type",
-                                "StringValue": "SnsAlarm"
-                            },
-                            {
-                                "Key": "role",
-                                "StringValue": {
-                                    "Ref": "DataPipelineRole"
-                                }
-                            },
-                            {
-                                "Key": "subject",
-                                "StringValue": {
-                                    "Fn::Join": [
-                                        "",
-                                        [
-                                            {
-                                                "Ref": "AWS::StackName"
-                                            },
-                                            "-",
-                                            {
-                                                "Ref": "EnvironmentParameter"
-                                            },
-                                            " Dataset dataset-id-placeholder - Phase 1 copy script failed"
                                         ]
                                     ]
                                 }
@@ -2272,7 +2502,7 @@
                             },
                             {
                                 "Key": "step",
-                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.data_tools.DataCli,canvas,hadoop,1,/phase_0,/phase_1"
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,hadoop,1,/phase_0,/phase_1"
                             }
                         ]
                     },
@@ -2365,6 +2595,678 @@
                         ]
                     },
                     {
+                        "Id": "RunPhase1MoveCommand",
+                        "Name": "RunPhase1MoveCommand",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "ShellCommandActivity"
+                            },
+                            {
+                                "Key": "command",
+                                "StringValue": "/home/hadoop/phase_1_move_unmodified_files.sh phase_0 phase_1"
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase1HiveCommand"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase1HadoopJAR"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendPhase1MoveSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendPhase1MoveFailureSNSMessage"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase1MoveSuccessSNSMessage",
+                        "Name": "SendPhase1MoveSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 1 move script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase1MoveFailureSNSMessage",
+                        "Name": "SendPhase1MoveFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 1 move script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "RunPhase1PostVerifyJAR",
+                        "Name": "RunPhase1PostVerifyJAR",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "EmrActivity"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase1MoveCommand"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendPhase1PostVerifySuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendPhase1PostVerifyFailureSNSMessage"
+                            },
+                            {
+                                "Key": "step",
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,postverify,1,-in,hdfs:///phase_0,-out,hdfs:///phase_1,-verify,hdfs:///verify/phase_1"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase1PostVerifySuccessSNSMessage",
+                        "Name": "SendPhase1PostVerifySuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 1 Post-Verify script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase1PostVerifyFailureSNSMessage",
+                        "Name": "SendPhase1PostVerifyFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 1 Post-Verify script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "MoveIdentityMapFromHDFS",
+                        "Name": "MoveIdentityMapFromHDFS",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "ShellCommandActivity"
+                            },
+                            {
+                                "Key": "command",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "s3-dist-cp --src=hdfs:///phase_1/identity_map --outputCodec=gzip --dest=s3://",
+                                            {
+                                                "Ref": "IntermediateS3Bucket"
+                                            },
+                                            "/dataset-path-placeholder/identity_map"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase1PostVerifyJAR"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendMoveIdentityMapFromHDFSSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendMoveIdentityMapFromHDFSFailureSNSMessage"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendMoveIdentityMapFromHDFSSuccessSNSMessage",
+                        "Name": "SendMoveIdentityMapFromHDFSSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Move Identity Map from HDFS succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendMoveIdentityMapFromHDFSFailureSNSMessage",
+                        "Name": "SendMoveIdentityMapFromHDFSFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Move Identity Map from HDFS failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "S3toRedshiftIdentityLoad",
+                        "Name": "S3toRedshiftIdentityLoad",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SqlActivity"
+                            },
+                            {
+                                "Key": "database",
+                                "RefValue": "RedshiftDatabase"
+                            },
+                            {
+                                "Key": "script",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "DROP TABLE IF EXISTS identity_map_stage;\n",
+                                            "CREATE TABLE identity_map_stage (LIKE identity_map);\n",
+                                            "COPY identity_map_stage (research_id, huid, xid, canvas_id, canvas_data_id) FROM 's3://",
+                                            {
+                                                "Ref": "IntermediateS3Bucket"
+                                            },
+                                            "/dataset-path-placeholder/identity_map/' CREDENTIALS 'aws_access_key_id=",
+                                            {
+                                                "Ref": "RedshiftOperationsAccessKey"
+                                            },
+                                            ";aws_secret_access_key=",
+                                            {
+                                                "Fn::GetAtt": [
+                                                    "RedshiftOperationsAccessKey",
+                                                    "SecretAccessKey"
+                                                ]
+                                            },
+                                            "' DELIMITER '\t' TRUNCATECOLUMNS GZIP;\n",
+                                            "BEGIN TRANSACTION;\n",
+                                            "DELETE FROM identity_map USING identity_map_stage WHERE identity_map.research_id = identity_map_stage.research_id;\n",
+                                            "INSERT INTO identity_map SELECT * FROM identity_map_stage;\n",
+                                            "END TRANSACTION;\n",
+                                            "DROP TABLE identity_map_stage;\n",
+                                            "VACUUM identity_map;\n",
+                                            "ANALYZE identity_map;\n"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "MoveIdentityMapFromHDFS"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendS3toRedshiftIdentityLoadSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendS3toRedshiftIdentityLoadFailureSNSMessage"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendS3toRedshiftIdentityLoadSuccessSNSMessage",
+                        "Name": "SendS3toRedshiftIdentityLoadSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - S3 to Redshift identity_map load succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendS3toRedshiftIdentityLoadFailureSNSMessage",
+                        "Name": "SendS3toRedshiftIdentityLoadFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - S3 to Redshift identity_map load failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "RunPhase2PreVerifyJAR",
+                        "Name": "RunPhase2PreVerifyJAR",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "EmrActivity"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "S3toRedshiftIdentityLoad"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendPhase2PreVerifySuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendPhase2PreVerifyFailureSNSMessage"
+                            },
+                            {
+                                "Key": "step",
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,preverify,2,-in,hdfs:///phase_1,-out,hdfs:///verify/phase_2"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase2PreVerifySuccessSNSMessage",
+                        "Name": "SendPhase2PreVerifySuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 2 Pre-Verify script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase2PreVerifyFailureSNSMessage",
+                        "Name": "SendPhase2PreVerifyFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 2 Pre-Verify script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
                         "Id": "RunPhase2CreateCommand",
                         "Name": "RunPhase2CreateCommand",
                         "Fields": [
@@ -2382,7 +3284,7 @@
                             },
                             {
                                 "Key": "dependsOn",
-                                "RefValue": "RunPhase1CopyCommand"
+                                "RefValue": "RunPhase2PreVerifyJAR"
                             },
                             {
                                 "Key": "runsOn",
@@ -2474,132 +3376,6 @@
                                                 "Ref": "EnvironmentParameter"
                                             },
                                             " Dataset dataset-id-placeholder - Phase 2 create tables script failed"
-                                        ]
-                                    ]
-                                }
-                            },
-                            {
-                                "Key": "message",
-                                "StringValue": "Boo!"
-                            },
-                            {
-                                "Key": "topicArn",
-                                "StringValue": {
-                                    "Ref": "FailureSNS"
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "Id": "RunPhase2CopyCommand",
-                        "Name": "RunPhase2CopyCommand",
-                        "Fields": [
-                            {
-                                "Key": "type",
-                                "StringValue": "ShellCommandActivity"
-                            },
-                            {
-                                "Key": "command",
-                                "StringValue": "/home/hadoop/phase_2_copy_unmodified_files.sh phase_1 phase_2"
-                            },
-                            {
-                                "Key": "schedule",
-                                "RefValue": "DefaultSchedule"
-                            },
-                            {
-                                "Key": "dependsOn",
-                                "RefValue": "RunPhase2CreateCommand"
-                            },
-                            {
-                                "Key": "runsOn",
-                                "RefValue": "EmrCluster"
-                            },
-                            {
-                                "Key": "retryDelay",
-                                "StringValue": "2 Minutes"
-                            },
-                            {
-                                "Key": "onSuccess",
-                                "RefValue": "SendPhase2CopySuccessSNSMessage"
-                            },
-                            {
-                                "Key": "onFail",
-                                "RefValue": "SendPhase2CopyFailureSNSMessage"
-                            }
-                        ]
-                    },
-                    {
-                        "Id": "SendPhase2CopySuccessSNSMessage",
-                        "Name": "SendPhase2CopySuccessSNSMessage",
-                        "Fields": [
-                            {
-                                "Key": "type",
-                                "StringValue": "SnsAlarm"
-                            },
-                            {
-                                "Key": "role",
-                                "StringValue": {
-                                    "Ref": "DataPipelineRole"
-                                }
-                            },
-                            {
-                                "Key": "subject",
-                                "StringValue": {
-                                    "Fn::Join": [
-                                        "",
-                                        [
-                                            {
-                                                "Ref": "AWS::StackName"
-                                            },
-                                            "-",
-                                            {
-                                                "Ref": "EnvironmentParameter"
-                                            },
-                                            " Dataset dataset-id-placeholder - Phase 2 copy script succeeded"
-                                        ]
-                                    ]
-                                }
-                            },
-                            {
-                                "Key": "message",
-                                "StringValue": "Yay!"
-                            },
-                            {
-                                "Key": "topicArn",
-                                "StringValue": {
-                                    "Ref": "SuccessSNS"
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "Id": "SendPhase2CopyFailureSNSMessage",
-                        "Name": "SendPhase2CopyFailureSNSMessage",
-                        "Fields": [
-                            {
-                                "Key": "type",
-                                "StringValue": "SnsAlarm"
-                            },
-                            {
-                                "Key": "role",
-                                "StringValue": {
-                                    "Ref": "DataPipelineRole"
-                                }
-                            },
-                            {
-                                "Key": "subject",
-                                "StringValue": {
-                                    "Fn::Join": [
-                                        "",
-                                        [
-                                            {
-                                                "Ref": "AWS::StackName"
-                                            },
-                                            "-",
-                                            {
-                                                "Ref": "EnvironmentParameter"
-                                            },
-                                            " Dataset dataset-id-placeholder - Phase 2 copy script failed"
                                         ]
                                     ]
                                 }
@@ -2772,7 +3548,7 @@
                             },
                             {
                                 "Key": "step",
-                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.data_tools.DataCli,canvas,hadoop,2,/phase_1,/phase_2"
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,hadoop,2,/phase_1,/phase_2"
                             }
                         ]
                     },
@@ -2865,6 +3641,1128 @@
                         ]
                     },
                     {
+                        "Id": "RunPhase2MoveCommand",
+                        "Name": "RunPhase2MoveCommand",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "ShellCommandActivity"
+                            },
+                            {
+                                "Key": "command",
+                                "StringValue": "/home/hadoop/phase_2_move_unmodified_files.sh phase_1 phase_2"
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase2HiveCommand"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase2HadoopJAR"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendPhase2MoveSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendPhase2MoveFailureSNSMessage"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase2MoveSuccessSNSMessage",
+                        "Name": "SendPhase2MoveSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 2 move script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase2MoveFailureSNSMessage",
+                        "Name": "SendPhase2MoveFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 2 move script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "RunPhase2PostVerifyJAR",
+                        "Name": "RunPhase2PostVerifyJAR",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "EmrActivity"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase2MoveCommand"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendPhase2PostVerifySuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendPhase2PostVerifyFailureSNSMessage"
+                            },
+                            {
+                                "Key": "step",
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,postverify,2,-in,hdfs:///phase_1,-out,hdfs:///phase_2,-verify,hdfs:///verify/phase_2"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase2PostVerifySuccessSNSMessage",
+                        "Name": "SendPhase2PostVerifySuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 2 Post-Verify script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase2PostVerifyFailureSNSMessage",
+                        "Name": "SendPhase2PostVerifyFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 2 Post-Verify script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "RunPhase3PreVerifyJAR",
+                        "Name": "RunPhase3PreVerifyJAR",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "EmrActivity"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase2PostVerifyJAR"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendPhase3PreVerifySuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendPhase3PreVerifyFailureSNSMessage"
+                            },
+                            {
+                                "Key": "step",
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,preverify,3,-in,hdfs:///phase_2,-out,hdfs:///verify/phase_3"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase3PreVerifySuccessSNSMessage",
+                        "Name": "SendPhase3PreVerifySuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 3 Pre-Verify script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase3PreVerifyFailureSNSMessage",
+                        "Name": "SendPhase3PreVerifyFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 3 Pre-Verify script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "RunPhase3CreateCommand",
+                        "Name": "RunPhase3CreateCommand",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "ShellCommandActivity"
+                            },
+                            {
+                                "Key": "command",
+                                "StringValue": "/home/hadoop/phase_3_create_tables.sh"
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase3PreVerifyJAR"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendPhase3CreateSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendPhase3CreateFailureSNSMessage"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase3CreateSuccessSNSMessage",
+                        "Name": "SendPhase3CreateSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 3 create tables script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase3CreateFailureSNSMessage",
+                        "Name": "SendPhase3CreateFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 3 create tables script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "RunPhase3HiveCommand",
+                        "Name": "RunPhase3HiveCommand",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "ShellCommandActivity"
+                            },
+                            {
+                                "Key": "command",
+                                "StringValue": "/home/hadoop/phase_3_hive.sh /home/hadoop/harvard-data-tools/hive/phase_3"
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase3CreateCommand"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendPhase3HiveSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendPhase3HiveFailureSNSMessage"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase3HiveSuccessSNSMessage",
+                        "Name": "SendPhase3HiveSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 3 Hive command succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase3HiveFailureSNSMessage",
+                        "Name": "SendPhase3HiveFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 3 Hive command failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "RunPhase3HadoopJAR",
+                        "Name": "RunPhase3HadoopJAR",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "EmrActivity"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase3CreateCommand"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendPhase3HadoopSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendPhase3HadoopFailureSNSMessage"
+                            },
+                            {
+                                "Key": "step",
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,hadoop,3,/phase_2,/phase_3"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase3HadoopSuccessSNSMessage",
+                        "Name": "SendPhase3HadoopSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 3 Hadoop script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase3HadoopFailureSNSMessage",
+                        "Name": "SendPhase3HadoopFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 3 Hadoop script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "RunPhase3MoveCommand",
+                        "Name": "RunPhase3MoveCommand",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "ShellCommandActivity"
+                            },
+                            {
+                                "Key": "command",
+                                "StringValue": "/home/hadoop/phase_3_move_unmodified_files.sh phase_2 phase_3"
+                            },
+                            {
+                                "Key": "schedule",
+                                "RefValue": "DefaultSchedule"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase3HiveCommand"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase3HadoopJAR"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendPhase3MoveSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendPhase3MoveFailureSNSMessage"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase3MoveSuccessSNSMessage",
+                        "Name": "SendPhase3MoveSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 3 move script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase3MoveFailureSNSMessage",
+                        "Name": "SendPhase3MoveFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 3 move script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "RunPhase3PostVerifyJAR",
+                        "Name": "RunPhase3PostVerifyJAR",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "EmrActivity"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase3MoveCommand"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendPhase3PostVerifySuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendPhase3PostVerifyFailureSNSMessage"
+                            },
+                            {
+                                "Key": "step",
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,postverify,3,-in,hdfs:///phase_2,-out,hdfs:///phase_3,-verify,hdfs:///verify/phase_3"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase3PostVerifySuccessSNSMessage",
+                        "Name": "SendPhase3PostVerifySuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 3 Post-Verify script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendPhase3PostVerifyFailureSNSMessage",
+                        "Name": "SendPhase3PostVerifyFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Phase 3 Post-Verify script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "RunCleanup",
+                        "Name": "RunCleanup",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "EmrActivity"
+                            },
+                            {
+                                "Key": "runsOn",
+                                "RefValue": "EmrCluster"
+                            },
+                            {
+                                "Key": "retryDelay",
+                                "StringValue": "2 Minutes"
+                            },
+                            {
+                                "Key": "dependsOn",
+                                "RefValue": "RunPhase3PostVerifyJAR"
+                            },
+                            {
+                                "Key": "onSuccess",
+                                "RefValue": "SendCleanupSuccessSNSMessage"
+                            },
+                            {
+                                "Key": "onFail",
+                                "RefValue": "SendCleanupFailureSNSMessage"
+                            },
+                            {
+                                "Key": "step",
+                                "StringValue": "/home/hadoop/data_tools.jar,edu.harvard.data.canvas.cli.CanvasDataCli,cleanup"
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendCleanupSuccessSNSMessage",
+                        "Name": "SendCleanupSuccessSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Cleanup script succeeded"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Yay!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "SuccessSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "Id": "SendCleanupFailureSNSMessage",
+                        "Name": "SendCleanupFailureSNSMessage",
+                        "Fields": [
+                            {
+                                "Key": "type",
+                                "StringValue": "SnsAlarm"
+                            },
+                            {
+                                "Key": "role",
+                                "StringValue": {
+                                    "Ref": "DataPipelineRole"
+                                }
+                            },
+                            {
+                                "Key": "subject",
+                                "StringValue": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "EnvironmentParameter"
+                                            },
+                                            " Dataset dataset-id-placeholder - Cleanup script failed"
+                                        ]
+                                    ]
+                                }
+                            },
+                            {
+                                "Key": "message",
+                                "StringValue": "Boo!"
+                            },
+                            {
+                                "Key": "topicArn",
+                                "StringValue": {
+                                    "Ref": "FailureSNS"
+                                }
+                            }
+                        ]
+                    },
+                    {
                         "Id": "MoveDataFromHDFS",
                         "Name": "MoveDataFromHDFS",
                         "Fields": [
@@ -2878,7 +4776,7 @@
                                     "Fn::Join": [
                                         "",
                                         [
-                                            "s3-dist-cp --src=hdfs:///phase_2 --outputCodec=gzip --dest=s3://",
+                                            "s3-dist-cp --src=hdfs:///phase_3 --outputCodec=gzip --dest=s3://",
                                             {
                                                 "Ref": "IntermediateS3Bucket"
                                             },
@@ -2901,15 +4799,7 @@
                             },
                             {
                                 "Key": "dependsOn",
-                                "RefValue": "RunPhase2CopyCommand"
-                            },
-                            {
-                                "Key": "dependsOn",
-                                "RefValue": "RunPhase2HiveCommand"
-                            },
-                            {
-                                "Key": "dependsOn",
-                                "RefValue": "RunPhase2HadoopJAR"
+                                "RefValue": "RunCleanup"
                             },
                             {
                                 "Key": "onSuccess",
@@ -3165,9 +5055,9 @@
                                         "",
                                         [
                                             "aws s3 rm s3://",
-											{
-												"Ref": "NewCodeS3Bucket"
-											},
+                                            {
+                                                "Ref": "NewCodeS3Bucket"
+                                            },
                                             "/dataset-id-placeholder.sql"
                                         ]
                                     ]
@@ -3302,9 +5192,9 @@
                                         "",
                                         [
                                             "aws s3 rm s3://",
-											{
-												"Ref": "NewCodeS3Bucket"
-											},
+                                            {
+                                                "Ref": "NewCodeS3Bucket"
+                                            },
                                             "/bootstrapdataset-id-placeholder.sh"
                                         ]
                                     ]
@@ -3656,9 +5546,9 @@
                                         "",
                                         [
                                             "s3://",
-											{
-												"Ref": "NewCodeS3Bucket"
-											},
+                                            {
+                                                "Ref": "NewCodeS3Bucket"
+                                            },
                                             "/dataset-id-placeholder.sql"
                                         ]
                                     ]

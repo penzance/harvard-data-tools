@@ -121,6 +121,14 @@ exports.handler = function(event, context) {
                                                     {
                                                     key: 'Name',
                                                     value: emrNames
+                                                    },
+                                                    {
+                                                    key: 'full-dump-path',
+                                                    value: fullObjectKey
+                                                    },
+                                                    {
+                                                    key: 'dump-id',
+                                                    value: fileKey
                                                 }, ]
                                             };
                                             datapipeline.addTags(params, function(err, data) {
