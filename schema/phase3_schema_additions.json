@@ -1,1 +1,82 @@
-{}
+{ "tables":
+  { "sessions": {
+      "owner": "java",
+      "description" : "Aggregation of session information from the non-admin request table.",
+      "columns" : [ 
+        {
+          "name" : "session_id",
+          "description" : "Unique session ID, taken from the requests table.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "user_research_id",
+          "description" : "Unique user ID.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "start_time",
+          "description" : "Timestamp of the first request in the session.",
+          "type" : "datetime"
+        },
+        {
+          "name" : "end_time",
+          "description" : "Timestamp of the last request in the session.",
+          "type" : "datetime"
+        },
+        {
+          "name" : "duration_ms",
+          "description" : "Elapsed time in milliseconds between the first and last requests.",
+          "type" : "bigint"
+        },
+        {
+          "name" : "unique_urls",
+          "description" : "Count of unique urls visited during the session.",
+          "type" : "integer"
+        },
+        {
+          "name" : "request_count",
+          "description" : "Total number of requests in the session. This includes automated traffic.",
+          "type" : "integer"
+        },
+        {
+          "name" : "unique_courses",
+          "description" : "Number of different courses visited during the session.",
+          "type" : "integer"
+        },
+        {
+          "name" : "unique_quizzes",
+          "description" : "Number of different quizzes visited during the session.",
+          "type" : "integer"
+        },
+        {
+          "name" : "unique_discussions",
+          "description" : "Number of different discussions visited during the session.",
+          "type" : "integer"
+        },
+        {
+          "name" : "unique_conversations",
+          "description" : "Number of different conversations visited during the session.",
+          "type" : "integer"
+        },
+        {
+          "name" : "unique_assignments",
+          "description" : "Number of different assignments visited during the session.",
+          "type" : "integer"
+        },
+        {
+          "name" : "unique_ips",
+          "description" : "Number of different IP addresses used during this session.",
+          "type" : "integer"
+        },
+        {
+          "name" : "main_ip",
+          "description" : "IP address used most frequently during this session.",
+          "type" : "varchar",
+          "length" : 255
+        }
+      ]
+    }
+  }
+}
