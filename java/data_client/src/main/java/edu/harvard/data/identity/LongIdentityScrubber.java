@@ -45,7 +45,6 @@ public abstract class LongIdentityScrubber extends Mapper<Object, Text, Text, Nu
       final Path path = new Path(uri.toString());
       try (HdfsTableReader<IdentityMap> in = new HdfsTableReader<IdentityMap>(IdentityMap.class,
           format, fs, path)) {
-        log.info("Loading IDs for " + this);
         for (final IdentityMap id : in) {
           identities.put(getHadoopKey(id), id);
         }
