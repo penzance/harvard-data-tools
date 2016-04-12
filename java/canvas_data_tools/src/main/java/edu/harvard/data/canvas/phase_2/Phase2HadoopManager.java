@@ -21,8 +21,6 @@ public class Phase2HadoopManager {
     final List<Job> jobs = new ArrayList<Job>();
     jobs.add(new RequestJob(hadoopConfig, config, aws, hdfsService, inputDir, outputDir).getJob());
     jobs.add(new AdminRequestJob(hadoopConfig, config, aws, hdfsService, inputDir, outputDir).getJob());
-    jobs.add(new RequestPerFileJob(hadoopConfig, aws, hdfsService, inputDir, outputDir).getJob());
-    jobs.add(new RequestPerPageJob(hadoopConfig, aws, hdfsService, inputDir, outputDir).getJob());
     return jobs;
   }
 

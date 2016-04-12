@@ -21,6 +21,7 @@ import edu.harvard.data.VerificationException;
 import edu.harvard.data.canvas.HadoopMultipleJobRunner;
 import edu.harvard.data.canvas.phase_1.Phase1HadoopManager;
 import edu.harvard.data.canvas.phase_2.Phase2HadoopManager;
+import edu.harvard.data.canvas.phase_3.Phase3HadoopManager;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class HadoopCommand implements Command {
@@ -80,7 +81,8 @@ public class HadoopCommand implements Command {
       return Phase2HadoopManager.getJobs(aws, hadoopConfig, config, hdfsService, inputDir,
           outputDir);
     case 3:
-      break;
+      return Phase3HadoopManager.getJobs(aws, hadoopConfig, config, hdfsService, inputDir,
+          outputDir);
     default:
       throw new ArgumentError("Invalid phase: " + phase);
     }

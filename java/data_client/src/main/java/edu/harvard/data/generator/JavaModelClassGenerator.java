@@ -57,6 +57,7 @@ public class JavaModelClassGenerator {
     out.println();
     outputEnumTypes(out);
     outputFields(out);
+    outputDefaultConstructor(out);
     outputCsvConstructor(out);
     outputPreviousClassConstructor(out);
     outputLikeClassConstructor(out);
@@ -149,6 +150,12 @@ public class JavaModelClassGenerator {
       final String variableName = JavaBindingGenerator.javaVariable(column.getName());
       out.println("  private " + typeName + " " + variableName + ";");
     }
+    out.println();
+  }
+
+  // Generate a no-argument constructor.
+  private void outputDefaultConstructor(final PrintStream out) {
+    out.println("  public " + className + "() {}");
     out.println();
   }
 

@@ -1,63 +1,9 @@
 { "tables": 
   { "requests": {
-      "owner": "java",
-      "columns" : [ 
-        {
-          "name" : "research_id",
-          "description" : "UUID generated for research data set.",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "browser",
-          "description" : "Client-side browser from which the request was sent",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "os",
-          "description" : "Operating system from which the request was sent",
-          "type" : "varchar",
-          "length" : 255
-        }
-      ]
+      "owner": "java"
     },
     "admin_requests": {
       "like": "requests"
-    },
-    "requests_per_file": {
-      "owner": "java",
-      "tableName" : "requests_per_file",
-      "columns" : [ 
-        {
-          "name" : "file_id",
-          "description" : "Unique file ID.",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "requests",
-          "description" : "Count of requests for the file.",
-          "type" : "bigint"
-        }
-      ]
-    },
-    "requests_per_page": {
-      "owner": "java",
-      "tableName" : "requests_per_page",
-      "columns" : [ 
-        {
-          "name" : "page_id",
-          "description" : "Unique page ID.",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "requests",
-          "description" : "Count of requests for the page.",
-          "type" : "bigint"
-        }
-      ]
     }
   }
 }
