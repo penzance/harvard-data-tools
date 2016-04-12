@@ -20,5 +20,4 @@ public class Phase3HadoopManager {
     jobs.add(new SessionsJob(hadoopConfig, aws, hdfsService, inputDir, outputDir).getJob());
     return jobs;
   }
-
 }
