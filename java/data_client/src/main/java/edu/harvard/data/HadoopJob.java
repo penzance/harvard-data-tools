@@ -1,14 +1,17 @@
 package edu.harvard.data;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -33,9 +36,9 @@ public abstract class HadoopJob {
     this.outputDir = outputDir;
   }
 
-  protected void setPaths(final Job job, final AwsUtils aws, final URI hdfsService,
-      final String in, final String out) throws IOException {
-    for(final Path path : listFiles(hdfsService, in)){
+  protected void setPaths(final Job job, final AwsUtils aws, final URI hdfsService, final String in,
+      final String out) throws IOException {
+    for (final Path path : listFiles(hdfsService, in)) {
       FileInputFormat.addInputPath(job, path);
       log.debug("Input path: " + path.toString());
     }
@@ -67,11 +70,20 @@ public abstract class HadoopJob {
   }
 
   protected void addToCache(final Job job, final String dir) throws IOException {
-    for(final Path path : listFiles(hdfsService, dir)){
+    for (final Path path : listFiles(hdfsService, dir)) {
       job.addCacheFile(URI.create(path.toString()));
       log.debug("Adding cache file: " + path.toString());
     }
   }
 
   public abstract Job getJob() throws IOException;
+
+  public static Text recordToText(final DataTable record, final TableFormat format)
+      throws IOException, InterruptedException {
+    final StringWriter writer = new StringWriter();
+    try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
+      printer.printRecord(record.getFieldsAsList(format));
+    }
+    return new Text(writer.toString().trim());
+  }
 }

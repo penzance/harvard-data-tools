@@ -25,7 +25,6 @@ import edu.harvard.data.TableFormat;
 import edu.harvard.data.UserAgentParser;
 import edu.harvard.data.canvas.bindings.phase1.Phase1Requests;
 import edu.harvard.data.canvas.bindings.phase2.Phase2Requests;
-import net.sf.uadetector.ReadableUserAgent;
 
 class RequestJob extends HadoopJob {
 
@@ -70,28 +69,17 @@ class RequestMapper extends Mapper<Object, Text, Text, NullWritable> {
     final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
     for (final CSVRecord csvRecord : parser.getRecords()) {
       final Phase1Requests request = new Phase1Requests(format, csvRecord);
-      //      if (request.getUserId() == null || (request.getUserId() != -262295411484124942L
-      //          || request.getUserId() == 134926641248969922L)) {
-      final Phase2Requests extended = new Phase2Requests(request);
-      parseUserAgent(extended);
+      if (request.getUserIdResearchUuid() == null || (request.getUserIdResearchUuid().equals("19e44a79-b2a1-4d8b-a1f8-c5547c3d5a05")
+          || request.getUserIdResearchUuid().equals("b80eda2a-3a0a-42ce-b6ad-c31b1638b785"))) {
+        final Phase2Requests phase2 = new Phase2Requests(request);
 
-      final StringWriter writer = new StringWriter();
-      try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
-        printer.printRecord(extended.getFieldsAsList(format));
+        final StringWriter writer = new StringWriter();
+        try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
+          printer.printRecord(phase2.getFieldsAsList(format));
+        }
+        final Text csvText = new Text(writer.toString().trim());
+        context.write(csvText, NullWritable.get());
       }
-      final Text csvText = new Text(writer.toString().trim());
-      context.write(csvText, NullWritable.get());
-      //      }
     }
   }
-
-  private void parseUserAgent(final Phase2Requests request) {
-    final String agentString = request.getUserAgent();
-    if (agentString != null) {
-      final ReadableUserAgent agent = uaParser.parse(agentString);
-      request.setBrowser(agent.getName());
-      request.setOs(agent.getOperatingSystem().getName());
-    }
-  }
-
 }

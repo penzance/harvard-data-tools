@@ -17,6 +17,7 @@ public class Phase3HadoopManager {
       final DataConfiguration config, final URI hdfsService, final String inputDir,
       final String outputDir) throws DataConfigurationException, IOException {
     final List<Job> jobs = new ArrayList<Job>();
+    jobs.add(new SessionsJob(hadoopConfig, aws, hdfsService, inputDir, outputDir).getJob());
     return jobs;
   }
 

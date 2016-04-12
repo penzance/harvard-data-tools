@@ -64,15 +64,15 @@ class AdminRequestMapper extends Mapper<Object, Text, Text, NullWritable> {
     for (final CSVRecord csvRecord : parser.getRecords()) {
       final Phase2Requests request = new Phase2Requests(new Phase1Requests(format, csvRecord));
 
-      //      if (request.getUserId() != null && (request.getUserId() == -262295411484124942L
-      //          || request.getUserId() == 134926641248969922L)) {
-      final StringWriter writer = new StringWriter();
-      try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
-        printer.printRecord(new Phase2AdminRequests(request).getFieldsAsList(format));
+      if (request.getUserIdResearchUuid() != null && (request.getUserIdResearchUuid().equals("19e44a79-b2a1-4d8b-a1f8-c5547c3d5a05")
+          || request.getUserIdResearchUuid().equals("b80eda2a-3a0a-42ce-b6ad-c31b1638b785"))) {
+        final StringWriter writer = new StringWriter();
+        try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
+          printer.printRecord(new Phase2AdminRequests(request).getFieldsAsList(format));
+        }
+        final Text csvText = new Text(writer.toString().trim());
+        context.write(csvText, NullWritable.get());
       }
-      final Text csvText = new Text(writer.toString().trim());
-      context.write(csvText, NullWritable.get());
-      //      }
     }
   }
 
