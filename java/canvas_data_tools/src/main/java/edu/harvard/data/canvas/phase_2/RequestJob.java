@@ -3,6 +3,8 @@ package edu.harvard.data.canvas.phase_2;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -17,12 +19,10 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfiguration;
-import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopJob;
 import edu.harvard.data.TableFormat;
-import edu.harvard.data.UserAgentParser;
 import edu.harvard.data.canvas.bindings.phase1.Phase1Requests;
 import edu.harvard.data.canvas.bindings.phase2.Phase2Requests;
 
@@ -51,16 +51,15 @@ class RequestJob extends HadoopJob {
 class RequestMapper extends Mapper<Object, Text, Text, NullWritable> {
 
   private TableFormat format;
-  private final UserAgentParser uaParser;
-
-  public RequestMapper() throws IOException, DataConfigurationException {
-    this.uaParser = new UserAgentParser();
-  }
+  private Set<String> adminResearchIds;
 
   @Override
   protected void setup(final Context context) {
     final Format formatName = Format.valueOf(context.getConfiguration().get("format"));
     this.format = new FormatLibrary().getFormat(formatName);
+    this.adminResearchIds = new HashSet<String>();
+    adminResearchIds.add("19e44a79-b2a1-4d8b-a1f8-c5547c3d5a05");
+    adminResearchIds.add("b80eda2a-3a0a-42ce-b6ad-c31b1638b785");
   }
 
   @Override
@@ -69,8 +68,8 @@ class RequestMapper extends Mapper<Object, Text, Text, NullWritable> {
     final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
     for (final CSVRecord csvRecord : parser.getRecords()) {
       final Phase1Requests request = new Phase1Requests(format, csvRecord);
-      if (request.getUserIdResearchUuid() == null || (request.getUserIdResearchUuid().equals("19e44a79-b2a1-4d8b-a1f8-c5547c3d5a05")
-          || request.getUserIdResearchUuid().equals("b80eda2a-3a0a-42ce-b6ad-c31b1638b785"))) {
+      if (request.getUserIdResearchUuid() == null
+          || (!adminResearchIds.contains(request.getUserIdResearchUuid()))) {
         final Phase2Requests phase2 = new Phase2Requests(request);
 
         final StringWriter writer = new StringWriter();

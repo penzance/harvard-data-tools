@@ -3,6 +3,8 @@ package edu.harvard.data.canvas.phase_2;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -50,11 +52,15 @@ public class AdminRequestJob extends HadoopJob {
 class AdminRequestMapper extends Mapper<Object, Text, Text, NullWritable> {
 
   private TableFormat format;
+  private Set<String> adminResearchIds;
 
   @Override
   protected void setup(final Context context) {
     final Format formatName = Format.valueOf(context.getConfiguration().get("format"));
     this.format = new FormatLibrary().getFormat(formatName);
+    this.adminResearchIds = new HashSet<String>();
+    adminResearchIds.add("19e44a79-b2a1-4d8b-a1f8-c5547c3d5a05");
+    adminResearchIds.add("b80eda2a-3a0a-42ce-b6ad-c31b1638b785");
   }
 
   @Override
@@ -64,8 +70,8 @@ class AdminRequestMapper extends Mapper<Object, Text, Text, NullWritable> {
     for (final CSVRecord csvRecord : parser.getRecords()) {
       final Phase2Requests request = new Phase2Requests(new Phase1Requests(format, csvRecord));
 
-      if (request.getUserIdResearchUuid() != null && (request.getUserIdResearchUuid().equals("19e44a79-b2a1-4d8b-a1f8-c5547c3d5a05")
-          || request.getUserIdResearchUuid().equals("b80eda2a-3a0a-42ce-b6ad-c31b1638b785"))) {
+      if (request.getUserIdResearchUuid() != null
+          && (adminResearchIds.contains(request.getUserIdResearchUuid()))) {
         final StringWriter writer = new StringWriter();
         try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
           printer.printRecord(new Phase2AdminRequests(request).getFieldsAsList(format));
