@@ -35,7 +35,7 @@ class SessionsJob extends HadoopJob {
 
   @Override
   public Job getJob() throws IOException {
-    final Job job = Job.getInstance(hadoopConf, "requests-pages-hadoop");
+    final Job job = Job.getInstance(hadoopConf, "sessions-hadoop");
 
     job.setInputFormatClass(TextInputFormat.class);
 
@@ -49,7 +49,7 @@ class SessionsJob extends HadoopJob {
 
     job.setOutputFormatClass(TextOutputFormat.class);
 
-    setPaths(job, aws, hdfsService, inputDir + "/requests", outputDir + "/requests_per_page");
+    setPaths(job, aws, hdfsService, inputDir + "/requests", outputDir + "/sessions");
     return job;
   }
 }
