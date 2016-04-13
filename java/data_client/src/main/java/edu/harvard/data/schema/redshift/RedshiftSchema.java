@@ -50,6 +50,11 @@ public class RedshiftSchema implements DataSchema {
   }
 
   @Override
+  public void addTable(final String tableName, final DataSchemaTable newTable) {
+    tables.put(tableName, newTable);
+  }
+
+  @Override
   public String toString() {
     String s = "";
     final List<String> names = new ArrayList<String>(tables.keySet());

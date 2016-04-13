@@ -50,4 +50,8 @@ public class ExtensionSchema implements DataSchema {
     return tables.get(name);
   }
 
+  @Override
+  public void addTable(final String tableName, final DataSchemaTable newTable) {
+    tables.put(tableName, newTable);
+  }
 }

@@ -12,4 +12,6 @@ public interface DataSchema {
 
   DataSchemaTable getTableByName(String name);
 
+  void addTable(String tableName, DataSchemaTable newTable);
+
 }

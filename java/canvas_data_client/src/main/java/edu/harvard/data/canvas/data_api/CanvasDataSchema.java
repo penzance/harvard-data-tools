@@ -99,4 +99,10 @@ public class CanvasDataSchema implements DataSchema {
     }
     return s.trim();
   }
+
+  @Override
+  public void addTable(final String tableName, final DataSchemaTable newTable) {
+    tables.put(tableName, newTable);
+    tablesByName.put(tableName, newTable);
+  }
 }

@@ -80,7 +80,6 @@ public class Phase1PostVerifier implements Verifier {
     for (final Path path : HadoopJob.listFiles(hdfsService, outputDir + "/identity_map")) {
       try (HdfsTableReader<IdentityMap> in = new HdfsTableReader<IdentityMap>(IdentityMap.class,
           format, fs, path)) {
-        log.info("Loading IDs for " + this);
         for (final IdentityMap id : in) {
           identities.put(id.getCanvasDataID(), id);
         }

@@ -124,6 +124,10 @@ public class AwsUtils {
     return key(obj.getBucketName(), obj.getKey());
   }
 
+  public static S3ObjectId key(final String str) {
+    return key(str.substring(0, str.indexOf("/")), str.substring(str.indexOf("/") + 1));
+  }
+
   public static S3ObjectId key(final S3ObjectId obj, final String... keys) {
     String key = obj.getKey();
     for (final String k : keys) {

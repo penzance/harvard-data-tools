@@ -88,7 +88,7 @@ public class SchemaTransformer {
 
         if (!schema.getTables().containsKey(tableName)) {
           // The new table doesn't exist yet - copy it into the schema.
-          schema.getTables().put(tableName, newTable);
+          schema.addTable(tableName, newTable);
         } else {
           // The new table already exists in the schema. Copy its columns.
           final DataSchemaTable originalTable = schema.getTables().get(tableName);

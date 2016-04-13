@@ -32,6 +32,7 @@ import edu.harvard.data.identity.IdentitySchemaTransformer;
 import edu.harvard.data.schema.DataSchema;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 import edu.harvard.data.schema.extension.ExtensionSchema;
+import edu.harvard.data.schema.extension.ExtensionSchemaTable;
 
 public class CanvasCodeGenerator {
   private static final Logger log = LogManager.getLogger();
@@ -150,7 +151,11 @@ public class CanvasCodeGenerator {
     jsonMapper.setDateFormat(FormatLibrary.JSON_DATE_FORMAT);
     final ClassLoader classLoader = CanvasCodeGenerator.class.getClassLoader();
     try (final InputStream in = classLoader.getResourceAsStream(jsonResource)) {
-      return jsonMapper.readValue(in, ExtensionSchema.class);
+      final ExtensionSchema schema = jsonMapper.readValue(in, ExtensionSchema.class);
+      for (final String tableName : schema.getTables().keySet()) {
+        ((ExtensionSchemaTable)schema.getTables().get(tableName)).setTableName(tableName);
+      }
+      return schema;
     }
   }
 
