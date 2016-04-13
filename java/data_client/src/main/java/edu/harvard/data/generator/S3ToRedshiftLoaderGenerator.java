@@ -44,7 +44,7 @@ public class S3ToRedshiftLoaderGenerator {
       //      if (table.getTableName().equals("requests")) { // TODO: Make this dynamic for the dump being processed.
       // outputPartialTableUpdate(out, table, columnList);
       //      } else {
-              outputTableOverwrite(out, table, columnList);
+      outputTableOverwrite(out, table, columnList);
       //      }
     }
   }
@@ -97,7 +97,7 @@ public class S3ToRedshiftLoaderGenerator {
     out.println("VACUUM " + tableName + ";");
     out.println("ANALYZE " + tableName + ";");
     out.println("COPY " + tableName + " " + columnList + " FROM '<intermediates3bucketandpath>/"
-        + tableName + "/' CREDENTIALS '<awskeyandsecret>' DELIMITER '\t' TRUNCATECOLUMNS GZIP;");
+        + tableName + "/' CREDENTIALS '<awskeyandsecret>' DELIMITER '\\t' TRUNCATECOLUMNS GZIP;");
     out.println("VACUUM " + tableName + ";");
     out.println("ANALYZE " + tableName + ";");
     out.println();
