@@ -104,6 +104,11 @@ public class AwsUtils {
     client.deleteObject(new DeleteObjectRequest(oldKey.getBucket(), oldKey.getKey()));
   }
 
+  public boolean keyExists(final S3ObjectId obj) {
+    final ObjectListing objects = client.listObjects(obj.getBucket(), obj.getKey());
+    return !objects.getObjectSummaries().isEmpty();
+  }
+
   public static String uri(final S3ObjectId obj) {
     return "s3://" + obj.getBucket() + "/" + obj.getKey();
   }
@@ -162,7 +167,8 @@ public class AwsUtils {
     getFile(objId, file, false);
   }
 
-  public void getFile(final S3ObjectId objId, final File file, final boolean gunzip) throws IOException {
+  public void getFile(final S3ObjectId objId, final File file, final boolean gunzip)
+      throws IOException {
     log.debug("Downloading " + objId + " to " + file);
     final S3Object obj = client.getObject(new GetObjectRequest(objId.getBucket(), objId.getKey()));
     file.getParentFile().mkdirs();
@@ -206,10 +212,8 @@ public class AwsUtils {
       throws SQLException {
     final String url = config.getRedshiftUrl();
     log.info("Executing query \n" + query + "\n on " + url);
-    try (
-        Connection connection = DriverManager.getConnection(url, config.getRedshiftUser(),
-            config.getRedshiftPassword());
-        Statement st = connection.createStatement();) {
+    try (Connection connection = DriverManager.getConnection(url, config.getRedshiftUser(),
+        config.getRedshiftPassword()); Statement st = connection.createStatement();) {
       st.execute(query);
     }
   }

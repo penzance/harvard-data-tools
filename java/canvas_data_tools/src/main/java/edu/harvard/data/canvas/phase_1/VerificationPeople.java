@@ -132,7 +132,7 @@ public class VerificationPeople {
 
     final Set<Path> chosen = new HashSet<Path>();
     chosen.add(new Path(paths.remove(paths.size() - 1)));
-    while (!paths.isEmpty() && chosen.size() < MAX_SAMPLE_FILES) {
+    while (paths.size() > 0 && chosen.size() < MAX_SAMPLE_FILES) {
       chosen.add(new Path(paths.remove(random.nextInt(paths.size() - 1))));
     }
     for (final Path p : chosen) {
