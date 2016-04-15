@@ -41,11 +41,13 @@ public class S3ToRedshiftLoaderGenerator {
       }
       columnList += ")";
 
-      //      if (table.getTableName().equals("requests")) { // TODO: Make this dynamic for the dump being processed.
-      // outputPartialTableUpdate(out, table, columnList);
-      //      } else {
-      outputTableOverwrite(out, table, columnList);
-      //      }
+      if (!table.isTemporary()) {
+        if (table.getTableName().equals("requests")) { // TODO: Make this dynamic for the dump being processed.
+          outputPartialTableUpdate(out, table, columnList);
+        } else {
+          outputTableOverwrite(out, table, columnList);
+        }
+      }
     }
   }
 

@@ -33,13 +33,15 @@ public class UpdateRedshift {
     }
     for (final String tableName : additions.keySet()) {
       final DataSchemaTable table = additions.get(tableName);
-      if (table.getNewlyGenerated()) {
-        final String create = SqlGenerator.generateCreateStatement(table);
-        aws.executeRedshiftQuery(create, config);
-      } else {
-        for (final DataSchemaColumn column : table.getColumns()) {
-          final String alter = SqlGenerator.generateAlterStatement(table, column);
-          aws.executeRedshiftQuery(alter, config);
+      if (!table.isTemporary()) {
+        if (table.getNewlyGenerated()) {
+          final String create = SqlGenerator.generateCreateStatement(table);
+          aws.executeRedshiftQuery(create, config);
+        } else {
+          for (final DataSchemaColumn column : table.getColumns()) {
+            final String alter = SqlGenerator.generateAlterStatement(table, column);
+            aws.executeRedshiftQuery(alter, config);
+          }
         }
       }
     }
