@@ -25,6 +25,8 @@ public class CanvasDataConfiguration implements RedshiftConfiguration {
   private String redshiftUser;
   private String redshiftPassword;
   private String tableInfoDynamoTable;
+  private String awsKey;
+  private String awsSecretKey;
 
   public static CanvasDataConfiguration getConfiguration(final String propertiesFileName)
       throws IOException, DataConfigurationException {
@@ -52,6 +54,8 @@ public class CanvasDataConfiguration implements RedshiftConfiguration {
     config.redshiftPort = getConfigParameter(properties, "redshift_port");
     config.redshiftUser = getConfigParameter(properties, "redshift_user");
     config.redshiftPassword = getConfigParameter(properties, "redshift_password");
+    config.awsKey = getConfigParameter(properties, "aws_key_id");
+    config.awsSecretKey = getConfigParameter(properties, "aws_secret_key");
     return config;
   }
 
@@ -118,6 +122,14 @@ public class CanvasDataConfiguration implements RedshiftConfiguration {
   @Override
   public String getRedshiftPassword() {
     return redshiftPassword;
+  }
+
+  public String getAwsKey() {
+    return awsKey;
+  }
+
+  public String getAwsSecretKey() {
+    return awsSecretKey;
   }
 
   @Override

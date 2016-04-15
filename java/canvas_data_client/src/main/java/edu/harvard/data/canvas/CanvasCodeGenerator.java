@@ -20,6 +20,7 @@ import edu.harvard.data.VerificationException;
 import edu.harvard.data.canvas.data_api.ApiClient;
 import edu.harvard.data.generator.CreateHiveTableGenerator;
 import edu.harvard.data.generator.CreateRedshiftTableGenerator;
+import edu.harvard.data.generator.ExistingTableSchemaTransformer;
 import edu.harvard.data.generator.GenerationSpec;
 import edu.harvard.data.generator.HiveQueryManifestGenerator;
 import edu.harvard.data.generator.IdentityJobGenerator;
@@ -31,6 +32,7 @@ import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.identity.IdentitySchemaTransformer;
 import edu.harvard.data.schema.DataSchema;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
+import edu.harvard.data.schema.existing.ExistingSchema;
 import edu.harvard.data.schema.extension.ExtensionSchema;
 import edu.harvard.data.schema.extension.ExtensionSchemaTable;
 
@@ -49,6 +51,7 @@ public class CanvasCodeGenerator {
   private static final String PHASE_THREE_PACKAGE = "edu.harvard.data.canvas.bindings.phase3";
   private static final String IDENTITY_HADOOP_PACKAGE = "edu.harvard.data.canvas.identity";
 
+  public static final String PHASE_ZERO_TABLES_JSON = "canvas/phase0_redshift_tables.json";
   public static final String PHASE_ONE_IDENTIFIERS_JSON = "canvas/phase1_identifiers.json";
   public static final String PHASE_TWO_ADDITIONS_JSON = "canvas/phase2_schema_additions.json";
   public static final String PHASE_THREE_ADDITIONS_JSON = "canvas/phase3_schema_additions.json";
@@ -113,25 +116,48 @@ public class CanvasCodeGenerator {
 
   public static List<DataSchema> transformSchema(final DataSchema base)
       throws VerificationException, IOException {
+    // We will transform the schema using the additions specified in json
+    // resources.
+    final ExtensionSchema phase2 = readExtensionSchema(PHASE_TWO_ADDITIONS_JSON);
+    final ExtensionSchema phase3 = readExtensionSchema(PHASE_THREE_ADDITIONS_JSON);
+
     // Transform the schema to remove identifers
     final IdentitySchemaTransformer idTrans = new IdentitySchemaTransformer();
     final DataSchema schema1 = idTrans.transform(base, readIdentities(PHASE_ONE_IDENTIFIERS_JSON),
         IdentifierType.CanvasDataID);
 
-    // Transform the schema using the additions specified in json resources.
-    final ExtensionSchema phase2 = readExtensionSchema(PHASE_TWO_ADDITIONS_JSON);
-    final ExtensionSchema phase3 = readExtensionSchema(PHASE_THREE_ADDITIONS_JSON);
-
     final SchemaTransformer transformer = new SchemaTransformer();
     final DataSchema schema2 = transformer.transform(schema1, phase2);
     final DataSchema schema3 = transformer.transform(schema2, phase3);
 
+    // Add in any tables that are to be read from Redshift. This has to happen
+    // last so that we have the correct schema for all existing tables; a table
+    // that will be read from Redshift is always based on a table that was
+    // previously written there.
+    final ExistingTableSchemaTransformer existingTrans = new ExistingTableSchemaTransformer();
+    final ExistingSchema existing = readExistingSchemas(PHASE_ZERO_TABLES_JSON);
+    final DataSchema schema0 = existingTrans.transform(base, existing, schema3);
+
     final List<DataSchema> schemas = new ArrayList<DataSchema>();
-    schemas.add(base);
+    schemas.add(schema0);
     schemas.add(schema1);
     schemas.add(schema2);
     schemas.add(schema3);
     return schemas;
+  }
+
+  public static ExistingSchema readExistingSchemas(final String jsonResource) throws IOException {
+    log.info("Reading existing table schemas from file " + jsonResource);
+    final ObjectMapper jsonMapper = new ObjectMapper();
+    jsonMapper.setDateFormat(FormatLibrary.JSON_DATE_FORMAT);
+    final ClassLoader classLoader = CanvasCodeGenerator.class.getClassLoader();
+    try (final InputStream in = classLoader.getResourceAsStream(jsonResource)) {
+      final ExistingSchema schema = jsonMapper.readValue(in, ExistingSchema.class);
+      for (final String tableName : schema.getTables().keySet()) {
+        schema.getTables().get(tableName).setTableName(tableName);
+      }
+      return schema;
+    }
   }
 
   private static Map<String, Map<String, List<IdentifierType>>> readIdentities(
@@ -156,7 +182,7 @@ public class CanvasCodeGenerator {
     try (final InputStream in = classLoader.getResourceAsStream(jsonResource)) {
       final ExtensionSchema schema = jsonMapper.readValue(in, ExtensionSchema.class);
       for (final String tableName : schema.getTables().keySet()) {
-        ((ExtensionSchemaTable)schema.getTables().get(tableName)).setTableName(tableName);
+        ((ExtensionSchemaTable) schema.getTables().get(tableName)).setTableName(tableName);
       }
       return schema;
     }

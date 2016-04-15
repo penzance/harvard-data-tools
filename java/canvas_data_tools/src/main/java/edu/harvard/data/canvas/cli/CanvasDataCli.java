@@ -34,6 +34,7 @@ public class CanvasDataCli {
     @SubCommand(name = "postverify", impl = PostVerifyCommand.class),
     @SubCommand(name = "hadoop", impl = HadoopCommand.class),
     @SubCommand(name = "updateredshift", impl = UpdateRedshiftCommand.class),
+    @SubCommand(name = "unload", impl = UnloadExistingTablesCommand.class),
     @SubCommand(name = "cleanup", impl = CleanupCommand.class),
     @SubCommand(name = "fulldumps", impl = GetCompleteTableInfoCommand.class),
     @SubCommand(name = "listdumps", impl = ListDumpsCommand.class),
