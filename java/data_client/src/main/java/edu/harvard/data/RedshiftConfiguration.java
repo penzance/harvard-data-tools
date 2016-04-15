@@ -14,4 +14,8 @@ public interface RedshiftConfiguration {
 
   String getRedshiftHost();
 
+  String getAwsKey();
+
+  String getAwsSecretKey();
+
 }

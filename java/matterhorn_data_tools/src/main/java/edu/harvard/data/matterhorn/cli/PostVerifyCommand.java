@@ -12,7 +12,6 @@ import org.kohsuke.args4j.Option;
 
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfigurationException;
-import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
@@ -68,7 +67,6 @@ public class PostVerifyCommand implements Command {
       throw new DataConfigurationException(e);
     }
     final AwsUtils aws = new AwsUtils();
-    final FormatLibrary formats = new FormatLibrary();
     switch (phase) {
     case 0:
       return new Phase0PostVerifier(dumpId, aws, config.getScratchDir(), exec);

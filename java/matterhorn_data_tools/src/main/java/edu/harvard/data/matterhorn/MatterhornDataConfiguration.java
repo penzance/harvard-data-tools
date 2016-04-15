@@ -17,6 +17,8 @@ public class MatterhornDataConfiguration implements RedshiftConfiguration {
   private String redshiftPort;
   private String redshiftUser;
   private String redshiftPassword;
+  private String awsKey;
+  private String awsSecretKey;
 
   public static MatterhornDataConfiguration getConfiguration(final String propertiesFileName)
       throws IOException, DataConfigurationException {
@@ -36,6 +38,8 @@ public class MatterhornDataConfiguration implements RedshiftConfiguration {
     config.redshiftPort = getConfigParameter(properties, "redshift_port");
     config.redshiftUser = getConfigParameter(properties, "redshift_user");
     config.redshiftPassword = getConfigParameter(properties, "redshift_password");
+    config.awsKey = getConfigParameter(properties, "aws_key_id");
+    config.awsSecretKey = getConfigParameter(properties, "aws_secret_key");
     return config;
   }
 
@@ -85,4 +89,13 @@ public class MatterhornDataConfiguration implements RedshiftConfiguration {
     return "jdbc:postgresql://" + redshiftHost + ":" + redshiftPort + "/" + redshiftDb;
   }
 
+  @Override
+  public String getAwsKey() {
+    return awsKey;
+  }
+
+  @Override
+  public String getAwsSecretKey() {
+    return awsSecretKey;
+  }
 }
