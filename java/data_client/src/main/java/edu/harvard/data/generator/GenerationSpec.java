@@ -21,6 +21,7 @@ public class GenerationSpec {
   private String identityHadoopPackage;
   private String hadoopManager;
   private IdentifierType mainIdentifier;
+  private String javaProjectName;
 
   public GenerationSpec(final int phaseCount) {
     this.phases = new ArrayList<SchemaPhase>();
@@ -73,6 +74,13 @@ public class GenerationSpec {
     return mainIdentifier;
   }
 
+  public void setJavaProjectName(final String javaProjectName) {
+    this.javaProjectName = javaProjectName;
+  }
+
+  public String getJavaProjectName() {
+    return javaProjectName;
+  }
 
   public void setJavaBindingPackages(final String... packageList) {
     if (packageList.length != phases.size()) {

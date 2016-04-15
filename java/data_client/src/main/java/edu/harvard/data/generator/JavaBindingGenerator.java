@@ -36,12 +36,12 @@ public class JavaBindingGenerator {
   private final File javaSrcBase;
   private final File baseDir;
 
-  public JavaBindingGenerator(final GenerationSpec spec, final String projectName) {
+  public JavaBindingGenerator(final GenerationSpec spec) {
     this.spec = spec;
     baseDir = new File(spec.getOutputBase(), "java");
     this.javaSrcBase = new File(baseDir, "src/main/java");
     this.schemaVersions = spec;
-    this.projectName = projectName;
+    this.projectName = spec.getJavaProjectName();
   }
 
   // Generates a new Maven project in the directory passed to the constructor.
