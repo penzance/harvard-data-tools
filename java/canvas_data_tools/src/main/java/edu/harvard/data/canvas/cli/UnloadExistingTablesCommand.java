@@ -9,13 +9,13 @@ import org.apache.logging.log4j.Logger;
 import org.kohsuke.args4j.Argument;
 
 import edu.harvard.data.AwsUtils;
-import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.DumpInfo;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.UnloadExistingTables;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.canvas.CanvasCodeGenerator;
+import edu.harvard.data.canvas.CanvasDataConfiguration;
 import edu.harvard.data.canvas.data_api.ApiClient;
 import edu.harvard.data.schema.DataSchema;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
@@ -33,7 +33,7 @@ public class UnloadExistingTablesCommand implements Command {
 
 
   @Override
-  public ReturnStatus execute(final DataConfiguration config, final ExecutorService exec)
+  public ReturnStatus execute(final CanvasDataConfiguration config, final ExecutorService exec)
       throws IOException, UnexpectedApiResponseException, DataConfigurationException,
       VerificationException {
     final AwsUtils aws = new AwsUtils();

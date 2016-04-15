@@ -124,10 +124,12 @@ public class CanvasDataConfiguration implements RedshiftConfiguration {
     return redshiftPassword;
   }
 
+  @Override
   public String getAwsKey() {
     return awsKey;
   }
 
+  @Override
   public String getAwsSecretKey() {
     return awsSecretKey;
   }

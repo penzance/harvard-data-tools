@@ -21,7 +21,7 @@ public class UnloadExistingTables {
     this.schema = schema;
   }
 
-  public void unload(final AwsUtils aws, final DataConfiguration config, final String s3Location,
+  public void unload(final AwsUtils aws, final RedshiftConfiguration config, final String s3Location,
       final Date dataBeginDate) throws SQLException {
     log.info("Connecting to Redshift to unload existing tables");
     for (final String tableName : existingSchema.getTables().keySet()) {
