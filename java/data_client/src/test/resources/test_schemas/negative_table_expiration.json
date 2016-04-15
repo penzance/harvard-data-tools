@@ -1,0 +1,7 @@
+{ "tables": {
+    "temporary_table" : {
+    	"expire_after_phase": -1
+    }
+  } 
+}
+

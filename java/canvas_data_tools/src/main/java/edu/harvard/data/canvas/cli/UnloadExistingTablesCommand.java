@@ -30,8 +30,6 @@ public class UnloadExistingTablesCommand implements Command {
   @Argument(index = 1, usage = "S3 location to store unloaded files.", metaVar = "s3://bucket/location", required = true)
   public String s3Location;
 
-
-
   @Override
   public ReturnStatus execute(final CanvasDataConfiguration config, final ExecutorService exec)
       throws IOException, UnexpectedApiResponseException, DataConfigurationException,
@@ -45,9 +43,10 @@ public class UnloadExistingTablesCommand implements Command {
     }
 
     final DataSchema base = api.getSchema(info.getSchemaVersion());
-    final ExistingSchema existingSchema = CanvasCodeGenerator
+    final CanvasCodeGenerator generator = new CanvasCodeGenerator(null, null, null);
+    final ExistingSchema existingSchema = generator
         .readExistingSchemas(CanvasCodeGenerator.PHASE_ZERO_TABLES_JSON);
-    final DataSchema schema0 = CanvasCodeGenerator.transformSchema(base).get(0);
+    final DataSchema schema0 = generator.transformSchema(base).get(0);
 
     try {
       new UnloadExistingTables(existingSchema, schema0).unload(aws, config, s3Location,

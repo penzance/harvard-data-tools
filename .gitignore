@@ -13,4 +13,6 @@ dependency-reduced-pom.xml
 log4j2.out.xml
 myparameters
 
+test-output
+
 Scratch.java
