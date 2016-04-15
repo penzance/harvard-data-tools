@@ -14,13 +14,15 @@ public class RedshiftTable extends DataSchemaTable {
   private final String name;
   private final List<DataSchemaColumn> columns;
   private final Map<String, DataSchemaColumn> columnsByName;
+  private final Integer expireAfterPhase;
 
   protected RedshiftTable(final String name, final Map<Integer, DataSchemaColumn> columnsByPosition)
       throws SQLException {
-    super(false, null);
+    super(false, null, null);
     this.name = name;
     this.columns = new ArrayList<DataSchemaColumn>(columnsByPosition.size());
     this.columnsByName = new HashMap<String, DataSchemaColumn>();
+    this.expireAfterPhase = null;
     for (int pos = 1; pos <= columnsByPosition.size(); pos++) {
       final DataSchemaColumn col = columnsByPosition.get(pos);
       columns.add(col);
@@ -29,9 +31,10 @@ public class RedshiftTable extends DataSchemaTable {
   }
 
   public RedshiftTable(final RedshiftTable original) {
-    super(original.newlyGenerated, original.owner);
+    super(original.newlyGenerated, original.owner, original.expireAfterPhase);
     this.name = original.name;
     this.columns = new ArrayList<DataSchemaColumn>();
+    this.expireAfterPhase = original.expireAfterPhase;
     this.columnsByName = new HashMap<String, DataSchemaColumn>();
     for (final DataSchemaColumn c : original.columns) {
       final DataSchemaColumn columnCopy = c.copy();
@@ -72,6 +75,11 @@ public class RedshiftTable extends DataSchemaTable {
   @Override
   public DataSchemaColumn getColumn(final String name) {
     return columnsByName.get(name);
+  }
+
+  @Override
+  public Integer getExpirationPhase() {
+    return expireAfterPhase;
   }
 
 }

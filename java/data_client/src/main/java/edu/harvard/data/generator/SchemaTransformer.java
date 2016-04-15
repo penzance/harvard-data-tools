@@ -104,6 +104,10 @@ public class SchemaTransformer {
           // If the table is set as owned in the extension schema, we need to
           // reflect that in the new schema.
           originalTable.setOwner(newTable.getOwner());
+          // Reflect whether the table is set to expire in the extension schema
+          if (newTable.isTemporary()) {
+            originalTable.setExpirationPhase(newTable.getExpirationPhase());
+          }
         }
       }
     }

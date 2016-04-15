@@ -31,7 +31,6 @@ public class CanvasDataSchemaTable extends DataSchemaTable {
   private final String databasePath; // non-null in requests
   private final String originalTable; // non-null in requests
 
-
   @JsonCreator
   public CanvasDataSchemaTable(@JsonProperty("dw_type") final DataWarehouseType dwType,
       @JsonProperty("description") final String description,
@@ -41,9 +40,9 @@ public class CanvasDataSchemaTable extends DataSchemaTable {
       @JsonProperty("hints") final Map<String, String> hints,
       @JsonProperty("data_base_path") final String databasePath,
       @JsonProperty("original_table") final String originalTable,
-      @JsonProperty("see_also") final String seeAlso,
-      @JsonProperty("owner") final TableOwner owner) {
-    super(false, owner);
+      @JsonProperty("see_also") final String seeAlso, @JsonProperty("owner") final TableOwner owner,
+      @JsonProperty("expire_after_phase") final Integer expireAfterPhase) {
+    super(false, owner, expireAfterPhase);
     this.dwType = dwType;
     this.description = description;
     this.incremental = incremental;
@@ -64,7 +63,7 @@ public class CanvasDataSchemaTable extends DataSchemaTable {
   }
 
   public CanvasDataSchemaTable(final CanvasDataSchemaTable original) {
-    super(original.newlyGenerated, original.owner);
+    super(original.newlyGenerated, original.owner, original.expireAfterPhase);
     this.dwType = original.dwType;
     this.description = original.description;
     this.incremental = original.incremental;
@@ -179,7 +178,8 @@ public class CanvasDataSchemaTable extends DataSchemaTable {
     for (final DataSchemaColumn column : columns2) {
       final String columnName = column.getName();
       if (map.containsKey(columnName)) {
-        map.get(columnName).calculateDifferences(tableName, (CanvasDataSchemaColumn) column, differences);
+        map.get(columnName).calculateDifferences(tableName, (CanvasDataSchemaColumn) column,
+            differences);
         map.remove(columnName);
       } else {
         differences.add(new SchemaDifference(tableName + ": Added column " + columnName));

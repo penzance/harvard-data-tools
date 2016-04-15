@@ -66,10 +66,10 @@ public class JavaBindingGenerator {
     copyPomXml();
 
     // Generate bindings for each step in the processing pipeline.
-    generateTableSet(schemaVersions.getPhase(0), null);
-    generateTableSet(schemaVersions.getPhase(1), schemaVersions.getPhase(0));
-    generateTableSet(schemaVersions.getPhase(2), schemaVersions.getPhase(1));
-    generateTableSet(schemaVersions.getPhase(3), schemaVersions.getPhase(2));
+    generateTableSet(0, schemaVersions.getPhase(0), null);
+    generateTableSet(1, schemaVersions.getPhase(1), schemaVersions.getPhase(0));
+    generateTableSet(2, schemaVersions.getPhase(2), schemaVersions.getPhase(1));
+    generateTableSet(3, schemaVersions.getPhase(3), schemaVersions.getPhase(2));
   }
 
   // Generate the bindings for one step in the processing pipeline. There are
@@ -83,13 +83,13 @@ public class JavaBindingGenerator {
   // TableGenerator is run once per table, and creates the individual table
   // class.
   //
-  private void generateTableSet(final SchemaPhase phase, final SchemaPhase previousVersion)
-      throws IOException {
+  private void generateTableSet(final int phase, final SchemaPhase currentVersion,
+      final SchemaPhase previousVersion) throws IOException {
     final File srcDir = new File(javaSrcBase,
-        phase.getJavaBindingPackage().replaceAll("\\.", File.separator));
-    final String classPrefix = phase.getPrefix();
-    final String version = phase.getSchema().getVersion();
-    final Map<String, DataSchemaTable> tables = phase.getSchema().getTables();
+        currentVersion.getJavaBindingPackage().replaceAll("\\.", File.separator));
+    final String classPrefix = currentVersion.getPrefix();
+    final String version = currentVersion.getSchema().getVersion();
+    final Map<String, DataSchemaTable> tables = currentVersion.getSchema().getTables();
     final String tableEnumName = spec.getJavaTableEnumName();
 
     // Create the base directory where all of the classes will be generated
@@ -99,27 +99,29 @@ public class JavaBindingGenerator {
       FileUtils.deleteDirectory(srcDir);
     }
     srcDir.mkdirs();
-    final List<String> tableNames = generateTableNames(tables);
+    final List<String> tableNames = generateTableNames(phase, tables);
 
     // Generate the Table enum.
     final File tableEnumFile = new File(srcDir, classPrefix + tableEnumName + ".java");
     try (final PrintStream out = new PrintStream(new FileOutputStream(tableEnumFile))) {
-      new JavaTableEnumGenerator(version, tableNames, phase, tableEnumName).generate(out);
+      new JavaTableEnumGenerator(version, tableNames, currentVersion, tableEnumName).generate(out);
     }
 
     // Generate the TableFactory class.
     final File tableFactoryFile = new File(srcDir, classPrefix + tableEnumName + "Factory.java");
     try (final PrintStream out = new PrintStream(new FileOutputStream(tableFactoryFile))) {
-      new JavaTableFactoryGenerator(version, tableNames, phase, tableEnumName).generate(out);
+      new JavaTableFactoryGenerator(version, tableNames, currentVersion, tableEnumName).generate(out);
     }
 
     // Generate a model class for each table.
     for (final String name : tables.keySet()) {
-      final String className = javaClass(tables.get(name).getTableName(), classPrefix);
-      final File classFile = new File(srcDir, className + ".java");
-      try (final PrintStream out = new PrintStream(new FileOutputStream(classFile))) {
-        new JavaModelClassGenerator(version, phase, previousVersion, tables.get(name))
-        .generate(out);
+      final DataSchemaTable table = tables.get(name);
+      if (!(table.isTemporary() && table.getExpirationPhase() < phase)) {
+        final String className = javaClass(table.getTableName(), classPrefix);
+        final File classFile = new File(srcDir, className + ".java");
+        try (final PrintStream out = new PrintStream(new FileOutputStream(classFile))) {
+          new JavaModelClassGenerator(version, currentVersion, previousVersion, table).generate(out);
+        }
       }
     }
   }
@@ -145,10 +147,13 @@ public class JavaBindingGenerator {
 
   // Generate a sorted list of table names for the switch tables in the enum and
   // factory classes
-  static List<String> generateTableNames(final Map<String, DataSchemaTable> tables) {
+  static List<String> generateTableNames(final int phase, final Map<String, DataSchemaTable> tables) {
     final List<String> tableNames = new ArrayList<String>();
     for (final String name : tables.keySet()) {
-      tableNames.add(tables.get(name).getTableName());
+      final DataSchemaTable table = tables.get(name);
+      if (!(table.isTemporary() && table.getExpirationPhase() < phase)) {
+        tableNames.add(table.getTableName());
+      }
     }
     Collections.sort(tableNames);
     return tableNames;

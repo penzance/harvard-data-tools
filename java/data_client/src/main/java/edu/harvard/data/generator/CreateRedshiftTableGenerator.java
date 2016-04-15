@@ -27,7 +27,9 @@ public class CreateRedshiftTableGenerator {
 
   private void generateCreateTableFile(final PrintStream out, final SchemaPhase phase) {
     for (final DataSchemaTable table : phase.getSchema().getTables().values()) {
-      out.println(SqlGenerator.generateCreateStatement(table));
+      if (!table.isTemporary()) {
+        out.println(SqlGenerator.generateCreateStatement(table));
+      }
     }
   }
 

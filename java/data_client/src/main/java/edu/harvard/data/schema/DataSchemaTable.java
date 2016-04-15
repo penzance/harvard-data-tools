@@ -9,6 +9,7 @@ public abstract class DataSchemaTable {
   @JsonIgnore
   protected boolean newlyGenerated;
   protected TableOwner owner;
+  protected Integer expireAfterPhase;
 
   public abstract String getTableName();
 
@@ -20,9 +21,10 @@ public abstract class DataSchemaTable {
 
   public abstract String getLikeTable();
 
-  protected DataSchemaTable(final boolean newlyGenerated, final TableOwner owner) {
+  protected DataSchemaTable(final boolean newlyGenerated, final TableOwner owner, final Integer expireAfterPhase) {
     this.newlyGenerated = newlyGenerated;
     this.owner = owner;
+    this.expireAfterPhase = expireAfterPhase;
   }
 
   public boolean getNewlyGenerated() {
@@ -48,6 +50,18 @@ public abstract class DataSchemaTable {
 
   public void setOwner(final TableOwner owner) {
     this.owner = owner;
+  }
+
+  public boolean isTemporary() {
+    return expireAfterPhase != null;
+  }
+
+  public Integer getExpirationPhase() {
+    return expireAfterPhase;
+  }
+
+  public void setExpirationPhase(final int phase) {
+    this.expireAfterPhase = phase;
   }
 
 }
