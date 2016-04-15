@@ -1,9 +1,91 @@
 { "tables": 
   { "requests": {
-      "owner": "java"
+      "owner": "java",
+      "columns" : [ 
+        {
+          "name" : "research_id",
+          "description" : "UUID generated for research data set.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "browser",
+          "description" : "Client-side browser from which the request was sent",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "os",
+          "description" : "Operating system from which the request was sent",
+          "type" : "varchar",
+          "length" : 255
+        }
+      ]
     },
     "admin_requests": {
       "like": "requests"
-    }
+    },
+    "requests_per_file": {
+      "owner": "java",
+      "tableName" : "requests_per_file",
+      "columns" : [ 
+        {
+          "name" : "file_id",
+          "description" : "Unique file ID.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "requests",
+          "description" : "Count of requests for the file.",
+          "type" : "bigint"
+        }
+      ]
+    },
+    "requests_per_page": {
+      "owner": "java",
+      "tableName" : "requests_per_page",
+      "columns" : [ 
+        {
+          "name" : "page_id",
+          "description" : "Unique page ID.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "requests",
+          "description" : "Count of requests for the page.",
+          "type" : "bigint"
+        }
+      ]
+    },
+    "course": {
+      "owner": "hive",
+      "tableName" : "course_dim",
+      "columns" : [ 
+        {
+          "name" : "student_enrollments",
+          "description" : "Number of enrolled users with the student_enrollment type",
+          "type" : "integer"
+        }
+      ]
+    },
+    "requests_per_user": {
+      "owner": "hive",
+      "tableName" : "requests_per_user",
+      "columns" : [ 
+        {
+          "name" : "user_id",
+          "description" : "Unique user ID, as defined in user_dim table.",
+          "type" : "bigint"
+        },
+        {
+          "name" : "requests",
+          "description" : "Count of requests by the user.",
+          "type" : "bigint"
+        }
+      ]
+    } 
+    
   }
 }
