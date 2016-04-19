@@ -27,7 +27,7 @@ import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.canvas.HadoopMultipleJobRunner;
 import edu.harvard.data.canvas.identity.CanvasIdentityHadoopManager;
 import edu.harvard.data.identity.HadoopIdentityKey;
-import edu.harvard.data.identity.CanvasDataIdIdentityReducer;
+import edu.harvard.data.identity.LongIdentityReducer;
 
 public class Phase1HadoopManager {
   private static final Logger log = LogManager.getLogger();
@@ -56,7 +56,7 @@ public class Phase1HadoopManager {
     job.setJarByClass(Phase1HadoopManager.class);
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(NullWritable.class);
-    job.setReducerClass(CanvasDataIdIdentityReducer.class);
+    job.setReducerClass(LongIdentityReducer.class);
     job.setMapOutputKeyClass(LongWritable.class);
     job.setMapOutputValueClass(HadoopIdentityKey.class);
     job.setInputFormatClass(TextInputFormat.class);

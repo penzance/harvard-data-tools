@@ -27,6 +27,7 @@ import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
 import edu.harvard.data.canvas.HadoopMultipleJobRunner;
+import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.identity.IdentityMap;
 import edu.harvard.data.io.HdfsTableReader;
 
@@ -81,7 +82,7 @@ public class Phase1PostVerifier implements Verifier {
       try (HdfsTableReader<IdentityMap> in = new HdfsTableReader<IdentityMap>(IdentityMap.class,
           format, fs, path)) {
         for (final IdentityMap id : in) {
-          identities.put(id.getCanvasDataID(), id);
+          identities.put((Long) id.get(IdentifierType.CanvasDataID), id);
         }
       }
     }
@@ -99,7 +100,7 @@ public class Phase1PostVerifier implements Verifier {
             throw new RuntimeException(
                 "Verification error: Canvas Data ID " + oldId + " missing from identity map");
           }
-          final String newId = identities.get(oldId).getResearchId();
+          final String newId = (String) identities.get(oldId).get(IdentifierType.ResearchUUID);
           out.writeBytes(parts[0] + "\t" + newId + "\n");
           line = in.readLine();
         }

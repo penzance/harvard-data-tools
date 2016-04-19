@@ -62,11 +62,12 @@ public class IdentityMapperGenerator {
     out.println("}");
   }
 
-  private void outputImportStatements(final PrintStream out, final String idType) {
+  private void outputImportStatements(final PrintStream out, final String idType)
+      throws VerificationException {
     out.println("import " + Map.class.getCanonicalName() + ";");
     out.println("import " + HashMap.class.getCanonicalName() + ";");
     out.println("import " + CSVRecord.class.getCanonicalName() + ";");
-    if (hasMultiplexedIdentities()) {
+    if (!hasMultipleMainIdColumns()) {
       out.println("import " + IdentifierType.class.getCanonicalName() + ";");
     }
     out.println("import " + IdentityMap.class.getCanonicalName() + ";");
@@ -74,13 +75,8 @@ public class IdentityMapperGenerator {
     out.println("import " + modelPackage + "." + modelClass + ";");
   }
 
-  private boolean hasMultiplexedIdentities() {
-    for (final List<IdentifierType> identifiers : identities.values()) {
-      if (identifiers.size() > 1) {
-        return true;
-      }
-    }
-    return false;
+  private boolean hasMultipleMainIdColumns() throws VerificationException {
+    return IdentityJobGenerator.getMainIdColumns(identities, table, mainIdentifier).size() != 1;
   }
 
   private void outputReadRecord(final PrintStream out) {
@@ -90,7 +86,8 @@ public class IdentityMapperGenerator {
     out.println("  }");
   }
 
-  private void outputGetHadoopKeys(final PrintStream out, final String idType) throws VerificationException {
+  private void outputGetHadoopKeys(final PrintStream out, final String idType)
+      throws VerificationException {
     out.println("  @Override");
     out.println("  protected Map<String, " + idType + "> getHadoopKeys() {");
     out.println("    Map<String, " + idType + "> keys = new HashMap<String, " + idType + ">();");
@@ -106,7 +103,7 @@ public class IdentityMapperGenerator {
   private void outputPopulateIdentityMap(final PrintStream out) throws VerificationException {
     out.println("  @Override");
     out.println("  protected boolean populateIdentityMap(final IdentityMap $id) {");
-    if (IdentityJobGenerator.getMainIdColumns(identities, table, mainIdentifier).size() > 1) {
+    if (hasMultipleMainIdColumns()) {
       out.println(
           "    throw new RuntimeException(\"Can't populate identity map with multiple main ID fields\");");
     } else {
@@ -138,10 +135,10 @@ public class IdentityMapperGenerator {
             "Table: " + table.getTableName() + " column: " + columnName + ". Can't use "
                 + IdentifierType.Other + " type in combination with any other identifier");
       }
-      final String setter = JavaBindingGenerator.javaSetter(identifierType.toString());
       out.println("      if (IdentifierType." + identifierType + ".getPattern().matcher("
           + fieldName + ").matches()) {");
-      out.println("        $id." + setter + "(phase0." + getter + "());");
+      out.println("        $id.set(IdentifierType." + identifierType.toString() + ", phase0."
+          + getter + "());");
       out.println("        populated = true;");
       out.println("      }");
     }
@@ -154,9 +151,9 @@ public class IdentityMapperGenerator {
     // values.
     if (identifierType != IdentifierType.Other) {
       final String getter = JavaBindingGenerator.javaGetter(columnName);
-      final String setter = JavaBindingGenerator.javaSetter(identifierType.toString());
       out.println("    if (phase0." + getter + "() != null) {");
-      out.println("      $id." + setter + "(phase0." + getter + "());");
+      out.println("      $id.set(IdentifierType." + identifierType.toString() + ", phase0." + getter
+          + "());");
       out.println("      populated = true;");
       out.println("    }");
     }

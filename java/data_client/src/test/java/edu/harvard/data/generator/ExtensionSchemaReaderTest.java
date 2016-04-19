@@ -1,13 +1,12 @@
 package edu.harvard.data.generator;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.schema.DataSchema;
@@ -43,19 +42,6 @@ public class ExtensionSchemaReaderTest {
     assertTrue(table.isTemporary());
     assertNotNull(table.getExpirationPhase());
     assertEquals(table.getExpirationPhase().intValue(), 1);
-  }
-
-  @DataProvider(name = "invalid_extension_schemas")
-  public static Object[][] invalidExtensionSchemas() {
-    return new Object[][] { { "no_name_column" }, { "no_type_column" },
-      { "no_length_varchar_column" }, { "zero_length_varchar_column" }, { "duplicate_column" },
-      { "negative_table_expiration" }, { "large_table_expiration" } };
-  }
-
-  @Test(dataProvider = "invalid_extension_schemas", expectedExceptions = VerificationException.class)
-  public void invalidExtensionSchema(final String resource)
-      throws IOException, VerificationException {
-    read(resource);
   }
 
 }
