@@ -8,6 +8,8 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -28,8 +30,9 @@ import edu.harvard.data.HadoopConfigurationException;
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore("javax.management.*")
 @PrepareForTest(FileSystem.class)
-public class IdentityReducerTests {
+public class IdentityReducerSetupTests {
 
+  private static final IdentifierType MAIN_IDENTIFIER = IdentifierType.XID;
   private static final URI URI1 = URI.create("mock://cache_file_1");
   private static final URI URI2 = URI.create("mock://cache_file_2");
   private static final URI URI3 = URI.create("mock://cache_file_3");
@@ -55,7 +58,7 @@ public class IdentityReducerTests {
     HadoopCacheFileMocker.mockInputStream(fs, URI1, ID_MAP_FILE1);
     HadoopCacheFileMocker.mockInputStream(fs, URI2, ID_MAP_FILE2);
     HadoopCacheFileMocker.mockInputStream(fs, URI3, ID_MAP_FILE3);
-    identityReducer = new IdentityReducer<String>(IdentifierType.XID);
+    identityReducer = new IdentityReducer<String>(MAIN_IDENTIFIER);
   }
 
   @Test
@@ -104,5 +107,24 @@ public class IdentityReducerTests {
     identityReducer.setup(context);
   }
 
-  // Test DelimitedFileIterator with a format that contains headers.
+  private Iterable<HadoopIdentityKey> getIterable(final HadoopIdentityKey... keys) {
+    final List<HadoopIdentityKey> lst = new ArrayList<HadoopIdentityKey>();
+    for (final HadoopIdentityKey key : keys) {
+      lst.add(key);
+    }
+    return lst;
+  }
+
+  @Test
+  public void runReducer() throws IOException, InterruptedException {
+    identityReducer.reduce("some_xid", getIterable(), context);
+  }
+
+  // Check existing object uses the right UUID
+  // Check new identity generates a new UUID
+  // Check that new identity data is properly added
+  // Give a list of some nulls and some populated. Check they are collapsed
+  // Empty values?
+  // Test with empty identity map
+  //
 }
