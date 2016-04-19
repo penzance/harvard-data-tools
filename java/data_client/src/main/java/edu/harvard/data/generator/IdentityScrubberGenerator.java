@@ -68,6 +68,7 @@ public class IdentityScrubberGenerator {
   private void outputImportStatements(final PrintStream out, final String idType) {
     out.println("import " + CSVRecord.class.getCanonicalName() + ";");
     out.println("import " + IdentityMap.class.getCanonicalName() + ";");
+    out.println("import " + IdentifierType.class.getCanonicalName() + ";");
     out.println("import " + DataTable.class.getCanonicalName() + ";");
     out.println("import edu.harvard.data.identity." + idType + "IdentityScrubber;");
     out.println("import " + phase0ModelPackage + "." + phase0ModelClass + ";");
@@ -81,24 +82,26 @@ public class IdentityScrubberGenerator {
         + "(format, csvRecord);");
     out.println(
         "    final " + phase1ModelClass + " phase1 = new " + phase1ModelClass + "(phase0);");
-    for (final String idColumn : IdentityJobGenerator.getMainIdColumns(identities, table, mainIdentifier)) {
+    for (final String idColumn : IdentityJobGenerator.getMainIdColumns(identities, table,
+        mainIdentifier)) {
       final String getter = JavaBindingGenerator.javaGetter(idColumn);
       final String setter = JavaBindingGenerator
           .javaSetter(idColumn + IdentitySchemaTransformer.RESEARCH_UUID_SUFFIX);
       out.println("    if (phase0." + getter + "() != null) {");
-      out.println(
-          "      phase1." + setter + "(identities.get(phase0." + getter + "()).getResearchId());");
+      out.println("      phase1." + setter + "((String) identities.get(phase0." + getter
+          + "()).get(IdentifierType.ResearchUUID));");
       out.println("    }");
     }
     out.println("    return phase1;");
     out.println("  }");
   }
 
-  private void outputGetHadoopKey(final PrintStream out, final String idType) throws VerificationException {
-    final String getter = JavaBindingGenerator.javaGetter(mainIdentifier.toString());
+  private void outputGetHadoopKey(final PrintStream out, final String idType)
+      throws VerificationException {
     out.println("  @Override");
     out.println("  protected " + idType + " getHadoopKey(final IdentityMap id) {");
-    out.println("    return id." + getter + "();");
+    out.println("    return (" + mainIdentifier.getType().getSimpleName()
+        + ") id.get(IdentifierType." + mainIdentifier.toString() + ");");
     out.println("  }");
   }
 

@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.util.Iterator;
 import java.util.zip.GZIPInputStream;
 
-import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
@@ -61,7 +60,7 @@ class HdfsDelimitedFileIterator<T extends DataTable> extends DelimitedFileIterat
     if (inStream != null) {
       return inStream;
     }
-    final FSDataInputStream inStream = fs.open(path);
+    final InputStream inStream = fs.open(path);
     switch (format.getCompression()) {
     case Gzip:
       return new GZIPInputStream(inStream);

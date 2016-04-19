@@ -11,12 +11,17 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import edu.harvard.data.FormatLibrary.Format;
+import edu.harvard.data.identity.HadoopIdentityKey;
 
 public abstract class HadoopJob {
   private static final Logger log = LogManager.getLogger();
@@ -36,8 +41,10 @@ public abstract class HadoopJob {
     this.outputDir = outputDir;
   }
 
-  protected void setPaths(final Job job, final AwsUtils aws, final URI hdfsService, final String in,
-      final String out) throws IOException {
+  public abstract Job getJob() throws IOException;
+
+  public static void setPaths(final Job job, final AwsUtils aws, final URI hdfsService,
+      final String in, final String out) throws IOException {
     for (final Path path : listFiles(hdfsService, in)) {
       FileInputFormat.addInputPath(job, path);
       log.debug("Input path: " + path.toString());
@@ -85,8 +92,6 @@ public abstract class HadoopJob {
     return new Text(writer.toString().trim());
   }
 
-  public abstract Job getJob() throws IOException;
-
   public static Text recordToText(final DataTable record, final TableFormat format)
       throws IOException, InterruptedException {
     final StringWriter writer = new StringWriter();
@@ -94,5 +99,26 @@ public abstract class HadoopJob {
       printer.printRecord(record.getFieldsAsList(format));
     }
     return new Text(writer.toString().trim());
+  }
+
+  public static TableFormat getFormat(
+      final Reducer<?, HadoopIdentityKey, Text, NullWritable>.Context context) {
+    final String formatString = context.getConfiguration().get("format");
+    if (formatString == null) {
+      throw new HadoopConfigurationException(
+          "Required Hadoop configuration parameter 'format' missing");
+    }
+    final Format formatName;
+    try {
+      formatName = Format.valueOf(formatString);
+    } catch (final IllegalArgumentException e) {
+      throw new HadoopConfigurationException(
+          "Unknown file format: \"" + formatString + "\". Expected one of " + Format.values(), e);
+    }
+    final TableFormat format = new FormatLibrary().getFormat(formatName);
+    if (format == null) {
+      throw new HadoopConfigurationException("Unknown format " + formatName);
+    }
+    return format;
   }
 }

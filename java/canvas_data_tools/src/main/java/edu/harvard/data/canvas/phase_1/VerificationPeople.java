@@ -30,6 +30,7 @@ import org.apache.logging.log4j.Logger;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.canvas.CanvasDataConfiguration;
 import edu.harvard.data.canvas.bindings.phase0.Phase0Requests;
+import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.identity.IdentityMap;
 import edu.harvard.data.io.FileTableWriter;
 import edu.harvard.data.io.HdfsTableReader;
@@ -160,7 +161,7 @@ public class VerificationPeople {
       try (final ResultSet rs = statement.executeQuery();) {
         while (rs.next()) {
           final IdentityMap id = new IdentityMap(rs);
-          originalIdentities.put(id.getCanvasDataID(), id);
+          originalIdentities.put((Long) id.get(IdentifierType.CanvasDataID), id);
         }
       }
     }
@@ -176,12 +177,12 @@ public class VerificationPeople {
         TableWriter<IdentityMap> out = new FileTableWriter<IdentityMap>(IdentityMap.class, format,
             "identity_map", outStream)) {
       for (final IdentityMap id : originalIdentities.values()) {
-        unknownPeople.remove(id.getCanvasDataID());
+        unknownPeople.remove(id.get(IdentifierType.CanvasDataID));
         out.add(id);
       }
       for (final Long canvasDataId : unknownPeople) {
         final IdentityMap id = new IdentityMap();
-        id.setCanvasDataID(canvasDataId);
+        id.set(IdentifierType.CanvasDataID, canvasDataId);
         out.add(id);
       }
     }

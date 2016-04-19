@@ -27,7 +27,7 @@ public class ExistingTableSchemaTransformer {
    * @param existing
    *          an {@code ExistingSchema} object that describes any additional
    *          tables to be added to the base schema.
-   * @param extensions
+   * @param finalSchema
    *          the fully-transformed set of tables that represent the current
    *          state of the database. Since an existing table is based on a table
    *          elsewhere in the schema, this method requires any table
