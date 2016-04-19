@@ -98,7 +98,7 @@ public class CanvasCodeGenerator {
     new CreateHiveTableGenerator(dir, spec).generate();
 
     log.info("Generating Hive query manifests in " + dir);
-    new HiveQueryManifestGenerator(new File(gitDir, "hive/canvas"), dir, spec).generate();
+    new HiveQueryManifestGenerator(dir, new File(gitDir, "hive/canvas"), spec).generate();
 
     log.info("Generating Redshift table definitions in " + dir);
     new CreateRedshiftTableGenerator(dir, spec).generate();

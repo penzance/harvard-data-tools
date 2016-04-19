@@ -93,7 +93,7 @@ public class MatterhornCodeGenerator {
     new CreateHiveTableGenerator(dir, spec).generate();
 
     log.info("Generating Hive query manifests in " + dir);
-    new HiveQueryManifestGenerator(new File(gitDir, "hive/matterhorn"), dir, spec).generate();
+    new HiveQueryManifestGenerator(dir, new File(gitDir, "hive/matterhorn"), spec).generate();
 
     log.info("Generating Redshift table definitions in " + dir);
     new CreateRedshiftTableGenerator(dir, spec).generate();

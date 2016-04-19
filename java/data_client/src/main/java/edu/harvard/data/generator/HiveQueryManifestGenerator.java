@@ -24,7 +24,7 @@ public class HiveQueryManifestGenerator {
   }
 
   public void generate() throws IOException {
-    for (int i = 1; i <= 3; i++) {
+    for (int i = 2; i <= 3; i++) {
       final String fileBase = "phase_" + i + "_hive";
       final File file = new File(dir, fileBase + ".sh");
       final File hiveDir = new File(hiveBase, "phase_" + i);
