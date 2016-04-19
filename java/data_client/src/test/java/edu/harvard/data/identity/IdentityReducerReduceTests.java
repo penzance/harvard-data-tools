@@ -53,8 +53,8 @@ public class IdentityReducerReduceTests {
     id.set(IdentifierType.ResearchUUID, "Research ID");
     id.set(IdentifierType.HUID, "HUID");
     id.set(IdentifierType.XID, XID);
-    id.set(IdentifierType.CanvasID, 12345);
-    id.set(IdentifierType.CanvasDataID, 67890);
+    id.set(IdentifierType.CanvasID, 12345L);
+    id.set(IdentifierType.CanvasDataID, 67890L);
     return id;
   }
 
@@ -79,6 +79,7 @@ public class IdentityReducerReduceTests {
   }
 
   @Test
+  // Check that a user's existing research ID is re-used
   public void existingUUID() throws IOException, InterruptedException {
     final IdentityMap id = makeId();
     identityReducer.identities.put(XID, id);
@@ -88,22 +89,41 @@ public class IdentityReducerReduceTests {
   }
 
   @Test
+  // Check that a new research UUID is generated if there's no matching ID
   public void newUUID() throws IOException, InterruptedException {
     final IdentityMap id = makeId();
     id.set(IdentifierType.XID, "some_other_xid");
-    identityReducer.identities.put(XID, id);
+    identityReducer.identities.put((String) id.get(IdentifierType.XID), id);
     identityReducer.reduce(XID, getIterable(makeId(XID)), context);
     final IdentityMap written = getWrittenMap();
     assertNotEquals(id.get(IdentifierType.ResearchUUID), written.get(IdentifierType.ResearchUUID));
   }
 
-
-
-  // Check existing object uses the right UUID
-  // Check new identity generates a new UUID
+  @Test
   // Check that new identity data is properly added
+  public void identityPopulation() throws IOException, InterruptedException {
+    final IdentityMap original = makeId();
+    identityReducer.reduce(XID, getIterable(original), context);
+    final IdentityMap written = getWrittenMap();
+    assertEquals(original.get(IdentifierType.HUID), written.get(IdentifierType.HUID));
+    assertEquals(original.get(IdentifierType.XID), written.get(IdentifierType.XID));
+    assertEquals(original.get(IdentifierType.CanvasID), written.get(IdentifierType.CanvasID));
+    assertEquals(original.get(IdentifierType.CanvasDataID), written.get(IdentifierType.CanvasDataID));
+  }
+
+  @Test
   // Give a list of some nulls and some populated. Check they are collapsed
-  // Empty values?
-  // Test with empty identity map
-  //
+  public void mergeIdentities() throws IOException, InterruptedException {
+    final IdentityMap id1 = makeId(XID);
+    final IdentityMap id2 = makeId(XID);
+    id1.set(IdentifierType.HUID, "huid");
+    id1.set(IdentifierType.CanvasID, 123L);
+    id2.set(IdentifierType.CanvasDataID, 456L);
+    identityReducer.reduce(XID, getIterable(id1, id2), context);
+    final IdentityMap written = getWrittenMap();
+    assertEquals("huid", written.get(IdentifierType.HUID));
+    assertEquals(XID, written.get(IdentifierType.XID));
+    assertEquals(123L, written.get(IdentifierType.CanvasID));
+    assertEquals(456L, written.get(IdentifierType.CanvasDataID));
+  }
 }

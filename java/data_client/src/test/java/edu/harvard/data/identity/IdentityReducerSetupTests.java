@@ -8,8 +8,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -106,25 +104,4 @@ public class IdentityReducerSetupTests {
     when(config.get("format")).thenReturn("Some unknown format");
     identityReducer.setup(context);
   }
-
-  private Iterable<HadoopIdentityKey> getIterable(final HadoopIdentityKey... keys) {
-    final List<HadoopIdentityKey> lst = new ArrayList<HadoopIdentityKey>();
-    for (final HadoopIdentityKey key : keys) {
-      lst.add(key);
-    }
-    return lst;
-  }
-
-  @Test
-  public void runReducer() throws IOException, InterruptedException {
-    identityReducer.reduce("some_xid", getIterable(), context);
-  }
-
-  // Check existing object uses the right UUID
-  // Check new identity generates a new UUID
-  // Check that new identity data is properly added
-  // Give a list of some nulls and some populated. Check they are collapsed
-  // Empty values?
-  // Test with empty identity map
-  //
 }
