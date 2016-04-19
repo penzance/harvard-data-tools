@@ -16,7 +16,7 @@ import org.apache.hadoop.fs.PositionedReadable;
 import org.apache.hadoop.fs.Seekable;
 import org.powermock.api.mockito.PowerMockito;
 
-import edu.harvard.data.identity.IdentityReducerTests;
+import edu.harvard.data.identity.IdentityReducerSetupTests;
 
 public class HadoopCacheFileMocker {
 
@@ -31,7 +31,7 @@ public class HadoopCacheFileMocker {
 
   public static void mockInputStream(final FileSystem fs, final URI uri, final String fileName)
       throws IOException {
-    final InputStream in = IdentityReducerTests.class.getClassLoader()
+    final InputStream in = IdentityReducerSetupTests.class.getClassLoader()
         .getResourceAsStream(fileName);
     final SeekableInputStream seekable = new SeekableInputStream(in);
     when(fs.open(new Path(uri))).thenReturn(new FSDataInputStream(seekable));

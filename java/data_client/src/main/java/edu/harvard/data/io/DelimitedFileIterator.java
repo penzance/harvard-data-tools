@@ -17,6 +17,7 @@ import edu.harvard.data.DataTable;
 import edu.harvard.data.RecordParsingException;
 import edu.harvard.data.TableFormat;
 
+// TODO: Test DelimitedFileIterator with a format that contains headers.
 class DelimitedFileIterator<T extends DataTable> implements Iterator<T>, Closeable {
 
   private Iterator<CSVRecord> iterator;

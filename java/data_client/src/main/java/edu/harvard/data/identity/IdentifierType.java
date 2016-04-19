@@ -3,11 +3,11 @@ package edu.harvard.data.identity;
 import java.util.regex.Pattern;
 
 public enum IdentifierType {
-  CanvasID ("canvas_id", ".*", Long.class),
-  CanvasDataID ("canvas_data_id", ".*", Long.class),
+  ResearchUUID ("research_id", ".*", String.class),
   HUID ("huid", "\\d{8}", String.class),
   XID ("xid", "[a-zA-Z][\\d|\\w]{7}", String.class),
-  ResearchUUID ("research_id", ".*", String.class),
+  CanvasID ("canvas_id", ".*", Long.class),
+  CanvasDataID ("canvas_data_id", ".*", Long.class),
   Other ("other", ".*", Void.class);
 
   private String fieldName;

@@ -90,18 +90,22 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
   @Override
   public List<Object> getFieldsAsList(final TableFormat formatter) {
     final List<Object> fields = new ArrayList<Object>();
-    for (final IdentifierType type : IdentifierType.values()) {
-      fields.add(identities.get(type));
-    }
+    fields.add(identities.get(IdentifierType.ResearchUUID));
+    fields.add(identities.get(IdentifierType.HUID));
+    fields.add(identities.get(IdentifierType.XID));
+    fields.add(identities.get(IdentifierType.CanvasID));
+    fields.add(identities.get(IdentifierType.CanvasDataID));
     return fields;
   }
 
   @Override
   public List<String> getFieldNames() {
     final List<String> fields = new ArrayList<String>();
-    for (final IdentifierType type : IdentifierType.values()) {
-      fields.add(type.getFieldName());
-    }
+    fields.add(IdentifierType.ResearchUUID.getFieldName());
+    fields.add(IdentifierType.HUID.getFieldName());
+    fields.add(IdentifierType.XID.getFieldName());
+    fields.add(IdentifierType.CanvasID.getFieldName());
+    fields.add(IdentifierType.CanvasDataID.getFieldName());
     return fields;
   }
 
@@ -109,7 +113,9 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
   public String toString() {
     String s = "";
     for (final IdentifierType type : IdentifierType.values()) {
-      s += type.getFieldName() + ": " + identities.get(type) + " ";
+      if (type != IdentifierType.Other) {
+        s += type.getFieldName() + ": " + identities.get(type) + " ";
+      }
     }
     return s.trim();
   }
@@ -138,9 +144,11 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
 
   private String getLookupSql(final List<String> params, final List<Object> vals) {
     for (final IdentifierType type : IdentifierType.values()) {
-      if (identities.containsKey(type)) {
-        params.add(type.getFieldName() + " = ?");
-        vals.add(identities.get(type));
+      if (type != IdentifierType.Other) {
+        if (identities.containsKey(type)) {
+          params.add(type.getFieldName() + " = ?");
+          vals.add(identities.get(type));
+        }
       }
     }
 
