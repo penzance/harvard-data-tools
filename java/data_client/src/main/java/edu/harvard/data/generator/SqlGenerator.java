@@ -11,8 +11,12 @@ public class SqlGenerator {
     final List<DataSchemaColumn> columns = table.getColumns();
     for (int i = 0; i < columns.size(); i++) {
       final DataSchemaColumn column = columns.get(i);
+      String columnName = column.getName();
+      if (columnName.contains(".")) {
+        columnName = columnName.substring(columnName.lastIndexOf(".") + 1);
+      }
       final String redshiftType = column.getType().getRedshiftType(column.getLength());
-      s += "    " + column.getName() + " " + redshiftType;
+      s += "    " + columnName + " " + redshiftType;
       if (i < columns.size() - 1) {
         s += ",\n";
       } else {
