@@ -29,7 +29,7 @@ public class CreateHiveTableGenerator {
   }
 
   public void generate() throws IOException {
-    for (int i=0; i<3; i++) {
+    for (int i=1; i<3; i++) {
       final String fileBase = "phase_" + (i+1) + "_create_tables";
       final File phaseFile = new File(dir, fileBase + ".sh");
       try (final PrintStream out = new PrintStream(new FileOutputStream(phaseFile))) {
@@ -94,7 +94,11 @@ public class CreateHiveTableGenerator {
     final List<DataSchemaColumn> columns = table.getColumns();
     for (int i = 0; i < columns.size(); i++) {
       final DataSchemaColumn column = columns.get(i);
-      out.print("    " + column.getName() + " " + column.getType().getHiveType());
+      String columnName = column.getName();
+      if (columnName.contains(".")) {
+        columnName = columnName.substring(columnName.lastIndexOf(".") + 1);
+      }
+      out.print("    " + columnName + " " + column.getType().getHiveType());
       if (i < columns.size() - 1) {
         out.println(",");
       } else {
