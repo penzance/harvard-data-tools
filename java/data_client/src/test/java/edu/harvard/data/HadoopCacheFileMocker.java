@@ -21,8 +21,8 @@ import edu.harvard.data.identity.IdentityReducerSetupTests;
 public class HadoopCacheFileMocker {
 
   public static FileSystem setupFilesystem(final Configuration config) throws IOException {
-    final FileSystem fs = mock(FileSystem.class);
     PowerMockito.mockStatic(FileSystem.class);
+    final FileSystem fs = mock(FileSystem.class);
     when(FileSystem.get(config)).thenReturn(fs);
     when(fs.exists(any(Path.class))).thenReturn(true);
     when(fs.isDirectory(any(Path.class))).thenReturn(false);
