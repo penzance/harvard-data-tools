@@ -34,10 +34,14 @@ public class S3ToRedshiftLoaderGenerator {
       String columnList = "(";
       for (int i = 0; i < table.getColumns().size(); i++) {
         final DataSchemaColumn column = table.getColumns().get(i);
+        String columnName = column.getName();
+        if (columnName.contains(".")) {
+          columnName = columnName.substring(columnName.lastIndexOf(".") + 1);
+        }
         if (i > 0) {
           columnList += ",";
         }
-        columnList += column.getName();
+        columnList += columnName;
       }
       columnList += ")";
 
