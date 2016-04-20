@@ -12,15 +12,15 @@ public class HiveQueryManifestGenerator {
   private static final Logger log = LogManager.getLogger();
 
   private final File hiveBase;
-  private final GenerationSpec schemaVersions;
+  private final GenerationSpec spec;
   private final File dir;
 
 
-  public HiveQueryManifestGenerator(final File dir, final File hiveDir,
-      final GenerationSpec schemaVersions) {
+  public HiveQueryManifestGenerator(final File dir,
+      final GenerationSpec spec) {
     this.dir = dir;
-    this.hiveBase = hiveDir;
-    this.schemaVersions = schemaVersions;
+    this.hiveBase = spec.getHiveScriptDir();
+    this.spec = spec;
   }
 
   public void generate() throws IOException {
@@ -32,7 +32,7 @@ public class HiveQueryManifestGenerator {
       log.info("Phase " + i + " hive directory: " + hiveDir);
 
       try (final PrintStream out = new PrintStream(new FileOutputStream(file))) {
-        generateHiveManifest(out, schemaVersions.getPhase(i), hiveDir,
+        generateHiveManifest(out, spec.getPhase(i), hiveDir,
             "/home/hadoop/" + fileBase + ".out");
       }
     }

@@ -22,6 +22,7 @@ public class GenerationSpec {
   private String hadoopManager;
   private IdentifierType mainIdentifier;
   private String javaProjectName;
+  private File hiveScriptDir;
 
   public GenerationSpec(final int phaseCount) {
     this.phases = new ArrayList<SchemaPhase>();
@@ -80,6 +81,14 @@ public class GenerationSpec {
 
   public String getJavaProjectName() {
     return javaProjectName;
+  }
+
+  public void setHiveScriptDir(final File hiveScriptDir) {
+    this.hiveScriptDir = hiveScriptDir;
+  }
+
+  public File getHiveScriptDir() {
+    return hiveScriptDir;
   }
 
   public void setJavaBindingPackages(final String... packageList) {

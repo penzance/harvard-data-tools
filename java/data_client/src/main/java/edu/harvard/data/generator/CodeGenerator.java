@@ -80,7 +80,7 @@ public abstract class CodeGenerator {
     new CreateHiveTableGenerator(codeDir, spec).generate();
 
     log.info("Generating Hive query manifests in " + codeDir);
-    new HiveQueryManifestGenerator(new File(gitDir, "hive/canvas"), codeDir, spec).generate();
+    new HiveQueryManifestGenerator(codeDir, spec).generate();
 
     log.info("Generating Redshift table definitions in " + codeDir);
     new CreateRedshiftTableGenerator(codeDir, spec).generate();

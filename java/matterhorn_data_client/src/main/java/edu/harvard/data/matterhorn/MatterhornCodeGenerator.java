@@ -67,6 +67,7 @@ public class MatterhornCodeGenerator extends CodeGenerator {
     spec.setJavaHadoopPackage(IDENTITY_HADOOP_PACKAGE);
     spec.setHadoopIdentityManagerClass("MatterhornIdentityHadoopManager");
     spec.setMainIdentifier(IdentifierType.HUID);
+    spec.setHiveScriptDir(new File(gitDir, "hive/matterhorn"));
 
     // Set the four schema versions in the spec.
     final DataSchema schema0 = readSchema(schemaVersion);

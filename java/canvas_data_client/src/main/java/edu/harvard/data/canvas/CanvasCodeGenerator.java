@@ -61,6 +61,7 @@ public class CanvasCodeGenerator extends CodeGenerator {
     spec.setJavaHadoopPackage(IDENTITY_HADOOP_PACKAGE);
     spec.setHadoopIdentityManagerClass("CanvasIdentityHadoopManager");
     spec.setMainIdentifier(IdentifierType.CanvasDataID);
+    spec.setHiveScriptDir(new File(gitDir, "hive/canvas"));
 
     // Get the specified schema version (or fail if that version doesn't exist).
     final CanvasDataConfiguration config = CanvasDataConfiguration
