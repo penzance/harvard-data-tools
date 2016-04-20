@@ -24,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.identity.HadoopIdentityKey;
+import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.identity.StringIdentityReducer;
 import edu.harvard.data.matterhorn.HadoopMultipleJobRunner;
 import edu.harvard.data.matterhorn.identity.MatterhornIdentityHadoopManager;
@@ -45,6 +46,7 @@ public class Phase1HadoopManager {
 
   public void runJobs(final Configuration hadoopConfig) throws IOException, DataConfigurationException {
     hadoopConfig.set("format", Format.DecompressedCanvasDataFlatFiles.toString());
+    hadoopConfig.set("mainIdentifier", IdentifierType.HUID.toString());
     runMapJobs(hadoopConfig);
     runScrubJobs(hadoopConfig);
   }

@@ -10,8 +10,8 @@ public class StringIdentityReducer extends Reducer<Text, HadoopIdentityKey, Text
 
   private final IdentityReducer<String> identityReducer;
 
-  public StringIdentityReducer(final IdentifierType mainIdentifier) {
-    this.identityReducer = new IdentityReducer<String>(mainIdentifier);
+  public StringIdentityReducer() {
+    this.identityReducer = new IdentityReducer<String>();
   }
 
   @Override

@@ -77,16 +77,16 @@ class SessionReducer extends Reducer<Text, Text, Text, NullWritable> {
   @Override
   public void reduce(final Text key, final Iterable<Text> values, final Context context)
       throws IOException, InterruptedException {
-    long earliest = Long.MIN_VALUE;
-    long latest = Long.MAX_VALUE;
+    long latest = Long.MIN_VALUE;
+    long earliest = Long.MAX_VALUE;
     for (final Text value : values) {
       final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
       final Phase1Event event = new Phase1Event(format, parser.getRecords().get(0));
       final long time = event.getCreated().getTime();
-      if (time < latest) {
+      if (time > latest) {
         latest = time;
       }
-      if (time > earliest) {
+      if (time < earliest) {
         earliest = time;
       }
     }

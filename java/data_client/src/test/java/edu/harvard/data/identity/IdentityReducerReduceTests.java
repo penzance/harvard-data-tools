@@ -36,8 +36,10 @@ public class IdentityReducerReduceTests {
     config = mock(Configuration.class);
     context = mock(Reducer.Context.class);
     when(context.getConfiguration()).thenReturn(config);
-    identityReducer = new IdentityReducer<String>(MAIN_IDENTIFIER);
+    identityReducer = new IdentityReducer<String>();
     identityReducer.format = new FormatLibrary().getFormat(Format.DecompressedCanvasDataFlatFiles);
+    identityReducer.mainIdentifier = MAIN_IDENTIFIER;
+
   }
 
   private Iterable<HadoopIdentityKey> getIterable(final IdentityMap... identityMap) {
