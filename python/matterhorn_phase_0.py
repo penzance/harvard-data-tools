@@ -17,7 +17,7 @@ CLASSPATH = "{0}/data_tools.jar:{1}:{2}".format(
 )
 
 command = [
-    'java', '-Duser.timezone=EST', '-Xmx32G', '-cp', CLASSPATH, MAIN_CLASS,
+    'java', '-Duser.timezone=America/New_York', '-Xmx32G', '-cp', CLASSPATH, MAIN_CLASS,
     "parse", DROPBOX_LOCATION, INCOMING_LOCATION
 ]
 print "Running {0}".format(command)
