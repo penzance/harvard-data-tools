@@ -81,7 +81,7 @@ public class IdentityMapperGenerator {
 
   private void outputReadRecord(final PrintStream out) {
     out.println("  @Override");
-    out.println("  protected void readRecord(final CSVRecord csvRecord) {");
+    out.println("  public void readRecord(final CSVRecord csvRecord) {");
     out.println("    this.phase0 = new " + modelClass + "(format, csvRecord);");
     out.println("  }");
   }
@@ -89,7 +89,7 @@ public class IdentityMapperGenerator {
   private void outputGetHadoopKeys(final PrintStream out, final String idType)
       throws VerificationException {
     out.println("  @Override");
-    out.println("  protected Map<String, " + idType + "> getHadoopKeys() {");
+    out.println("  public Map<String, " + idType + "> getHadoopKeys() {");
     out.println("    Map<String, " + idType + "> keys = new HashMap<String, " + idType + ">();");
     for (final String column : IdentityJobGenerator.getMainIdColumns(identities, table,
         mainIdentifier)) {
@@ -102,7 +102,7 @@ public class IdentityMapperGenerator {
 
   private void outputPopulateIdentityMap(final PrintStream out) throws VerificationException {
     out.println("  @Override");
-    out.println("  protected boolean populateIdentityMap(final IdentityMap $id) {");
+    out.println("  public boolean populateIdentityMap(final IdentityMap $id) {");
     if (hasMultipleMainIdColumns()) {
       out.println(
           "    throw new RuntimeException(\"Can't populate identity map with multiple main ID fields\");");

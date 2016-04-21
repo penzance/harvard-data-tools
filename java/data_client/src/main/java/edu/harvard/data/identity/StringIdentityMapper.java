@@ -3,73 +3,33 @@ package edu.harvard.data.identity;
 import java.io.IOException;
 import java.util.Map;
 
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.InputSplit;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import edu.harvard.data.FormatLibrary;
-import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.TableFormat;
 
-public abstract class StringIdentityMapper
-extends Mapper<Object, Text, Text, HadoopIdentityKey> {
-  private static final Logger log = LogManager.getLogger();
+public abstract class StringIdentityMapper extends
+Mapper<Object, Text, Text, HadoopIdentityKey> implements GeneratedIdentityMapper<String> {
 
   protected TableFormat format;
+  private final IdentityMapper<String> mapper;
 
-  protected abstract void readRecord(CSVRecord csvRecord);
-
-  // Get a map in case there are two identifier fields but one of them is null.
-  // This way we register that we're dealing with the second case in the map
-  // method.
-  protected abstract Map<String, String> getHadoopKeys();
-
-  protected abstract boolean populateIdentityMap(IdentityMap id);
+  public StringIdentityMapper() {
+    mapper = new IdentityMapper<String>();
+  }
 
   @Override
   protected void setup(final Context context) {
-    final Format formatName = Format.valueOf(context.getConfiguration().get("format"));
-    this.format = new FormatLibrary().getFormat(formatName);
+    mapper.setup(context);
   }
 
   @Override
   public void map(final Object key, final Text value, final Context context)
       throws IOException, InterruptedException {
-    final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
-    for (final CSVRecord csvRecord : parser.getRecords()) {
-      try {
-        readRecord(csvRecord);
-      }catch(final Throwable t) {
-        final InputSplit fileSplit = (InputSplit)context.getInputSplit();
-        final String filename = fileSplit.toString();
-        throw new RuntimeException("Error parsing " + value + " in file " + filename);
-      }
-      final Map<String, String> hadoopKeys = getHadoopKeys();
-      log.info("Hadoop keys: " + hadoopKeys);
-      if (hadoopKeys.size() == 1) {
-        // If there's only one main ID, we can use this table to figure
-        // out other identities for that individual.
-        final String hadoopKey = hadoopKeys.entrySet().iterator().next().getValue();
-        final IdentityMap id = new IdentityMap();
-        final boolean populated = populateIdentityMap(id);
-        if (populated) {
-          log.info("Writing identity " + hadoopKey);
-          context.write(new Text(hadoopKey), new HadoopIdentityKey(id));
-        }
-      } else {
-        // If there are multiple main IDs in the table, it's ambiguous as
-        // to which individual other identifier fields may refer. We just log
-        // the identifier and leave it at that.
-        for (final String hadoopKey : hadoopKeys.values()) {
-          if (hadoopKey != null) {
-            context.write(new Text(hadoopKey), new HadoopIdentityKey(new IdentityMap()));
-          }
-        }
-      }
+    final Map<String, HadoopIdentityKey> map = mapper.map(key, value, context, this);
+    for (final String hadoopKey : map.keySet()) {
+      final HadoopIdentityKey identityKey = map.get(hadoopKey);
+      context.write(new Text(hadoopKey), identityKey);
     }
   }
 }
