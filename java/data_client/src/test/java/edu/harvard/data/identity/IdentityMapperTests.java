@@ -68,14 +68,14 @@ public class IdentityMapperTests {
   }
 
   @Test(expected = HadoopConfigurationException.class)
-  public void noFormat() throws IOException {
+  public void noFormat() throws IOException, InterruptedException {
     final LongIdentityMapper mapper = new TestIdentityMapper();
     when(config.get("format")).thenReturn(null);
     mapper.setup(context);
   }
 
   @Test(expected = HadoopConfigurationException.class)
-  public void badFormatString() throws IOException {
+  public void badFormatString() throws IOException, InterruptedException {
     final LongIdentityMapper mapper = new TestIdentityMapper();
     when(config.get("format")).thenReturn("Some unknown format");
     mapper.setup(context);
@@ -174,6 +174,7 @@ class TestIdentityMapper extends LongIdentityMapper {
     this.populated = true;
     this.passedIds = new ArrayList<IdentityMap>();
     this.idValues = new ArrayList<IdentityMap>();
+    this.mapper = new IdentityMapper<Long>();
     this.mapper.format = new FormatLibrary().getFormat(Format.DecompressedCanvasDataFlatFiles);
 
   }
