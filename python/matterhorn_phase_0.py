@@ -5,7 +5,7 @@ import sys
 GENERATED_CODE_DIR = os.environ['HARVARD_DATA_GENERATED_OUTPUT']
 SECURE_PROPERTIES_LOCATION = os.environ['SECURE_PROPERTIES_LOCATION']
 GIT_BASE = os.environ['HARVARD_DATA_TOOLS_BASE']
-THREAD_COUNT = os.environ.get('MATTERHORN_DATA_THREAD_COUNT', 1)
+THREAD_COUNT = os.environ.get('DATA_THREAD_COUNT', 1)
 
 MAIN_CLASS = 'edu.harvard.data.matterhorn.cli.MatterhornDataCli'
 CLASSPATH = "{0}/data_tools.jar:{1}:{2}".format(
