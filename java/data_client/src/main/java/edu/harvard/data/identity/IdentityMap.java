@@ -125,6 +125,31 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     return toString().compareTo(o.toString());
   }
 
+  @Override
+  public boolean equals(final Object o) {
+    if (o == null || !(o instanceof IdentityMap)) {
+      return false;
+    }
+    final IdentityMap other = (IdentityMap)o;
+    for (final IdentifierType type : IdentifierType.values()) {
+      final Object v1 = identities.get(type);
+      final Object v2 = other.identities.get(type);
+      if (v1 == null) {
+        if (v2 != null) {
+          return false;
+        }
+      } else {
+        if (v2 == null) {
+          return false;
+        }
+        if (!v1.equals(v2)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
   public PreparedStatement getLookupSqlQuery(final Connection connection) throws SQLException {
     final List<String> params = new ArrayList<String>();
     final List<Object> vals = new ArrayList<Object>();
