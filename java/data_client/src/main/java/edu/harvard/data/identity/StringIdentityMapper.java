@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.InputSplit;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,7 +41,13 @@ extends Mapper<Object, Text, Text, HadoopIdentityKey> {
       throws IOException, InterruptedException {
     final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
     for (final CSVRecord csvRecord : parser.getRecords()) {
-      readRecord(csvRecord);
+      try {
+        readRecord(csvRecord);
+      }catch(final Throwable t) {
+        final InputSplit fileSplit = (InputSplit)context.getInputSplit();
+        final String filename = fileSplit.toString();
+        throw new RuntimeException("Error parsing " + value + " in file " + filename);
+      }
       final Map<String, String> hadoopKeys = getHadoopKeys();
       log.info("Hadoop keys: " + hadoopKeys);
       if (hadoopKeys.size() == 1) {

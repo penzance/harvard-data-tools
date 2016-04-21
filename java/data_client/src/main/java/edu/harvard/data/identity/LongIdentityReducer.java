@@ -12,8 +12,8 @@ extends Reducer<LongWritable, HadoopIdentityKey, Text, NullWritable> {
 
   private final IdentityReducer<Long> identityReducer;
 
-  public LongIdentityReducer(final IdentifierType mainIdentifier) {
-    this.identityReducer = new IdentityReducer<Long>(mainIdentifier);
+  public LongIdentityReducer() {
+    this.identityReducer = new IdentityReducer<Long>();
   }
 
   @Override

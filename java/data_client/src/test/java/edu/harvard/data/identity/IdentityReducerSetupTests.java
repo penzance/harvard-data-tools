@@ -49,6 +49,7 @@ public class IdentityReducerSetupTests {
   public void beforeTest() throws IOException {
     config = mock(Configuration.class);
     when(config.get("format")).thenReturn(Format.DecompressedCanvasDataFlatFiles.toString());
+    when(config.get("mainIdentifier")).thenReturn(MAIN_IDENTIFIER.toString());
     context = mock(Reducer.Context.class);
     when(context.getConfiguration()).thenReturn(config);
     fs = HadoopCacheFileMocker.setupFilesystem(config);
@@ -56,7 +57,7 @@ public class IdentityReducerSetupTests {
     HadoopCacheFileMocker.mockInputStream(fs, URI1, ID_MAP_FILE1);
     HadoopCacheFileMocker.mockInputStream(fs, URI2, ID_MAP_FILE2);
     HadoopCacheFileMocker.mockInputStream(fs, URI3, ID_MAP_FILE3);
-    identityReducer = new IdentityReducer<String>(MAIN_IDENTIFIER);
+    identityReducer = new IdentityReducer<String>();
   }
 
   @Test
@@ -104,4 +105,17 @@ public class IdentityReducerSetupTests {
     when(config.get("format")).thenReturn("Some unknown format");
     identityReducer.setup(context);
   }
+
+  @Test(expected = HadoopConfigurationException.class)
+  public void noMainIdentifier() throws IOException {
+    when(config.get("mainIdentifier")).thenReturn(null);
+    identityReducer.setup(context);
+  }
+
+  @Test(expected = HadoopConfigurationException.class)
+  public void badMainIdentifier() throws IOException {
+    when(config.get("mainIdentifier")).thenReturn("Some unknown identifier");
+    identityReducer.setup(context);
+  }
+
 }

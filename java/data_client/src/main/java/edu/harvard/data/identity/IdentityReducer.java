@@ -17,6 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.FormatLibrary.Format;
+import edu.harvard.data.HadoopConfigurationException;
 import edu.harvard.data.HadoopJob;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.io.HdfsTableReader;
@@ -41,21 +42,9 @@ public class IdentityReducer<T> {
 
   final Map<T, IdentityMap> identities;
   TableFormat format;
-  private final IdentifierType mainIdentifier;
+  IdentifierType mainIdentifier;
 
-  /**
-   * Create a new {@code IdentityReducer}.
-   *
-   * @param mainIdentifier
-   *          the {@link IdentifierType} that represents the primary identifier
-   *          used in the data set. This is generally the primary key in a
-   *          <code>users</code> table, or some external user identifier. The
-   *          type of the identifier (determined by
-   *          {@link IdentifierType#getType}) must be the same as the class
-   *          parameter {@code T}.
-   */
-  public IdentityReducer(final IdentifierType mainIdentifier) {
-    this.mainIdentifier = mainIdentifier;
+  public IdentityReducer() {
     this.identities = new HashMap<T, IdentityMap>();
   }
 
@@ -64,9 +53,15 @@ public class IdentityReducer<T> {
    * be called by the {@code setup} method of the actual identity reducer Hadoop
    * task.
    *
-   * This method populates two fields in the class. First, it retrieves the
+   * This method populates three fields in the class. First, it retrieves the
    * format configuration setting from the Hadoop context and converts it into a
-   * {@link Format} instance in order to correctly parse the incoming data.
+   * {@link Format} instance in order to correctly parse the incoming data. It
+   * does the same for the main identifier value: the {@link IdentifierType}
+   * that represents the primary identifier used in the data set. This is
+   * generally the primary key in a <code>users</code> table, or some external
+   * user identifier. The type of the identifier (determined by
+   * {@link IdentifierType#getType}) must be the same as the class parameter
+   * {@code T}.
    *
    * It then fetches the incoming identity map files from the Hadoop distributed
    * cache and builds up a map from the main identifier type to identity map
@@ -82,7 +77,23 @@ public class IdentityReducer<T> {
   public void setup(final Reducer<?, HadoopIdentityKey, Text, NullWritable>.Context context)
       throws IOException {
     this.format = HadoopJob.getFormat(context);
+    this.mainIdentifier = getMainIdentifier(context);
     readIdentityMap(context);
+  }
+
+  private IdentifierType getMainIdentifier(
+      final Reducer<?, HadoopIdentityKey, Text, NullWritable>.Context context) {
+    final String idString = context.getConfiguration().get("mainIdentifier");
+    if (idString == null) {
+      throw new HadoopConfigurationException(
+          "Required Hadoop configuration parameter 'mainIdentifier' missing");
+    }
+    try {
+      return IdentifierType.valueOf(idString);
+    } catch (final IllegalArgumentException e) {
+      throw new HadoopConfigurationException("Unknown main identifier type: \"" + idString
+          + "\". Expected one of " + IdentifierType.values(), e);
+    }
   }
 
   @SuppressWarnings("unchecked")
