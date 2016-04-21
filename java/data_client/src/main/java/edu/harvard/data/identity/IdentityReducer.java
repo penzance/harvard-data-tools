@@ -74,15 +74,13 @@ public class IdentityReducer<T> {
    *           if an error occurs while reading and parsing the identity map
    *           files in the Hadoop distributed cache.
    */
-  public void setup(final Reducer<?, HadoopIdentityKey, Text, NullWritable>.Context context)
-      throws IOException {
+  public void setup(final Reducer<?, ?, ?, ?>.Context context) throws IOException {
     this.format = HadoopJob.getFormat(context);
     this.mainIdentifier = getMainIdentifier(context);
     readIdentityMap(context);
   }
 
-  private IdentifierType getMainIdentifier(
-      final Reducer<?, HadoopIdentityKey, Text, NullWritable>.Context context) {
+  private IdentifierType getMainIdentifier(final Reducer<?, ?, ?, ?>.Context context) {
     final String idString = context.getConfiguration().get("mainIdentifier");
     if (idString == null) {
       throw new HadoopConfigurationException(
@@ -97,8 +95,7 @@ public class IdentityReducer<T> {
   }
 
   @SuppressWarnings("unchecked")
-  private void readIdentityMap(
-      final Reducer<?, HadoopIdentityKey, Text, NullWritable>.Context context) throws IOException {
+  private void readIdentityMap(final Reducer<?, ?, ?, ?>.Context context) throws IOException {
     final FileSystem fs = FileSystem.get(context.getConfiguration());
     log.info("Reading existing identities from " + context.getCacheFiles().length + " files");
     for (final URI uri : context.getCacheFiles()) {
@@ -145,7 +142,7 @@ public class IdentityReducer<T> {
    *           if interrupted while writing to the context.
    */
   public void reduce(final T mainIdValue, final Iterable<HadoopIdentityKey> values,
-      final Reducer<?, HadoopIdentityKey, Text, NullWritable>.Context context)
+      final Reducer<?, ?, Text, NullWritable>.Context context)
           throws IOException, InterruptedException {
     final IdentityMap id;
     if (identities.containsKey(mainIdValue)) {

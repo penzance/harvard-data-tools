@@ -11,9 +11,9 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -21,7 +21,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.FormatLibrary.Format;
-import edu.harvard.data.identity.HadoopIdentityKey;
 
 public abstract class HadoopJob {
   private static final Logger log = LogManager.getLogger();
@@ -101,9 +100,15 @@ public abstract class HadoopJob {
     return new Text(writer.toString().replaceAll("\n", ""));
   }
 
-  public static TableFormat getFormat(
-      final Reducer<?, HadoopIdentityKey, Text, NullWritable>.Context context) {
-    final String formatString = context.getConfiguration().get("format");
+  public static TableFormat getFormat(final Reducer<?, ?, ?, ?>.Context context) {
+    return parseFormat(context.getConfiguration().get("format"));
+  }
+
+  public static TableFormat getFormat(final Mapper<?, ?, ?, ?>.Context context) {
+    return parseFormat(context.getConfiguration().get("format"));
+  }
+
+  private static TableFormat parseFormat(final String formatString) {
     if (formatString == null) {
       throw new HadoopConfigurationException(
           "Required Hadoop configuration parameter 'format' missing");
