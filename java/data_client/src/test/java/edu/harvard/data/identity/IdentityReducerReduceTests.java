@@ -39,7 +39,6 @@ public class IdentityReducerReduceTests {
     identityReducer = new IdentityReducer<String>();
     identityReducer.format = new FormatLibrary().getFormat(Format.DecompressedCanvasDataFlatFiles);
     identityReducer.mainIdentifier = MAIN_IDENTIFIER;
-
   }
 
   private Iterable<HadoopIdentityKey> getIterable(final IdentityMap... identityMap) {
