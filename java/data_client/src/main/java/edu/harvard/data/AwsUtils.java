@@ -129,7 +129,10 @@ public class AwsUtils {
     return key(obj.getBucketName(), obj.getKey());
   }
 
-  public static S3ObjectId key(final String str) {
+  public static S3ObjectId key(String str) {
+    if (str.toLowerCase().startsWith("s3://")) {
+      str = str.substring("s3://".length());
+    }
     return key(str.substring(0, str.indexOf("/")), str.substring(str.indexOf("/") + 1));
   }
 
@@ -181,6 +184,7 @@ public class AwsUtils {
   }
 
   public void putFile(final S3ObjectId objId, final File file) throws IOException {
+    log.debug("Uploading " + file + " to " + objId);
     client.putObject(objId.getBucket(), objId.getKey(), file);
   }
 
