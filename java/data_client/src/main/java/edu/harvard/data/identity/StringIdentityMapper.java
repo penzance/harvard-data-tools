@@ -6,7 +6,6 @@ import java.util.Map;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-import edu.harvard.data.HadoopJob;
 import edu.harvard.data.TableFormat;
 
 /**
@@ -22,15 +21,24 @@ implements TableIdentityMapper<String> {
   protected IdentityMapper<String> mapper;
   protected TableFormat format;
 
+  public StringIdentityMapper() {
+    this.mapper = new IdentityMapper<String>();
+  }
+
   /**
    * Read and parse the {@link TableFormat} object that determines how records
    * are stored as strings. This value must be stored in the Hadoop context
    * under the key {@code "format"}.
+   *
+   * @throws InterruptedException
+   *           see {link Mapper#setup}
+   * @throws IOException
+   *           see {link Mapper#setup}
    */
   @Override
-  protected void setup(final Context context) {
-    this.format = HadoopJob.getFormat(context);
-    mapper = new IdentityMapper<String>(format);
+  protected void setup(final Context context) throws IOException, InterruptedException {
+    super.setup(context);
+    mapper.setup(context);
   }
 
   /**
