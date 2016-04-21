@@ -2,8 +2,6 @@ import os
 import subprocess
 import sys
 
-DROPBOX_LOCATION = os.environ['MATTERHORN_DROPBOX_LOCATION']
-INCOMING_LOCATION = os.environ['MATTERHORN_INCOMING_LOCATION']
 GENERATED_CODE_DIR = os.environ['HARVARD_DATA_GENERATED_OUTPUT']
 SECURE_PROPERTIES_LOCATION = os.environ['SECURE_PROPERTIES_LOCATION']
 GIT_BASE = os.environ['HARVARD_DATA_TOOLS_BASE']
@@ -18,7 +16,7 @@ CLASSPATH = "{0}/data_tools.jar:{1}:{2}".format(
 
 command = [
     'java', '-Duser.timezone=America/New_York', '-Xmx32G', '-cp', CLASSPATH, MAIN_CLASS,
-    "parse", DROPBOX_LOCATION, INCOMING_LOCATION
+    "parse"
 ]
 print "Running {0}".format(command)
 process = subprocess.Popen(command)

@@ -72,8 +72,8 @@ public class InputParser {
     final String videoFileName = "video-" + date + ".gz";
     eventFile = new File(config.getScratchDir(), eventFileName);
     videoFile = new File(config.getScratchDir(), videoFileName);
-    eventOutputObj = AwsUtils.key(outputDir, eventFileName);
-    videoOutputObj = AwsUtils.key(outputDir, videoFileName);
+    eventOutputObj = AwsUtils.key(outputDir.getBucket(), "event", eventFileName);
+    videoOutputObj = AwsUtils.key(outputDir.getBucket(), "video", videoFileName);
     log.info("Parsing " + filename + " to " + eventFile + ", " + videoFile);
     log.info("Event key: " + eventOutputObj);
     log.info("Video key: " + videoOutputObj);

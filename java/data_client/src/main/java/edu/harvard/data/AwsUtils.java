@@ -63,7 +63,12 @@ public class AwsUtils {
 
   public List<S3ObjectSummary> listKeys(final S3ObjectId obj) {
     log.debug("Listing keys for " + obj);
-    ObjectListing objects = client.listObjects(obj.getBucket(), obj.getKey());
+    ObjectListing objects;
+    if (obj.getKey().equals("/")) {
+      objects = client.listObjects(obj.getBucket());
+    } else {
+      objects  = client.listObjects(obj.getBucket(), obj.getKey());
+    }
     final List<S3ObjectSummary> summaries = new ArrayList<S3ObjectSummary>();
     do {
       for (final S3ObjectSummary objectSummary : objects.getObjectSummaries()) {

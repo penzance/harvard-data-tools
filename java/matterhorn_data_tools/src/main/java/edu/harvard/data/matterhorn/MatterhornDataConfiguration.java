@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import com.amazonaws.services.s3.model.S3ObjectId;
+
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.RedshiftConfiguration;
 
@@ -19,6 +21,8 @@ public class MatterhornDataConfiguration implements RedshiftConfiguration {
   private String redshiftPassword;
   private String awsKey;
   private String awsSecretKey;
+  private S3ObjectId dropboxBucket;
+  private S3ObjectId incomingBucket;
 
   public static MatterhornDataConfiguration getConfiguration(final String propertiesFileName)
       throws IOException, DataConfigurationException {
@@ -40,6 +44,10 @@ public class MatterhornDataConfiguration implements RedshiftConfiguration {
     config.redshiftPassword = getConfigParameter(properties, "redshift_password");
     config.awsKey = getConfigParameter(properties, "aws_key_id");
     config.awsSecretKey = getConfigParameter(properties, "aws_secret_key");
+    config.incomingBucket = new S3ObjectId(getConfigParameter(properties, "incoming_data_bucket"),
+        "/");
+    config.dropboxBucket = new S3ObjectId(getConfigParameter(properties, "dropbox_data_bucket"),
+        "/");
     return config;
   }
 
@@ -98,4 +106,13 @@ public class MatterhornDataConfiguration implements RedshiftConfiguration {
   public String getAwsSecretKey() {
     return awsSecretKey;
   }
+
+  public S3ObjectId getDropboxBucket() {
+    return dropboxBucket;
+  }
+
+  public S3ObjectId getIncomingBucket() {
+    return incomingBucket;
+  }
+
 }

@@ -44,7 +44,7 @@ public class CanvasDataConfiguration implements RedshiftConfiguration {
     config.canvasApiSecret = getConfigParameter(properties, "canvas_data_api_secret");
     config.canvasDataHost = getConfigParameter(properties, "canvas_data_host");
     config.scratchDir = new File(getConfigParameter(properties, "scratch_dir"));
-    final String dataBucket = getConfigParameter(properties, "canvas_data_bucket");
+    final String dataBucket = getConfigParameter(properties, "incoming_data_bucket");
     config.canvasDataArchiveKey = new S3ObjectId(dataBucket,
         getConfigParameter(properties, "canvas_data_archive_key"));
     config.dumpInfoDynamoTable = getConfigParameter(properties, "dump_info_dynamo_table");
