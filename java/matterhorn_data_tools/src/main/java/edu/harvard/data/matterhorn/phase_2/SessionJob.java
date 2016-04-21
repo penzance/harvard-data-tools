@@ -110,7 +110,7 @@ class SessionReducer extends Reducer<Text, Text, Text, NullWritable> {
     session.setMainUser(getMainValue(ids));
     session.setVideoCount(mpids.size());
     session.setMainVideo(getMainValue(mpids));
-    session.setEndTime(new Timestamp(earliest));
+    session.setEndTime(new Timestamp(latest));
     session.setStartTime(new Timestamp(earliest));
     session.setDuration(latest - earliest);
     context.write(HadoopJob.convertToText(session, format), NullWritable.get());
