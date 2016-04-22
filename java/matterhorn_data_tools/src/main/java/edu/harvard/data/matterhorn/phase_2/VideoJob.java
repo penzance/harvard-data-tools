@@ -23,8 +23,8 @@ import edu.harvard.data.matterhorn.bindings.phase2.Phase2Video;
 
 class VideoJob extends HadoopJob {
 
-  public VideoJob(final Configuration hadoopConf, final AwsUtils aws,
-      final URI hdfsService, final String inputDir, final String outputDir) {
+  public VideoJob(final Configuration hadoopConf, final AwsUtils aws, final URI hdfsService,
+      final String inputDir, final String outputDir) {
     super(hadoopConf, aws, hdfsService, inputDir, outputDir);
   }
 
@@ -59,12 +59,7 @@ class VideoFileMapper extends Mapper<Object, Text, Text, Text> {
   public void map(final Object key, final Text value, final Context context)
       throws IOException, InterruptedException {
     final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
-    final Phase1Video video;
-    try {
-      video = new Phase1Video(format, parser.getRecords().get(0));
-    } catch (final Throwable t) {
-      throw new RuntimeException("Value: " + value.toString(), t);
-    }
+    final Phase1Video video = new Phase1Video(format, parser.getRecords().get(0));
     context.write(new Text(video.getId()), HadoopJob.convertToText(video, format));
   }
 }
@@ -86,12 +81,7 @@ class VideoFileReducer extends Reducer<Text, Text, Text, NullWritable> {
     video.setId(key.toString());
     for (final Text value : values) {
       final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
-      final Phase1Video v;
-      try {
-        v = new Phase1Video(format, parser.getRecords().get(0));
-      } catch (final Throwable t) {
-        throw new RuntimeException("Value: " + value.toString(), t);
-      }
+      final Phase1Video v = new Phase1Video(format, parser.getRecords().get(0));
 
       if (video.getCdn() == null && v.getCdn() != null) {
         video.setCdn(v.getCdn());
