@@ -89,6 +89,7 @@ public abstract class HadoopJob {
     try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
       printer.printRecord(record.getFieldsAsList(format));
     }
+    log.info("Writing object " + record.getFieldsAsMap() + " as " + writer.toString() + ", trimmed: " + writer.toString().trim());
     return new Text(writer.toString().trim());
   }
 
