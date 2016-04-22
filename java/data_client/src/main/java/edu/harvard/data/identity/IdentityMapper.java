@@ -12,16 +12,28 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import edu.harvard.data.HadoopJob;
 import edu.harvard.data.TableFormat;
+import edu.harvard.data.generator.IdentityMapperGenerator;
 
+/**
+ * Helper class that implements the common logic for the various mapper classes
+ * used during the first identity Hadoop job. For every table that has been
+ * determined to hold identifying information, a mapper is created that gathers
+ * all identifiers for each record, grouping them by the data set's main
+ * identifier. Is is recommended, although not required, that these map jobs be
+ * generated; see {@link IdentityMapperGenerator} for details of the
+ * table-specific classes.
+ *
+ * Since Hadoop requires that mappers declare the types
+ *
+ * @param <T>
+ */
 public class IdentityMapper<T> {
   private static final Logger log = LogManager.getLogger();
-
   TableFormat format;
 
-  public void setup(final Mapper<?, ?, ?, ?>.Context context) {
-    this.format = HadoopJob.getFormat(context);
+  public IdentityMapper(final TableFormat format) {
+    this.format = format;
   }
 
   public Map<T, HadoopIdentityKey> map(final Text value,
