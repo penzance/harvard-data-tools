@@ -89,7 +89,6 @@ public abstract class HadoopJob {
     try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
       printer.printRecord(record.getFieldsAsList(format));
     }
-    log.info("Writing object " + record.getFieldsAsMap() + " as " + writer.toString() + ", trimmed: " + writer.toString().trim());
     return new Text(writer.toString().trim());
   }
 
@@ -99,7 +98,7 @@ public abstract class HadoopJob {
     try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
       printer.printRecord(record.getFieldsAsList(format));
     }
-    return new Text(writer.toString().trim());
+    return new Text(writer.toString().replaceAll("\n", ""));
   }
 
   public static TableFormat getFormat(
