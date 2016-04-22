@@ -89,7 +89,7 @@ public abstract class HadoopJob {
     try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
       printer.printRecord(record.getFieldsAsList(format));
     }
-    return new Text(writer.toString().trim());
+    return new Text(writer.toString().replaceAll("\n", ""));
   }
 
   public static Text recordToText(final DataTable record, final TableFormat format)
@@ -98,7 +98,7 @@ public abstract class HadoopJob {
     try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
       printer.printRecord(record.getFieldsAsList(format));
     }
-    return new Text(writer.toString().trim());
+    return new Text(writer.toString().replaceAll("\n", ""));
   }
 
   public static TableFormat getFormat(
