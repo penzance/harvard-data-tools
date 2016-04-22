@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import edu.harvard.data.schema.DataSchemaColumn;
 import edu.harvard.data.schema.DataSchemaTable;
@@ -46,7 +48,12 @@ public class S3ToRedshiftLoaderGenerator {
       columnList += ")";
 
       if (!table.isTemporary()) {
-        if (table.getTableName().equals("requests")) { // TODO: Make this dynamic for the dump being processed.
+        final Set<String> partialTables = new HashSet<String>();
+        partialTables.add("requests");
+        partialTables.add("event");
+        partialTables.add("video");
+        partialTables.add("session");
+        if (partialTables.contains(table.getTableName())) { // TODO: Make this dynamic for the dump being processed.
           outputPartialTableUpdate(out, table, columnList);
         } else {
           outputTableOverwrite(out, table, columnList);

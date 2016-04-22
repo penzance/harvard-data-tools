@@ -19,6 +19,8 @@ public class MatterhornDataConfiguration implements RedshiftConfiguration {
   private String redshiftPassword;
   private String awsKey;
   private String awsSecretKey;
+  private String dropboxBucket;
+  private String incomingBucket;
 
   public static MatterhornDataConfiguration getConfiguration(final String propertiesFileName)
       throws IOException, DataConfigurationException {
@@ -40,6 +42,8 @@ public class MatterhornDataConfiguration implements RedshiftConfiguration {
     config.redshiftPassword = getConfigParameter(properties, "redshift_password");
     config.awsKey = getConfigParameter(properties, "aws_key_id");
     config.awsSecretKey = getConfigParameter(properties, "aws_secret_key");
+    config.incomingBucket = getConfigParameter(properties, "incoming_data_bucket");
+    config.dropboxBucket = getConfigParameter(properties, "dropbox_data_bucket");
     return config;
   }
 
@@ -98,4 +102,13 @@ public class MatterhornDataConfiguration implements RedshiftConfiguration {
   public String getAwsSecretKey() {
     return awsSecretKey;
   }
+
+  public String getDropboxBucket() {
+    return dropboxBucket;
+  }
+
+  public String getIncomingBucket() {
+    return incomingBucket;
+  }
+
 }

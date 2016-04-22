@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import com.amazonaws.services.s3.model.S3ObjectId;
-
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.RedshiftConfiguration;
 
@@ -17,7 +15,6 @@ public class CanvasDataConfiguration implements RedshiftConfiguration {
   private String canvasApiSecret;
   private String canvasDataHost;
   private File scratchDir;
-  private S3ObjectId canvasDataArchiveKey;
   private String dumpInfoDynamoTable;
   private String redshiftDb;
   private String redshiftHost;
@@ -27,6 +24,7 @@ public class CanvasDataConfiguration implements RedshiftConfiguration {
   private String tableInfoDynamoTable;
   private String awsKey;
   private String awsSecretKey;
+  private String incomingBucket;
 
   public static CanvasDataConfiguration getConfiguration(final String propertiesFileName)
       throws IOException, DataConfigurationException {
@@ -44,9 +42,7 @@ public class CanvasDataConfiguration implements RedshiftConfiguration {
     config.canvasApiSecret = getConfigParameter(properties, "canvas_data_api_secret");
     config.canvasDataHost = getConfigParameter(properties, "canvas_data_host");
     config.scratchDir = new File(getConfigParameter(properties, "scratch_dir"));
-    final String dataBucket = getConfigParameter(properties, "canvas_data_bucket");
-    config.canvasDataArchiveKey = new S3ObjectId(dataBucket,
-        getConfigParameter(properties, "canvas_data_archive_key"));
+    config.incomingBucket = getConfigParameter(properties, "incoming_data_bucket");
     config.dumpInfoDynamoTable = getConfigParameter(properties, "dump_info_dynamo_table");
     config.tableInfoDynamoTable = getConfigParameter(properties, "table_info_dynamo_table");
     config.redshiftDb = getConfigParameter(properties, "redshift_database");
@@ -87,8 +83,8 @@ public class CanvasDataConfiguration implements RedshiftConfiguration {
     return scratchDir;
   }
 
-  public S3ObjectId getCanvasDataArchiveKey() {
-    return canvasDataArchiveKey;
+  public String getIncomingBucket() {
+    return incomingBucket;
   }
 
   public String getDumpInfoDynamoTable() {
