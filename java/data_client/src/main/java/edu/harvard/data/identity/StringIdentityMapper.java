@@ -6,18 +6,19 @@ import java.util.Map;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
+import edu.harvard.data.HadoopJob;
+import edu.harvard.data.TableFormat;
+
 public abstract class StringIdentityMapper extends
 Mapper<Object, Text, Text, HadoopIdentityKey> implements GeneratedIdentityMapper<String> {
 
-  private final IdentityMapper<String> mapper;
-
-  public StringIdentityMapper() {
-    mapper = new IdentityMapper<String>();
-  }
+  protected IdentityMapper<String> mapper;
+  protected TableFormat format;
 
   @Override
   protected void setup(final Context context) {
-    mapper.setup(context);
+    this.format = HadoopJob.getFormat(context);
+    mapper = new IdentityMapper<String>(format);
   }
 
   @Override
