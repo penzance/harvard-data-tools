@@ -14,9 +14,9 @@ export SECURE_PROPERTIES_LOCATION=/home/hadoop
 #     .jar files should be stored.
 export HARVARD_DATA_GENERATED_OUTPUT=/home/hadoop
 
-# - CANVAS_DATA_SCHEMA_VERSION: The version of the Canvas Data schema for which
+# - DATA_SCHEMA_VERSION: The version of the data schema for which
 #     files will be generated. Format as a string, e.g. 1.2.0
-export CANVAS_DATA_SCHEMA_VERSION=$1
+export DATA_SCHEMA_VERSION=$1
 
 # - HDFS_PHASE_n_DIR: HDFS directories for data in each phase n
 export HDFS_PHASE_0_DIR=hdfs:///phase_0
@@ -45,7 +45,7 @@ sudo yum install -y apache-maven
 aws s3 cp s3://$2/secure.properties /home/hadoop/.
 
 # generate the tools
-python /home/hadoop/harvard-data-tools/python/canvas_generate_tools.py
+python /home/hadoop/harvard-data-tools/python/$8_generate_tools.py
 
 chmod 764 /home/hadoop/*.sh
 
