@@ -7,8 +7,6 @@ import java.util.Map;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.InputSplit;
-import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,9 +22,16 @@ import edu.harvard.data.generator.IdentityMapperGenerator;
  * generated; see {@link IdentityMapperGenerator} for details of the
  * table-specific classes.
  *
- * Since Hadoop requires that mappers declare the types
+ * Since Hadoop requires that mappers declare the key and value types to be
+ * processed as part of the mapper definition, there are several identity
+ * mappers defined (one for each main identifier type). These mappers defer to
+ * this class for common operations. See {@link LongIdentityMapper} for an
+ * example of an identity mapper job.
  *
  * @param <T>
+ *          the Java type of the main identifier over which this job operates.
+ *          Thus, for a mapper job that returns a map from {@code LongWritable}
+ *          to {@code Text}, this parameter would be {@code Long}.
  */
 public class IdentityMapper<T> {
   private static final Logger log = LogManager.getLogger();
@@ -36,19 +41,55 @@ public class IdentityMapper<T> {
     this.format = format;
   }
 
-  public Map<T, HadoopIdentityKey> map(final Text value,
-      final Mapper<?, ?, ?, HadoopIdentityKey>.Context context,
-      final GeneratedIdentityMapper<T> idMapper) throws IOException, InterruptedException {
+  /**
+   * Process a single record to produce a map from the data set's main
+   * identifier (of type {@code T}) to a {@link HadoopIdentityKey} object that
+   * contains all identifiers that relate to a given individual. This method
+   * uses a {@link TableIdentityMapper} to determine the specific identity
+   * values that can be extracted from a given record.
+   *
+   * Depending on the table being analyzed, there are two cases to consider. In
+   * the first case, there is exactly one column in the table that contains the
+   * dataset's main identifier (we assume the case with zero identifiers does
+   * not occur, since such a table would not be specified as a candidate for the
+   * identity Hadoop job). When there is one main identifier column, we assume
+   * that any other identifier in the table relates to the same individual. Thus
+   * for a hypothetical <code>user</code> table, the main identifier may be the
+   * primary key, but other interesting identifiers may exist, such as foreign
+   * keys into external systems. In that case, the {@code HadoopIdentityKey}
+   * returned for that user will contain all the identifiers in the record.
+   *
+   * In the second case, there may be multiple main identifier columns in the
+   * table. This would be the case in a join table that connects two entries in
+   * the <code>user</code> table together. In this case, we can't make any
+   * assumptions around the other values in the record, since they may be
+   * related to any one of the main identifiers. When we encounter this case we
+   * record the values of the main identifiers, but do not populate the
+   * {@code HadoopIdentityKey} objects any further.
+   *
+   * @param value
+   *          the Hadoop {@code Text} object that wraps the record to be
+   *          processed by this method. The body of the {@code Text} object must
+   *          be formatted according to the {@link TableFormat} specified in
+   *          {@link this#format}.
+   * @param idMapper
+   *          a table-specific mapper object that implements the
+   *          {@code TableIdentityMapper} class. This object is used to
+   *          determine which fields in the record represent identifiers.
+   *
+   * @return a {@link Map} from {@code T} (the main identifier type) to
+   *         {@code HadoopIdentityKey} that contains the identity information
+   *         discovered by this method. This map may be empty, but will never be
+   *         null.
+   *
+   * @throws IOException if an error occurs when parsing the {@code value} text string.
+   */
+  public Map<T, HadoopIdentityKey> map(final Text value, final TableIdentityMapper<T> idMapper)
+      throws IOException {
     final Map<T, HadoopIdentityKey> results = new HashMap<T, HadoopIdentityKey>();
     final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
     for (final CSVRecord csvRecord : parser.getRecords()) {
-      try {
-        idMapper.readRecord(csvRecord);
-      } catch (final Throwable t) {
-        final InputSplit fileSplit = (InputSplit) context.getInputSplit();
-        final String filename = fileSplit.toString();
-        throw new RuntimeException("Error parsing " + value + " in file " + filename);
-      }
+      idMapper.readRecord(csvRecord);
       final Map<String, T> hadoopKeys = idMapper.getHadoopKeys();
       log.info("Hadoop keys: " + hadoopKeys);
       if (hadoopKeys.size() == 1) {

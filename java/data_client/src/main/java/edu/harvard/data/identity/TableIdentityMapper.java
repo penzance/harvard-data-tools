@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.apache.commons.csv.CSVRecord;
 
-public interface GeneratedIdentityMapper<T> {
+public interface TableIdentityMapper<T> {
 
   void readRecord(CSVRecord csvRecord);
 
