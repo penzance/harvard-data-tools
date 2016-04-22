@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URI;
 
 import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
@@ -60,10 +59,13 @@ class VideoFileMapper extends Mapper<Object, Text, Text, Text> {
   public void map(final Object key, final Text value, final Context context)
       throws IOException, InterruptedException {
     final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
-    for (final CSVRecord csvRecord : parser.getRecords()) {
-      final Phase1Video video = new Phase1Video(format, csvRecord);
-      context.write(new Text(video.getId()), HadoopJob.convertToText(video, format));
+    final Phase1Video video;
+    try {
+      video = new Phase1Video(format, parser.getRecords().get(0));
+    } catch (final Throwable t) {
+      throw new RuntimeException("Value: " + value.toString(), t);
     }
+    context.write(new Text(video.getId()), HadoopJob.convertToText(video, format));
   }
 }
 
@@ -84,7 +86,12 @@ class VideoFileReducer extends Reducer<Text, Text, Text, NullWritable> {
     video.setId(key.toString());
     for (final Text value : values) {
       final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
-      final Phase2Video v = new Phase2Video(format, parser.getRecords().get(0));
+      final Phase1Video v;
+      try {
+        v = new Phase1Video(format, parser.getRecords().get(0));
+      } catch (final Throwable t) {
+        throw new RuntimeException("Value: " + value.toString(), t);
+      }
 
       if (video.getCdn() == null && v.getCdn() != null) {
         video.setCdn(v.getCdn());
