@@ -4,7 +4,8 @@ canvas_data_api_key=<API Key>
 canvas_data_api_secret=<API Secret>
 canvas_data_host=<Data host endpoint>
 
-canvas_data_bucket=<Data storage S3 bucket>
+dropbox_data_bucket=<Data dropbox S3 bucket>
+incoming_data_bucket=<Data storage S3 bucket>
 
 # Temporary storage during file download and processing
 scratch_dir=<File system location for temporary files>
@@ -22,3 +23,11 @@ canvas_data_archive_key=<S3 key prefix>
 
 # DynamoDB table to store dump metadata
 dump_info_dynamo_table=<Dynamo table with String key named 'id'>
+table_info_dynamo_table=<Table info Dynamo DB table>
+leases_dynamo_table=<Leases Dynamo DB table>
+
+redshift_host=<FQDN for Redshift cluster>
+redshift_port=<Redshift port (usually 5439)>
+redshift_database=<Name of Redshift database>
+redshift_user=<Redshift admin username>
+redshift_password=<Redshift admin password>
