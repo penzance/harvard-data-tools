@@ -18,13 +18,13 @@ import edu.harvard.data.TableFormat;
 public class IdentityMapper<T> {
   private static final Logger log = LogManager.getLogger();
 
-  protected TableFormat format;
+  TableFormat format;
 
   public void setup(final Mapper<?, ?, ?, ?>.Context context) {
     this.format = HadoopJob.getFormat(context);
   }
 
-  public Map<T, HadoopIdentityKey> map(final Object key, final Text value,
+  public Map<T, HadoopIdentityKey> map(final Text value,
       final Mapper<?, ?, ?, HadoopIdentityKey>.Context context,
       final GeneratedIdentityMapper<T> idMapper) throws IOException, InterruptedException {
     final Map<T, HadoopIdentityKey> results = new HashMap<T, HadoopIdentityKey>();

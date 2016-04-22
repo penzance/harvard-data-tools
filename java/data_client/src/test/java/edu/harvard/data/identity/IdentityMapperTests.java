@@ -2,6 +2,7 @@ package edu.harvard.data.identity;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -54,11 +55,11 @@ public class IdentityMapperTests {
     return maps;
   }
 
-  private List<Long> getWrittenKeys() throws IOException, InterruptedException {
+  private List<Long> getWrittenKeys(final int times) throws IOException, InterruptedException {
     final ArgumentCaptor<LongWritable> key = ArgumentCaptor.forClass(LongWritable.class);
     final ArgumentCaptor<HadoopIdentityKey> value = ArgumentCaptor
         .forClass(HadoopIdentityKey.class);
-    verify(context).write(key.capture(), value.capture());
+    verify(context, times(times)).write(key.capture(), value.capture());
     final List<Long> keys = new ArrayList<Long>();
     for (final LongWritable longWritable : key.getAllValues()) {
       keys.add(longWritable.get());
@@ -135,6 +136,7 @@ public class IdentityMapperTests {
     verify(context, never()).write((LongWritable) any(), (HadoopIdentityKey) any());
   }
 
+  @Test
   // Reduce with two keys, one null.
   public void twoKeysOneNull() throws IOException, InterruptedException {
     final TestIdentityMapper mapper = new TestIdentityMapper();
@@ -142,10 +144,10 @@ public class IdentityMapperTests {
     mapper.addKey("Key2", (Long) null);
     mapper.populated = false;
     mapper.map(null, new Text("value"), context);
-    verify(context, times(1)).write((LongWritable) any(), (HadoopIdentityKey) any());
-    assertEquals((Long) 123L, getWrittenKeys().get(0));
+    assertEquals((Long) 123L, getWrittenKeys(1).get(0));
   }
 
+  @Test
   // Reduce with two keys, neither null.
   public void twoKeysNoneNull() throws IOException, InterruptedException {
     final TestIdentityMapper mapper = new TestIdentityMapper();
@@ -153,18 +155,16 @@ public class IdentityMapperTests {
     mapper.addKey("Key2", 456L);
     mapper.populated = false;
     mapper.map(null, new Text("value"), context);
-    verify(context, times(2)).write((LongWritable) any(), (HadoopIdentityKey) any());
-    assertEquals((Long) 123L, getWrittenKeys().get(0));
-    assertEquals((Long) 456L, getWrittenKeys().get(1));
+    final List<Long> writtenKeys = getWrittenKeys(2);
+    assertTrue(writtenKeys.contains(123L));
+    assertTrue(writtenKeys.contains(456L));
   }
-
 }
 
 class TestIdentityMapper extends LongIdentityMapper {
 
   Map<String, Long> keys;
   boolean populated;
-
   CSVRecord passedRecord;
   List<IdentityMap> passedIds;
   List<IdentityMap> idValues;
@@ -174,7 +174,8 @@ class TestIdentityMapper extends LongIdentityMapper {
     this.populated = true;
     this.passedIds = new ArrayList<IdentityMap>();
     this.idValues = new ArrayList<IdentityMap>();
-    this.format = new FormatLibrary().getFormat(Format.DecompressedCanvasDataFlatFiles);
+    this.mapper.format = new FormatLibrary().getFormat(Format.DecompressedCanvasDataFlatFiles);
+
   }
 
   public void addKey(final String key, final Long value) {
