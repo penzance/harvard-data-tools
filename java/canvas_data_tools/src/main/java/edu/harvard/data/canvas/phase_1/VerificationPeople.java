@@ -53,8 +53,9 @@ public class VerificationPeople {
 
   private final CanvasDataConfiguration dataConfig;
 
-  public VerificationPeople(final CanvasDataConfiguration dataConfig, final Configuration hadoopConfig,
-      final URI hdfsService, final String inputDir, final TableFormat format) throws IOException {
+  public VerificationPeople(final CanvasDataConfiguration dataConfig,
+      final Configuration hadoopConfig, final URI hdfsService, final String inputDir,
+      final TableFormat format) throws IOException {
     this.dataConfig = dataConfig;
     this.inputDir = inputDir;
     this.format = format;
@@ -134,7 +135,11 @@ public class VerificationPeople {
     final Set<Path> chosen = new HashSet<Path>();
     chosen.add(new Path(paths.remove(paths.size() - 1)));
     while (paths.size() > 0 && chosen.size() < MAX_SAMPLE_FILES) {
-      chosen.add(new Path(paths.remove(random.nextInt(paths.size() - 1))));
+      if (paths.size() == 1) {
+        chosen.add(new Path(paths.remove(0)));
+      } else {
+        chosen.add(new Path(paths.remove(random.nextInt(paths.size() - 1))));
+      }
     }
     for (final Path p : chosen) {
       log.info("Selecting " + p + " to search for interesting users");
