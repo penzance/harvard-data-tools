@@ -25,8 +25,8 @@ extends Reducer<LongWritable, HadoopIdentityKey, Text, NullWritable> {
   @Override
   public void reduce(final LongWritable key, final Iterable<HadoopIdentityKey> values,
       final Context context) throws IOException, InterruptedException {
-    final Long mainIdValue = key.get(); // TODO: Test that the reducer is passed
-    // the wrapped value, not the
+    final Long mainIdValue = key.get();
+    // TODO: Test that the reducer is passed the wrapped value, not the
     // LongWritable wrapper here.
     identityReducer.reduce(mainIdValue, values, context);
   }

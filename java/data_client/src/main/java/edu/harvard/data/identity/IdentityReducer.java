@@ -52,7 +52,7 @@ public class IdentityReducer<T> {
    * Perform initial setup tasks before running the reducer. This method should
    * be called by the {@code setup} method of the actual identity reducer Hadoop
    * task.
-   *
+   * <p>
    * This method populates three fields in the class. First, it retrieves the
    * format configuration setting from the Hadoop context and converts it into a
    * {@link Format} instance in order to correctly parse the incoming data. It
@@ -62,7 +62,7 @@ public class IdentityReducer<T> {
    * user identifier. The type of the identifier (determined by
    * {@link IdentifierType#getType}) must be the same as the class parameter
    * {@code T}.
-   *
+   * <p>
    * It then fetches the incoming identity map files from the Hadoop distributed
    * cache and builds up a map from the main identifier type to identity map
    * values that can be used during the reduce phase to ensure that consistent
@@ -118,13 +118,13 @@ public class IdentityReducer<T> {
    * identity for that individual. It then scans through all the identity
    * information gathered by the mappers to supplement the user's identity with
    * any newly-discovered identities.
-   *
+   * <p>
    * This method should be called by the {@code reduce} method of the actual
    * identity reducer Hadoop task.
-   *
+   * <p>
    * TODO: This method does not currently handle the case where different
    * mappers produce contradictory identities.
-   *
+   * <p>
    * @param mainIdValue
    *          the key used to identify this user in the data set.
    * @param values
