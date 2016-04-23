@@ -21,13 +21,13 @@ import edu.harvard.data.generator.IdentityMapperGenerator;
  * identifier. Is is recommended, although not required, that these map jobs be
  * generated; see {@link IdentityMapperGenerator} for details of the
  * table-specific classes.
- *
+ * <p>
  * Since Hadoop requires that mappers declare the key and value types to be
  * processed as part of the mapper definition, there are several identity
  * mappers defined (one for each main identifier type). These mappers defer to
  * this class for common operations. See {@link LongIdentityMapper} for an
  * example of an identity mapper job.
- *
+ * <p>
  * @param <T>
  *          the Java type of the main identifier over which this job operates.
  *          Thus, for a mapper job that returns a map from {@code LongWritable}
@@ -47,7 +47,7 @@ public class IdentityMapper<T> {
    * contains all identifiers that relate to a given individual. This method
    * uses a {@link TableIdentityMapper} to determine the specific identity
    * values that can be extracted from a given record.
-   *
+   * <p>
    * Depending on the table being analyzed, there are two cases to consider. In
    * the first case, there is exactly one column in the table that contains the
    * dataset's main identifier (we assume the case with zero identifiers does
@@ -58,7 +58,7 @@ public class IdentityMapper<T> {
    * primary key, but other interesting identifiers may exist, such as foreign
    * keys into external systems. In that case, the {@code HadoopIdentityKey}
    * returned for that user will contain all the identifiers in the record.
-   *
+   * <p>
    * In the second case, there may be multiple main identifier columns in the
    * table. This would be the case in a join table that connects two entries in
    * the <code>user</code> table together. In this case, we can't make any
@@ -66,12 +66,12 @@ public class IdentityMapper<T> {
    * related to any one of the main identifiers. When we encounter this case we
    * record the values of the main identifiers, but do not populate the
    * {@code HadoopIdentityKey} objects any further.
-   *
+   * <p>
    * @param value
    *          the Hadoop {@code Text} object that wraps the record to be
    *          processed by this method. The body of the {@code Text} object must
    *          be formatted according to the {@link TableFormat} specified in
-   *          {@link this#format}.
+   *          {@link #format}.
    * @param idMapper
    *          a table-specific mapper object that implements the
    *          {@code TableIdentityMapper} class. This object is used to
