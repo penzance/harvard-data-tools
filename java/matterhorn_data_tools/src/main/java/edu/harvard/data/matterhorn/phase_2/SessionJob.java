@@ -20,6 +20,7 @@ import edu.harvard.data.AwsUtils;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopJob;
+import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.matterhorn.bindings.phase1.Phase1Event;
 import edu.harvard.data.matterhorn.bindings.phase2.Phase2Session;
@@ -43,7 +44,7 @@ class SessionJob extends HadoopJob {
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(NullWritable.class);
     job.setOutputFormatClass(TextOutputFormat.class);
-    setPaths(job, aws, hdfsService, inputDir + "/event", outputDir + "/session");
+    hadoopUtils.setPaths(job, hdfsService, inputDir + "/event", outputDir + "/session");
     return job;
   }
 }
@@ -51,6 +52,11 @@ class SessionJob extends HadoopJob {
 class SessionMapper extends Mapper<Object, Text, Text, Text> {
 
   private TableFormat format;
+  private final HadoopUtilities hadoopUtils;
+
+  public SessionMapper() {
+    this.hadoopUtils = new HadoopUtilities();
+  }
 
   @Override
   protected void setup(final Context context) {
@@ -63,13 +69,18 @@ class SessionMapper extends Mapper<Object, Text, Text, Text> {
       throws IOException, InterruptedException {
     final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
     final Phase1Event event = new Phase1Event(format, parser.getRecords().get(0));
-    context.write(new Text(event.getSessionId()), HadoopJob.convertToText(event, format));
+    context.write(new Text(event.getSessionId()), hadoopUtils.convertToText(event, format));
   }
 }
 
 class SessionReducer extends Reducer<Text, Text, Text, NullWritable> {
 
   private TableFormat format;
+  private final HadoopUtilities hadoopUtils;
+
+  public SessionReducer() {
+    this.hadoopUtils = new HadoopUtilities();
+  }
 
   @Override
   protected void setup(final Context context) {
@@ -113,7 +124,7 @@ class SessionReducer extends Reducer<Text, Text, Text, NullWritable> {
     session.setEndTime(new Timestamp(latest));
     session.setStartTime(new Timestamp(earliest));
     session.setDuration(latest - earliest);
-    context.write(HadoopJob.convertToText(session, format), NullWritable.get());
+    context.write(hadoopUtils.convertToText(session, format), NullWritable.get());
   }
 
   private String getMainValue(final Map<String, Integer> ips) {

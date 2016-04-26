@@ -90,6 +90,6 @@
  * values be declared as part of a job's definition we have multiple base
  * classes for the mappers and scrubbers, to be used depending on the type of
  * the main identifier. See {@link LongIdentityMapper} and
- * {@link LongIdentityScrubber} for examples.
+ * {@link IdentityScrubber} for examples.
  */
 package edu.harvard.data.identity;

@@ -7,9 +7,11 @@ import java.util.Map;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.generator.IdentityMapperGenerator;
 
@@ -36,9 +38,14 @@ import edu.harvard.data.generator.IdentityMapperGenerator;
 public class IdentityMapper<T> {
   private static final Logger log = LogManager.getLogger();
   TableFormat format;
+  private final HadoopUtilities hadoopUtils;
 
-  public IdentityMapper(final TableFormat format) {
-    this.format = format;
+  public IdentityMapper() {
+    this.hadoopUtils = new HadoopUtilities();
+  }
+
+  public void setup(final Mapper<?, ?, ?, ?>.Context context) {
+    this.format = hadoopUtils.getFormat(context);
   }
 
   /**
