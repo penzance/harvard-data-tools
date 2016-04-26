@@ -13,7 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.DataConfigurationException;
-import edu.harvard.data.HadoopJob;
+import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
@@ -28,6 +28,7 @@ public class PostVerifyIdentityMap implements Verifier {
   private final URI hdfsService;
   private final Configuration hadoopConfig;
   private final TableFormat format;
+  private final HadoopUtilities hadoopUtils;
 
   public PostVerifyIdentityMap(final Configuration hadoopConfig, final URI hdfsService,
       final String originalDir, final String updatedDir, final TableFormat format) {
@@ -36,6 +37,7 @@ public class PostVerifyIdentityMap implements Verifier {
     this.originalDir = originalDir;
     this.updatedDir = updatedDir;
     this.format = format;
+    this.hadoopUtils = new HadoopUtilities();
   }
 
   @Override
@@ -59,7 +61,7 @@ public class PostVerifyIdentityMap implements Verifier {
   private Map<Long, String> readIdMap(final String dir) throws IOException {
     final FileSystem fs = FileSystem.get(hdfsService, hadoopConfig);
     final Map<Long, String> ids = new HashMap<Long, String>();
-    for (final Path path : HadoopJob.listFiles(hdfsService, dir)) {
+    for (final Path path : hadoopUtils.listFiles(hdfsService, dir)) {
       try (HdfsTableReader<IdentityMap> in = new HdfsTableReader<IdentityMap>(IdentityMap.class,
           format, fs, path)) {
         log.info("Loading IDs from path " + path);

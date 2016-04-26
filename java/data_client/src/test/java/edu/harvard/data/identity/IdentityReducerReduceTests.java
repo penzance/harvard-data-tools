@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
@@ -39,6 +40,7 @@ public class IdentityReducerReduceTests {
     identityReducer = new IdentityReducer<String>();
     identityReducer.format = new FormatLibrary().getFormat(Format.DecompressedCanvasDataFlatFiles);
     identityReducer.mainIdentifier = MAIN_IDENTIFIER;
+    identityReducer.identities = new HashMap<String, IdentityMap>();
   }
 
   private Iterable<HadoopIdentityKey> getIterable(final IdentityMap... identityMap) {

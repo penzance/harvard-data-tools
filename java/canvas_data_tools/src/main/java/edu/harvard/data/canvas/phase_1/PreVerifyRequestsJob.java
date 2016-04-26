@@ -32,7 +32,7 @@ class PreVerifyRequestsJob extends HadoopJob {
 
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
-    setPaths(job, aws, hdfsService, inputDir + "/requests", outputDir + "/requests");
+    hadoopUtils.setPaths(job, hdfsService, inputDir + "/requests", outputDir + "/requests");
     return job;
   }
 }
