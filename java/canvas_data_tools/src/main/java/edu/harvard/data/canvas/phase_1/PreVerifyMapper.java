@@ -14,6 +14,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.TableFormat;
+import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.identity.IdentityMap;
 import edu.harvard.data.io.HdfsTableReader;
 
@@ -37,7 +38,7 @@ abstract class PreVerifyMapper extends Mapper<Object, Text, Text, LongWritable> 
       try (HdfsTableReader<IdentityMap> in = new HdfsTableReader<IdentityMap>(IdentityMap.class,
           format, fs, path)) {
         for (final IdentityMap id : in) {
-          idByCanvasDataId.put(id.getCanvasDataID(), id);
+          idByCanvasDataId.put((Long) id.get(IdentifierType.CanvasDataID), id);
         }
       }
     }

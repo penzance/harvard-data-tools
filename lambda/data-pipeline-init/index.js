@@ -68,18 +68,31 @@ exports.handler = function(event, context) {
                             var timeStampAsDate = new Date();
                             var fullObjectKey = event.AWS_KEY;
 
-                            var directoryOfKey = "";
-                            var fileKey;
-                            if (fullObjectKey.indexOf("/") > -1) {
-                                directoryOfKey = fullObjectKey.substr(0, fullObjectKey.lastIndexOf("/"));
+//                            var directoryOfKey = "";
+                            var d = new Date();
+                            var fileKey = "matterhorn" + d.getTime(); // Default to materhorn, canvas will overwrite this
+                            var fileKeySQL = "";
+                            var fullObjectKeyWithSlash = "";
+                            if (fullObjectKey != "") {
+//                                directoryOfKey = fullObjectKey.substr(0, fullObjectKey.lastIndexOf("/"));
 //                                fileKey = parseInt(fullObjectKey.substr(fullObjectKey.lastIndexOf("/") + 1), 10).toString();
                                 fileKey = event.DUMP_SEQUENCE;
+                                fileKeySQL = event.DUMP_SEQUENCE;
+                                fullObjectKeyWithSlash = event.AWS_KEY + "/";
                             }
 
                             var params = {
                                 name: fileKey,
                                 uniqueId: fileKey
                             };
+
+                            // Matterhorn doesn't use fullObjectKey or fileKey
+                            if (fileKey.indexOf("matterhorn") > -1) {
+                                fullObjectKey = "";
+                                fullObjectKeyWithSlash = "";
+                                fileKey = "";
+                                fileKeySQL = "matterhorn";
+                            }
 
                             // Create new pipeline and replace values of tokens in the
                             // template pipeline definition with actual values for this
@@ -92,9 +105,11 @@ exports.handler = function(event, context) {
                                 } else {
                                     console.log('New pipeline id: ' + pipelineIdObject.pipelineId);
 
+                                    findAndReplaceStringValue(definition, "dataset-path-with-slash-placeholder", fullObjectKeyWithSlash);
                                     findAndReplaceStringValue(definition, "dataset-path-placeholder", fullObjectKey);
                                     // Run this again because dataset-path-placeholder is in our  MoveDatasetToArchives string twice!
                                     findAndReplaceStringValue(definition, "dataset-path-placeholder", fullObjectKey);
+                                    findAndReplaceStringValue(definition, "dataset-id-sql-placeholder", fileKeySQL);
                                     findAndReplaceStringValue(definition, "dataset-id-placeholder", fileKey);
 
                                     // Place the modified pipeline definition into the
@@ -124,7 +139,7 @@ exports.handler = function(event, context) {
                                                     },
                                                     {
                                                     key: 'full-dump-path',
-                                                    value: fullObjectKey
+                                                    value: fullObjectKeyWithSlash
                                                     },
                                                     {
                                                     key: 'dump-id',

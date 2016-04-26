@@ -5,10 +5,10 @@ import java.util.concurrent.ExecutorService;
 
 import org.kohsuke.args4j.Argument;
 
-import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.VerificationException;
+import edu.harvard.data.canvas.CanvasDataConfiguration;
 import edu.harvard.data.canvas.data_api.ApiClient;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
@@ -18,7 +18,7 @@ public class DumpInfoCommand implements Command {
   public long sequence;
 
   @Override
-  public ReturnStatus execute(final DataConfiguration config, final ExecutorService exec) throws IOException,
+  public ReturnStatus execute(final CanvasDataConfiguration config, final ExecutorService exec) throws IOException,
   UnexpectedApiResponseException, DataConfigurationException, VerificationException {
     final ApiClient api = new ApiClient(config.getCanvasDataHost(),
         config.getCanvasApiKey(), config.getCanvasApiSecret());

@@ -17,20 +17,21 @@ Please note this CloudFormation spins up a number of resources, including IAM re
 ## How to stand up the infrastructure in your AWS VPC
 
 1. Make an S3 bucket to store code and note the location (e.g., `s3://my-awesome-bucket`)
-2. Place the following files in the root of the code S3 bucket unless otherwise noted:
+2. If using Slack for notifications, obtain three email addresses via Slack email configuration to receive notifications from our system. The three email addresses are for success, failure and monitoring messages.
+3. Place the following files in the root of the code S3 bucket unless otherwise noted:
   * `cloudformation/environment.json`
   * `emr/bootstrap.sh`
   * `lambda/download-verify/download-verify-lambda.zip` (NOTE: This file is the result of running `zip -r download-verify-lambda.zip .` inside the `lambda/download-verify` directory.)
   * `lambda/data-pipeline-init/data-pipeline-init-lambda.zip` (NOTE: This file is the result of running `zip -r data-pipeline-init-lambda.zip .` inside the `lambda/data-pipeline-init` directory.)
   * `secure.properties` based on `java/aws_data_tools/src/main/resources/secure.properties.example`
   * `extra_keys`, a custom file containing SSH keys which should be installed on the EMR cluster, most useful for debugging
-3. Create a customized CloudFormation parameters file by doing the following:
+4. Create a customized CloudFormation parameters file by doing the following:
   * Create a `cloudformation/myparameters` directory locally (it and its future contents will be .gitignore'd)
   * Copy `cloudformation/parameters.json.example` to `cloudformation/myparameters/my-custom-parameters.json` edit it to include your specific parameter values
-4. Create the CloudFormation stack by running:
+5. Create the CloudFormation stack by running:
 ```aws cloudformation create-stack --stack-name mystack --template-url https://my-awesome-bucket.s3.amazonaws.com/environment.json --parameters file:///path/to/cloudformation/myparameters/my-custom-parameters.json --region us-east-1 --capabilities CAPABILITY_IAM```
-5. Edit the `secure.properties` file created above with updated values for some resources which were created during the CloudFormation spin up.
-6. Once the stack is up, cron functionality to process data sets on a schedule must be setup manually. To accomplish this:
+6. Edit the `secure.properties` file created above with updated values for some resources which were created during the CloudFormation spin up.
+7. Once the stack is up, cron functionality to process data sets on a schedule must be setup manually. To accomplish this:
   * Login to the AWS CloudWatch console, go to Events, then Rules
   * Click Create a Rule
   * Select Schedule for event source, create the desired schedule (e.g., a cron to run daily at 0700UTC - `00 07 * * ? *`)

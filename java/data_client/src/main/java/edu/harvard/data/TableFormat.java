@@ -1,16 +1,22 @@
 package edu.harvard.data;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.csv.CSVFormat;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.harvard.data.FormatLibrary.Format;
 
@@ -25,6 +31,7 @@ public class TableFormat {
   private CSVFormat csvFormat;
   private Compression compression;
   private final Format format;
+  private ObjectMapper jsonMapper;
 
   public TableFormat(final FormatLibrary.Format format) {
     this.format = format;
@@ -34,6 +41,7 @@ public class TableFormat {
     this.encoding = "UTF-8";
     this.csvFormat = CSVFormat.DEFAULT;
     this.compression = Compression.None;
+    this.jsonMapper = new ObjectMapper();
   }
 
   public DateFormat getTimstampFormat() {
@@ -84,6 +92,14 @@ public class TableFormat {
     this.compression = compression;
   }
 
+  public ObjectMapper getJsonMapper() {
+    return jsonMapper;
+  }
+
+  public void setJsonMapper(final ObjectMapper jsonMapper) {
+    this.jsonMapper = jsonMapper;
+  }
+
   public String formatTimestamp(final Date date) {
     if (date == null) {
       return null;
@@ -127,6 +143,17 @@ public class TableFormat {
       return new FileOutputStream(file);
     default:
       throw new RuntimeException("Unknown compression: " + compression);
+    }
+  }
+
+  public InputStream getInputStream(final File file) throws FileNotFoundException, IOException {
+    switch (getCompression()) {
+    case Gzip:
+      return new GZIPInputStream(new FileInputStream(file));
+    case None:
+      return new FileInputStream(file);
+    default:
+      throw new RuntimeException("Unknown compression format: " + getCompression());
     }
   }
 }

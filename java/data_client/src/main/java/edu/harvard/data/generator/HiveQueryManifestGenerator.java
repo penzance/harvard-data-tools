@@ -11,27 +11,28 @@ import org.apache.logging.log4j.Logger;
 public class HiveQueryManifestGenerator {
   private static final Logger log = LogManager.getLogger();
 
-  private final File gitDir;
-  private final GenerationSpec schemaVersions;
+  private final File hiveBase;
+  private final GenerationSpec spec;
   private final File dir;
 
-  public HiveQueryManifestGenerator(final File gitDir, final File dir,
-      final GenerationSpec schemaVersions) {
-    this.gitDir = gitDir;
+
+  public HiveQueryManifestGenerator(final File dir,
+      final GenerationSpec spec) {
     this.dir = dir;
-    this.schemaVersions = schemaVersions;
+    this.hiveBase = spec.getHiveScriptDir();
+    this.spec = spec;
   }
 
   public void generate() throws IOException {
-    for (int i = 1; i <= 3; i++) {
+    for (int i = 2; i <= 3; i++) {
       final String fileBase = "phase_" + i + "_hive";
       final File file = new File(dir, fileBase + ".sh");
-      final File hiveDir = new File(gitDir, "hive/phase_" + i);
+      final File hiveDir = new File(hiveBase, "phase_" + i);
       log.info("Generating hive mainifest for phase " + i + ". file: " + file);
       log.info("Phase " + i + " hive directory: " + hiveDir);
 
       try (final PrintStream out = new PrintStream(new FileOutputStream(file))) {
-        generateHiveManifest(out, schemaVersions.getPhase(i), hiveDir,
+        generateHiveManifest(out, spec.getPhase(i), hiveDir,
             "/home/hadoop/" + fileBase + ".out");
       }
     }

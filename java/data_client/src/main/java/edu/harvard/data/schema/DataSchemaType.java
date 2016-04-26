@@ -27,6 +27,9 @@ public enum DataSchemaType {
   }
 
   public static DataSchemaType parse(final String type) {
+    if (type == null) {
+      return null;
+    }
     final DataSchemaType t = stringToType.get(type);
     if (t == null) {
       return valueOf(type);

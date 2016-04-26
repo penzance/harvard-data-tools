@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.schema.DataSchema;
 
 /**
@@ -18,6 +19,10 @@ public class GenerationSpec {
   private File outputBase;
   private String tableEnumName;
   private String identityHadoopPackage;
+  private String hadoopManager;
+  private IdentifierType mainIdentifier;
+  private String javaProjectName;
+  private File hiveScriptDir;
 
   public GenerationSpec(final int phaseCount) {
     this.phases = new ArrayList<SchemaPhase>();
@@ -52,6 +57,37 @@ public class GenerationSpec {
 
   public void setJavaHadoopPackage(final String identityHadoopPackage) {
     this.identityHadoopPackage = identityHadoopPackage;
+  }
+
+  public void setHadoopIdentityManagerClass(final String hadoopManager) {
+    this.hadoopManager = hadoopManager;
+  }
+
+  public String getHadoopIdentityManagerClass() {
+    return hadoopManager;
+  }
+
+  public void setMainIdentifier(final IdentifierType mainIdentifier) {
+    this.mainIdentifier = mainIdentifier;
+  }
+
+  public IdentifierType getMainIdentifier() {
+    return mainIdentifier;
+  }
+
+  public void setJavaProjectName(final String javaProjectName) {
+    this.javaProjectName = javaProjectName;
+  }
+
+  public String getJavaProjectName() {
+    return javaProjectName;
+  }
+  public void setHiveScriptDir(final File hiveScriptDir) {
+    this.hiveScriptDir = hiveScriptDir;
+  }
+
+  public File getHiveScriptDir() {
+    return hiveScriptDir;
   }
 
   public void setJavaBindingPackages(final String... packageList) {

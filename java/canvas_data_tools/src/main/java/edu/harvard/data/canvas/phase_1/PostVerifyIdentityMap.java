@@ -17,6 +17,7 @@ import edu.harvard.data.HadoopJob;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
+import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.identity.IdentityMap;
 import edu.harvard.data.io.HdfsTableReader;
 
@@ -39,7 +40,8 @@ public class PostVerifyIdentityMap implements Verifier {
 
   @Override
   public void verify() throws VerificationException, IOException, DataConfigurationException {
-    log.info("Verifying identity map. Original dir: " + originalDir + ", updated dir: " + updatedDir);
+    log.info(
+        "Verifying identity map. Original dir: " + originalDir + ", updated dir: " + updatedDir);
     final Map<Long, String> originalIds = readIdMap(originalDir);
     final Map<Long, String> updatedIds = readIdMap(updatedDir);
 
@@ -62,7 +64,8 @@ public class PostVerifyIdentityMap implements Verifier {
           format, fs, path)) {
         log.info("Loading IDs from path " + path);
         for (final IdentityMap id : in) {
-          ids.put(id.getCanvasDataID(), id.getResearchId());
+          ids.put((Long) id.get(IdentifierType.CanvasDataID),
+              (String) id.get(IdentifierType.ResearchUUID));
         }
       }
     }

@@ -39,6 +39,7 @@ public class SchemaTransformer {
    */
   public DataSchema transform(final DataSchema base, final ExtensionSchema extension)
       throws VerificationException {
+
     // The new schema we're going to return will have all of the columns of the
     // original. We make a copy of the base schema so that we can edit it
     // safely.
@@ -104,6 +105,10 @@ public class SchemaTransformer {
           // If the table is set as owned in the extension schema, we need to
           // reflect that in the new schema.
           originalTable.setOwner(newTable.getOwner());
+          // Reflect whether the table is set to expire in the extension schema
+          if (newTable.isTemporary()) {
+            originalTable.setExpirationPhase(newTable.getExpirationPhase());
+          }
         }
       }
     }
@@ -131,7 +136,7 @@ public class SchemaTransformer {
 
       // Check that the original table exists.
       final String tableName = table.getTableName();
-      if (!updates.containsKey(tableName) && schema.getTableByName(tableName) == null) {
+      if (!updates.containsKey(likeTableName) && schema.getTableByName(likeTableName) == null) {
         throw new VerificationException(
             "Table " + tableName + " specified to be like missing table " + likeTableName);
       }

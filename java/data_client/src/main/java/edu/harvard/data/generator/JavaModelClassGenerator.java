@@ -1,6 +1,13 @@
 package edu.harvard.data.generator;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -59,12 +66,14 @@ public class JavaModelClassGenerator {
     outputFields(out);
     outputDefaultConstructor(out);
     outputCsvConstructor(out);
+    outputMapConstructor(out);
     outputPreviousClassConstructor(out);
     outputLikeClassConstructor(out);
     outputAllFieldConstructor(out);
     outputGettersAndSetters(out);
-    outputGetFieldsAsListMethod(out);
     outputGetFieldNames(out);
+    outputGetFieldsAsListMethod(out);
+    outputGetFieldsAsMapMethod(out);
     out.println("}");
   }
 
@@ -122,23 +131,24 @@ public class JavaModelClassGenerator {
     if (hasTimestampColumn(table)) {
       out.println("import java.sql.Timestamp;");
     }
-    if (hasDateColumn(table)) {
-      out.println("import java.util.Date;");
+    if (hasDateColumn(table) || hasTimestampColumn(table)) {
       out.println("import java.text.ParseException;");
     }
-    if (hasEnumColumn(table)) {
-      out.println("import java.util.Map;");
-      out.println("import java.util.HashMap;");
+    if (hasDateColumn(table)) {
+      out.println("import java.util.Date;");
     }
-    out.println("import java.util.ArrayList;");
-    out.println("import java.util.List;");
+    out.println("import " + ArrayList.class.getName() + ";");
+    out.println("import " + List.class.getName() + ";");
+    out.println("import " + Map.class.getName() + ";");
+    out.println("import " + HashMap.class.getName() + ";");
     out.println();
     out.println("import org.apache.commons.csv.CSVRecord;");
     out.println("import " + DataTable.class.getName() + ";");
     out.println("import " + TableFormat.class.getName() + ";");
     out.println();
     if (previousVersion != null && !table.getNewlyGenerated()) {
-      out.println("import " + previousVersion.getJavaBindingPackage() + "." + previousClassName + ";");
+      out.println(
+          "import " + previousVersion.getJavaBindingPackage() + "." + previousClassName + ";");
       out.println();
     }
   }
@@ -171,7 +181,48 @@ public class JavaModelClassGenerator {
     }
     int columnIdx = 0;
     for (final DataSchemaColumn column : table.getColumns()) {
-      outputParseFromCsv(out, column, columnIdx++);
+      outputParseFromString(out, column, "record.get(" + columnIdx + ")");
+      columnIdx++;
+    }
+    out.println("  }");
+    out.println();
+  }
+
+  // Generate a constructor that takes the TableFormat and a Map<Object,
+  // String>. This constructor is required to parse JSON objects. It recognizes
+  // nested maps, flattening structures according to the column definitions in
+  // the schema description.
+  private void outputMapConstructor(final PrintStream out) {
+    if (!getNestedMaps().isEmpty()) {
+      out.println("  @SuppressWarnings(\"unchecked\")");
+    }
+    if (hasTimestampColumn(table)) {
+      out.println("  public " + className
+          + "(final TableFormat format, final Map<String, Object> map) throws ParseException {");
+    } else {
+      out.println(
+          "  public " + className + "(final TableFormat format, Map<String, Object> map) {");
+    }
+    for (final String map : getNestedMaps()) {
+      final String mapName = JavaBindingGenerator.javaVariable(map);
+      out.println("    Map<String, Object> " + mapName + " = (Map<String, Object>) map.get(\""
+          + mapName + "\");");
+    }
+    for (final DataSchemaColumn column : table.getColumns()) {
+      final String columnName = column.getName();
+      final String key;
+      final String getMethod;
+      final String mapName;
+      if (columnName.contains(".")) {
+        mapName = JavaBindingGenerator
+            .javaVariable(columnName.substring(0, columnName.lastIndexOf(".")));
+        key = columnName.substring(columnName.indexOf(".") + 1);
+      } else {
+        mapName = "map";
+        key = columnName;
+      }
+      getMethod = mapName + ".get(\"" + key + "\")";
+      outputGetFromMap(out, column, getMethod);
     }
     out.println("  }");
     out.println();
@@ -255,14 +306,14 @@ public class JavaModelClassGenerator {
   private void outputGettersAndSetters(final PrintStream out) {
     for (final DataSchemaColumn column : table.getColumns()) {
       final String typeName = JavaBindingGenerator.javaType(column);
-      String methodName = "get" + JavaBindingGenerator.javaClass(column.getName(), "");
+      String methodName = JavaBindingGenerator.javaGetter(column.getName());
       final String variableName = JavaBindingGenerator.javaVariable(column.getName());
       JavaBindingGenerator.writeComment(column.getDescription(), 2, out, true);
       out.println("  public " + typeName + " " + methodName + "() {");
       out.println("    return this." + variableName + ";");
       out.println("  }");
       out.println();
-      methodName = "set" + JavaBindingGenerator.javaClass(column.getName(), "");
+      methodName = JavaBindingGenerator.javaSetter(column.getName());
       JavaBindingGenerator.writeComment(column.getDescription(), 2, out, true);
       out.println("  public void " + methodName + "(" + typeName + " " + variableName + ") {");
       out.println("    this." + variableName + " = " + variableName + ";");
@@ -290,11 +341,60 @@ public class JavaModelClassGenerator {
     out.println("  }");
   }
 
+  // Generate an implementation of the getFieldsAsMap method. This method
+  // returns a HashMap containing each field name and its value. Any nested
+  // object (those described in the schema as outer.inner) will be represented
+  // as an inner map.
+  private void outputGetFieldsAsMapMethod(final PrintStream out) {
+    out.println("  @Override");
+    out.println("  public Map<String, Object> getFieldsAsMap() {");
+    out.println("    Map<String, Object> $map = new HashMap<String, Object>();");
+    // Add any nested objects as new maps
+    for (final String map : getNestedMaps()) {
+      final String mapName = JavaBindingGenerator.javaVariable(map);
+      out.println("    Map<String, Object> $" + mapName + " = new HashMap<String, Object>();");
+      out.println("    $map.put(\"" + mapName + "\", $" + mapName + ");");
+    }
+    for (final DataSchemaColumn column : table.getColumns()) {
+      final String columnName = column.getName();
+      final String mapName;
+      final String key;
+      final String variableName;
+      if (columnName.contains(".")) {
+        mapName = JavaBindingGenerator
+            .javaVariable(columnName.substring(0, columnName.lastIndexOf(".")));
+        key = columnName.substring(columnName.lastIndexOf(".") + 1);
+        variableName = JavaBindingGenerator.javaVariable(key);
+      } else {
+        mapName = "map";
+        key = columnName;
+        variableName = JavaBindingGenerator.javaVariable(columnName);
+      }
+      out.println("    $" + mapName + ".put(\"" + key + "\", " + variableName + ");");
+    }
+    out.println("    return $map;");
+    out.println("  }");
+  }
+
+  private List<String> getNestedMaps() {
+    final Set<String> maps = new HashSet<String>();
+    for (final DataSchemaColumn column : table.getColumns()) {
+      final String columnName = column.getName();
+      if (columnName.contains(".")) {
+        maps.add(columnName.substring(0, columnName.lastIndexOf(".")));
+      }
+    }
+    final List<String> mapList = new ArrayList<String>(maps);
+    Collections.sort(mapList);
+    return mapList;
+  }
+
   // Generate a method that returns an ArrayList of Strings, holding the field
   // names in the order that they were defined in the schema.
   private void outputGetFieldNames(final PrintStream out) {
     out.println();
-    out.println("  public static List<String> getFieldNames() {");
+    out.println("  @Override");
+    out.println("  public List<String> getFieldNames() {");
     out.println("    final List<String> fields = new ArrayList<String>();");
     for (final DataSchemaColumn column : table.getColumns()) {
       out.println("      fields.add(\"" + column.getName() + "\");");
@@ -321,16 +421,6 @@ public class JavaModelClassGenerator {
     return false;
   }
 
-  // Checks the whole table for any column that is of type Enum
-  private boolean hasEnumColumn(final DataSchemaTable table) {
-    for (final DataSchemaColumn c : table.getColumns()) {
-      if (c.getType() == DataSchemaType.Enum) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   // Checks the whole table for any column that is of type Timestamp
   private boolean hasTimestampColumn(final DataSchemaTable table) {
     for (final DataSchemaColumn c : table.getColumns()) {
@@ -341,12 +431,60 @@ public class JavaModelClassGenerator {
     return false;
   }
 
+  // Determine the code needed to correctly type a value extracted from an
+  // untyped map.
+  private void outputGetFromMap(final PrintStream out, final DataSchemaColumn column,
+      final String getMethod) {
+    final String variableName = JavaBindingGenerator.javaVariable(column.getName());
+    switch (column.getType()) {
+    case BigInt:
+      out.println("    if (" + getMethod + " instanceof Integer) {");
+      out.println("      this." + variableName + " = Long.parseLong(((Integer) " + getMethod
+          + ").toString());");
+      out.println("    } else {");
+      out.println("      this." + variableName + " = (Long) " + getMethod + ";");
+      out.println("    }");
+      break;
+    case Boolean:
+      out.println("    if (" + getMethod + " instanceof Integer) {");
+      out.println("      this." + variableName + " = ((Integer) " + getMethod + ") != 0;");
+      out.println("    } else {");
+      out.println("      this." + variableName + " = (Boolean) " + getMethod + ";");
+      out.println("    }");
+      break;
+    case Date:
+    case DateTime:
+    case Timestamp:
+      final String tmpName = "$" + variableName;
+      out.println("    String " + tmpName + " = (String) " + getMethod + ";");
+      out.println("    if (" + tmpName + " != null && " + tmpName + ".length() > 0) {");
+      out.println("    this." + variableName + " = new Timestamp(format.getTimstampFormat().parse("
+          + tmpName + ").getTime());");
+      out.println("    }");
+      break;
+    case Enum:
+      outputParseFromString(out, column, "(String) " + getMethod);
+      break;
+    case DoublePrecision:
+      out.println("    this." + variableName + " = (Double) " + getMethod + ";");
+      break;
+    case Guid:
+    case Text:
+    case VarChar:
+      out.println("    this." + variableName + " = (String) " + getMethod + ";");
+      break;
+    case Integer:
+      out.println("    this." + variableName + " = (Integer) " + getMethod + ";");
+      break;
+    }
+  }
+
   // Determine the code needed to parse a value from the CSV reader.
   // The CSV reader returns all data as Strings, so we must use the appropriate
   // valueOf method in the case of boxed primitive types, or use the TableFormat
   // class to parse dates and timestamps.
-  private void outputParseFromCsv(final PrintStream out, final DataSchemaColumn column,
-      final int idx) {
+  private void outputParseFromString(final PrintStream out, final DataSchemaColumn column,
+      final String getRecord) {
     String parseMethod = null;
     final String extraParams = "";
     switch (column.getType()) {
@@ -376,7 +514,6 @@ public class JavaModelClassGenerator {
     case VarChar:
       break;
     }
-    final String getRecord = "record.get(" + idx + ")";
     final String varName = JavaBindingGenerator.javaVariable(column.getName());
     if (parseMethod == null) {
       out.println("    this." + varName + " = " + getRecord + ";");
@@ -389,5 +526,4 @@ public class JavaModelClassGenerator {
       out.println("    }");
     }
   }
-
 }

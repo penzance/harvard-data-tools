@@ -27,7 +27,8 @@ import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.canvas.HadoopMultipleJobRunner;
 import edu.harvard.data.canvas.identity.CanvasIdentityHadoopManager;
 import edu.harvard.data.identity.HadoopIdentityKey;
-import edu.harvard.data.identity.IdentityReducer;
+import edu.harvard.data.identity.IdentifierType;
+import edu.harvard.data.identity.LongIdentityReducer;
 
 public class Phase1HadoopManager {
   private static final Logger log = LogManager.getLogger();
@@ -46,6 +47,7 @@ public class Phase1HadoopManager {
 
   public void runJobs(final Configuration hadoopConfig) throws IOException, DataConfigurationException {
     hadoopConfig.set("format", Format.DecompressedCanvasDataFlatFiles.toString());
+    hadoopConfig.set("mainIdentifier", IdentifierType.CanvasDataID.toString());
     runMapJobs(hadoopConfig);
     runScrubJobs(hadoopConfig);
   }
@@ -56,7 +58,7 @@ public class Phase1HadoopManager {
     job.setJarByClass(Phase1HadoopManager.class);
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(NullWritable.class);
-    job.setReducerClass(IdentityReducer.class);
+    job.setReducerClass(LongIdentityReducer.class);
     job.setMapOutputKeyClass(LongWritable.class);
     job.setMapOutputValueClass(HadoopIdentityKey.class);
     job.setInputFormatClass(TextInputFormat.class);

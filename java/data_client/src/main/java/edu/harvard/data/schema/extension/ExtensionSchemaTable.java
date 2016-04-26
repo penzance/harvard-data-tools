@@ -24,8 +24,9 @@ public class ExtensionSchemaTable extends DataSchemaTable {
   public ExtensionSchemaTable(@JsonProperty("like") final String like,
       @JsonProperty("description") final String description,
       @JsonProperty("columns") final List<ExtensionSchemaColumn> columnList,
-      @JsonProperty("owner") final TableOwner owner) {
-    super(false, owner);
+      @JsonProperty("owner") final TableOwner owner,
+      @JsonProperty("expire_after_phase") final Integer expireAfterPhase) {
+    super(false, owner, expireAfterPhase);
     this.like = like;
     this.description = description;
     this.columns = new ArrayList<DataSchemaColumn>();
@@ -39,7 +40,7 @@ public class ExtensionSchemaTable extends DataSchemaTable {
   }
 
   public ExtensionSchemaTable(final String name, final List<DataSchemaColumn> columns) {
-    super(false, null);
+    super(false, null, null);
     this.tableName = name;
     this.like = null;
     this.description = null;
@@ -53,7 +54,7 @@ public class ExtensionSchemaTable extends DataSchemaTable {
   }
 
   private ExtensionSchemaTable(final ExtensionSchemaTable original) {
-    super(original.newlyGenerated, original.owner);
+    super(original.newlyGenerated, original.owner, original.expireAfterPhase);
     this.like = original.like;
     this.description = original.description;
     this.tableName = original.tableName;
@@ -68,6 +69,10 @@ public class ExtensionSchemaTable extends DataSchemaTable {
 
   public void setTableName(final String tableName) {
     this.tableName = tableName;
+  }
+
+  public void setExpiration(final int phase) {
+    this.expireAfterPhase = phase;
   }
 
   @Override

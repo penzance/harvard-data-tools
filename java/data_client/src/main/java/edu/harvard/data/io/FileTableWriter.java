@@ -68,6 +68,8 @@ public class FileTableWriter<T extends DataTable> implements TableWriter<T> {
   public void close() throws IOException {
     if (!buffer.isEmpty()) {
       flush();
+    }
+    if (printer != null) {
       printer.close();
     }
   }

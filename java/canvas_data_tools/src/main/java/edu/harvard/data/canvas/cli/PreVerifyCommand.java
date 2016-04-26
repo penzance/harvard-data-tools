@@ -10,11 +10,11 @@ import org.apache.logging.log4j.Logger;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 
-import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
+import edu.harvard.data.canvas.CanvasDataConfiguration;
 import edu.harvard.data.canvas.phase_0.Phase0PreVerifier;
 import edu.harvard.data.canvas.phase_1.Phase1PreVerifier;
 import edu.harvard.data.canvas.phase_2.Phase2PreVerifier;
@@ -38,7 +38,7 @@ public class PreVerifyCommand implements Command {
   public String outputDir;
 
   @Override
-  public ReturnStatus execute(final DataConfiguration config, final ExecutorService exec)
+  public ReturnStatus execute(final CanvasDataConfiguration config, final ExecutorService exec)
       throws IOException, DataConfigurationException, UnexpectedApiResponseException,
       ArgumentError {
     if (!checkArguments()) {
@@ -54,7 +54,7 @@ public class PreVerifyCommand implements Command {
     return ReturnStatus.OK;
   }
 
-  private Verifier getVerifier(final DataConfiguration config, final ExecutorService exec)
+  private Verifier getVerifier(final CanvasDataConfiguration config, final ExecutorService exec)
       throws ArgumentError, DataConfigurationException {
     final URI hdfsService;
     try {

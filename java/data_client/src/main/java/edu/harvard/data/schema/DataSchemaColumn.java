@@ -30,6 +30,9 @@ public abstract class DataSchemaColumn {
   }
 
   protected String cleanColumnName(final String name) {
+    if (name == null) {
+      return null;
+    }
     final String clean = name;
     switch(name) {
     case "default":

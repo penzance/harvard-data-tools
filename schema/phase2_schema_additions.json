@@ -1,9 +1,0 @@
-{ "tables": 
-  { "requests": {
-      "owner": "java"
-    },
-    "admin_requests": {
-      "like": "requests"
-    }
-  }
-}

@@ -27,9 +27,10 @@ import org.apache.hadoop.fs.Path;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.TableFormat;
+import edu.harvard.data.canvas.CanvasDataConfiguration;
 import edu.harvard.data.canvas.bindings.phase0.Phase0Requests;
+import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.identity.IdentityMap;
 import edu.harvard.data.io.FileTableWriter;
 import edu.harvard.data.io.HdfsTableReader;
@@ -50,10 +51,11 @@ public class VerificationPeople {
   private List<Long> people;
   private final Map<Long, IdentityMap> originalIdentities;
 
-  private final DataConfiguration dataConfig;
+  private final CanvasDataConfiguration dataConfig;
 
-  public VerificationPeople(final DataConfiguration dataConfig, final Configuration hadoopConfig,
-      final URI hdfsService, final String inputDir, final TableFormat format) throws IOException {
+  public VerificationPeople(final CanvasDataConfiguration dataConfig,
+      final Configuration hadoopConfig, final URI hdfsService, final String inputDir,
+      final TableFormat format) throws IOException {
     this.dataConfig = dataConfig;
     this.inputDir = inputDir;
     this.format = format;
@@ -133,7 +135,11 @@ public class VerificationPeople {
     final Set<Path> chosen = new HashSet<Path>();
     chosen.add(new Path(paths.remove(paths.size() - 1)));
     while (paths.size() > 0 && chosen.size() < MAX_SAMPLE_FILES) {
-      chosen.add(new Path(paths.remove(random.nextInt(paths.size() - 1))));
+      if (paths.size() == 1) {
+        chosen.add(new Path(paths.remove(0)));
+      } else {
+        chosen.add(new Path(paths.remove(random.nextInt(paths.size() - 1))));
+      }
     }
     for (final Path p : chosen) {
       log.info("Selecting " + p + " to search for interesting users");
@@ -141,7 +147,7 @@ public class VerificationPeople {
     return chosen;
   }
 
-  private void getIdMapsFromRedshift(final DataConfiguration config) throws SQLException {
+  private void getIdMapsFromRedshift(final CanvasDataConfiguration config) throws SQLException {
     final Long start = System.currentTimeMillis();
     final String url = config.getRedshiftUrl();
     String queryString = "SELECT * FROM identity_map WHERE identity_map.canvas_data_id IN (";
@@ -160,7 +166,7 @@ public class VerificationPeople {
       try (final ResultSet rs = statement.executeQuery();) {
         while (rs.next()) {
           final IdentityMap id = new IdentityMap(rs);
-          originalIdentities.put(id.getCanvasDataID(), id);
+          originalIdentities.put((Long) id.get(IdentifierType.CanvasDataID), id);
         }
       }
     }
@@ -176,12 +182,12 @@ public class VerificationPeople {
         TableWriter<IdentityMap> out = new FileTableWriter<IdentityMap>(IdentityMap.class, format,
             "identity_map", outStream)) {
       for (final IdentityMap id : originalIdentities.values()) {
-        unknownPeople.remove(id.getCanvasDataID());
+        unknownPeople.remove(id.get(IdentifierType.CanvasDataID));
         out.add(id);
       }
       for (final Long canvasDataId : unknownPeople) {
         final IdentityMap id = new IdentityMap();
-        id.setCanvasDataID(canvasDataId);
+        id.set(IdentifierType.CanvasDataID, canvasDataId);
         out.add(id);
       }
     }

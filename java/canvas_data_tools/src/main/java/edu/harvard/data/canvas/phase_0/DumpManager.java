@@ -16,11 +16,11 @@ import org.apache.logging.log4j.Logger;
 import com.amazonaws.services.s3.model.S3ObjectId;
 
 import edu.harvard.data.AwsUtils;
-import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.DumpInfo;
 import edu.harvard.data.TableInfo;
 import edu.harvard.data.VerificationException;
+import edu.harvard.data.canvas.CanvasDataConfiguration;
 import edu.harvard.data.canvas.cli.ArgumentError;
 import edu.harvard.data.canvas.data_api.ApiClient;
 import edu.harvard.data.canvas.data_api.CanvasDataSchema;
@@ -34,18 +34,18 @@ public class DumpManager {
 
   private static final Logger log = LogManager.getLogger();
 
-  private final DataConfiguration config;
+  private final CanvasDataConfiguration config;
   private final AwsUtils aws;
 
-  public DumpManager(final DataConfiguration config, final AwsUtils aws) {
+  public DumpManager(final CanvasDataConfiguration config, final AwsUtils aws) {
     this.config = config;
     this.aws = aws;
   }
 
   public boolean needToSaveDump(final DataDump dump) throws IOException {
     final DumpInfo info = DumpInfo.find(dump.getDumpId());
-    if (dump.getSequence() < 169) {
-      log.warn("Dump downloader set to ignore dumps with sequence < 169");
+    if (dump.getSequence() < 188) {
+      log.warn("Dump downloader set to ignore dumps with sequence < 188");
       return false;
     }
     if (info == null) {
@@ -154,7 +154,7 @@ public class DumpManager {
 
   public S3ObjectId getArchiveDumpObj(final DataDump dump) {
     final String dirName = String.format("%05d", dump.getSequence());
-    return AwsUtils.key(config.getCanvasDataArchiveKey(), dirName);
+    return AwsUtils.key(config.getIncomingBucket(), dirName);
   }
 
   public void updateTableInfoTable(final DataDump dump) {

@@ -17,12 +17,12 @@ import org.kohsuke.args4j.spi.SubCommand;
 import org.kohsuke.args4j.spi.SubCommandHandler;
 import org.kohsuke.args4j.spi.SubCommands;
 
-import edu.harvard.data.DataConfiguration;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.DumpInfo;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.TableInfo;
 import edu.harvard.data.VerificationException;
+import edu.harvard.data.canvas.CanvasDataConfiguration;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class CanvasDataCli {
@@ -34,6 +34,7 @@ public class CanvasDataCli {
     @SubCommand(name = "postverify", impl = PostVerifyCommand.class),
     @SubCommand(name = "hadoop", impl = HadoopCommand.class),
     @SubCommand(name = "updateredshift", impl = UpdateRedshiftCommand.class),
+    @SubCommand(name = "unload", impl = UnloadExistingTablesCommand.class),
     @SubCommand(name = "cleanup", impl = CleanupCommand.class),
     @SubCommand(name = "fulldumps", impl = GetCompleteTableInfoCommand.class),
     @SubCommand(name = "listdumps", impl = ListDumpsCommand.class),
@@ -62,9 +63,9 @@ public class CanvasDataCli {
       System.exit(ReturnStatus.ARGUMENT_ERROR.getCode());
     } else {
       // Config is set or System.exit is called.
-      DataConfiguration config = null;
+      CanvasDataConfiguration config = null;
       try {
-        config = DataConfiguration.getConfiguration("secure.properties");
+        config = CanvasDataConfiguration.getConfiguration("secure.properties");
         DumpInfo.init(config.getDumpInfoDynamoTable());
         TableInfo.init(config.getTableInfoDynamoTable());
         log.info("Using table " + config.getDumpInfoDynamoTable() + " for dump info.");
@@ -126,7 +127,7 @@ public class CanvasDataCli {
   }
 
   public static void bail(final ReturnStatus status, final String[] args,
-      final DataConfiguration config, final String message, final Throwable t) {
+      final CanvasDataConfiguration config, final String message, final Throwable t) {
     log.error("Exiting with error status " + status);
     if (t == null) {
       log.error(message);
@@ -140,7 +141,7 @@ public class CanvasDataCli {
     log.error("Canvas data host: " + config.getCanvasDataHost());
     log.error("DynamoDB dump info table: " + config.getDumpInfoDynamoTable());
     log.error("Local scratch directory: " + config.getScratchDir());
-    log.error("S3 archive location: " + config.getCanvasDataArchiveKey());
+    log.error("S3 archive location: " + config.getIncomingBucket());
     System.exit(status.getCode());
   }
 }

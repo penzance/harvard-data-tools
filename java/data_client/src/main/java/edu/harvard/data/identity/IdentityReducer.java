@@ -10,70 +10,159 @@ import java.util.UUID;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
+import edu.harvard.data.HadoopConfigurationException;
+import edu.harvard.data.HadoopJob;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.io.HdfsTableReader;
 
-public class IdentityReducer extends Reducer<LongWritable, HadoopIdentityKey, Text, NullWritable> {
+/**
+ * Helper class that implements the actual logic for the reduce phase during the
+ * identity generation job. Since Hadoop requires that Hadoop-specific wrapper
+ * types for the input key and value types be specified as part of the reducer
+ * class declaration, we declare a separate reducer class for each possible type
+ * for a data set's main identifier. See {@code LongIdentityReducer} for an
+ * example.
+ *
+ * @param <T>
+ *          the Java language class of the reducer's input key type. For
+ *          example, a reducer that consumes
+ *          {@link org.apache.hadoop.io.LongWritable} keys should declare an
+ *          {@code IdentityReducer} parameterized with {@link Long}.
+ */
+public class IdentityReducer<T> {
+
   private static final Logger log = LogManager.getLogger();
 
-  protected final Map<Long, IdentityMap> identities;
-  private TableFormat format;
+  final Map<T, IdentityMap> identities;
+  TableFormat format;
+  IdentifierType mainIdentifier;
 
   public IdentityReducer() {
-    this.identities = new HashMap<Long, IdentityMap>();
+    this.identities = new HashMap<T, IdentityMap>();
   }
 
-  @Override
-  protected void setup(final Context context) throws IOException, InterruptedException {
-    super.setup(context);
-    final Format formatName = Format.valueOf(context.getConfiguration().get("format"));
-    this.format = new FormatLibrary().getFormat(formatName);
+  /**
+   * Perform initial setup tasks before running the reducer. This method should
+   * be called by the {@code setup} method of the actual identity reducer Hadoop
+   * task.
+   *
+   * This method populates three fields in the class. First, it retrieves the
+   * format configuration setting from the Hadoop context and converts it into a
+   * {@link Format} instance in order to correctly parse the incoming data. It
+   * does the same for the main identifier value: the {@link IdentifierType}
+   * that represents the primary identifier used in the data set. This is
+   * generally the primary key in a <code>users</code> table, or some external
+   * user identifier. The type of the identifier (determined by
+   * {@link IdentifierType#getType}) must be the same as the class parameter
+   * {@code T}.
+   *
+   * It then fetches the incoming identity map files from the Hadoop distributed
+   * cache and builds up a map from the main identifier type to identity map
+   * values that can be used during the reduce phase to ensure that consistent
+   * research UUIDs are assigned to existing users.
+   *
+   * @param context
+   *          the Hadoop context for the reducer.
+   * @throws IOException
+   *           if an error occurs while reading and parsing the identity map
+   *           files in the Hadoop distributed cache.
+   */
+  public void setup(final Reducer<?, HadoopIdentityKey, Text, NullWritable>.Context context)
+      throws IOException {
+    this.format = HadoopJob.getFormat(context);
+    this.mainIdentifier = getMainIdentifier(context);
+    readIdentityMap(context);
+  }
+
+  private IdentifierType getMainIdentifier(
+      final Reducer<?, HadoopIdentityKey, Text, NullWritable>.Context context) {
+    final String idString = context.getConfiguration().get("mainIdentifier");
+    if (idString == null) {
+      throw new HadoopConfigurationException(
+          "Required Hadoop configuration parameter 'mainIdentifier' missing");
+    }
+    try {
+      return IdentifierType.valueOf(idString);
+    } catch (final IllegalArgumentException e) {
+      throw new HadoopConfigurationException("Unknown main identifier type: \"" + idString
+          + "\". Expected one of " + IdentifierType.values(), e);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private void readIdentityMap(
+      final Reducer<?, HadoopIdentityKey, Text, NullWritable>.Context context) throws IOException {
     final FileSystem fs = FileSystem.get(context.getConfiguration());
+    log.info("Reading existing identities from " + context.getCacheFiles().length + " files");
     for (final URI uri : context.getCacheFiles()) {
       final Path path = new Path(uri.toString());
-      log.info("Reading existing identities from " + path);
       try (HdfsTableReader<IdentityMap> in = new HdfsTableReader<IdentityMap>(IdentityMap.class,
           format, fs, path)) {
         for (final IdentityMap id : in) {
-          identities.put(id.getCanvasDataID(), id);
+          identities.put((T) id.get(mainIdentifier), id);
         }
       }
     }
     log.info("Read " + identities.size() + " existing identities in identity reducer");
   }
 
-  @Override
-  public void reduce(final LongWritable key, final Iterable<HadoopIdentityKey> values,
-      final Context context) throws IOException, InterruptedException {
-    final IdentityMap id = new IdentityMap();
-    final Long canvasDataId = key.get();
-    id.setCanvasDataID(canvasDataId);
-    if (identities.containsKey(canvasDataId)) {
-      id.setResearchId(identities.get(canvasDataId).getResearchId());
+  /**
+   * Merge the identities of a single user. This method operates over the set of
+   * {@link IdentityMap} objects generated by the various identity mapper jobs.
+   * For each main identifier it fist checks to see whether a user with that
+   * identifier exists in the existing identity map. If not, it creates a new
+   * identity for that individual. It then scans through all the identity
+   * information gathered by the mappers to supplement the user's identity with
+   * any newly-discovered identities.
+   *
+   * This method should be called by the {@code reduce} method of the actual
+   * identity reducer Hadoop task.
+   *
+   * TODO: This method does not currently handle the case where different
+   * mappers produce contradictory identities.
+   *
+   * @param mainIdValue
+   *          the key used to identify this user in the data set.
+   * @param values
+   *          all identity values calculated by the various identity mapper
+   *          jobs. The {@code IdentityMap} objects are wrapped in
+   *          Hadoop-friendly {@link HadoopIdentityKey} objects.
+   * @param context
+   *          the Hadoop context for this job to which the resulting identity
+   *          object will be written.
+   *
+   * @throws IOException
+   *           if an error occurs while outputting the identity object to the
+   *           context.
+   * @throws InterruptedException
+   *           if interrupted while writing to the context.
+   */
+  public void reduce(final T mainIdValue, final Iterable<HadoopIdentityKey> values,
+      final Reducer<?, HadoopIdentityKey, Text, NullWritable>.Context context)
+          throws IOException, InterruptedException {
+    final IdentityMap id;
+    if (identities.containsKey(mainIdValue)) {
+      id = identities.get(mainIdValue);
     } else {
-      id.setResearchId(UUID.randomUUID().toString());
+      id = new IdentityMap();
+      id.set(mainIdentifier, mainIdValue);
+      id.set(IdentifierType.ResearchUUID, UUID.randomUUID().toString());
     }
     for (final HadoopIdentityKey value : values) {
-      final Long canvasId = value.getIdentityMap().getCanvasID();
-      final String huid = value.getIdentityMap().getHUID();
-      final String xid = value.getIdentityMap().getXID();
-      if (id.getCanvasID() == null && canvasId != null) {
-        id.setCanvasID(canvasId);
-      }
-      if (id.getHUID() == null && huid != null) {
-        id.setHUID(huid);
-      }
-      if (id.getXID() == null && xid != null) {
-        id.setXID(xid);
+      for (final IdentifierType type : IdentifierType.values()) {
+        if (type != mainIdentifier) {
+          final Object obj = value.getIdentityMap().get(type);
+          if (obj != null && id.get(type) == null) {
+            id.set(type, obj);
+          }
+        }
       }
     }
     final StringWriter writer = new StringWriter();

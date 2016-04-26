@@ -21,7 +21,7 @@ public class UpdateRedshift {
     this.expectedSchema = expectedSchema;
   }
 
-  public void update(final AwsUtils aws, final DataConfiguration config) throws SQLException {
+  public void update(final AwsUtils aws, final RedshiftConfiguration config) throws SQLException {
     log.info("Connecting to Redshift to retrieve schema");
     final RedshiftSchema rs = aws.getRedshiftSchema(config);
     final SchemaComparison diff = new SchemaComparison(expectedSchema, rs);
@@ -33,16 +33,17 @@ public class UpdateRedshift {
     }
     for (final String tableName : additions.keySet()) {
       final DataSchemaTable table = additions.get(tableName);
-      if (table.getNewlyGenerated()) {
-        final String create = SqlGenerator.generateCreateStatement(table);
-        aws.executeRedshiftQuery(create, config);
-      } else {
-        for (final DataSchemaColumn column : table.getColumns()) {
-          final String alter = SqlGenerator.generateAlterStatement(table, column);
-          aws.executeRedshiftQuery(alter, config);
+      if (!table.isTemporary()) {
+        if (table.getNewlyGenerated()) {
+          final String create = SqlGenerator.generateCreateStatement(table);
+          aws.executeRedshiftQuery(create, config);
+        } else {
+          for (final DataSchemaColumn column : table.getColumns()) {
+            final String alter = SqlGenerator.generateAlterStatement(table, column);
+            aws.executeRedshiftQuery(alter, config);
+          }
         }
       }
     }
-
   }
 }

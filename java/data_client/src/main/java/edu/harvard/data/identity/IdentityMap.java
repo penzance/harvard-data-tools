@@ -5,7 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.csv.CSVRecord;
 
@@ -25,16 +27,14 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
 
   private static final String ID_TABLE_NAME = "identity_map";
 
-  private String researchId;
-  private String huid;
-  private String xid;
-  private Long canvasId;
-  private Long canvasDataId;
+  private final Map<IdentifierType, Object> identities;
 
   public IdentityMap() {
+    this.identities = new HashMap<IdentifierType, Object>();
   }
 
   public IdentityMap(final CSVRecord record) {
+    this();
     this.populate(record);
   }
 
@@ -43,102 +43,81 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
   }
 
   public IdentityMap(final ResultSet resultSet) throws SQLException {
+    this();
     this.populate(resultSet);
   }
 
   public void populate(final CSVRecord record) {
-    this.researchId = record.get(0);
-    this.huid = record.get(1);
-    this.xid = record.get(2);
+    if (record.get(0) != null) {
+      identities.put(IdentifierType.ResearchUUID, record.get(0));
+    }
+    if (record.get(1) != null) {
+      identities.put(IdentifierType.HUID, record.get(1));
+    }
+    if (record.get(2) != null) {
+      identities.put(IdentifierType.XID, record.get(2));
+    }
     final String $canvasId = record.get(3);
     if ($canvasId != null && $canvasId.length() > 0) {
-      this.canvasId = Long.valueOf($canvasId);
+      identities.put(IdentifierType.CanvasID, Long.valueOf($canvasId));
     }
     final String $canvasDataId = record.get(4);
     if ($canvasDataId != null && $canvasDataId.length() > 0) {
-      this.canvasDataId = Long.valueOf($canvasDataId);
+      identities.put(IdentifierType.CanvasDataID, Long.valueOf($canvasDataId));
     }
   }
 
   public void populate(final ResultSet resultSet) throws SQLException {
-    this.researchId = resultSet.getString("research_id");
-    this.huid = resultSet.getString("huid");
-    this.xid = resultSet.getString("xid");
-    this.canvasId = resultSet.getLong("canvas_id");
-    if (resultSet.wasNull()) {
-      this.canvasId = null;
+    if (resultSet.getString("research_id") != null) {
+      identities.put(IdentifierType.ResearchUUID, "research_id");
     }
-    this.canvasDataId = resultSet.getLong("canvas_data_id");
-    if (resultSet.wasNull()) {
-      this.canvasDataId = null;
+    if (resultSet.getString("huid") != null) {
+      identities.put(IdentifierType.HUID, "huid");
     }
-  }
-
-  public String getResearchId() {
-    return this.researchId;
-  }
-
-  public void setResearchId(final String researchId) {
-    this.researchId = researchId;
-  }
-
-  public String getHUID() {
-    return this.huid;
-  }
-
-  public void setHUID(final String huid) {
-    this.huid = huid;
-  }
-
-  public String getXID() {
-    return this.xid;
-  }
-
-  public void setXID(final String xid) {
-    this.xid = xid;
-  }
-
-  public Long getCanvasID() {
-    return this.canvasId;
-  }
-
-  public void setCanvasID(final Long canvasId) {
-    this.canvasId = canvasId;
-  }
-
-  public Long getCanvasDataID() {
-    return this.canvasDataId;
-  }
-
-  public void setCanvasDataID(final Long canvasDataId) {
-    this.canvasDataId = canvasDataId;
+    if (resultSet.getString("xid") != null) {
+      identities.put(IdentifierType.XID, "xid");
+    }
+    final long canvasId = resultSet.getLong("canvas_id");
+    if (!resultSet.wasNull()) {
+      identities.put(IdentifierType.CanvasID, canvasId);
+    }
+    final long canvasDataId = resultSet.getLong("canvas_data_id");
+    if (!resultSet.wasNull()) {
+      identities.put(IdentifierType.CanvasDataID, canvasDataId);
+    }
   }
 
   @Override
   public List<Object> getFieldsAsList(final TableFormat formatter) {
     final List<Object> fields = new ArrayList<Object>();
-    fields.add(researchId);
-    fields.add(huid);
-    fields.add(xid);
-    fields.add(canvasId);
-    fields.add(canvasDataId);
+    fields.add(identities.get(IdentifierType.ResearchUUID));
+    fields.add(identities.get(IdentifierType.HUID));
+    fields.add(identities.get(IdentifierType.XID));
+    fields.add(identities.get(IdentifierType.CanvasID));
+    fields.add(identities.get(IdentifierType.CanvasDataID));
     return fields;
   }
 
-  public static List<String> getFieldNames() {
+  @Override
+  public List<String> getFieldNames() {
     final List<String> fields = new ArrayList<String>();
-    fields.add("research_id");
-    fields.add("huid");
-    fields.add("xid");
-    fields.add("canvas_id");
-    fields.add("canvas_data_id");
+    fields.add(IdentifierType.ResearchUUID.getFieldName());
+    fields.add(IdentifierType.HUID.getFieldName());
+    fields.add(IdentifierType.XID.getFieldName());
+    fields.add(IdentifierType.CanvasID.getFieldName());
+    fields.add(IdentifierType.CanvasDataID.getFieldName());
     return fields;
   }
 
   @Override
   public String toString() {
-    return "research_id: " + researchId + "\nhuid: " + huid + "\nxid: " + xid + "\ncanvas_id: " + canvasId
-        + "\ncanvasDataId: " + canvasDataId;
+    String s = "";
+    for (final IdentifierType type : IdentifierType.values()) {
+      if (type != IdentifierType.Other) {
+        s += type.getFieldName() + ": " + identities.get(type) + " ";
+      }
+    }
+    return s.trim();
   }
 
   @Override
@@ -149,38 +128,9 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
   public PreparedStatement getLookupSqlQuery(final Connection connection) throws SQLException {
     final List<String> params = new ArrayList<String>();
     final List<Object> vals = new ArrayList<Object>();
-    if (researchId != null) {
-      params.add("research_id = ?");
-      vals.add(researchId);
-    }
-    if (huid != null) {
-      params.add("huid = ?");
-      vals.add(huid);
-    }
-    if (huid != null) {
-      params.add("xid = ?");
-      vals.add(xid);
-    }
-    if (canvasId != null) {
-      params.add("canvas_id = ?");
-      vals.add(canvasId);
-    }
-    if (canvasDataId != null) {
-      params.add("canvas_data_id = ?");
-      vals.add(canvasDataId);
-    }
-
-    String query = "SELECT research_id, huid, canvas_id, canvas_data_id FROM " + ID_TABLE_NAME + " WHERE ";
-    for (int i=0; i<params.size(); i++) {
-      if (i > 0) {
-        query += " OR ";
-      }
-      query += params.get(i);
-    }
-    query += ";";
-
+    final String query = getLookupSql(params, vals);
     final PreparedStatement statement = connection.prepareStatement(query);
-    for (int i=0; i<params.size(); i++) {
+    for (int i = 0; i < params.size(); i++) {
       if (vals.get(i) instanceof Long) {
         statement.setLong(i, (Long) vals.get(i));
       } else if (vals.get(i) instanceof String) {
@@ -190,5 +140,56 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
       }
     }
     return statement;
+  }
+
+  private String getLookupSql(final List<String> params, final List<Object> vals) {
+    for (final IdentifierType type : IdentifierType.values()) {
+      if (type != IdentifierType.Other) {
+        if (identities.containsKey(type)) {
+          params.add(type.getFieldName() + " = ?");
+          vals.add(identities.get(type));
+        }
+      }
+    }
+
+    String query = "SELECT research_id, huid, xid, canvas_id, canvas_data_id FROM " + ID_TABLE_NAME
+        + " WHERE ";
+    for (int i = 0; i < params.size(); i++) {
+      if (i > 0) {
+        query += " OR ";
+      }
+      query += params.get(i);
+    }
+    query += ";";
+    return query;
+  }
+
+  @Override
+  public Map<String, Object> getFieldsAsMap() {
+    final Map<String, Object> fields = new HashMap<String, Object>();
+    if (identities.containsKey(IdentifierType.ResearchUUID)) {
+      fields.put("research_id", identities.get(IdentifierType.ResearchUUID));
+    }
+    if (identities.containsKey(IdentifierType.HUID)) {
+      fields.put("huid", identities.get(IdentifierType.HUID));
+    }
+    if (identities.containsKey(IdentifierType.XID)) {
+      fields.put("xid", identities.get(IdentifierType.XID));
+    }
+    if (identities.containsKey(IdentifierType.CanvasID)) {
+      fields.put("canvas_id", identities.get(IdentifierType.CanvasID));
+    }
+    if (identities.containsKey(IdentifierType.CanvasDataID)) {
+      fields.put("canvas_data_id", identities.get(IdentifierType.CanvasDataID));
+    }
+    return fields;
+  }
+
+  public Object get(final IdentifierType idType) {
+    return identities.get(idType);
+  }
+
+  public void set(final IdentifierType idType, final Object value) {
+    identities.put(idType, value);
   }
 }

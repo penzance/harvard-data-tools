@@ -14,9 +14,9 @@ export SECURE_PROPERTIES_LOCATION=/home/hadoop
 #     .jar files should be stored.
 export HARVARD_DATA_GENERATED_OUTPUT=/home/hadoop
 
-# - CANVAS_DATA_SCHEMA_VERSION: The version of the Canvas Data schema for which
+# - DATA_SCHEMA_VERSION: The version of the data schema for which
 #     files will be generated. Format as a string, e.g. 1.2.0
-export CANVAS_DATA_SCHEMA_VERSION=$1
+export DATA_SCHEMA_VERSION=$1
 
 # - HDFS_PHASE_n_DIR: HDFS directories for data in each phase n
 export HDFS_PHASE_0_DIR=hdfs:///phase_0
@@ -45,8 +45,8 @@ sudo yum install -y apache-maven
 aws s3 cp s3://$2/secure.properties /home/hadoop/.
 
 # generate the tools
-python /home/hadoop/harvard-data-tools/python/canvas_generate_tools.py
-
+python /home/hadoop/harvard-data-tools/python/$8_generate_tools.py
+x
 chmod 764 /home/hadoop/*.sh
 
 # setup CloudWatch logging
@@ -71,11 +71,14 @@ FULLDUMPPATH=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$(curl h
 #DATASETNUM=$(grep -Po '(?<=\"DUMP_SEQUENCE\" : \")[^\"]*' /root/the_result.json)
 
 # Replace <intermediates3bucketandpath> placeholder with real intermediate bucket name and path
-sed -i "s@<intermediates3bucketandpath>@s3://$4/$FULLDUMPPATH@g" /home/hadoop/s3_to_redshift_loader.sql
+sed -i "s@<intermediates3bucketandpath>/@s3://$4/$FULLDUMPPATH@g" /home/hadoop/s3_to_redshift_loader.sql
 
 # Replace <awskeyandsecret> placeholder with real creds
 sed -i "s@<awskeyandsecret>@aws_access_key_id=$5;aws_secret_access_key=$6@g" /home/hadoop/s3_to_redshift_loader.sql
 
 # Copy modified file to code S3 bucket, name it with data set number.
-aws s3 cp /home/hadoop/s3_to_redshift_loader.sql s3://$7/$DUMPID.sql
-
+if [ "$DUMPID" != "" ]; then
+  aws s3 cp /home/hadoop/s3_to_redshift_loader.sql s3://$7/$DUMPID.sql
+else
+  aws s3 cp /home/hadoop/s3_to_redshift_loader.sql s3://$7/matterhorn.sql
+fi
