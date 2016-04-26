@@ -77,7 +77,7 @@ sed -i "s@<intermediates3bucketandpath>/@s3://$4/$FULLDUMPPATH@g" /home/hadoop/s
 sed -i "s@<awskeyandsecret>@aws_access_key_id=$5;aws_secret_access_key=$6@g" /home/hadoop/s3_to_redshift_loader.sql
 
 # Copy modified file to code S3 bucket, name it with data set number.
-if [ DUMPID != "" ]; then
+if [ "$DUMPID" != "" ]; then
   aws s3 cp /home/hadoop/s3_to_redshift_loader.sql s3://$7/$DUMPID.sql
 else
   aws s3 cp /home/hadoop/s3_to_redshift_loader.sql s3://$7/matterhorn.sql
