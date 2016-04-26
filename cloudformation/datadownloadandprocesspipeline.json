@@ -741,6 +741,9 @@
                                 "# add github.com to known_hosts and run ansible-pull\n",
                                 "ssh-keyscan github.com >> /root/.ssh/known_hosts\n",
                                 "\n",
+                                "# update aws cli to make Lambda happy\n",
+                                "pip install awscli --upgrade\n",
+                                "\n",
                                 "# install jdk and git\n",
                                 "yum install -y java-devel git-core\n",
                                 "\n",
@@ -844,7 +847,7 @@
                                 {
                                     "Ref": "DataPipelineInitLambda"
                                 },
-                                " --payload file:///root/the_result.json myoutfile --region us-east-1\n",
+                                " --payload file:///root/the_result.json /root/data-pipeline-init-lambda.out --region us-east-1\n",
                                 "\n",
                                 "# Reduce max instances for this machine's ASG to 0, thus terminating the machine\n",
                                 "asg=$(aws ec2 describe-tags --filters \"Name=resource-id,Values=$(curl http://169.254.169.254/latest/meta-data/instance-id)\" \"Name=key,Values=aws:autoscaling:groupName\" --query 'Tags[*].[Value]' --output text --region us-east-1); aws autoscaling update-auto-scaling-group --auto-scaling-group-name $asg --max-size 0 --region us-east-1\n"
@@ -1530,7 +1533,7 @@
                                             {
                                                 "Ref": "IncomingS3Bucket"
                                             },
-                                            "/dataset-path-placeholder/identity_map/' CREDENTIALS 'aws_access_key_id=",
+                                            "/dataset-path-with-slash-placeholderidentity_map/' CREDENTIALS 'aws_access_key_id=",
                                             {
                                                 "Ref": "RedshiftOperationsAccessKey"
                                             },
@@ -2348,7 +2351,7 @@
                                             {
                                                 "Ref": "IntermediateS3Bucket"
                                             },
-                                            "/dataset-path-placeholder/identity_map"
+                                            "/dataset-path-with-slash-placeholderidentity_map"
                                         ]
                                     ]
                                 }
@@ -2491,7 +2494,7 @@
                                             {
                                                 "Ref": "IntermediateS3Bucket"
                                             },
-                                            "/dataset-path-placeholder/identity_map/' CREDENTIALS 'aws_access_key_id=",
+                                            "/dataset-path-with-slash-placeholderidentity_map/' CREDENTIALS 'aws_access_key_id=",
                                             {
                                                 "Ref": "RedshiftOperationsAccessKey"
                                             },
@@ -4669,7 +4672,7 @@
                                             {
                                                 "Ref": "NewCodeS3Bucket"
                                             },
-                                            "/dataset-id-placeholder.sql"
+                                            "/dataset-id-sql-placeholder.sql"
                                         ]
                                     ]
                                 }
@@ -4802,7 +4805,7 @@
                                     "Fn::Join": [
                                         "",
                                         [
-                                            "#aws s3 rm s3://",
+                                            "aws s3 rm s3://",
                                             {
                                                 "Ref": "IntermediateS3Bucket"
                                             },
@@ -5019,7 +5022,7 @@
                                             {
                                                 "Ref": "NewCodeS3Bucket"
                                             },
-                                            "/dataset-id-placeholder.sql"
+                                            "/dataset-id-sql-placeholder.sql"
                                         ]
                                     ]
                                 }
