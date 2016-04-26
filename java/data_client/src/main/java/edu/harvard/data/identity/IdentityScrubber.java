@@ -68,8 +68,8 @@ public abstract class IdentityScrubber<T> extends Mapper<Object, Text, Text, Nul
   protected void setup(final Context context) throws IOException, InterruptedException {
     super.setup(context);
     this.format = hadoopUtils.getFormat(context);
-    this.identities = new HashMap<T, IdentityMap>();
     this.mainIdentifier = hadoopUtils.getMainIdentifier(context);
+    this.identities = new HashMap<T, IdentityMap>();
     try (TableReader<IdentityMap> in = hadoopUtils.getHdfsTableReader(context, format,
         IdentityMap.class)) {
       for (final IdentityMap id : in) {
@@ -78,6 +78,7 @@ public abstract class IdentityScrubber<T> extends Mapper<Object, Text, Text, Nul
     }
     log.info("Completed setup for " + this);
   }
+
 
   @Override
   public void map(final Object key, final Text value, final Context context)
