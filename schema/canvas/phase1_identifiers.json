@@ -30,6 +30,16 @@
 	"enrollment_rollup_dim": {
 		"user_id": ["CanvasDataID"]
 	},
+	"file_dim": {
+		"user_id": ["CanvasDataID"],
+		"uploader_id": ["CanvasDataID"]
+	},
+	"file_fact": {
+		"conversation_message_author_id": ["CanvasDataID"],
+		"grader_id": ["CanvasDataID"],
+		"uploader_id": ["CanvasDataID"],
+		"user_id": ["CanvasDataID"]
+	},
 	"group_membership_fact": {
 		"user_id": ["CanvasDataID"]
 	},
