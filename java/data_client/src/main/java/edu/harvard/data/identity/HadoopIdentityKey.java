@@ -8,10 +8,16 @@ import org.apache.hadoop.io.WritableComparable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Wrapper class to allow Hadoop to serialize an {@link IdentityMap}. This class
+ * simply converts the {@code IdentityMap} instance to a JSON representation
+ * which can then be written to HDFS.
+ */
 public class HadoopIdentityKey implements WritableComparable<HadoopIdentityKey> {
 
-  private IdentityMap id;
   private static final ObjectMapper jsonMapper = new ObjectMapper();
+
+  private IdentityMap id;
 
   public HadoopIdentityKey() {
   }
