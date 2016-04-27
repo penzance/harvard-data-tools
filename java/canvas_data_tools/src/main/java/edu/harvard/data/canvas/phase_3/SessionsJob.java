@@ -84,6 +84,11 @@ class SessionsMapper extends Mapper<Object, Text, Text, Text> {
 class SessionsReducer extends Reducer<Text, Text, Text, NullWritable> {
 
   private TableFormat format;
+  private final HadoopUtilities hadoopUtils;
+
+  public SessionsReducer() {
+    this.hadoopUtils = new HadoopUtilities();
+  }
 
   @Override
   protected void setup(final Context context) {
@@ -174,5 +179,7 @@ class SessionsReducer extends Reducer<Text, Text, Text, NullWritable> {
     session.setStartTime(earliest);
     session.setEndTime(latest);
     session.setDurationMs(latest.getTime() - earliest.getTime());
+
+    context.write(hadoopUtils.convertToText(session, format), NullWritable.get());
   }
 }
