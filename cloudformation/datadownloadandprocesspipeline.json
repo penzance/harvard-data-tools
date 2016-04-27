@@ -5289,6 +5289,21 @@
             "Value": {
                 "Ref": "FailureSNS"
             }
+        },
+        "RedshiftOperationsKey": {
+            "Description": "Redshift Operations Access Key",
+            "Value": {
+				"Ref": "RedshiftOperationsAccessKey"
+            }
+        },
+        "RedshiftOperationsKeySecret": {
+            "Description": "Redshift Operations Access Key Secret",
+            "Value": {
+				"Fn::GetAtt": [
+					"RedshiftOperationsAccessKey",
+					"SecretAccessKey"
+				]
+            }
         }
     }
 }
