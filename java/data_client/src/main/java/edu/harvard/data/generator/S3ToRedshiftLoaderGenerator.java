@@ -26,7 +26,7 @@ public class S3ToRedshiftLoaderGenerator {
     final File createTableFile = new File(dir, "s3_to_redshift_loader.sql");
 
     try (final PrintStream out = new PrintStream(new FileOutputStream(createTableFile))) {
-      generateRedshiftLoaderFile(out, schemaVersions.getPhase(2));
+      generateRedshiftLoaderFile(out, schemaVersions.getPhase(3));
     }
   }
 
@@ -50,6 +50,7 @@ public class S3ToRedshiftLoaderGenerator {
       if (!table.isTemporary()) {
         final Set<String> partialTables = new HashSet<String>();
         partialTables.add("requests");
+        partialTables.add("sessions");
         partialTables.add("event");
         partialTables.add("video");
         partialTables.add("session");
