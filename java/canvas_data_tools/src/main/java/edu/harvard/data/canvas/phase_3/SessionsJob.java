@@ -168,5 +168,7 @@ class SessionsReducer extends Reducer<Text, Text, Text, NullWritable> {
     session.setStartTime(earliest);
     session.setEndTime(latest);
     session.setDurationMs(latest.getTime() - earliest.getTime());
+
+    context.write(HadoopJob.convertToText(session, format), NullWritable.get());
   }
 }
