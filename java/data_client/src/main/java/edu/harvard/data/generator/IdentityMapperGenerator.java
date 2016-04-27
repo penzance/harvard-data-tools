@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.identity.IdentifierType;
+import edu.harvard.data.identity.IdentityImplementationException;
 import edu.harvard.data.identity.IdentityMap;
 import edu.harvard.data.schema.DataSchemaTable;
 
@@ -56,7 +57,7 @@ public class IdentityMapperGenerator {
     out.println();
     outputReadRecord(out);
     out.println();
-    outputGetHadoopKeys(out, idType);
+    outputGetMainIdentifiers(out, idType);
     out.println();
     outputPopulateIdentityMap(out);
     out.println("}");
@@ -67,7 +68,9 @@ public class IdentityMapperGenerator {
     out.println("import " + Map.class.getCanonicalName() + ";");
     out.println("import " + HashMap.class.getCanonicalName() + ";");
     out.println("import " + CSVRecord.class.getCanonicalName() + ";");
-    if (!hasMultipleMainIdColumns()) {
+    if (hasMultipleMainIdColumns()) {
+      out.println("import " + IdentityImplementationException.class.getCanonicalName() + ";");
+    } else {
       out.println("import " + IdentifierType.class.getCanonicalName() + ";");
     }
     out.println("import " + IdentityMap.class.getCanonicalName() + ";");
@@ -86,10 +89,10 @@ public class IdentityMapperGenerator {
     out.println("  }");
   }
 
-  private void outputGetHadoopKeys(final PrintStream out, final String idType)
+  private void outputGetMainIdentifiers(final PrintStream out, final String idType)
       throws VerificationException {
     out.println("  @Override");
-    out.println("  public Map<String, " + idType + "> getHadoopKeys() {");
+    out.println("  public Map<String, " + idType + "> getMainIdentifiers() {");
     out.println("    Map<String, " + idType + "> keys = new HashMap<String, " + idType + ">();");
     for (final String column : IdentityJobGenerator.getMainIdColumns(identities, table,
         mainIdentifier)) {
@@ -105,7 +108,7 @@ public class IdentityMapperGenerator {
     out.println("  public boolean populateIdentityMap(final IdentityMap $id) {");
     if (hasMultipleMainIdColumns()) {
       out.println(
-          "    throw new RuntimeException(\"Can't populate identity map with multiple main ID fields\");");
+          "    throw new IdentityImplementationException(\"Can't populate identity map with multiple main ID fields\");");
     } else {
       out.println("    boolean populated = false;");
       for (final String columnName : identities.keySet()) {

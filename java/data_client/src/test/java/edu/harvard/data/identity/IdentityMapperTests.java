@@ -200,7 +200,7 @@ class TestIdentityMapper extends LongIdentityMapper {
   }
 
   @Override
-  public Map<String, Long> getHadoopKeys() {
+  public Map<String, Long> getMainIdentifiers() {
     return keys;
   }
 

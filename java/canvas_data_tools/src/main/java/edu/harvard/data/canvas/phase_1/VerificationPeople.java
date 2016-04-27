@@ -147,6 +147,7 @@ public class VerificationPeople {
     return chosen;
   }
 
+  // TODO: Move this code into IdentityMap.
   private void getIdMapsFromRedshift(final CanvasDataConfiguration config) throws SQLException {
     final Long start = System.currentTimeMillis();
     final String url = config.getRedshiftUrl();
