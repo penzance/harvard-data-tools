@@ -148,23 +148,25 @@ public class VerificationPeople {
   private void getIdMapsFromRedshift(final DataConfiguration config) throws SQLException {
     final Long start = System.currentTimeMillis();
     final String url = config.getRedshiftUrl();
-    String queryString = "SELECT * FROM identity_map WHERE identity_map.canvas_data_id IN (";
-    for (int i = 0; i < people.size(); i++) {
-      queryString += "?, ";
-    }
-    queryString = queryString.substring(0, queryString.length() - 2) + ");";
-    log.info("Executing query \n" + queryString + "\n on " + url);
-    try (
-        Connection connection = DriverManager.getConnection(url, config.getRedshiftUser(),
-            config.getRedshiftPassword());
-        PreparedStatement statement = connection.prepareStatement(queryString);) {
+    if (!people.isEmpty()) {
+      String queryString = "SELECT * FROM identity_map WHERE identity_map.canvas_data_id IN (";
       for (int i = 0; i < people.size(); i++) {
-        statement.setLong(i + 1, people.get(i));
+        queryString += "?, ";
       }
-      try (final ResultSet rs = statement.executeQuery();) {
-        while (rs.next()) {
-          final IdentityMap id = new IdentityMap(rs);
-          originalIdentities.put(id.getCanvasDataID(), id);
+      queryString = queryString.substring(0, queryString.length() - 2) + ");";
+      log.info("Executing query \n" + queryString + "\n on " + url);
+      try (
+          Connection connection = DriverManager.getConnection(url, config.getRedshiftUser(),
+              config.getRedshiftPassword());
+          PreparedStatement statement = connection.prepareStatement(queryString);) {
+        for (int i = 0; i < people.size(); i++) {
+          statement.setLong(i + 1, people.get(i));
+        }
+        try (final ResultSet rs = statement.executeQuery();) {
+          while (rs.next()) {
+            final IdentityMap id = new IdentityMap(rs);
+            originalIdentities.put(id.getCanvasDataID(), id);
+          }
         }
       }
     }
