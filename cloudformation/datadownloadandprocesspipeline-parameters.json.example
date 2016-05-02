@@ -1,0 +1,114 @@
+[
+  {
+    "ParameterKey": "EnvironmentParameter",
+    "ParameterValue": "devcanvas"
+  }, 
+  {
+    "ParameterKey": "LowercaseDatasourceParameter",
+    "ParameterValue": "canvas"
+  }, 
+  {
+    "ParameterKey": "InitcapsDatasourceParameter",
+    "ParameterValue": "Canvas"
+  }, 
+  {
+    "ParameterKey": "KeypairParameter",
+    "ParameterValue": "mypublickey-id_rsa"
+  },
+  {
+    "ParameterKey": "RedshiftMasterUserNameParameter",
+    "ParameterValue": "mydatabaseadminuser"
+  },
+  {
+    "ParameterKey": "RedshiftMasterUserPasswordParameter",
+    "ParameterValue": "changeM3!"
+  },
+  {
+    "ParameterKey": "Phase0LambdaCodeObjectParameter",
+    "ParameterValue": "phase0-lambda.zip"
+  },
+  {
+    "ParameterKey": "SecurePropertiesLocationParameter",
+    "ParameterValue": "secure.properties"
+  },
+  {
+    "ParameterKey": "HDTGitTagOrBranchParameter",
+    "ParameterValue": "dev"
+  },
+  {
+    "ParameterKey": "DataSourceSchemaVersion",
+    "ParameterValue": "1.10.1"
+  },
+  {
+    "ParameterKey": "CodeS3BucketParameter",
+    "ParameterValue": "harvarddatatoolsdev-secure"
+  },
+  {
+    "ParameterKey": "DataPipelineInitLambdaCodeObjectParameter",
+    "ParameterValue": "data-pipeline-init-lambda.zip"
+  },
+  {
+    "ParameterKey": "SuccessSNSEmailParameter",
+    "ParameterValue": "success@example.com"
+  },
+  {
+    "ParameterKey": "FailureSNSEmailParameter",
+    "ParameterValue": "failure@example.com"
+  },
+  {
+    "ParameterKey": "VPCIDParameter",
+    "ParameterValue": "vpc-34567890"
+  },
+  {
+    "ParameterKey": "PrivateAppSubnetParameter",
+    "ParameterValue": "subnet-56789012"
+  },
+  {
+    "ParameterKey": "Phase0AMIIdParameter",
+    "ParameterValue": "ami-66b6c60c"
+  },
+  {
+    "ParameterKey": "Phase0InstanceTypeParameter",
+    "ParameterValue": "i2.8xlarge"
+  },
+  {
+    "ParameterKey": "EMRMasterInstanceTypeParameter",
+    "ParameterValue": "m3.xlarge"
+  },
+  {
+    "ParameterKey": "EMRMasterInstanceBidPriceParameter",
+    "ParameterValue": "0.06"
+  },
+  {
+    "ParameterKey": "EMRCoreInstanceTypeParameter",
+    "ParameterValue": "m3.xlarge"
+  },
+  {
+    "ParameterKey": "EMRCoreInstanceCountParameter",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "EMRCoreInstanceBidPriceParameter",
+    "ParameterValue": "0.06"
+  },
+  {
+    "ParameterKey": "EMRTaskInstanceTypeParameter",
+    "ParameterValue": "m3.xlarge"
+  },
+  {
+    "ParameterKey": "EMRTaskInstanceCountParameter",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "EMRTaskInstanceBidPriceParameter",
+    "ParameterValue": "0.06"
+  },
+  {
+    "ParameterKey": "EMRReleaseLabelParameter",
+    "ParameterValue": "emr-4.5.0"
+  },
+  {
+    "ParameterKey": "RedshiftClusterParameter",
+    "ParameterValue": "harvarddatatoolsdev-redshiftcluster-1a2bcde34fghi"
+  }
+]
