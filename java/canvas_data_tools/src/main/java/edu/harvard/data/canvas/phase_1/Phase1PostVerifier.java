@@ -22,7 +22,7 @@ import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
-import edu.harvard.data.HadoopJob;
+import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
@@ -39,6 +39,7 @@ public class Phase1PostVerifier implements Verifier {
   private final String outputDir;
   private final String verifyDir;
   private final TableFormat format;
+  private final HadoopUtilities hadoopUtils;
 
   public Phase1PostVerifier(final URI hdfsService, final String inputDir, final String outputDir,
       final String verifyDir) {
@@ -48,6 +49,7 @@ public class Phase1PostVerifier implements Verifier {
     this.verifyDir = verifyDir;
     this.hadoopConfig = new Configuration();
     this.format = new FormatLibrary().getFormat(Format.DecompressedCanvasDataFlatFiles);
+    this.hadoopUtils = new HadoopUtilities();
   }
 
   @Override
@@ -78,7 +80,7 @@ public class Phase1PostVerifier implements Verifier {
   private void updateInterestingTables() throws IOException {
     final FileSystem fs = FileSystem.get(hdfsService, hadoopConfig);
     final Map<Long, IdentityMap> identities = new HashMap<Long, IdentityMap>();
-    for (final Path path : HadoopJob.listFiles(hdfsService, outputDir + "/identity_map")) {
+    for (final Path path : hadoopUtils.listFiles(hdfsService, outputDir + "/identity_map")) {
       try (HdfsTableReader<IdentityMap> in = new HdfsTableReader<IdentityMap>(IdentityMap.class,
           format, fs, path)) {
         for (final IdentityMap id : in) {
@@ -87,11 +89,11 @@ public class Phase1PostVerifier implements Verifier {
       }
     }
 
-    for (final Path path : HadoopJob.listFiles(hdfsService, verifyDir + "/requests")) {
+    for (final Path path : hadoopUtils.listFiles(hdfsService, verifyDir + "/requests")) {
       try (FSDataInputStream fsin = fs.open(path);
           BufferedReader in = new BufferedReader(new InputStreamReader(fsin));
           FSDataOutputStream out = fs
-              .create(new Path(verifyDir + "/updated/requests/" + HadoopJob.getFileName(path)))) {
+              .create(new Path(verifyDir + "/updated/requests/" + hadoopUtils.getFileName(path)))) {
         String line = in.readLine();
         while (line != null) {
           final String[] parts = line.split("\t");

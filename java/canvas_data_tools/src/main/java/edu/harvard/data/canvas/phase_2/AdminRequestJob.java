@@ -44,7 +44,7 @@ public class AdminRequestJob extends HadoopJob {
 
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
-    setPaths(job, aws, hdfsService, inputDir + "/requests", outputDir + "/admin_requests");
+    hadoopUtils.setPaths(job, hdfsService, inputDir + "/requests", outputDir + "/admin_requests");
     return job;
   }
 }

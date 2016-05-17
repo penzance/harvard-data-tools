@@ -100,9 +100,11 @@ public abstract class CodeGenerator {
     final ExtensionSchema phase3 = readExtensionSchema(getPhaseThreeAdditionsResource());
 
     // Transform the schema to remove identifers
-    final IdentitySchemaTransformer idTrans = new IdentitySchemaTransformer();
-    final DataSchema schema1 = idTrans.transform(base, readIdentities(getIdentifierResource()),
+    final Map<String, Map<String, List<IdentifierType>>> identities = readIdentities(
+        getIdentifierResource());
+    final IdentitySchemaTransformer idTrans = new IdentitySchemaTransformer(base, identities,
         getMainIdentifier());
+    final DataSchema schema1 = idTrans.transform();
 
     final SchemaTransformer transformer = new SchemaTransformer();
     final DataSchema schema2 = transformer.transform(schema1, phase2);
@@ -185,9 +187,9 @@ public abstract class CodeGenerator {
     }
   }
 
-  private static void error(final DataSchemaTable table, final String msg) throws VerificationException {
-    throw new VerificationException(
-        "Table " + table.getTableName() + " " + msg);
+  private static void error(final DataSchemaTable table, final String msg)
+      throws VerificationException {
+    throw new VerificationException("Table " + table.getTableName() + " " + msg);
   }
 
   private static void error(final DataSchemaColumn column, final String tableName, final String msg)

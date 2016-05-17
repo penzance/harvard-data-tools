@@ -17,6 +17,7 @@ import edu.harvard.data.AwsUtils;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopJob;
+import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.matterhorn.bindings.phase1.Phase1Video;
 import edu.harvard.data.matterhorn.bindings.phase2.Phase2Video;
@@ -40,7 +41,7 @@ class VideoJob extends HadoopJob {
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(NullWritable.class);
     job.setOutputFormatClass(TextOutputFormat.class);
-    setPaths(job, aws, hdfsService, inputDir + "/video", outputDir + "/video");
+    hadoopUtils.setPaths(job, hdfsService, inputDir + "/video", outputDir + "/video");
     return job;
   }
 }
@@ -48,6 +49,11 @@ class VideoJob extends HadoopJob {
 class VideoFileMapper extends Mapper<Object, Text, Text, Text> {
 
   private TableFormat format;
+  private final HadoopUtilities hadoopUtils;
+
+  public VideoFileMapper() {
+    this.hadoopUtils = new HadoopUtilities();
+  }
 
   @Override
   protected void setup(final Context context) {
@@ -60,13 +66,18 @@ class VideoFileMapper extends Mapper<Object, Text, Text, Text> {
       throws IOException, InterruptedException {
     final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
     final Phase1Video video = new Phase1Video(format, parser.getRecords().get(0));
-    context.write(new Text(video.getId()), HadoopJob.convertToText(video, format));
+    context.write(new Text(video.getId()), hadoopUtils.convertToText(video, format));
   }
 }
 
 class VideoFileReducer extends Reducer<Text, Text, Text, NullWritable> {
 
   private TableFormat format;
+  private final HadoopUtilities hadoopUtils;
+
+  public VideoFileReducer() {
+    this.hadoopUtils = new HadoopUtilities();
+  }
 
   @Override
   protected void setup(final Context context) {
@@ -105,6 +116,6 @@ class VideoFileReducer extends Reducer<Text, Text, Text, NullWritable> {
         video.setTerm(v.getTerm());
       }
     }
-    context.write(HadoopJob.convertToText(video, format), NullWritable.get());
+    context.write(hadoopUtils.convertToText(video, format), NullWritable.get());
   }
 }

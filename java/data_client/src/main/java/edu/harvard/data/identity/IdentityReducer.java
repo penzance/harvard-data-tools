@@ -2,25 +2,19 @@ package edu.harvard.data.identity;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.csv.CSVPrinter;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.FormatLibrary.Format;
-import edu.harvard.data.HadoopConfigurationException;
-import edu.harvard.data.HadoopJob;
+import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.TableFormat;
-import edu.harvard.data.io.HdfsTableReader;
+import edu.harvard.data.io.TableReader;
 
 /**
  * Helper class that implements the actual logic for the reduce phase during the
@@ -38,21 +32,20 @@ import edu.harvard.data.io.HdfsTableReader;
  */
 public class IdentityReducer<T> {
 
-  private static final Logger log = LogManager.getLogger();
-
-  final Map<T, IdentityMap> identities;
+  Map<T, IdentityMap> identities;
   TableFormat format;
   IdentifierType mainIdentifier;
+  private final HadoopUtilities hadoopUtils;
 
   public IdentityReducer() {
-    this.identities = new HashMap<T, IdentityMap>();
+    this.hadoopUtils = new HadoopUtilities();
   }
 
   /**
    * Perform initial setup tasks before running the reducer. This method should
    * be called by the {@code setup} method of the actual identity reducer Hadoop
    * task.
-   *
+   * <p>
    * This method populates three fields in the class. First, it retrieves the
    * format configuration setting from the Hadoop context and converts it into a
    * {@link Format} instance in order to correctly parse the incoming data. It
@@ -62,7 +55,7 @@ public class IdentityReducer<T> {
    * user identifier. The type of the identifier (determined by
    * {@link IdentifierType#getType}) must be the same as the class parameter
    * {@code T}.
-   *
+   * <p>
    * It then fetches the incoming identity map files from the Hadoop distributed
    * cache and builds up a map from the main identifier type to identity map
    * values that can be used during the reduce phase to ensure that consistent
@@ -74,43 +67,17 @@ public class IdentityReducer<T> {
    *           if an error occurs while reading and parsing the identity map
    *           files in the Hadoop distributed cache.
    */
-  public void setup(final Reducer<?, HadoopIdentityKey, Text, NullWritable>.Context context)
-      throws IOException {
-    this.format = HadoopJob.getFormat(context);
-    this.mainIdentifier = getMainIdentifier(context);
-    readIdentityMap(context);
-  }
-
-  private IdentifierType getMainIdentifier(
-      final Reducer<?, HadoopIdentityKey, Text, NullWritable>.Context context) {
-    final String idString = context.getConfiguration().get("mainIdentifier");
-    if (idString == null) {
-      throw new HadoopConfigurationException(
-          "Required Hadoop configuration parameter 'mainIdentifier' missing");
-    }
-    try {
-      return IdentifierType.valueOf(idString);
-    } catch (final IllegalArgumentException e) {
-      throw new HadoopConfigurationException("Unknown main identifier type: \"" + idString
-          + "\". Expected one of " + IdentifierType.values(), e);
-    }
-  }
-
   @SuppressWarnings("unchecked")
-  private void readIdentityMap(
-      final Reducer<?, HadoopIdentityKey, Text, NullWritable>.Context context) throws IOException {
-    final FileSystem fs = FileSystem.get(context.getConfiguration());
-    log.info("Reading existing identities from " + context.getCacheFiles().length + " files");
-    for (final URI uri : context.getCacheFiles()) {
-      final Path path = new Path(uri.toString());
-      try (HdfsTableReader<IdentityMap> in = new HdfsTableReader<IdentityMap>(IdentityMap.class,
-          format, fs, path)) {
-        for (final IdentityMap id : in) {
-          identities.put((T) id.get(mainIdentifier), id);
-        }
+  public void setup(final Reducer<?, ?, ?, ?>.Context context) throws IOException {
+    this.format = hadoopUtils.getFormat(context);
+    this.mainIdentifier = hadoopUtils.getMainIdentifier(context);
+    this.identities = new HashMap<T, IdentityMap>();
+    try (TableReader<IdentityMap> in = hadoopUtils.getHdfsTableReader(context, format,
+        IdentityMap.class)) {
+      for (final IdentityMap id : in) {
+        identities.put((T) id.get(mainIdentifier), id);
       }
     }
-    log.info("Read " + identities.size() + " existing identities in identity reducer");
   }
 
   /**
@@ -121,12 +88,13 @@ public class IdentityReducer<T> {
    * identity for that individual. It then scans through all the identity
    * information gathered by the mappers to supplement the user's identity with
    * any newly-discovered identities.
-   *
+   * <p>
    * This method should be called by the {@code reduce} method of the actual
    * identity reducer Hadoop task.
-   *
+   * <p>
    * TODO: This method does not currently handle the case where different
    * mappers produce contradictory identities.
+   * <p>
    *
    * @param mainIdValue
    *          the key used to identify this user in the data set.
@@ -145,7 +113,7 @@ public class IdentityReducer<T> {
    *           if interrupted while writing to the context.
    */
   public void reduce(final T mainIdValue, final Iterable<HadoopIdentityKey> values,
-      final Reducer<?, HadoopIdentityKey, Text, NullWritable>.Context context)
+      final Reducer<?, ?, Text, NullWritable>.Context context)
           throws IOException, InterruptedException {
     final IdentityMap id;
     if (identities.containsKey(mainIdValue)) {

@@ -1,7 +1,5 @@
 package edu.harvard.data.identity;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -22,32 +20,62 @@ import edu.harvard.data.TableFormat;
 //     canvas_id BIGINT,
 //     canvas_data_id BIGINT
 // );
-
+/**
+ * This class represents an entry in the environment-scoped
+ * <code>identity_map</code> table. It contains the cumulative information that
+ * we gather over many runs of many data sets in order to tie together an
+ * individual's various identifiers. As such, it is not scoped to any particular
+ * data set.
+ *
+ * The {@code IdentityMap} class implements the {@link DataTable} interface,
+ * meaning that it can be read and written using the streams defined in
+ * {@link edu.harvard.data.io}. It is used heavily in the identity phase, as the
+ * means of transferring identity information between Hadoop steps (see
+ * {@link HadoopIdentityKey} for the Hadoop framework-specific wrapper used that
+ * allows the IdentityMap to be used as a key). The {@code IdentityMap} is also
+ * treated as any other table in a data set, read as part of the input to the
+ * identity phase, and written as part of its output.
+ */
 public class IdentityMap implements DataTable, Comparable<IdentityMap> {
-
-  private static final String ID_TABLE_NAME = "identity_map";
 
   private final Map<IdentifierType, Object> identities;
 
+  /**
+   * Create a new empty identity map.
+   */
   public IdentityMap() {
     this.identities = new HashMap<IdentifierType, Object>();
   }
 
+  /**
+   * Create an identity map, reading is initial values from a CSV record.
+   *
+   * @param record
+   *          a properly-formatted {@link CSVRecord} that contains String values
+   *          for each identifier (any of which may be null, apart from the
+   *          research ID).
+   */
   public IdentityMap(final CSVRecord record) {
     this();
-    this.populate(record);
+    populate(record);
   }
 
+  /**
+   * Create an identity map, reading is initial values from a CSV record.
+   *
+   * @param format
+   *          this parameter is ignored by this {@code DataTable} implementation.
+   * @param record
+   *          a properly-formatted {@link CSVRecord} that contains String values
+   *          for each identifier (any of which may be null, apart from the
+   *          research ID).
+   */
   public IdentityMap(final TableFormat format, final CSVRecord record) {
-    this(record);
-  }
-
-  public IdentityMap(final ResultSet resultSet) throws SQLException {
     this();
-    this.populate(resultSet);
+    populate(record);
   }
 
-  public void populate(final CSVRecord record) {
+  private void populate(final CSVRecord record) {
     if (record.get(0) != null) {
       identities.put(IdentifierType.ResearchUUID, record.get(0));
     }
@@ -67,7 +95,22 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     }
   }
 
-  public void populate(final ResultSet resultSet) throws SQLException {
+  /**
+   * Create an identity map, using initial values that were obtained through
+   * JDBC. This method assumes that the columns in the <code>identity_map</code>
+   * table were named as specified by {@link IdentifierType#getFieldName}.
+   *
+   * @param resultSet
+   *          a {@link ResultSet} instance that contains an entry for each
+   *          identifier type (any of which may be null, apart from the research
+   *          ID).
+   *
+   * @throws SQLException
+   *           if an error occurred while retrieving values from the
+   *           {@code ResultSet}.
+   */
+  public IdentityMap(final ResultSet resultSet) throws SQLException {
+    this();
     if (resultSet.getString("research_id") != null) {
       identities.put(IdentifierType.ResearchUUID, "research_id");
     }
@@ -125,43 +168,29 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     return toString().compareTo(o.toString());
   }
 
-  public PreparedStatement getLookupSqlQuery(final Connection connection) throws SQLException {
-    final List<String> params = new ArrayList<String>();
-    final List<Object> vals = new ArrayList<Object>();
-    final String query = getLookupSql(params, vals);
-    final PreparedStatement statement = connection.prepareStatement(query);
-    for (int i = 0; i < params.size(); i++) {
-      if (vals.get(i) instanceof Long) {
-        statement.setLong(i, (Long) vals.get(i));
-      } else if (vals.get(i) instanceof String) {
-        statement.setString(i, (String) vals.get(i));
-      } else {
-        throw new RuntimeException("Unknown identity type for " + params.get(i));
-      }
+  @Override
+  public boolean equals(final Object o) {
+    if (o == null || !(o instanceof IdentityMap)) {
+      return false;
     }
-    return statement;
-  }
-
-  private String getLookupSql(final List<String> params, final List<Object> vals) {
+    final IdentityMap other = (IdentityMap) o;
     for (final IdentifierType type : IdentifierType.values()) {
-      if (type != IdentifierType.Other) {
-        if (identities.containsKey(type)) {
-          params.add(type.getFieldName() + " = ?");
-          vals.add(identities.get(type));
+      final Object v1 = identities.get(type);
+      final Object v2 = other.identities.get(type);
+      if (v1 == null) {
+        if (v2 != null) {
+          return false;
+        }
+      } else {
+        if (v2 == null) {
+          return false;
+        }
+        if (!v1.equals(v2)) {
+          return false;
         }
       }
     }
-
-    String query = "SELECT research_id, huid, xid, canvas_id, canvas_data_id FROM " + ID_TABLE_NAME
-        + " WHERE ";
-    for (int i = 0; i < params.size(); i++) {
-      if (i > 0) {
-        query += " OR ";
-      }
-      query += params.get(i);
-    }
-    query += ";";
-    return query;
+    return true;
   }
 
   @Override

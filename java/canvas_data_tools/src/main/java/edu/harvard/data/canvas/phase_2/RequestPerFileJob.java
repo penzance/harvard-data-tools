@@ -39,7 +39,7 @@ class RequestPerFileJob extends HadoopJob {
     job.setMapOutputValueClass(LongWritable.class);
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
-    setPaths(job, aws, hdfsService, inputDir + "/requests", outputDir + "/requests_per_file");
+    hadoopUtils.setPaths(job, hdfsService, inputDir + "/requests", outputDir + "/requests_per_file");
     return job;
   }
 }

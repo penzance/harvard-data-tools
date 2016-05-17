@@ -39,7 +39,7 @@ class EventTypeJob extends HadoopJob {
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(NullWritable.class);
     job.setOutputFormatClass(TextOutputFormat.class);
-    setPaths(job, aws, hdfsService, inputDir + "/event", outputDir + "/event_types");
+    hadoopUtils.setPaths(job, hdfsService, inputDir + "/event", outputDir + "/event_types");
     return job;
   }
 }

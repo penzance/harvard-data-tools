@@ -16,7 +16,7 @@ public class ExtensionSchemaColumn extends DataSchemaColumn {
   @JsonCreator
   public ExtensionSchemaColumn(@JsonProperty("name") final String name,
       @JsonProperty("description") final String description,
-      @JsonProperty("type") final String type, @JsonProperty("length") final int length) {
+      @JsonProperty("type") final String type, @JsonProperty("length") final Integer length) {
     super(false);
     this.name = cleanColumnName(name);
     this.description = description;
