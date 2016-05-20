@@ -33,6 +33,11 @@ public class CompareSchemasCommand implements Command {
     final ApiClient api = new ApiClient(config.getCanvasDataHost(),
         config.getCanvasApiKey(), config.getCanvasApiSecret());
     final DumpInfo info = DumpInfo.find(dumpId);
+    
+    if (info.getSchemaVersion().equals("1.10.2")) {
+      log.info("Accepting schema version 1.10.2.");
+      return ReturnStatus.OK;
+    }
 
     if (expectedVersion.equals(info.getSchemaVersion())) {
       log.info("Schema version numbers match.");
