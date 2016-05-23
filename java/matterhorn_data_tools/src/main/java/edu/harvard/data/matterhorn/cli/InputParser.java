@@ -15,7 +15,6 @@ import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.io.FileTableReader;
-import edu.harvard.data.io.FileTableWriter;
 import edu.harvard.data.io.JsonFileReader;
 import edu.harvard.data.io.TableWriter;
 import edu.harvard.data.matterhorn.EventJsonDocumentParser;
@@ -84,9 +83,9 @@ public class InputParser {
     try (
         final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
             new EventJsonDocumentParser(inFormat, true));
-        TableWriter<Phase0Event> events = new FileTableWriter<Phase0Event>(Phase0Event.class,
+        TableWriter<Phase0Event> events = new TableWriter<Phase0Event>(Phase0Event.class,
             outFormat, eventFile);
-        TableWriter<Phase0Video> videos = new FileTableWriter<Phase0Video>(Phase0Video.class,
+        TableWriter<Phase0Video> videos = new TableWriter<Phase0Video>(Phase0Video.class,
             outFormat, videoFile);) {
       for (final Map<String, ? extends DataTable> tables : in) {
         events.add(tables.get("event"));

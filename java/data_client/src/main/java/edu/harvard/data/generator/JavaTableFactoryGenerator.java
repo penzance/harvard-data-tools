@@ -15,7 +15,6 @@ import edu.harvard.data.DataTable;
 import edu.harvard.data.TableFactory;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.io.FileTableReader;
-import edu.harvard.data.io.FileTableWriter;
 import edu.harvard.data.io.S3TableReader;
 import edu.harvard.data.io.TableReader;
 import edu.harvard.data.io.TableWriter;
@@ -28,7 +27,6 @@ public class JavaTableFactoryGenerator {
   private final SchemaPhase tableVersion;
   private final List<String> tableNames;
   private final String classPrefix;
-
   private final String tableEnumName;
 
   public JavaTableFactoryGenerator(final String schemaVersion, final List<String> tableNames,
@@ -52,7 +50,7 @@ public class JavaTableFactoryGenerator {
     out.println();
     outputFileTableReaderFactory(out);
     outputS3TableReaderFactory(out);
-    outputFileTableWriterFactory(out);
+    outputTableWriterFactory(out);
     out.println("}");
   }
 
@@ -65,12 +63,11 @@ public class JavaTableFactoryGenerator {
     out.println("import " + AwsUtils.class.getName() + ";");
     out.println("import " + DataTable.class.getName() + ";");
     out.println("import " + FileTableReader.class.getName() + ";");
-    out.println("import " + FileTableWriter.class.getName() + ";");
+    out.println("import " + TableWriter.class.getName() + ";");
     out.println("import " + S3TableReader.class.getName() + ";");
     out.println("import " + TableFactory.class.getName() + ";");
     out.println("import " + TableFormat.class.getName() + ";");
     out.println("import " + TableReader.class.getName() + ";");
-    out.println("import " + TableWriter.class.getName() + ";");
     out.println();
   }
 
@@ -118,7 +115,7 @@ public class JavaTableFactoryGenerator {
   // Generate a method to create a TableWriter for a specific table, writing
   // data to a file. The generated method will return an instance of
   // FileTableWriter.
-  private void outputFileTableWriterFactory(final PrintStream out) {
+  private void outputTableWriterFactory(final PrintStream out) {
     final String params = "String table, TableFormat format, File file";
     out.println("  @Override");
     out.println("  public TableWriter<? extends DataTable> getTableWriter(" + params
@@ -127,7 +124,7 @@ public class JavaTableFactoryGenerator {
     for (final String name : tableNames) {
       final String className = JavaBindingGenerator.javaClass(name, classPrefix);
       out.println("    case \"" + name + "\":");
-      out.println("      return new FileTableWriter<" + className + ">(" + className
+      out.println("      return new TableWriter<" + className + ">(" + className
           + ".class, format, file);");
     }
     out.println("    }");

@@ -32,7 +32,6 @@ import edu.harvard.data.canvas.CanvasDataConfiguration;
 import edu.harvard.data.canvas.bindings.phase0.Phase0Requests;
 import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.identity.IdentityMap;
-import edu.harvard.data.io.FileTableWriter;
 import edu.harvard.data.io.HdfsTableReader;
 import edu.harvard.data.io.TableWriter;
 
@@ -180,7 +179,7 @@ public class VerificationPeople {
   public void writeIds(final String output) throws IOException {
     final Set<Long> unknownPeople = new HashSet<Long>(people);
     try (final OutputStream outStream = fs.create(new Path(output));
-        TableWriter<IdentityMap> out = new FileTableWriter<IdentityMap>(IdentityMap.class, format,
+        TableWriter<IdentityMap> out = new TableWriter<IdentityMap>(IdentityMap.class, format,
             outStream)) {
       for (final IdentityMap id : originalIdentities.values()) {
         unknownPeople.remove(id.get(IdentifierType.CanvasDataID));
