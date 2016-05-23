@@ -11,12 +11,10 @@ import edu.harvard.data.TableFormat;
 
 public class FileTableReader<T extends DataTable> implements TableReader<T> {
 
-  private final Class<T> tableType;
   private final Iterator<T> iterator;
 
   public FileTableReader(final Class<T> tableType, final TableFormat format, final File file)
       throws IOException {
-    this.tableType = tableType;
     if (!file.exists() || file.isDirectory()) {
       throw new FileNotFoundException(file.toString());
     }
@@ -31,11 +29,6 @@ public class FileTableReader<T extends DataTable> implements TableReader<T> {
   @Override
   public void close() throws IOException {
     ((Closeable) iterator).close();
-  }
-
-  @Override
-  public Class<T> getTableType() {
-    return tableType;
   }
 
 }

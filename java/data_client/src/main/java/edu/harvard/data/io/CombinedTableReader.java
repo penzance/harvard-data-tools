@@ -11,11 +11,9 @@ public class CombinedTableReader<T extends DataTable> implements TableReader<T> 
 
   private final List<TableReader<T>> tables;
   private final CombinedTableIterator<T> iterator;
-  private final Class<T> tableType;
 
-  public CombinedTableReader(final List<TableReader<T>> tables, final Class<T> tableType) {
+  public CombinedTableReader(final List<TableReader<T>> tables) {
     this.tables = tables;
-    this.tableType = tableType;
     this.iterator = new CombinedTableIterator<T>(tables);
   }
 
@@ -29,11 +27,6 @@ public class CombinedTableReader<T extends DataTable> implements TableReader<T> 
     for (final TableReader<T> table : tables) {
       table.close();
     }
-  }
-
-  @Override
-  public Class<T> getTableType() {
-    return tableType;
   }
 
 }

@@ -14,12 +14,10 @@ import edu.harvard.data.TableFormat;
 
 public class HdfsTableReader<T extends DataTable> implements TableReader<T> {
 
-  private final Class<T> tableType;
   private final HdfsDelimitedFileIterator<T> iterator;
 
   public HdfsTableReader(final Class<T> tableType, final TableFormat format, final FileSystem fs,
       final Path path) throws IOException {
-    this.tableType = tableType;
     if (!fs.exists(path) || fs.isDirectory(path)) {
       throw new FileNotFoundException(path.toString());
     }
@@ -34,11 +32,6 @@ public class HdfsTableReader<T extends DataTable> implements TableReader<T> {
   @Override
   public void close() throws IOException {
     iterator.close();
-  }
-
-  @Override
-  public Class<T> getTableType() {
-    return tableType;
   }
 
 }

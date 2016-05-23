@@ -128,7 +128,7 @@ public class JavaTableFactoryGenerator {
       final String className = JavaBindingGenerator.javaClass(name, classPrefix);
       out.println("    case \"" + name + "\":");
       out.println("      return new FileTableWriter<" + className + ">(" + className
-          + ".class, format, \"" + name + "\", file);");
+          + ".class, format, file);");
     }
     out.println("    }");
     out.println("    return null;");

@@ -158,7 +158,7 @@ public class HadoopUtilities {
       final Path path = new Path(uri.toString());
       readers.add(new HdfsTableReader<T>(tableType, format, fs, path));
     }
-    return new CombinedTableReader<T>(readers, tableType);
+    return new CombinedTableReader<T>(readers);
   }
 
 }

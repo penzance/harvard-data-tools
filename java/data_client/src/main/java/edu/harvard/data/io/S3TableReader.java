@@ -59,8 +59,4 @@ public class S3TableReader<T extends DataTable> implements TableReader<T> {
     reader = null;
   }
 
-  @Override
-  public Class<T> getTableType() {
-    return tableType;
-  }
 }

@@ -181,7 +181,7 @@ public class VerificationPeople {
     final Set<Long> unknownPeople = new HashSet<Long>(people);
     try (final OutputStream outStream = fs.create(new Path(output));
         TableWriter<IdentityMap> out = new FileTableWriter<IdentityMap>(IdentityMap.class, format,
-            "identity_map", outStream)) {
+            outStream)) {
       for (final IdentityMap id : originalIdentities.values()) {
         unknownPeople.remove(id.get(IdentifierType.CanvasDataID));
         out.add(id);

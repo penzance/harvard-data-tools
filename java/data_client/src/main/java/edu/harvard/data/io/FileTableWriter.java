@@ -19,7 +19,6 @@ public class FileTableWriter<T extends DataTable> implements TableWriter<T> {
 
   private final List<T> buffer;
   private int bufferSize;
-  private final String tableName;
   private File file;
   private final TableFormat format;
   private final Class<T> tableType;
@@ -27,17 +26,16 @@ public class FileTableWriter<T extends DataTable> implements TableWriter<T> {
   private CSVPrinter printer;
 
 
-  public FileTableWriter(final Class<T> tableType, final TableFormat format, final String tableName) {
-    this.tableName = tableName;
+  public FileTableWriter(final Class<T> tableType, final TableFormat format) {
     this.buffer = new ArrayList<T>();
     this.bufferSize = DEFAULT_BUFFER_SIZE;
     this.tableType = tableType;
     this.format = format;
   }
 
-  public FileTableWriter(final Class<T> tableType, final TableFormat format, final String tableName,
+  public FileTableWriter(final Class<T> tableType, final TableFormat format,
       final File file) {
-    this(tableType, format, tableName);
+    this(tableType, format);
     this.file = file;
     if (file.exists()) {
       file.delete();
@@ -45,9 +43,9 @@ public class FileTableWriter<T extends DataTable> implements TableWriter<T> {
     file.getParentFile().mkdirs();
   }
 
-  public FileTableWriter(final Class<T> tableType, final TableFormat format, final String tableName,
+  public FileTableWriter(final Class<T> tableType, final TableFormat format,
       final OutputStream outStream) {
-    this(tableType, format, tableName);
+    this(tableType, format);
     this.outStream = outStream;
   }
 
@@ -74,13 +72,7 @@ public class FileTableWriter<T extends DataTable> implements TableWriter<T> {
     }
   }
 
-  @Override
-  public String getTableName() {
-    return tableName;
-  }
-
-  @Override
-  public void flush() throws IOException {
+  private void flush() throws IOException {
     if (printer == null) {
       getPrinter();
       if (format.includeHeaders()) {

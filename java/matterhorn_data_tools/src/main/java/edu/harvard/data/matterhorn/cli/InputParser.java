@@ -85,9 +85,9 @@ public class InputParser {
         final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
             new EventJsonDocumentParser(inFormat, true));
         TableWriter<Phase0Event> events = new FileTableWriter<Phase0Event>(Phase0Event.class,
-            outFormat, "events", eventFile);
+            outFormat, eventFile);
         TableWriter<Phase0Video> videos = new FileTableWriter<Phase0Video>(Phase0Video.class,
-            outFormat, "videos", videoFile);) {
+            outFormat, videoFile);) {
       for (final Map<String, ? extends DataTable> tables : in) {
         events.add(tables.get("event"));
         if (tables.containsKey("video")) {
