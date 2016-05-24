@@ -37,6 +37,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import edu.harvard.data.schema.redshift.RedshiftSchema;
 
+// TODO: Convert RuntimeExceptions to checked.
 public class AwsUtils {
 
   private static final Logger log = LogManager.getLogger();

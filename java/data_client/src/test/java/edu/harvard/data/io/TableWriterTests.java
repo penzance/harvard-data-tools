@@ -46,7 +46,6 @@ public class TableWriterTests {
     when(mockFormat.getOutputStream(file)).thenReturn(out);
     when(mockFormat.includeHeaders()).thenReturn(false);
     when(mockFormat.getCsvFormat()).thenReturn(format.getCsvFormat());
-
   }
 
   @After

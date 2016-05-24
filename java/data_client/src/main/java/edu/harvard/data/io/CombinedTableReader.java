@@ -1,17 +1,38 @@
 package edu.harvard.data.io;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import edu.harvard.data.DataTable;
 
+/**
+ * Implementation of the {@link TableReader} interface that iterates over the
+ * records returned by multiple other table readers. This class exists as a
+ * convenience to simplify the case where a data table is represented by
+ * multiple files.
+ *
+ * This class is a simple wrapper around the {@link CombinedTableIterator} type;
+ * see the documentation for that class for more details.
+ *
+ * @param <T>
+ *          the record type that this reader parses.
+ */
 public class CombinedTableReader<T extends DataTable> implements TableReader<T> {
 
   private final List<TableReader<T>> tables;
   private final CombinedTableIterator<T> iterator;
 
+  /**
+   * Create a combined reader from a list of existing {@link TableReader}
+   * instances. The iterator returned by this instance will return all the
+   * records in each table reader in the order that they are specified in the
+   * {@code List}.
+   *
+   * @param tables
+   *          an ordered {@link List} of {@code TableReader} instances that will
+   *          provide the records for this iterator.
+   */
   public CombinedTableReader(final List<TableReader<T>> tables) {
     this.tables = tables;
     this.iterator = new CombinedTableIterator<T>(tables);
@@ -27,66 +48,6 @@ public class CombinedTableReader<T extends DataTable> implements TableReader<T> 
     for (final TableReader<T> table : tables) {
       table.close();
     }
-  }
-
-}
-
-class CombinedTableIterator<T extends DataTable> implements Iterator<T> {
-
-  private Iterator<T> currentIterator;
-  private final List<Iterator<T>> iteratorQueue;
-  private final List<TableReader<T>> tables;
-
-  public CombinedTableIterator(final List<TableReader<T>> tables) {
-    iteratorQueue = new ArrayList<Iterator<T>>();
-    this.tables = tables;
-    if (tables.size() == 0) {
-      currentIterator = null;
-    } else {
-      currentIterator = tables.get(0).iterator();
-    }
-    for (int i = 1; i < tables.size(); i++) {
-      iteratorQueue.add(tables.get(i).iterator());
-    }
-  }
-
-  @Override
-  public boolean hasNext() {
-    if (currentIterator == null) {
-      return false;
-    }
-    if (currentIterator.hasNext()) {
-      return true;
-    }
-    if (iteratorQueue.isEmpty()) {
-      closeCurrentIterator();
-      return false;
-    }
-    closeCurrentIterator();
-    currentIterator = iteratorQueue.remove(0);
-    return hasNext();
-  }
-
-  private void closeCurrentIterator() {
-    for (final TableReader<T> t : tables) {
-      if (t.iterator().equals(currentIterator)) {
-        try {
-          t.close();
-        } catch (final IOException e) {
-          throw new RuntimeException(e);
-        }
-      }
-    }
-  }
-
-  @Override
-  public T next() {
-    return currentIterator.next();
-  }
-
-  @Override
-  public void remove() {
-    throw new UnsupportedOperationException();
   }
 
 }

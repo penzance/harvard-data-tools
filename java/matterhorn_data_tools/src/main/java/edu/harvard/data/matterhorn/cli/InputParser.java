@@ -88,9 +88,9 @@ public class InputParser {
         TableWriter<Phase0Video> videos = new TableWriter<Phase0Video>(Phase0Video.class,
             outFormat, videoFile);) {
       for (final Map<String, ? extends DataTable> tables : in) {
-        events.add(tables.get("event"));
+        events.add((Phase0Event) tables.get("event"));
         if (tables.containsKey("video")) {
-          videos.add(tables.get("video"));
+          videos.add((Phase0Video) tables.get("video"));
         }
       }
     }
