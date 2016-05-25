@@ -1,37 +1,76 @@
 package edu.harvard.data.io;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.text.ParseException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.core.type.TypeReference;
 
 import edu.harvard.data.DataTable;
 import edu.harvard.data.TableFormat;
-import edu.harvard.data.VerificationException;
 
-public class JsonFileReader implements Closeable, Iterable<Map<String, ? extends DataTable>> {
+/**
+ * Stream class that parses an {@link InputStream} or local {@link File}
+ * containing JSON-formatted records. This class does not implement
+ * {@link TableReader}, since it is possible for one JSON record to produce many
+ * {@link DataTable} objects.
+ *
+ * This class is a wrapper around {@link JsonFileIterator}; see the
+ * documentation for that class for more details.
+ */
+public class JsonFileReader implements Closeable, Iterable<Map<String, List<? extends DataTable>>> {
 
   private final JsonFileIterator iterator;
 
+  /**
+   * Create a new reader based on a local file.
+   *
+   * @param format
+   *          the {@link TableFormat} that indicates how the data file is
+   *          formatted.
+   * @param file
+   *          a {@link File} object that refers to the data file.
+   * @param parser
+   *          an implementation of the {@link JsonDocumentParser} interface that
+   *          is able to convert a parsed JSON object into a set of all
+   *          {@link DataTable} records contained within that JSON object.
+   *
+   * @throws FileNotFoundException
+   *           if the file parameter refers to a file that does not exist.
+   */
   public JsonFileReader(final TableFormat format, final File file, final JsonDocumentParser parser)
-      throws IOException {
+      throws FileNotFoundException {
     if (!file.exists() || file.isDirectory()) {
       throw new FileNotFoundException(file.toString());
     }
     iterator = new JsonFileIterator(format, file, parser);
   }
 
+  /**
+   * Create a new reader based on an {@link InputStream}.
+   *
+   * @param format
+   *          the {@link TableFormat} that indicates how the data file is
+   *          formatted.
+   * @param inStream
+   *          an {@link InputStream} from which JSON-formatted records can be
+   *          read. The stream will be closed when the {@link #close} method is
+   *          called on this instance.
+   * @param parser
+   *          an implementation of the {@link JsonDocumentParser} interface that
+   *          is able to convert a parsed JSON object into a set of all
+   *          {@link DataTable} records contained within that JSON object.
+   */
+  public JsonFileReader(final TableFormat format, final InputStream inStream,
+      final JsonDocumentParser parser) {
+    iterator = new JsonFileIterator(format, inStream, parser);
+  }
+
   @Override
-  public Iterator<Map<String, ? extends DataTable>> iterator() {
+  public Iterator<Map<String, List<? extends DataTable>>> iterator() {
     return iterator;
   }
 
@@ -40,66 +79,4 @@ public class JsonFileReader implements Closeable, Iterable<Map<String, ? extends
     ((Closeable) iterator).close();
   }
 
-}
-
-class JsonFileIterator implements Iterator<Map<String, ? extends DataTable>>, Closeable {
-
-  protected final TableFormat format;
-  private final File file;
-  protected BufferedReader in;
-  private String nextLine;
-  private final JsonDocumentParser parser;
-
-  public JsonFileIterator(final TableFormat format, final File file, final JsonDocumentParser parser)
-      throws IOException {
-    this.format = format;
-    this.parser = parser;
-    this.file = file;
-  }
-
-  @Override
-  public boolean hasNext() {
-    if (in == null) {
-      try {
-        init();
-      } catch (final IOException e) {
-        throw new RuntimeException(e);
-      }
-    }
-    return nextLine != null;
-  }
-
-  private void init() throws IOException {
-    in = new BufferedReader(new InputStreamReader(format.getInputStream(file)));
-    nextLine = in.readLine();
-  }
-
-  @Override
-  public Map<String, ? extends DataTable> next() {
-    if (nextLine == null) {
-      return null;
-    }
-    final TypeReference<Map<String, Object>> typeRef = new TypeReference<Map<String, Object>>() {
-    };
-    final InputStream lineIn = new ByteArrayInputStream(nextLine.getBytes());
-    try {
-      nextLine = in.readLine();
-      final Map<String, Object> obj = format.getJsonMapper().readValue(lineIn, typeRef);
-      return parser.getDocuments(obj);
-    } catch (final IOException | ParseException | VerificationException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  @Override
-  public void close() throws IOException {
-    if (in != null) {
-      in.close();
-    }
-  }
-
-  @Override
-  public void remove() {
-    throw new UnsupportedOperationException();
-  }
 }

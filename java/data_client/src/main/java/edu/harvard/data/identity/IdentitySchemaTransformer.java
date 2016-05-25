@@ -134,6 +134,7 @@ public class IdentitySchemaTransformer {
    *
    * @return a transformed version of the base schema passed to the constructor.
    * @throws VerificationException
+   *           if an error occurs while applying the schema transformations.
    */
   public DataSchema transform() throws VerificationException {
     if (schema == null) {

@@ -26,6 +26,9 @@ import edu.harvard.data.DataTable;
  * This class is not thread-safe. Any access synchronization must be performed
  * by the caller.
  *
+ * This class should not be instantiated by clients; create an instance of
+ * {@link CombinedTableReader} instead.
+ *
  * Note that the iteration process can throw an instance of
  * {@link IterationException}. This occurs when an exception is encountered
  * inside the {@link java.util.Iterator#hasNext} or
@@ -38,7 +41,7 @@ import edu.harvard.data.DataTable;
  * @param <T>
  *          the {@link DataTable} implementation to be read by this iterator.
  */
-class CombinedTableIterator<T extends DataTable> implements Iterator<T> {
+public class CombinedTableIterator<T extends DataTable> implements Iterator<T> {
 
   private Iterator<T> currentIterator;
   private final List<Iterator<T>> iteratorQueue;
@@ -57,7 +60,7 @@ class CombinedTableIterator<T extends DataTable> implements Iterator<T> {
    *          a {@link List} of {@code TableReader} instances to be iterated
    *          over.
    */
-  public CombinedTableIterator(final List<TableReader<T>> tables) {
+  CombinedTableIterator(final List<TableReader<T>> tables) {
     iteratorQueue = new ArrayList<Iterator<T>>();
     this.tables = tables;
     if (tables.size() == 0) {

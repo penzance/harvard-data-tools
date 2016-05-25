@@ -1,6 +1,5 @@
 package edu.harvard.data.io;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
@@ -17,10 +16,13 @@ import edu.harvard.data.TableFormat;
  * from {@link DelimitedFileIterator}, changing only its input from the local
  * file system to HDFS.
  *
+ * This class should not be instantiated by clients; create an instance of
+ * {@link HdfsTableReader} instead.
+ *
  * @param <T>
  *          the {@link DataTable} implementation to be read by this iterator.
  */
-class HdfsDelimitedFileIterator<T extends DataTable> extends DelimitedFileIterator<T> {
+public class HdfsDelimitedFileIterator<T extends DataTable> extends DelimitedFileIterator<T> {
 
   private final FileSystem fs;
   private final Path path;
@@ -34,11 +36,13 @@ class HdfsDelimitedFileIterator<T extends DataTable> extends DelimitedFileIterat
    * @param format
    *          the {@link TableFormat} that indicates how the data file is
    *          formatted.
-   * @param file
-   *          a {@link File} object that refers to the data file.
+   * @param fs
+   *          The Hadoop file system on which the data file is stored.
+   * @param path
+   *          the location of the data file on the Hadoop file system.
    */
-  public HdfsDelimitedFileIterator(final Class<T> tableType, final TableFormat format,
-      final FileSystem fs, final Path path) throws IOException {
+  HdfsDelimitedFileIterator(final Class<T> tableType, final TableFormat format,
+      final FileSystem fs, final Path path) {
     super(tableType, format, null);
     this.fs = fs;
     this.path = path;

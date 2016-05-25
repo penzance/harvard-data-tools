@@ -28,6 +28,15 @@ class DataTableStub implements DataTable {
     fieldNames.add("date");
   }
 
+  public static List<DataTableStub> generateRecords(final int count, final TableFormat format) {
+    final DataTableStub base = new DataTableStub(format);
+    final List<DataTableStub> lst = new ArrayList<DataTableStub>();
+    for (int i=0; i<count; i++) {
+      lst.add(new DataTableStub(format, i, "" + i, "123", base.timestamp, base.date));
+    }
+    return lst;
+  }
+
   Integer int1;
   String string1;
   String string2;
@@ -184,4 +193,5 @@ class DataTableStub implements DataTable {
   static String headerString() {
     return "int_1\tstring_1\tstring_2\ttimestamp\tdate";
   }
+
 }

@@ -4,6 +4,8 @@ import java.util.Map;
 
 import org.apache.commons.csv.CSVRecord;
 
+import edu.harvard.data.generator.IdentityMapperGenerator;
+
 /**
  * Interface to provide table-specific functionality for the Hadoop identity map
  * job. An instance of this interface represents a single row in a data table.
@@ -11,7 +13,7 @@ import org.apache.commons.csv.CSVRecord;
  * There should be an implementation of this interface for every table in a data
  * set that contains identifying information. It is recommended, although not
  * required, that implementations of this interface be generated; see
- * {@link IdentityMapperTests} for a generator that matches this interface.
+ * {@link IdentityMapperGenerator} for a generator that matches this interface.
  *
  * @param <T>
  *          the type of the main identifier in the data set. This parameter

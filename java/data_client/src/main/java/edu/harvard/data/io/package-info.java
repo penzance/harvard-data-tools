@@ -19,5 +19,14 @@
  * single {@link TableWriter}. The {@code TableWriter} outputs {@code DataTable}
  * records to an {@link java.io.OutputStream} or to a local file which, once
  * closed, can be moved elsewhere in the infrastructure by client code.
+ *
+ * While the majority of the classes in this package are based around reading
+ * tabular data, the {@link JsonFileReader} enables clients to parse
+ * JSON-formatted data. The {@code JsonFileReader} class consumes a data file
+ * formatted as newline-delimited JSON objects, and then uses an instance of
+ * {@link JsonDocumentParser} to convert those objects to {@code DataTable}
+ * records. Clients of the code need to provide a custom
+ * {@code JsonDocumentParser}, but do not have to handle the details of parsing
+ * JSON.
  */
 package edu.harvard.data.io;

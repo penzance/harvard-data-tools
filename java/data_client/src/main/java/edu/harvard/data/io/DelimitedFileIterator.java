@@ -30,6 +30,9 @@ import edu.harvard.data.TableFormat;
  * This class is not thread-safe. Any access synchronization must be performed
  * by the caller.
  *
+ * This class should not be instantiated by clients; create an instance of
+ * {@link FileTableReader} instead.
+ *
  * Note that the iteration process can throw an instance of
  * {@link IterationException}. This occurs when an exception is encountered
  * inside the {@link java.util.Iterator#hasNext} or
@@ -40,7 +43,7 @@ import edu.harvard.data.TableFormat;
  * @param <T>
  *          the {@link DataTable} implementation to be read by this iterator.
  */
-class DelimitedFileIterator<T extends DataTable> implements Iterator<T>, Closeable {
+public class DelimitedFileIterator<T extends DataTable> implements Iterator<T>, Closeable {
 
   private Iterator<CSVRecord> iterator;
   private CSVParser requestParser;
@@ -62,7 +65,7 @@ class DelimitedFileIterator<T extends DataTable> implements Iterator<T>, Closeab
    * @param file
    *          a {@link File} object that refers to the data file.
    */
-  public DelimitedFileIterator(final Class<T> tableType, final TableFormat format,
+  DelimitedFileIterator(final Class<T> tableType, final TableFormat format,
       final File file) {
     this.format = format;
     this.table = tableType;

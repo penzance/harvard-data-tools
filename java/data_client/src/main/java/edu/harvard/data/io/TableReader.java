@@ -14,7 +14,6 @@ import edu.harvard.data.DataTable;
  *
  * A typical pattern to iterate through the records of a {@code TableReader}
  * would be:
- *
  * <pre>
  * {@code
  * try (
@@ -26,10 +25,8 @@ import edu.harvard.data.DataTable;
  * } catch (final IterationException ie) {
  *   final Throwable e = ie.getCause();
  *   // Exception handler code.
- * }
- * }
- * <pre>
- *
+ * } }
+ * </pre>
  * Note that the iteration process can throw an instance of
  * {@link IterationException}. This occurs when an exception is encountered
  * inside the {@link java.util.Iterator#hasNext} or
