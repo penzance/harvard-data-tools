@@ -201,7 +201,7 @@ public class JavaModelClassGenerator {
           + "(final TableFormat format, final Map<String, Object> map) throws ParseException {");
     } else {
       out.println(
-          "  public " + className + "(final TableFormat format, Map<String, Object> map) {");
+          "  public " + className + "(final TableFormat format, final Map<String, Object> map) {");
     }
     for (final String map : getNestedMaps()) {
       final String mapName = JavaBindingGenerator.javaVariable(map);

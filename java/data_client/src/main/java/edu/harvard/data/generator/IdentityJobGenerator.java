@@ -15,17 +15,18 @@ import edu.harvard.data.VerificationException;
 import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.schema.DataSchema;
 import edu.harvard.data.schema.DataSchemaTable;
+import edu.harvard.data.schema.identity.IdentitySchema;
 
 public class IdentityJobGenerator {
 
   private static final Logger log = LogManager.getLogger();
   private final DataSchema schema;
-  private final Map<String, Map<String, List<IdentifierType>>> identities;
+  private final IdentitySchema identities;
   private final GenerationSpec spec;
   private final File javaSrcBase;
 
   public IdentityJobGenerator(final GenerationSpec spec,
-      final Map<String, Map<String, List<IdentifierType>>> identities) {
+      final IdentitySchema identities) {
     this.identities = identities;
     this.schema = spec.getPhase(0).getSchema();
     this.spec = spec;
@@ -42,7 +43,7 @@ public class IdentityJobGenerator {
     final String hadoopPackage = spec.getIdentityHadoopPackage();
     final String version = schema.getVersion();
 
-    for (final String tableName : identities.keySet()) {
+    for (final String tableName : identities.tableNames()) {
       final String classBase = JavaBindingGenerator.javaClass(tableName, "");
       final Map<String, List<IdentifierType>> tableIds = identities.get(tableName);
       final DataSchemaTable table = schema.getTableByName(tableName);

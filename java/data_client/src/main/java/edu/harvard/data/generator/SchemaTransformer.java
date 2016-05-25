@@ -154,11 +154,19 @@ public class SchemaTransformer {
    * Copy all columns from one schema to another. If a column has already been
    * copied (we can tell because it's in the seenColumns map), we skip it. As an
    * extra check, we ensure that any duplicate columns are of the same type.
+   *
+   * We run throught the columns in reverse, and then prepend them to the list
+   * of columns in the new table. That way we can ensure that columns are
+   * ordered as:
+   *  1) columns defined in the 'like' table in previous schemas
+   *  2) columns defined in the 'like' table in the updated schema
+   *  3) columns defined in the new table definition in the updated schema.
    */
   private void addColumns(final DataSchemaTable table, final DataSchemaTable likeTable,
       final Map<String, DataSchemaType> seenColumns) throws VerificationException {
     if (likeTable != null) {
-      for (final DataSchemaColumn column : likeTable.getColumns()) {
+      for (int i = likeTable.getColumns().size() - 1; i >= 0; i--) {
+        final DataSchemaColumn column = likeTable.getColumns().get(i);
         final String columnName = column.getName();
         final DataSchemaType columnType = column.getType();
 

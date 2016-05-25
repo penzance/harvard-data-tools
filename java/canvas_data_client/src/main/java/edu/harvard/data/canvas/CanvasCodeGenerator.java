@@ -1,6 +1,12 @@
 package edu.harvard.data.canvas;
 
+import static edu.harvard.data.generator.InfrastructureConstants.HDFS_PHASE_0_DIR;
+import static edu.harvard.data.generator.InfrastructureConstants.HDFS_PHASE_1_DIR;
+import static edu.harvard.data.generator.InfrastructureConstants.HDFS_PHASE_2_DIR;
+import static edu.harvard.data.generator.InfrastructureConstants.HDFS_PHASE_3_DIR;
+
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -16,6 +22,8 @@ import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class CanvasCodeGenerator extends CodeGenerator {
 
+  private static final int TRANFORMATION_PHASES = 2;
+
   private static final String PHASE_ZERO_PACKAGE = "edu.harvard.data.canvas.bindings.phase0";
   private static final String PHASE_ONE_PACKAGE = "edu.harvard.data.canvas.bindings.phase1";
   private static final String PHASE_TWO_PACKAGE = "edu.harvard.data.canvas.bindings.phase2";
@@ -28,9 +36,15 @@ public class CanvasCodeGenerator extends CodeGenerator {
   public static final String PHASE_THREE_ADDITIONS_JSON = "canvas/phase3_schema_additions.json";
 
   private final String schemaVersion;
+  private final File gitDir;
 
-  public CanvasCodeGenerator(final String schemaVersion, final File gitDir, final File codeDir) {
-    super(gitDir, codeDir);
+  public CanvasCodeGenerator(final String schemaVersion, final File gitDir, final File codeDir)
+      throws FileNotFoundException {
+    super(codeDir);
+    if (!gitDir.exists() && gitDir.isDirectory()) {
+      throw new FileNotFoundException(gitDir.toString());
+    }
+    this.gitDir = gitDir;
     this.schemaVersion = schemaVersion;
   }
 
@@ -51,7 +65,7 @@ public class CanvasCodeGenerator extends CodeGenerator {
   protected GenerationSpec createGenerationSpec() throws IOException, DataConfigurationException,
   VerificationException, UnexpectedApiResponseException {
     // Specify the four versions of the table bindings
-    final GenerationSpec spec = new GenerationSpec(PIPELINE_PHASES);
+    final GenerationSpec spec = new GenerationSpec(TRANFORMATION_PHASES);
     spec.setJavaProjectName("canvas_generated_code");
     spec.setJavaTableEnumName("CanvasTable");
     spec.setPrefixes("Phase0", "Phase1", "Phase2", "Phase3");

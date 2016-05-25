@@ -2,79 +2,170 @@ package edu.harvard.data.generator;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import edu.harvard.data.DataConfigurationException;
-import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.identity.IdentitySchemaTransformer;
 import edu.harvard.data.schema.DataSchema;
-import edu.harvard.data.schema.DataSchemaColumn;
-import edu.harvard.data.schema.DataSchemaTable;
-import edu.harvard.data.schema.DataSchemaType;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 import edu.harvard.data.schema.existing.ExistingSchema;
 import edu.harvard.data.schema.extension.ExtensionSchema;
-import edu.harvard.data.schema.extension.ExtensionSchemaTable;
+import edu.harvard.data.schema.identity.IdentitySchema;
 
+/**
+ * Base class for all dataset-specific code generators. It is expected that
+ * every data set implementation will provide a subclass of this abstract class
+ * in order to generate its SDK, Hadoop identity jobs and other scripts and
+ * code.
+ * <P>
+ * This class uses the Abstract Factory design pattern. It implements the schema
+ * transformation and code generation functionality by calling a set of abstract
+ * methods defined in the class itself. These abstract methods represent the
+ * minimal amount of information that must be provided by an implementing
+ * subclass.
+ */
 public abstract class CodeGenerator {
 
   private static final Logger log = LogManager.getLogger();
 
-  public static final int PIPELINE_PHASES = 4;
-
-  public static final String HDFS_HIVE_QUERY_DIR = "HIVE_QUERY_DIR";
-  public static final String HDFS_PHASE_0_DIR = "hdfs:///phase_0";
-  public static final String HDFS_PHASE_1_DIR = "hdfs:///phase_1";
-  public static final String HDFS_PHASE_2_DIR = "hdfs:///phase_2";
-  public static final String HDFS_PHASE_3_DIR = "hdfs:///phase_3";
-
   protected final File codeDir;
-  protected final File gitDir;
 
-  public CodeGenerator(final File gitDir, final File codeDir) {
-    this.gitDir = gitDir;
+  /**
+   * Initialize the CodeGenerator class with input and output file locations.
+   *
+   * @param codeDir
+   *          the directory where generated files should be stored. If this
+   *          directory does not exist it will be created.
+   */
+  public CodeGenerator(final File codeDir) {
     this.codeDir = codeDir;
   }
 
+  /**
+   * Generate and populate a {@link GenerationSpec} object that contains the
+   * parameters and identifiers to be used by generated code. See the
+   * documentation for {@link GenerationSpec} for details on the fields that may
+   * be added to the spec.
+   *
+   * @return a populated {@code GenerationSpec} object that will be used to
+   *         guide the code generator.
+   *
+   * @throws IOException
+   *           if an error occurs when reading or transforming the data schema.
+   * @throws DataConfigurationException
+   *           if the subclass encounters a problem when reading some
+   *           client-specific configuration file.
+   * @throws VerificationException
+   *           if an error is detected in the the input schema specifications.
+   * @throws UnexpectedApiResponseException
+   *           if the subclass encounters an error when interfacing with an
+   *           external API.
+   */
   protected abstract GenerationSpec createGenerationSpec() throws IOException,
   DataConfigurationException, VerificationException, UnexpectedApiResponseException;
 
+  /**
+   * Get the name of a resource on the class path that contains the definitions
+   * of any existing Redshift tables that should be loaded into the data
+   * pipeline before processing begins. See {@link ExistingSchema} for details
+   * on the format of this resource.
+   *
+   * @return a {@code String} containing the name of a classpath resource. A
+   *         resource by this name must be available to the classloader that
+   *         loaded this class.
+   */
   protected abstract String getExistingTableResource();
 
+  /**
+   * Get the common identifier that is used throughout the data set to uniquely
+   * identify an individual. See the description of the
+   * {@link edu.harvard.data.identity} package for more details on the main
+   * identifier.
+   *
+   * @return an {@code IdentifierType} that indicates the main identifier used
+   *         to differentiate users across the data set.
+   */
   protected abstract IdentifierType getMainIdentifier();
 
+  /**
+   * Get the name of a resource on the class path that contains the definitions
+   * of all user identifiers across the data set. These identifiers will be
+   * removed from all models after Phase 1 of processing, and will be used to
+   * generate Hadoop jobs to replace identifiers with semantically-meaningless
+   * IDs. See {@link IdentitySchema} for details on the format of this resource.
+   *
+   * @return a {@code String} containing the name of a classpath resource. A
+   *         resource by this name must be available to the classloader that
+   *         loaded this class.
+   */
   protected abstract String getIdentifierResource();
 
+  /**
+   * Get the name of a resource on the class path that contains the definitions
+   * of any new or modified table that will be produced as a result of running
+   * Phase 2. This resource will guide the generation of the Phase 2 models and
+   * all later scripts. See {@link ExtensionSchema} for details on the format of
+   * this resource.
+   *
+   * @return a {@code String} containing the name of a classpath resource. A
+   *         resource by this name must be available to the classloader that
+   *         loaded this class.
+   */
   protected abstract String getPhaseTwoAdditionsResource();
 
+  /**
+   * Get the name of a resource on the class path that contains the definitions
+   * of any new or modified table that will be produced as a result of running
+   * Phase 3. This resource will guide the generation of the Phase 3 models and
+   * all later scripts. See {@link ExtensionSchema} for details on the format of
+   * this resource.
+   *
+   * @return a {@code String} containing the name of a classpath resource. A
+   *         resource by this name must be available to the classloader that
+   *         loaded this class.
+   */
   protected abstract String getPhaseThreeAdditionsResource();
 
-  protected void generate() throws IOException, DataConfigurationException, VerificationException,
-  UnexpectedApiResponseException {
-    codeDir.mkdirs();
-
+  /**
+   * Generate the various Java, Bash and SQL files that are required by the
+   * {@link GenerationSpec}. This is the main entry point to the generator;
+   * client code should instantiate a subclass of {@code CodeGenerator} and then
+   * call its {@code generate} method to kick off the code generation process.
+   *
+   * @throws IOException
+   *           if an error occurs when reading classpath resources or writing to
+   *           generated output files.
+   * @throws DataConfigurationException
+   *           if the subclass encounters a problem when reading some
+   *           client-specific configuration file.
+   * @throws VerificationException
+   *           if an error is detected in the the input schema specifications.
+   * @throws UnexpectedApiResponseException
+   *           if the subclass encounters an error when interfacing with an
+   *           external API.
+   */
+  protected final void generate() throws IOException, DataConfigurationException,
+  VerificationException, UnexpectedApiResponseException {
+    // Fetch the generation spec from the subclass
     final GenerationSpec spec = createGenerationSpec();
+
+    codeDir.mkdirs();
     spec.setOutputBaseDirectory(codeDir);
+    spec.setMainIdentifier(getMainIdentifier());
 
     // Generate the bindings.
     log.info("Generating Java bindings in " + codeDir);
     new JavaBindingGenerator(spec).generate();
 
     log.info("Generating Java identity Hadoop jobs in " + codeDir);
-    new IdentityJobGenerator(spec, readIdentities(getIdentifierResource())).generate();
+    new IdentityJobGenerator(spec, IdentitySchema.readIdentities(getIdentifierResource()))
+    .generate();
 
     log.info("Generating Hive table definitions in " + codeDir);
     new CreateHiveTableGenerator(codeDir, spec).generate();
@@ -92,16 +183,44 @@ public abstract class CodeGenerator {
     new MoveUnmodifiedTableGenerator(codeDir, spec).generate();
   }
 
-  public List<DataSchema> transformSchema(final DataSchema base)
+  /**
+   * Modify a {@link DataSchema} using a series of transformation resources
+   * defined by the abstract methods implemented by subclasses of this type. The
+   * result of the transformations are a series of {@code DataSchema} objects
+   * that represent the state of the data set at the end of each phase.
+   * <P>
+   * This method should be called by subclass implementations to take advantage
+   * of a standardized transformation process over the set of resources defined
+   * by the abstract methods of this class.
+   *
+   * @param base
+   *          the original {@code DataSchema} before any transformations are
+   *          applied. This can be thought of as the Phase 0 schema,
+   *          representing the set of tables either directly obtained from the
+   *          data source or minimally transformed in order to fit into the
+   *          table structure required by the rest of the pipeline.
+   *
+   * @return a {@link List} of {@code DataSchema} objects representing the
+   *         schema at the end of each phase in the pipeline. Thus to get the
+   *         schema at the end of Phase 2, a client would use
+   *         {@code transformSchema(base).get(2);}
+   *
+   * @throws VerificationException
+   *           if an error is detected in the the input schema specifications.
+   * @throws IOException
+   *           if an error occurs when reading classpath resources.
+   */
+  public final List<DataSchema> transformSchema(final DataSchema base)
       throws VerificationException, IOException {
     // We will transform the schema using the additions specified in json
     // resources.
-    final ExtensionSchema phase2 = readExtensionSchema(getPhaseTwoAdditionsResource());
-    final ExtensionSchema phase3 = readExtensionSchema(getPhaseThreeAdditionsResource());
+    final ExtensionSchema phase2 = ExtensionSchema
+        .readExtensionSchema(getPhaseTwoAdditionsResource());
+    final ExtensionSchema phase3 = ExtensionSchema
+        .readExtensionSchema(getPhaseThreeAdditionsResource());
 
     // Transform the schema to remove identifers
-    final Map<String, Map<String, List<IdentifierType>>> identities = readIdentities(
-        getIdentifierResource());
+    final IdentitySchema identities = IdentitySchema.readIdentities(getIdentifierResource());
     final IdentitySchemaTransformer idTrans = new IdentitySchemaTransformer(base, identities,
         getMainIdentifier());
     final DataSchema schema1 = idTrans.transform();
@@ -115,7 +234,7 @@ public abstract class CodeGenerator {
     // that will be read from Redshift is always based on a table that was
     // previously written there.
     final ExistingTableSchemaTransformer existingTrans = new ExistingTableSchemaTransformer();
-    final ExistingSchema existing = readExistingSchemas(getExistingTableResource());
+    final ExistingSchema existing = ExistingSchema.readExistingSchemas(getExistingTableResource());
     final DataSchema schema0 = existingTrans.transform(base, existing, schema3);
 
     final List<DataSchema> schemas = new ArrayList<DataSchema>();
@@ -126,102 +245,4 @@ public abstract class CodeGenerator {
     return schemas;
   }
 
-  public static ExtensionSchema readExtensionSchema(final String jsonResource)
-      throws IOException, VerificationException {
-    log.info("Extending schema from file " + jsonResource);
-    final ObjectMapper jsonMapper = new ObjectMapper();
-    jsonMapper.setDateFormat(FormatLibrary.JSON_DATE_FORMAT);
-    final ClassLoader classLoader = CodeGenerator.class.getClassLoader();
-    final ExtensionSchema schema;
-    try (final InputStream in = classLoader.getResourceAsStream(jsonResource)) {
-      schema = jsonMapper.readValue(in, ExtensionSchema.class);
-    }
-    for (final String tableName : schema.getTables().keySet()) {
-      ((ExtensionSchemaTable) schema.getTables().get(tableName)).setTableName(tableName);
-    }
-    verify(schema);
-    return schema;
-  }
-
-  private static void verify(final ExtensionSchema schema) throws VerificationException {
-    for (final DataSchemaTable table : schema.getTables().values()) {
-      verifyTable(table);
-      final Set<String> columnNames = new HashSet<String>();
-      for (final DataSchemaColumn column : table.getColumns()) {
-        verifyColumn(column, table.getTableName());
-        if (columnNames.contains(column.getName())) {
-          error(table, "defines column " + column.getName() + " more than once.");
-        }
-        columnNames.add(column.getName());
-      }
-    }
-  }
-
-  private static void verifyTable(final DataSchemaTable table) throws VerificationException {
-    if (table.getExpirationPhase() != null) {
-      if (table.getExpirationPhase() < 0) {
-        error(table, "has a negative expiration phase");
-      }
-      if (table.getExpirationPhase() >= PIPELINE_PHASES) {
-        error(table, "has an expiration phase greater than " + (PIPELINE_PHASES - 1));
-      }
-
-    }
-  }
-
-  private static void verifyColumn(final DataSchemaColumn column, final String tableName)
-      throws VerificationException {
-    if (column.getName() == null) {
-      throw new VerificationException("Column of table " + tableName + " has no name");
-    }
-    if (column.getType() == null) {
-      error(column, tableName, "has no type");
-    }
-    if (column.getType().equals(DataSchemaType.VarChar)) {
-      if (column.getLength() == null) {
-        error(column, tableName, "is of type varchar but has no length");
-      }
-      if (column.getLength() == 0) {
-        error(column, tableName, "is of type varchar but has zero length");
-      }
-    }
-  }
-
-  private static void error(final DataSchemaTable table, final String msg)
-      throws VerificationException {
-    throw new VerificationException("Table " + table.getTableName() + " " + msg);
-  }
-
-  private static void error(final DataSchemaColumn column, final String tableName, final String msg)
-      throws VerificationException {
-    throw new VerificationException(
-        "Column " + column.getName() + " of table " + tableName + " " + msg);
-  }
-
-  public static ExistingSchema readExistingSchemas(final String jsonResource) throws IOException {
-    log.info("Reading existing table schemas from file " + jsonResource);
-    final ObjectMapper jsonMapper = new ObjectMapper();
-    jsonMapper.setDateFormat(FormatLibrary.JSON_DATE_FORMAT);
-    final ClassLoader classLoader = CodeGenerator.class.getClassLoader();
-    try (final InputStream in = classLoader.getResourceAsStream(jsonResource)) {
-      final ExistingSchema schema = jsonMapper.readValue(in, ExistingSchema.class);
-      for (final String tableName : schema.getTables().keySet()) {
-        schema.getTables().get(tableName).setTableName(tableName);
-      }
-      return schema;
-    }
-  }
-
-  public static Map<String, Map<String, List<IdentifierType>>> readIdentities(
-      final String jsonResource) throws IOException {
-    log.info("Reading identifiers from file " + jsonResource);
-    final ObjectMapper jsonMapper = new ObjectMapper();
-    jsonMapper.setDateFormat(FormatLibrary.JSON_DATE_FORMAT);
-    final ClassLoader classLoader = CodeGenerator.class.getClassLoader();
-    final TypeReference<Map<String, Map<String, List<IdentifierType>>>> identiferTypeRef = new TypeReference<Map<String, Map<String, List<IdentifierType>>>>() {
-    };
-    try (final InputStream in = classLoader.getResourceAsStream(jsonResource)) {
-      return jsonMapper.readValue(in, identiferTypeRef);
-    }
-  }
 }

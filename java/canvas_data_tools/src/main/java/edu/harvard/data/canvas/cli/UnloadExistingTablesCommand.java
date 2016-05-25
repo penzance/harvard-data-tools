@@ -17,7 +17,6 @@ import edu.harvard.data.VerificationException;
 import edu.harvard.data.canvas.CanvasCodeGenerator;
 import edu.harvard.data.canvas.CanvasDataConfiguration;
 import edu.harvard.data.canvas.data_api.ApiClient;
-import edu.harvard.data.generator.CodeGenerator;
 import edu.harvard.data.schema.DataSchema;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 import edu.harvard.data.schema.existing.ExistingSchema;
@@ -45,7 +44,7 @@ public class UnloadExistingTablesCommand implements Command {
 
     final DataSchema base = api.getSchema(info.getSchemaVersion());
     final CanvasCodeGenerator generator = new CanvasCodeGenerator(null, null, null);
-    final ExistingSchema existingSchema = CodeGenerator
+    final ExistingSchema existingSchema = ExistingSchema
         .readExistingSchemas(CanvasCodeGenerator.PHASE_ZERO_TABLES_JSON);
     final DataSchema schema0 = generator.transformSchema(base).get(0);
 

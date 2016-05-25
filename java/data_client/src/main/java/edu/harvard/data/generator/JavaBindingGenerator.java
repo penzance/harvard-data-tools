@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -162,10 +161,8 @@ public class JavaBindingGenerator {
   // Write a standard file header to warn future developers against editing the
   // generated files.
   public static void writeFileHeader(final PrintStream out, final String version) {
-    writeComment("This file was generated on "
-        + new SimpleDateFormat("M-dd-yyyy hh:mm:ss").format(new Date()) + ". Do not manually edit.",
+    writeComment("This file was generated automatically. Do not edit.",
         0, out, false);
-    writeComment("This class is based on Version " + version + " of the schema", 0, out, false);
     out.println();
   }
 

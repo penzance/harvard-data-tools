@@ -4,9 +4,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import edu.harvard.data.schema.DataSchemaColumn;
@@ -32,7 +33,13 @@ public class S3ToRedshiftLoaderGenerator {
 
   private void generateRedshiftLoaderFile(final PrintStream out, final SchemaPhase phase) {
     outputComments(out, phase.getSchema().getVersion());
+    final List<String> tableNames = new ArrayList<String>();
     for (final DataSchemaTable table : phase.getSchema().getTables().values()) {
+      tableNames.add(table.getTableName());
+    }
+    Collections.sort(tableNames);
+    for (final String tableName : tableNames) {
+      final DataSchemaTable table = phase.getSchema().getTableByName(tableName);
       String columnList = "(";
       for (int i = 0; i < table.getColumns().size(); i++) {
         final DataSchemaColumn column = table.getColumns().get(i);
@@ -119,20 +126,11 @@ public class S3ToRedshiftLoaderGenerator {
   }
 
   private void outputComments(final PrintStream out, final String version) {
-    out.println("-- This file was generated on "
-        + new SimpleDateFormat("M-dd-yyyy hh:mm:ss").format(new Date())
-        + ". Do not manually edit.");
-    out.println("-- This file is based on Version " + version + " of the Canvas Data schema");
+    out.println("-- This file was automatically generated. Do not manually edit.");
 
     out.println(
         "-- See http://docs.aws.amazon.com/redshift/latest/dg/t_updating-inserting-using-staging-tables-.html");
     out.println("-- for Redshift update strategies.");
-    out.println();
-    out.println("-- NOTE: Eventually I should just use temporary tables, like this:");
-    out.println("-- CREATE TEMPORARY TABLE #requests_stage (LIKE requests);");
-    out.println("-- COPY #requests_stage");
-    out.println(
-        "-- FROM '<intermediates3bucketandpath>/requests/' CREDENTIALS '<awskeyandsecret>' DELIMITER '\t' TRUNCATECOLUMNS;");
     out.println();
     out.println();
   }

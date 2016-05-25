@@ -1,6 +1,12 @@
 package edu.harvard.data.matterhorn;
 
+import static edu.harvard.data.generator.InfrastructureConstants.HDFS_PHASE_0_DIR;
+import static edu.harvard.data.generator.InfrastructureConstants.HDFS_PHASE_1_DIR;
+import static edu.harvard.data.generator.InfrastructureConstants.HDFS_PHASE_2_DIR;
+import static edu.harvard.data.generator.InfrastructureConstants.HDFS_PHASE_3_DIR;
+
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -22,6 +28,9 @@ import edu.harvard.data.schema.extension.ExtensionSchema;
 import edu.harvard.data.schema.extension.ExtensionSchemaTable;
 
 public class MatterhornCodeGenerator extends CodeGenerator {
+
+  private static final int TRANFORMATION_PHASES = 2;
+
   private static final String PHASE_ZERO_PACKAGE = "edu.harvard.data.matterhorn.bindings.phase0";
   private static final String PHASE_ONE_PACKAGE = "edu.harvard.data.matterhorn.bindings.phase1";
   private static final String PHASE_TWO_PACKAGE = "edu.harvard.data.matterhorn.bindings.phase2";
@@ -34,9 +43,15 @@ public class MatterhornCodeGenerator extends CodeGenerator {
   public static final String PHASE_THREE_ADDITIONS_JSON = "matterhorn/phase3_schema_additions.json";
 
   private final String schemaVersion;
+  private final File gitDir;
 
-  public MatterhornCodeGenerator(final String schemaVersion, final File gitDir, final File codeDir) {
-    super(gitDir, codeDir);
+  public MatterhornCodeGenerator(final String schemaVersion, final File gitDir, final File codeDir)
+      throws FileNotFoundException {
+    super(codeDir);
+    if (!gitDir.exists() && gitDir.isDirectory()) {
+      throw new FileNotFoundException(gitDir.toString());
+    }
+    this.gitDir = gitDir;
     this.schemaVersion = schemaVersion;
   }
 
@@ -54,10 +69,9 @@ public class MatterhornCodeGenerator extends CodeGenerator {
   }
 
   @Override
-  protected GenerationSpec createGenerationSpec() throws IOException, DataConfigurationException,
-  VerificationException, UnexpectedApiResponseException {
+  protected GenerationSpec createGenerationSpec() throws IOException, VerificationException {
     // Specify the four versions of the table bindings
-    final GenerationSpec spec = new GenerationSpec(PIPELINE_PHASES);
+    final GenerationSpec spec = new GenerationSpec(TRANFORMATION_PHASES);
     spec.setJavaProjectName("matterhorn_generated_code");
     spec.setJavaTableEnumName("MatterhornTable");
     spec.setPrefixes("Phase0", "Phase1", "Phase2", "Phase3");

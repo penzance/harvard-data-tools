@@ -42,12 +42,14 @@ public class CreateHiveTableGenerator {
 
   private void generateCreateTablesFile(final PrintStream out, final int phase, final SchemaPhase input,
       final SchemaPhase output, final String logFile) {
+    final List<String> tableNames = new ArrayList<String>(input.getSchema().getTables().keySet());
+    Collections.sort(tableNames);
     out.println("sudo mkdir -p /var/log/hive/user/hadoop # Workaround for Hive logging bug");
     out.println("sudo chown hive:hive -R /var/log/hive");
     out.println("hive -e \"");
-    generateDropStatements(out, phase, "in_", input.getSchema().getTables());
+    generateDropStatements(out, phase, "in_", tableNames, input.getSchema().getTables());
     out.println();
-    generateDropStatements(out, phase, "out_", output.getSchema().getTables());
+    generateDropStatements(out, phase, "out_", tableNames, output.getSchema().getTables());
     out.println();
     generateCreateStatements(out, phase, input, "in_", true);
     generateCreateStatements(out, phase, output, "out_", false);
@@ -56,8 +58,9 @@ public class CreateHiveTableGenerator {
   }
 
   private void generateDropStatements(final PrintStream out, final int phase, final String prefix,
-      final Map<String, DataSchemaTable> tables) {
-    for (final DataSchemaTable table : tables.values()) {
+      final List<String> tableNames, final Map<String, DataSchemaTable> tables) {
+    for (final String tableName : tableNames) {
+      final DataSchemaTable table = tables.get(tableName);
       if (!(table.isTemporary() && table.getExpirationPhase() < phase)) {
         out.println("  DROP TABLE IF EXISTS " + prefix + table.getTableName() + " PURGE;");
       }

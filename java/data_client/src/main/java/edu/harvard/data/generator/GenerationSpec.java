@@ -24,9 +24,9 @@ public class GenerationSpec {
   private String javaProjectName;
   private File hiveScriptDir;
 
-  public GenerationSpec(final int phaseCount) {
+  public GenerationSpec(final int transformationPhaseCount) {
     this.phases = new ArrayList<SchemaPhase>();
-    for (int i = 0; i < phaseCount; i++) {
+    for (int i = 0; i < transformationPhaseCount + 2; i++) {
       phases.add(new SchemaPhase());
     }
   }

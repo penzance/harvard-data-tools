@@ -12,7 +12,7 @@ import edu.harvard.data.schema.existing.ExistingSchemaTable;
 
 public class SqlGenerator {
   public static String generateCreateStatement(final DataSchemaTable table) {
-    String s = "CREATE TABLE " + table.getTableName() + " (";
+    String s = "CREATE TABLE " + table.getTableName() + " (\n";
     final List<DataSchemaColumn> columns = table.getColumns();
     for (int i = 0; i < columns.size(); i++) {
       final DataSchemaColumn column = columns.get(i);

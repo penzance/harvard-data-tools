@@ -15,12 +15,15 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.harvard.data.VerificationException;
+import edu.harvard.data.identity.IdentifierType;
+import edu.harvard.data.identity.IdentitySchemaTransformer;
 import edu.harvard.data.schema.DataSchema;
 import edu.harvard.data.schema.DataSchemaColumn;
 import edu.harvard.data.schema.DataSchemaType;
 import edu.harvard.data.schema.extension.ExtensionSchema;
 import edu.harvard.data.schema.extension.ExtensionSchemaColumn;
 import edu.harvard.data.schema.extension.ExtensionSchemaTable;
+import edu.harvard.data.schema.identity.IdentitySchema;
 
 public class IdentitySchemaTransformerTests {
 
@@ -82,20 +85,20 @@ public class IdentitySchemaTransformerTests {
     cols.add(new ExtensionSchemaColumn(name, null, type.toString(), length));
   }
 
-  private Map<String, Map<String, List<IdentifierType>>> getIdMap() {
-    return new HashMap<String, Map<String, List<IdentifierType>>>();
+  private IdentitySchema getIdMap() {
+    return new IdentitySchema(new HashMap<String, Map<String, List<IdentifierType>>>());
   }
 
-  private void addIdentifier(final Map<String, Map<String, List<IdentifierType>>> idMap,
-      final String table, final String column, final IdentifierType... ids) {
-    if (!idMap.containsKey(table)) {
-      idMap.put(table, new HashMap<String, List<IdentifierType>>());
+  private void addIdentifier(final IdentitySchema idSchema, final String table, final String column,
+      final IdentifierType... ids) {
+    if (!idSchema.tables.containsKey(table)) {
+      idSchema.tables.put(table, new HashMap<String, List<IdentifierType>>());
     }
-    if (!idMap.get(table).containsKey(column)) {
-      idMap.get(table).put(column, new ArrayList<IdentifierType>());
+    if (!idSchema.tables.get(table).containsKey(column)) {
+      idSchema.tables.get(table).put(column, new ArrayList<IdentifierType>());
     }
     for (final IdentifierType id : ids) {
-      idMap.get(table).get(column).add(id);
+      idSchema.tables.get(table).get(column).add(id);
     }
   }
 
@@ -121,7 +124,7 @@ public class IdentitySchemaTransformerTests {
   // Check that one main identifier column has been removed.
   @Test
   public void removeOneId() throws VerificationException {
-    final Map<String, Map<String, List<IdentifierType>>> idMap = getIdMap();
+    final IdentitySchema idMap = getIdMap();
     addIdentifier(idMap, TABLE_NAME_1, MAIN_ID_COL_1, MAIN_ID);
     final IdentitySchemaTransformer trans = new IdentitySchemaTransformer(schema, idMap, MAIN_ID);
     final DataSchema newSchema = trans.transform();
@@ -133,13 +136,13 @@ public class IdentitySchemaTransformerTests {
   // Check that one identifier column has been replaced by UUID.
   @Test
   public void addOneUuid() throws VerificationException {
-    final Map<String, Map<String, List<IdentifierType>>> idMap = getIdMap();
+    final IdentitySchema idMap = getIdMap();
     addIdentifier(idMap, TABLE_NAME_1, MAIN_ID_COL_1, MAIN_ID);
     final IdentitySchemaTransformer trans = new IdentitySchemaTransformer(schema, idMap, MAIN_ID);
     final DataSchema newSchema = trans.transform();
     boolean found = false;
     for (final DataSchemaColumn column : newSchema.getTableByName(TABLE_NAME_1).getColumns()) {
-      if (column.getName().equals(MAIN_ID_COL_1 + IdentitySchemaTransformer.RESEARCH_UUID_SUFFIX) ) {
+      if (column.getName().equals(MAIN_ID_COL_1 + IdentitySchemaTransformer.RESEARCH_UUID_SUFFIX)) {
         found = true;
       }
     }
@@ -149,7 +152,7 @@ public class IdentitySchemaTransformerTests {
   // Check that two main identifier columns have been removed.
   @Test
   public void removeMultipleId() throws VerificationException {
-    final Map<String, Map<String, List<IdentifierType>>> idMap = getIdMap();
+    final IdentitySchema idMap = getIdMap();
     addIdentifier(idMap, TABLE_NAME_1, MAIN_ID_COL_1, MAIN_ID);
     addIdentifier(idMap, TABLE_NAME_1, MAIN_ID_COL_2, MAIN_ID);
     final IdentitySchemaTransformer trans = new IdentitySchemaTransformer(schema, idMap, MAIN_ID);
@@ -163,7 +166,7 @@ public class IdentitySchemaTransformerTests {
   // Check that two identifier columns have been replaced by UUIDs.
   @Test
   public void addMultipleUuids() throws VerificationException {
-    final Map<String, Map<String, List<IdentifierType>>> idMap = getIdMap();
+    final IdentitySchema idMap = getIdMap();
     addIdentifier(idMap, TABLE_NAME_1, MAIN_ID_COL_1, MAIN_ID);
     addIdentifier(idMap, TABLE_NAME_1, MAIN_ID_COL_2, MAIN_ID);
     final IdentitySchemaTransformer trans = new IdentitySchemaTransformer(schema, idMap, MAIN_ID);
@@ -171,10 +174,10 @@ public class IdentitySchemaTransformerTests {
     boolean found1 = false;
     boolean found2 = false;
     for (final DataSchemaColumn column : newSchema.getTableByName(TABLE_NAME_1).getColumns()) {
-      if (column.getName().equals(MAIN_ID_COL_1 + IdentitySchemaTransformer.RESEARCH_UUID_SUFFIX) ) {
+      if (column.getName().equals(MAIN_ID_COL_1 + IdentitySchemaTransformer.RESEARCH_UUID_SUFFIX)) {
         found1 = true;
       }
-      if (column.getName().equals(MAIN_ID_COL_2 + IdentitySchemaTransformer.RESEARCH_UUID_SUFFIX) ) {
+      if (column.getName().equals(MAIN_ID_COL_2 + IdentitySchemaTransformer.RESEARCH_UUID_SUFFIX)) {
         found2 = true;
       }
     }
@@ -185,7 +188,7 @@ public class IdentitySchemaTransformerTests {
   // Check that an Other identfier column has been removed.
   @Test
   public void removeOtherId() throws VerificationException {
-    final Map<String, Map<String, List<IdentifierType>>> idMap = getIdMap();
+    final IdentitySchema idMap = getIdMap();
     addIdentifier(idMap, TABLE_NAME_1, OTHER_ID_COL, IdentifierType.Other);
     final IdentitySchemaTransformer trans = new IdentitySchemaTransformer(schema, idMap, MAIN_ID);
     final DataSchema newSchema = trans.transform();
@@ -197,13 +200,13 @@ public class IdentitySchemaTransformerTests {
   // Check that an Other identifier column has not been replaced by UUID.
   @Test
   public void dontAddOtherUuid() throws VerificationException {
-    final Map<String, Map<String, List<IdentifierType>>> idMap = getIdMap();
+    final IdentitySchema idMap = getIdMap();
     addIdentifier(idMap, TABLE_NAME_1, OTHER_ID_COL, IdentifierType.Other);
     final IdentitySchemaTransformer trans = new IdentitySchemaTransformer(schema, idMap, MAIN_ID);
     final DataSchema newSchema = trans.transform();
     boolean found = false;
     for (final DataSchemaColumn column : newSchema.getTableByName(TABLE_NAME_1).getColumns()) {
-      if (column.getName().equals(OTHER_ID_COL + IdentitySchemaTransformer.RESEARCH_UUID_SUFFIX) ) {
+      if (column.getName().equals(OTHER_ID_COL + IdentitySchemaTransformer.RESEARCH_UUID_SUFFIX)) {
         found = true;
       }
     }
@@ -213,7 +216,7 @@ public class IdentitySchemaTransformerTests {
   // Attempt to transform table that is not in the original schema.
   @Test(expected = VerificationException.class)
   public void transformMissingTable() throws VerificationException {
-    final Map<String, Map<String, List<IdentifierType>>> idMap = getIdMap();
+    final IdentitySchema idMap = getIdMap();
     addIdentifier(idMap, "MissingTable", OTHER_ID_COL, IdentifierType.Other);
     final IdentitySchemaTransformer trans = new IdentitySchemaTransformer(schema, idMap, MAIN_ID);
     trans.transform();
@@ -222,7 +225,7 @@ public class IdentitySchemaTransformerTests {
   // Attempt to transform column that is not in the original schema.
   @Test(expected = VerificationException.class)
   public void transformMissingColumn() throws VerificationException {
-    final Map<String, Map<String, List<IdentifierType>>> idMap = getIdMap();
+    final IdentitySchema idMap = getIdMap();
     addIdentifier(idMap, TABLE_NAME_1, "Missing Column", IdentifierType.Other);
     final IdentitySchemaTransformer trans = new IdentitySchemaTransformer(schema, idMap, MAIN_ID);
     trans.transform();

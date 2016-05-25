@@ -27,7 +27,7 @@ public class SchemaTransformerFailureTest {
   }
 
   private ExtensionSchema read(final String resource) throws IOException, VerificationException {
-    return CodeGenerator.readExtensionSchema("test_schemas/" + resource + ".json");
+    return ExtensionSchema.readExtensionSchema("test_schemas/" + resource + ".json");
   }
 
   @Parameters
