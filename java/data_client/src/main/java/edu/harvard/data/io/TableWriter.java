@@ -17,20 +17,20 @@ import edu.harvard.data.TableFormat;
  * Output stream that writes a series of {@link DataTable} records to an
  * {@link OutputStream} or to a local file. The records will be written in the
  * same order that they were received by the {@link #add} method.
- *
+ * <P>
  * Clients of this class should ensure that the {@link #close} method is called
  * when all records have been added to the writer. The class performs buffering
  * to cut down on the number of writes, and so may not write the final records
  * if {@code close} is not called.
- *
+ * <P>
  * The memory footprint of this writer is designed to be small. Aside from
  * records that are buffered for performance reasons (up to 512 records by
  * default, although this can be changed by the {@link #resizeBuffer} method),
  * no other records are stored to memory.
- *
+ * <P>
  * This class is not thread-safe. Any access synchronization must be performed
  * by the caller.
- *
+ * <P>
  * A single {@code TableWriter} instance outputs a single type of
  * {@link DataTable} records, determined by the type parameter {@code T}.
  */

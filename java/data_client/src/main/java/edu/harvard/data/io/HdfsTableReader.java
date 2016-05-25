@@ -13,7 +13,7 @@ import edu.harvard.data.TableFormat;
 /**
  * Implementation of the {@link TableReader} interface that reads records from a
  * file stored on the Hadoop Distributed File System.
- *
+ * <P>
  * This class is a simple wrapper around {@link HdfsDelimitedFileIterator}; see
  * the documentation for that class for details around how a file is read.
  *

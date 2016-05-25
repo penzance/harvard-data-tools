@@ -15,7 +15,7 @@ import edu.harvard.data.TableFormat;
  * File System (HDFS). This class inherits the majority of its functionality
  * from {@link DelimitedFileIterator}, changing only its input from the local
  * file system to HDFS.
- *
+ * <P>
  * This class should not be instantiated by clients; create an instance of
  * {@link HdfsTableReader} instead.
  *

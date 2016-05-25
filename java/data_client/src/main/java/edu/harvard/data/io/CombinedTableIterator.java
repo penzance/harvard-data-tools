@@ -13,22 +13,22 @@ import edu.harvard.data.DataTable;
  * {@link TableReader} instances. The inputs to this iterator can be any
  * {@code TableReader} instances, including other instances of
  * {@code CombinedTableIterator}.
- *
+ * <P>
  * The iterator returns all records from all source {@code TableReader}
  * instances in order. It processes each {@code TableReader} in the order in
  * which they were passed to the constructor, and returns the records of each
  * {@code TableReader} in the ordering defined by the {@code TableReader}
  * implementation.
- *
+ * <P>
  * The iterator does not cache any records, meaning that its memory footprint is
  * small.
- *
+ * <P>
  * This class is not thread-safe. Any access synchronization must be performed
  * by the caller.
- *
+ * <P>
  * This class should not be instantiated by clients; create an instance of
  * {@link CombinedTableReader} instead.
- *
+ * <P>
  * Note that the iteration process can throw an instance of
  * {@link IterationException}. This occurs when an exception is encountered
  * inside the {@link java.util.Iterator#hasNext} or
@@ -50,7 +50,7 @@ public class CombinedTableIterator<T extends DataTable> implements Iterator<T> {
   /**
    * Create an iterator based on an existing set of {@link TableReader} objects.
    * The tables will be processed in the order that they appear in this list.
-   *
+   * <P>
    * The table readers should all have been initialized, and should not have
    * been closed. Once the records available from a {@code TableReader} instance
    * have been exhausted, the {@code CombinedTableIterator} will call

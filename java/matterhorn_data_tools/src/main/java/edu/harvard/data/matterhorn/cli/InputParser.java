@@ -2,6 +2,7 @@ package edu.harvard.data.matterhorn.cli;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
@@ -87,10 +88,10 @@ public class InputParser {
             outFormat, eventFile);
         TableWriter<Phase0Video> videos = new TableWriter<Phase0Video>(Phase0Video.class,
             outFormat, videoFile);) {
-      for (final Map<String, ? extends DataTable> tables : in) {
-        events.add((Phase0Event) tables.get("event"));
-        if (tables.containsKey("video")) {
-          videos.add((Phase0Video) tables.get("video"));
+      for (final Map<String, List<? extends DataTable>> tables : in) {
+        events.add((Phase0Event) tables.get("event").get(0));
+        if (tables.containsKey("video") && !tables.get("video").isEmpty()) {
+          videos.add((Phase0Video) tables.get("video").get(0));
         }
       }
     }

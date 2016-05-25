@@ -14,12 +14,12 @@ import edu.harvard.data.TableFormat;
 /**
  * {@link TableReader} implementation that reads records from a delimited data
  * file.
- *
+ * <P>
  * This class is mostly a wrapper around a {@link FileTableReader}. When a
  * client first attempts to retrieve the iterator for the data table, this class
  * downloads the data file from S3 to a temporary location on the local file
  * system. It then delegates to {@code FileTableReader} to read the file.
- *
+ * <P>
  * This class is not thread-safe. Any access synchronization must be performed
  * by the caller.
  *

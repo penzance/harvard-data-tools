@@ -11,10 +11,10 @@ import edu.harvard.data.TableFormat;
 /**
  * {@link TableReader} implementation that reads records from a delimited data
  * file.
- *
+ * <P>
  * This class is a simple wrapper around {@link DelimitedFileIterator}; see the
  * documentation for that class for details around how a file is read.
- *
+ * <P>
  * This class is not thread-safe. Any access synchronization must be performed
  * by the caller.
  *

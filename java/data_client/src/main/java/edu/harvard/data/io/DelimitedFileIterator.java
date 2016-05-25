@@ -19,20 +19,20 @@ import edu.harvard.data.TableFormat;
  * delimited data files. The delimiter character, as well as other
  * characteristics of the data file, are indicated by the {@link TableFormat}
  * object passed to the constructor.
- *
+ * <P>
  * The iterator reads each line of the source file and reflectively calls the
  * {@link CSVRecord} constructor on the appropriate {@link DataTable} class that
  * parses a line in the input to populate an object.
- *
+ * <P>
  * The iterator does not cache any records, meaning that its memory footprint is
  * small.
- *
+ * <P>
  * This class is not thread-safe. Any access synchronization must be performed
  * by the caller.
- *
+ * <P>
  * This class should not be instantiated by clients; create an instance of
  * {@link FileTableReader} instead.
- *
+ * <P>
  * Note that the iteration process can throw an instance of
  * {@link IterationException}. This occurs when an exception is encountered
  * inside the {@link java.util.Iterator#hasNext} or

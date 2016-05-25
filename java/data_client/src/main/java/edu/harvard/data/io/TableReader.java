@@ -11,7 +11,7 @@ import edu.harvard.data.DataTable;
  * enables compile-time checking that the {@link Closeable#close} method has
  * been called properly, and to allow the {@code TableReader} to be used in a
  * try-with-resources construct.
- *
+ * <P>
  * A typical pattern to iterate through the records of a {@code TableReader}
  * would be:
  * <pre>

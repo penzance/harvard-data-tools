@@ -17,7 +17,7 @@ import edu.harvard.data.TableFormat;
  * containing JSON-formatted records. This class does not implement
  * {@link TableReader}, since it is possible for one JSON record to produce many
  * {@link DataTable} objects.
- *
+ * <P>
  * This class is a wrapper around {@link JsonFileIterator}; see the
  * documentation for that class for more details.
  */

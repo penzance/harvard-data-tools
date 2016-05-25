@@ -11,7 +11,7 @@ import edu.harvard.data.DataTable;
  * records returned by multiple other table readers. This class exists as a
  * convenience to simplify the case where a data table is represented by
  * multiple files.
- *
+ * <P>
  * This class is a simple wrapper around the {@link CombinedTableIterator} type;
  * see the documentation for that class for more details.
  *

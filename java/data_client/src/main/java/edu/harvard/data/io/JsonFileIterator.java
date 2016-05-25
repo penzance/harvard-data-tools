@@ -23,16 +23,16 @@ import edu.harvard.data.VerificationException;
  * each line of the input file as a JSON object, and then defers to a
  * {@link JsonDocumentParser} instance to convert that JSON object to a set of
  * one or more {@link DataTable} instances.
- *
+ * <P>
  * The iterator does not cache any records, meaning that its memory footprint is
  * small.
- *
+ * <P>
  * This class is not thread-safe. Any access synchronization must be performed
  * by the caller.
- *
+ * <P>
  * This class should not be instantiated by clients; create an instance of
  * {@link JsonFileReader} instead.
- *
+ * <P>
  * Note that the iteration process can throw an instance of
  * {@link IterationException}. This occurs when an exception is encountered
  * inside the {@link java.util.Iterator#hasNext} or
