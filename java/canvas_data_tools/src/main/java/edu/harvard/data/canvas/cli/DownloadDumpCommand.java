@@ -25,7 +25,7 @@ import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.DumpInfo;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.VerificationException;
-import edu.harvard.data.canvas.CanvasDataConfiguration;
+import edu.harvard.data.canvas.CanvasDataConfig;
 import edu.harvard.data.canvas.data_api.ApiClient;
 import edu.harvard.data.canvas.data_api.CanvasDataSchema;
 import edu.harvard.data.canvas.data_api.DataDump;
@@ -40,13 +40,13 @@ public class DownloadDumpCommand implements Command {
   private File output;
 
   @Override
-  public ReturnStatus execute(final CanvasDataConfiguration config, final ExecutorService exec) throws IOException,
-  DataConfigurationException, UnexpectedApiResponseException,
-  VerificationException, ArgumentError {
+  public ReturnStatus execute(final CanvasDataConfig config, final ExecutorService exec)
+      throws IOException, DataConfigurationException, UnexpectedApiResponseException,
+      VerificationException, ArgumentError {
     final AwsUtils aws = new AwsUtils();
     final DumpManager manager = new DumpManager(config, aws);
-    final ApiClient api = new ApiClient(config.getCanvasDataHost(),
-        config.getCanvasApiKey(), config.getCanvasApiSecret());
+    final ApiClient api = new ApiClient(config.canvasDataHost, config.canvasApiKey,
+        config.canvasApiSecret);
     final List<DataDump> orderedDumps = sortDumps(api.getDumps());
     for (final DataDump dump : orderedDumps) {
       if (manager.needToSaveDump(dump)) {

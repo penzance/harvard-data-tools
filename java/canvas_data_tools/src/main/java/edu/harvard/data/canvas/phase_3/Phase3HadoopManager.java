@@ -11,11 +11,11 @@ import org.apache.hadoop.mapreduce.Job;
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary.Format;
-import edu.harvard.data.canvas.CanvasDataConfiguration;
+import edu.harvard.data.canvas.CanvasDataConfig;
 
 public class Phase3HadoopManager {
   public static List<Job> getJobs(final AwsUtils aws, final Configuration hadoopConfig,
-      final CanvasDataConfiguration config, final URI hdfsService, final String inputDir,
+      final CanvasDataConfig config, final URI hdfsService, final String inputDir,
       final String outputDir) throws DataConfigurationException, IOException {
     hadoopConfig.set("format", Format.DecompressedCanvasDataFlatFiles.toString());
     final List<Job> jobs = new ArrayList<Job>();

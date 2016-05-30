@@ -17,7 +17,7 @@ import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
-import edu.harvard.data.canvas.CanvasDataConfiguration;
+import edu.harvard.data.canvas.CanvasDataConfig;
 import edu.harvard.data.canvas.HadoopMultipleJobRunner;
 
 public class Phase1PreVerifier implements Verifier {
@@ -27,9 +27,9 @@ public class Phase1PreVerifier implements Verifier {
   private final URI hdfsService;
   private final Configuration hadoopConfig;
   private final TableFormat format;
-  private final CanvasDataConfiguration dataConfig;
+  private final CanvasDataConfig dataConfig;
 
-  public Phase1PreVerifier(final CanvasDataConfiguration dataConfig, final URI hdfsService,
+  public Phase1PreVerifier(final CanvasDataConfig dataConfig, final URI hdfsService,
       final String inputDir, final String outputDir) {
     this.dataConfig = dataConfig;
     this.hdfsService = hdfsService;

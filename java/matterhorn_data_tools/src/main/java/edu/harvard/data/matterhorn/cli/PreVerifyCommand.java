@@ -14,7 +14,7 @@ import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
-import edu.harvard.data.matterhorn.MatterhornDataConfiguration;
+import edu.harvard.data.matterhorn.MatterhornDataConfig;
 import edu.harvard.data.matterhorn.phase_0.Phase0PreVerifier;
 import edu.harvard.data.matterhorn.phase_1.Phase1PreVerifier;
 import edu.harvard.data.matterhorn.phase_2.Phase2PreVerifier;
@@ -38,7 +38,7 @@ public class PreVerifyCommand implements Command {
   public String outputDir;
 
   @Override
-  public ReturnStatus execute(final MatterhornDataConfiguration config, final ExecutorService exec)
+  public ReturnStatus execute(final MatterhornDataConfig config, final ExecutorService exec)
       throws IOException, DataConfigurationException, UnexpectedApiResponseException,
       ArgumentError {
     if (!checkArguments()) {
@@ -54,7 +54,7 @@ public class PreVerifyCommand implements Command {
     return ReturnStatus.OK;
   }
 
-  private Verifier getVerifier(final MatterhornDataConfiguration config, final ExecutorService exec)
+  private Verifier getVerifier(final MatterhornDataConfig config, final ExecutorService exec)
       throws ArgumentError, DataConfigurationException {
     final URI hdfsService;
     try {

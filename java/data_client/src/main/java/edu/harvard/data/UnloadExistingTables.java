@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.generator.SqlGenerator;
+import edu.harvard.data.pipeline.DataConfig;
 import edu.harvard.data.schema.DataSchema;
 import edu.harvard.data.schema.existing.ExistingSchema;
 import edu.harvard.data.schema.existing.ExistingSchemaTable;
@@ -21,15 +22,15 @@ public class UnloadExistingTables {
     this.schema = schema;
   }
 
-  public void unload(final AwsUtils aws, final RedshiftConfiguration config, final String s3Location,
+  public void unload(final AwsUtils aws, final DataConfig config, final String s3Location,
       final Date dataBeginDate) throws SQLException {
     log.info("Connecting to Redshift to unload existing tables");
     for (final String tableName : existingSchema.getTables().keySet()) {
       final ExistingSchemaTable table = existingSchema.getTables().get(tableName);
       log.info("Unloading " + tableName);
       final String unload = SqlGenerator.generateUnloadStatement(table,
-          schema.getTableByName(tableName), s3Location, config.getAwsKey(),
-          config.getAwsSecretKey(), dataBeginDate);
+          schema.getTableByName(tableName), s3Location, config.awsKeyId,
+          config.awsSecretKey, dataBeginDate);
       aws.executeRedshiftQuery(unload, config);
     }
   }

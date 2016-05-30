@@ -9,12 +9,12 @@ import org.apache.logging.log4j.Logger;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
-import edu.harvard.data.matterhorn.MatterhornDataConfiguration;
+import edu.harvard.data.matterhorn.MatterhornDataConfig;
 
 public class Phase1PreVerifier implements Verifier {
   private static final Logger log = LogManager.getLogger();
 
-  public Phase1PreVerifier(final MatterhornDataConfiguration dataConfig, final URI hdfsService,
+  public Phase1PreVerifier(final MatterhornDataConfig dataConfig, final URI hdfsService,
       final String inputDir, final String outputDir) {
   }
 

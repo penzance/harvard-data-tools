@@ -20,7 +20,7 @@ import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.DumpInfo;
 import edu.harvard.data.TableInfo;
 import edu.harvard.data.VerificationException;
-import edu.harvard.data.canvas.CanvasDataConfiguration;
+import edu.harvard.data.canvas.CanvasDataConfig;
 import edu.harvard.data.canvas.cli.ArgumentError;
 import edu.harvard.data.canvas.data_api.ApiClient;
 import edu.harvard.data.canvas.data_api.CanvasDataSchema;
@@ -34,10 +34,10 @@ public class DumpManager {
 
   private static final Logger log = LogManager.getLogger();
 
-  private final CanvasDataConfiguration config;
+  private final CanvasDataConfig config;
   private final AwsUtils aws;
 
-  public DumpManager(final CanvasDataConfiguration config, final AwsUtils aws) {
+  public DumpManager(final CanvasDataConfig config, final AwsUtils aws) {
     this.config = config;
     this.aws = aws;
   }
@@ -149,12 +149,12 @@ public class DumpManager {
 
   private File getScratchDumpDir(final DataDump dump) {
     final String dirName = String.format("%05d", dump.getSequence());
-    return new File(config.getScratchDir(), dirName);
+    return new File(config.scratchDir, dirName);
   }
 
   public S3ObjectId getArchiveDumpObj(final DataDump dump) {
     final String dirName = String.format("%05d", dump.getSequence());
-    return AwsUtils.key(config.getIncomingBucket(), dirName);
+    return AwsUtils.key(config.incomingBucket, dirName);
   }
 
   public void updateTableInfoTable(final DataDump dump) {

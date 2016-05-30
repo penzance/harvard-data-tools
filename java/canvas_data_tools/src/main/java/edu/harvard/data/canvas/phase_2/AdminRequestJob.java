@@ -22,14 +22,14 @@ import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopJob;
 import edu.harvard.data.TableFormat;
-import edu.harvard.data.canvas.CanvasDataConfiguration;
+import edu.harvard.data.canvas.CanvasDataConfig;
 import edu.harvard.data.canvas.bindings.phase1.Phase1Requests;
 import edu.harvard.data.canvas.bindings.phase2.Phase2AdminRequests;
 import edu.harvard.data.canvas.bindings.phase2.Phase2Requests;
 
 public class AdminRequestJob extends HadoopJob {
 
-  public AdminRequestJob(final Configuration hadoopConf, final CanvasDataConfiguration dataConfig,
+  public AdminRequestJob(final Configuration hadoopConf, final CanvasDataConfig dataConfig,
       final AwsUtils aws, final URI hdfsService, final String inputDir, final String outputDir) {
     super(hadoopConf, aws, hdfsService, inputDir, outputDir);
   }

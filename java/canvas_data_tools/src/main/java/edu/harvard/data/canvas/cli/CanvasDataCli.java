@@ -22,13 +22,16 @@ import edu.harvard.data.DumpInfo;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.TableInfo;
 import edu.harvard.data.VerificationException;
-import edu.harvard.data.canvas.CanvasDataConfiguration;
+import edu.harvard.data.canvas.CanvasDataConfig;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class CanvasDataCli {
   private static final Logger log = LogManager.getLogger();
 
-  @Argument(handler = SubCommandHandler.class, usage = "Canvas data operation.")
+  @Argument(index = 0, usage = "Colon-separated list of config files.", metaVar = "/path/to/config1:/path/to/config2", required = true)
+  private String configPaths;
+
+  @Argument(index = 1, handler = SubCommandHandler.class, usage = "Canvas data operation.")
   @SubCommands({ @SubCommand(name = "download", impl = DownloadDumpCommand.class),
     @SubCommand(name = "preverify", impl = PreVerifyCommand.class),
     @SubCommand(name = "postverify", impl = PostVerifyCommand.class),
@@ -63,12 +66,12 @@ public class CanvasDataCli {
       System.exit(ReturnStatus.ARGUMENT_ERROR.getCode());
     } else {
       // Config is set or System.exit is called.
-      CanvasDataConfiguration config = null;
+      CanvasDataConfig config = null;
       try {
-        config = CanvasDataConfiguration.getConfiguration("secure.properties");
-        DumpInfo.init(config.getDumpInfoDynamoTable());
-        TableInfo.init(config.getTableInfoDynamoTable());
-        log.info("Using table " + config.getDumpInfoDynamoTable() + " for dump info.");
+        config = CanvasDataConfig.parseFiles(CanvasDataConfig.class, parser.configPaths, true);
+        DumpInfo.init(config.dumpInfoDynamoTable);
+        TableInfo.init(config.tableInfoDynamoTable);
+        log.info("Using table " + config.dumpInfoDynamoTable + " for dump info.");
       } catch (final DataConfigurationException e) {
         log.fatal("Invalid configuration. Field", e);
         System.exit(ReturnStatus.CONFIG_ERROR.getCode());
@@ -127,7 +130,7 @@ public class CanvasDataCli {
   }
 
   public static void bail(final ReturnStatus status, final String[] args,
-      final CanvasDataConfiguration config, final String message, final Throwable t) {
+      final CanvasDataConfig config, final String message, final Throwable t) {
     log.error("Exiting with error status " + status);
     if (t == null) {
       log.error(message);
@@ -138,10 +141,10 @@ public class CanvasDataCli {
     for (final String arg : args) {
       log.error("  " + arg);
     }
-    log.error("Canvas data host: " + config.getCanvasDataHost());
-    log.error("DynamoDB dump info table: " + config.getDumpInfoDynamoTable());
-    log.error("Local scratch directory: " + config.getScratchDir());
-    log.error("S3 archive location: " + config.getIncomingBucket());
+    log.error("Canvas data host: " + config.canvasDataHost);
+    log.error("DynamoDB dump info table: " + config.dumpInfoDynamoTable);
+    log.error("Local scratch directory: " + config.scratchDir);
+    log.error("S3 archive location: " + config.incomingBucket);
     System.exit(status.getCode());
   }
 }

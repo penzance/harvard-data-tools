@@ -15,7 +15,7 @@ import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.UpdateRedshift;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.canvas.CanvasCodeGenerator;
-import edu.harvard.data.canvas.CanvasDataConfiguration;
+import edu.harvard.data.canvas.CanvasDataConfig;
 import edu.harvard.data.canvas.data_api.ApiClient;
 import edu.harvard.data.schema.DataSchema;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
@@ -27,15 +27,15 @@ public class UpdateRedshiftCommand implements Command {
   public String dumpId;
 
   @Override
-  public ReturnStatus execute(final CanvasDataConfiguration config, final ExecutorService exec)
+  public ReturnStatus execute(final CanvasDataConfig config, final ExecutorService exec)
       throws IOException, UnexpectedApiResponseException, DataConfigurationException,
       VerificationException {
     final AwsUtils aws = new AwsUtils();
-    final ApiClient api = new ApiClient(config.getCanvasDataHost(),
-        config.getCanvasApiKey(), config.getCanvasApiSecret());
+    final ApiClient api = new ApiClient(config.canvasDataHost,
+        config.canvasApiKey, config.canvasApiSecret);
     final DumpInfo info = DumpInfo.find(dumpId);
 
-    final CanvasCodeGenerator generator = new CanvasCodeGenerator(null, null, null);
+    final CanvasCodeGenerator generator = new CanvasCodeGenerator(null, null, null, null, config);
     final DataSchema schema0 = api.getSchema(info.getSchemaVersion());
     final DataSchema schema3 = generator.transformSchema(schema0).get(3);
     try {

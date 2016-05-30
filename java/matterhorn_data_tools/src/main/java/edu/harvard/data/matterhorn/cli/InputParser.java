@@ -19,7 +19,7 @@ import edu.harvard.data.io.FileTableReader;
 import edu.harvard.data.io.JsonFileReader;
 import edu.harvard.data.io.TableWriter;
 import edu.harvard.data.matterhorn.EventJsonDocumentParser;
-import edu.harvard.data.matterhorn.MatterhornDataConfiguration;
+import edu.harvard.data.matterhorn.MatterhornDataConfig;
 import edu.harvard.data.matterhorn.bindings.phase0.Phase0Event;
 import edu.harvard.data.matterhorn.bindings.phase0.Phase0Video;
 
@@ -27,7 +27,7 @@ public class InputParser {
 
   private static final Logger log = LogManager.getLogger();
 
-  private final MatterhornDataConfiguration config;
+  private final MatterhornDataConfig config;
   private final AwsUtils aws;
   private final S3ObjectId inputObj;
   private final String outputBucket;
@@ -39,7 +39,7 @@ public class InputParser {
   private final TableFormat inFormat;
   private final TableFormat outFormat;
 
-  public InputParser(final MatterhornDataConfiguration config, final AwsUtils aws,
+  public InputParser(final MatterhornDataConfig config, final AwsUtils aws,
       final S3ObjectId inputObj, final String outputBucket) {
     this.config = config;
     this.aws = aws;
@@ -67,11 +67,11 @@ public class InputParser {
     final String key = inputObj.getKey();
     final String filename = key.substring(key.lastIndexOf("/") + 1);
     final String date = filename.substring(filename.indexOf(".") + 1, filename.indexOf(".jsonl"));
-    originalFile = new File(config.getScratchDir(), filename);
+    originalFile = new File(config.scratchDir, filename);
     final String eventFileName = "event-" + date + ".gz";
     final String videoFileName = "video-" + date + ".gz";
-    eventFile = new File(config.getScratchDir(), eventFileName);
-    videoFile = new File(config.getScratchDir(), videoFileName);
+    eventFile = new File(config.scratchDir, eventFileName);
+    videoFile = new File(config.scratchDir, videoFileName);
     eventOutputObj = AwsUtils.key(outputBucket, "event", eventFileName);
     videoOutputObj = AwsUtils.key(outputBucket, "video", videoFileName);
     log.info("Parsing " + filename + " to " + eventFile + ", " + videoFile);

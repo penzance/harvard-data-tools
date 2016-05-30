@@ -1,5 +1,6 @@
 package edu.harvard.data.canvas.cli;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,7 +16,7 @@ import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
-import edu.harvard.data.canvas.CanvasDataConfiguration;
+import edu.harvard.data.canvas.CanvasDataConfig;
 import edu.harvard.data.canvas.phase_0.Phase0PostVerifier;
 import edu.harvard.data.canvas.phase_1.Phase1PostVerifier;
 import edu.harvard.data.canvas.phase_2.Phase2PostVerifier;
@@ -42,7 +43,7 @@ public class PostVerifyCommand implements Command {
   public String verifyDir;
 
   @Override
-  public ReturnStatus execute(final CanvasDataConfiguration config, final ExecutorService exec)
+  public ReturnStatus execute(final CanvasDataConfig config, final ExecutorService exec)
       throws IOException, DataConfigurationException, UnexpectedApiResponseException,
       ArgumentError {
     if (!checkArguments()) {
@@ -58,7 +59,7 @@ public class PostVerifyCommand implements Command {
     return ReturnStatus.OK;
   }
 
-  private Verifier getVerifier(final CanvasDataConfiguration config, final ExecutorService exec)
+  private Verifier getVerifier(final CanvasDataConfig config, final ExecutorService exec)
       throws ArgumentError, DataConfigurationException {
     final URI hdfsService;
     try {
@@ -69,7 +70,7 @@ public class PostVerifyCommand implements Command {
     final AwsUtils aws = new AwsUtils();
     switch (phase) {
     case 0:
-      return new Phase0PostVerifier(dumpId, aws, config.getScratchDir(), exec);
+      return new Phase0PostVerifier(dumpId, aws, new File(config.scratchDir), exec);
     case 1:
       return new Phase1PostVerifier(hdfsService, inputDir, outputDir, verifyDir);
     case 2:

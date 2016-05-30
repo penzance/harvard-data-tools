@@ -17,7 +17,7 @@ import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.VerificationException;
-import edu.harvard.data.canvas.CanvasDataConfiguration;
+import edu.harvard.data.canvas.CanvasDataConfig;
 import edu.harvard.data.canvas.HadoopMultipleJobRunner;
 import edu.harvard.data.canvas.phase_1.Phase1HadoopManager;
 import edu.harvard.data.canvas.phase_2.Phase2HadoopManager;
@@ -38,7 +38,7 @@ public class HadoopCommand implements Command {
   public String outputDir;
 
   @Override
-  public ReturnStatus execute(final CanvasDataConfiguration config, final ExecutorService exec)
+  public ReturnStatus execute(final CanvasDataConfig config, final ExecutorService exec)
       throws IOException, UnexpectedApiResponseException, DataConfigurationException,
       VerificationException, ArgumentError {
     log.info("Setting up Canvas Hadoop job");
@@ -68,7 +68,7 @@ public class HadoopCommand implements Command {
     return ReturnStatus.OK;
   }
 
-  private List<Job> setupJobs(final Configuration hadoopConfig, final CanvasDataConfiguration config, final URI hdfsService)
+  private List<Job> setupJobs(final Configuration hadoopConfig, final CanvasDataConfig config, final URI hdfsService)
       throws DataConfigurationException, IOException, ArgumentError {
     final AwsUtils aws = new AwsUtils();
     final List<Job> jobs = new ArrayList<Job>();

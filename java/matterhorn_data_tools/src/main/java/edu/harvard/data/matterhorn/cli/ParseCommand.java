@@ -12,7 +12,7 @@ import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.VerificationException;
-import edu.harvard.data.matterhorn.MatterhornDataConfiguration;
+import edu.harvard.data.matterhorn.MatterhornDataConfig;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class ParseCommand implements Command {
@@ -20,15 +20,15 @@ public class ParseCommand implements Command {
   private static final Logger log = LogManager.getLogger();
 
   @Override
-  public ReturnStatus execute(final MatterhornDataConfiguration config, final ExecutorService exec)
+  public ReturnStatus execute(final MatterhornDataConfig config, final ExecutorService exec)
       throws IOException, UnexpectedApiResponseException, DataConfigurationException,
       VerificationException, ArgumentError {
     log.info("Parsing files");
     final AwsUtils aws = new AwsUtils();
-    for (final S3ObjectSummary obj : aws.listKeys(config.getDropboxBucket())) {
+    for (final S3ObjectSummary obj : aws.listKeys(config.dropboxBucket)) {
       if (obj.getKey().endsWith(".gz")) {
         log.info("Parsing file " + obj.getBucketName() + "/" + obj.getKey());
-        new InputParser(config, aws, AwsUtils.key(obj), config.getIncomingBucket()).parseFile();
+        new InputParser(config, aws, AwsUtils.key(obj), config.incomingBucket).parseFile();
       }
     }
     return ReturnStatus.OK;

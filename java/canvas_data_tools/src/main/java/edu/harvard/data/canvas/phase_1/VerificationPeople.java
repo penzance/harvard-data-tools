@@ -28,7 +28,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.TableFormat;
-import edu.harvard.data.canvas.CanvasDataConfiguration;
+import edu.harvard.data.canvas.CanvasDataConfig;
 import edu.harvard.data.canvas.bindings.phase0.Phase0Requests;
 import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.identity.IdentityMap;
@@ -50,9 +50,9 @@ public class VerificationPeople {
   private List<Long> people;
   private final Map<Long, IdentityMap> originalIdentities;
 
-  private final CanvasDataConfiguration dataConfig;
+  private final CanvasDataConfig dataConfig;
 
-  public VerificationPeople(final CanvasDataConfiguration dataConfig,
+  public VerificationPeople(final CanvasDataConfig dataConfig,
       final Configuration hadoopConfig, final URI hdfsService, final String inputDir,
       final TableFormat format) throws IOException {
     this.dataConfig = dataConfig;
@@ -147,7 +147,7 @@ public class VerificationPeople {
   }
 
   // TODO: Move this code into IdentityMap.
-  private void getIdMapsFromRedshift(final CanvasDataConfiguration config) throws SQLException {
+  private void getIdMapsFromRedshift(final CanvasDataConfig config) throws SQLException {
     final Long start = System.currentTimeMillis();
     final String url = config.getRedshiftUrl();
     String queryString = "SELECT * FROM identity_map WHERE identity_map.canvas_data_id IN (";
@@ -157,8 +157,8 @@ public class VerificationPeople {
     queryString = queryString.substring(0, queryString.length() - 2) + ");";
     log.info("Executing query \n" + queryString + "\n on " + url);
     try (
-        Connection connection = DriverManager.getConnection(url, config.getRedshiftUser(),
-            config.getRedshiftPassword());
+        Connection connection = DriverManager.getConnection(url, config.redshiftUserName,
+            config.redshiftPassword);
         PreparedStatement statement = connection.prepareStatement(queryString);) {
       for (int i = 0; i < people.size(); i++) {
         statement.setLong(i + 1, people.get(i));

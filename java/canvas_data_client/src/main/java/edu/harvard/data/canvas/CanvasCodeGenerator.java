@@ -37,28 +37,31 @@ public class CanvasCodeGenerator extends CodeGenerator {
 
   private final String schemaVersion;
   private final File gitDir;
+  private final CanvasDataConfig config;
 
-  public CanvasCodeGenerator(final String schemaVersion, final File gitDir, final File codeDir)
-      throws FileNotFoundException {
+  public CanvasCodeGenerator(final String schemaVersion, final String configFiles,
+      final File gitDir, final File codeDir, final CanvasDataConfig config) throws FileNotFoundException {
     super(codeDir);
-    if (!gitDir.exists() && gitDir.isDirectory()) {
-      throw new FileNotFoundException(gitDir.toString());
-    }
     this.gitDir = gitDir;
     this.schemaVersion = schemaVersion;
+    this.config = config;
   }
 
   public static void main(final String[] args) throws IOException, DataConfigurationException,
   UnexpectedApiResponseException, SQLException, VerificationException {
-    if (args.length != 3) {
-      System.err
-      .println("Usage: schema_version /path/to/harvard-data-tools /path/to/output/directory");
+    if (args.length != 4) {
+      System.err.println(
+          "Usage: schema_version /path/to/config1:/path/to/config2 /path/to/harvard-data-tools /path/to/output/directory");
     }
     final String schemaVersion = args[0];
-    final File gitDir = new File(args[1]);
-    final File dir = new File(args[2]);
-
-    new CanvasCodeGenerator(schemaVersion, gitDir, dir).generate();
+    final String configFiles = args[1];
+    final File gitDir = new File(args[2]);
+    final File dir = new File(args[3]);
+    if (!(gitDir.exists() && gitDir.isDirectory())) {
+      throw new FileNotFoundException(gitDir.toString());
+    }
+    final CanvasDataConfig config = CanvasDataConfig.parseFiles(CanvasDataConfig.class, configFiles, true);
+    new CanvasCodeGenerator(schemaVersion, configFiles, gitDir, dir, config).generate();
   }
 
   @Override
@@ -77,12 +80,11 @@ public class CanvasCodeGenerator extends CodeGenerator {
     spec.setMainIdentifier(IdentifierType.CanvasDataID);
     spec.setHiveScriptDir(new File(gitDir, "hive/canvas"));
 
+
     // Get the specified schema version (or fail if that version doesn't exist).
-    final CanvasDataConfiguration config = CanvasDataConfiguration
-        .getConfiguration("secure.properties");
-    final String host = config.getCanvasDataHost();
-    final String key = config.getCanvasApiKey();
-    final String secret = config.getCanvasApiSecret();
+    final String host = config.canvasDataHost;
+    final String key = config.canvasApiKey;
+    final String secret = config.canvasApiSecret;
     final ApiClient api = new ApiClient(host, key, secret);
 
     // Set the four schema versions in the spec.

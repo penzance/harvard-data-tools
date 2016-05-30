@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.generator.SqlGenerator;
+import edu.harvard.data.pipeline.DataConfig;
 import edu.harvard.data.schema.DataSchema;
 import edu.harvard.data.schema.DataSchemaColumn;
 import edu.harvard.data.schema.DataSchemaTable;
@@ -21,7 +22,7 @@ public class UpdateRedshift {
     this.expectedSchema = expectedSchema;
   }
 
-  public void update(final AwsUtils aws, final RedshiftConfiguration config) throws SQLException {
+  public void update(final AwsUtils aws, final DataConfig config) throws SQLException {
     log.info("Connecting to Redshift to retrieve schema");
     final RedshiftSchema rs = aws.getRedshiftSchema(config);
     final SchemaComparison diff = new SchemaComparison(expectedSchema, rs);

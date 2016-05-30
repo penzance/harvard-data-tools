@@ -1,6 +1,8 @@
 package edu.harvard.data.matterhorn.cli;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
@@ -20,15 +22,17 @@ import org.kohsuke.args4j.spi.SubCommands;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.VerificationException;
-import edu.harvard.data.matterhorn.MatterhornDataConfiguration;
+import edu.harvard.data.matterhorn.MatterhornDataConfig;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class MatterhornDataCli {
   private static final Logger log = LogManager.getLogger();
 
-  @Argument(handler = SubCommandHandler.class, usage = "Canvas data operation.")
-  @SubCommands({
-    @SubCommand(name = "parse", impl = ParseCommand.class),
+  @Argument(index = 0, usage = "Colon-separated list of config files.", metaVar = "/path/to/config1:/path/to/config2", required = true)
+  private String configPaths;
+
+  @Argument(handler = SubCommandHandler.class, usage = "Matterhorn data operation.")
+  @SubCommands({ @SubCommand(name = "parse", impl = ParseCommand.class),
     @SubCommand(name = "preverify", impl = PreVerifyCommand.class),
     @SubCommand(name = "postverify", impl = PostVerifyCommand.class),
     @SubCommand(name = "hadoop", impl = HadoopCommand.class),
@@ -54,10 +58,16 @@ public class MatterhornDataCli {
       printUsage(cli);
       System.exit(ReturnStatus.ARGUMENT_ERROR.getCode());
     } else {
-      // Config is set or System.exit is called.
-      MatterhornDataConfiguration config = null;
+      MatterhornDataConfig config = null;
       try {
-        config = MatterhornDataConfiguration.getConfiguration("secure.properties");
+        final String[] configFiles = parser.configPaths.split(":");
+        for (final String f : configFiles) {
+          final File file = new File(f);
+          if (!file.exists() || file.isDirectory()) {
+            throw new FileNotFoundException(f);
+          }
+        }
+        config = MatterhornDataConfig.parseFiles(configFiles);
       } catch (final DataConfigurationException e) {
         log.fatal("Invalid configuration. Field", e);
         System.exit(ReturnStatus.CONFIG_ERROR.getCode());
@@ -116,7 +126,7 @@ public class MatterhornDataCli {
   }
 
   public static void bail(final ReturnStatus status, final String[] args,
-      final MatterhornDataConfiguration config, final String message, final Throwable t) {
+      final MatterhornDataConfig config, final String message, final Throwable t) {
     log.error("Exiting with error status " + status);
     if (t == null) {
       log.error(message);
@@ -127,7 +137,7 @@ public class MatterhornDataCli {
     for (final String arg : args) {
       log.error("  " + arg);
     }
-    log.error("Local scratch directory: " + config.getScratchDir());
+    log.error("Local scratch directory: " + config.scratchDir);
     System.exit(status.getCode());
   }
 }
