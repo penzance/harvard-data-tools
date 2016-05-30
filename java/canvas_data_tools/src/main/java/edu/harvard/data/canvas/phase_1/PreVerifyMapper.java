@@ -33,12 +33,14 @@ abstract class PreVerifyMapper extends Mapper<Object, Text, Text, LongWritable> 
     final Format formatName = Format.valueOf(context.getConfiguration().get("format"));
     this.format = new FormatLibrary().getFormat(formatName);
     final FileSystem fs = FileSystem.get(context.getConfiguration());
-    for (final URI uri : context.getCacheFiles()) {
-      final Path path = new Path(uri.toString());
-      try (HdfsTableReader<IdentityMap> in = new HdfsTableReader<IdentityMap>(IdentityMap.class,
-          format, fs, path)) {
-        for (final IdentityMap id : in) {
-          idByCanvasDataId.put((Long) id.get(IdentifierType.CanvasDataID), id);
+    if (context.getCacheFiles() != null) {
+      for (final URI uri : context.getCacheFiles()) {
+        final Path path = new Path(uri.toString());
+        try (HdfsTableReader<IdentityMap> in = new HdfsTableReader<IdentityMap>(IdentityMap.class,
+            format, fs, path)) {
+          for (final IdentityMap id : in) {
+            idByCanvasDataId.put((Long) id.get(IdentifierType.CanvasDataID), id);
+          }
         }
       }
     }

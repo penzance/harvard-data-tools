@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +15,6 @@ import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.mapreduce.Job;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,16 +22,16 @@ import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
+import edu.harvard.data.HadoopJob;
 import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
-import edu.harvard.data.Verifier;
-import edu.harvard.data.canvas.HadoopMultipleJobRunner;
+import edu.harvard.data.canvas.CanvasDataConfig;
 import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.identity.IdentityMap;
 import edu.harvard.data.io.HdfsTableReader;
 
-public class Phase1PostVerifier implements Verifier {
+public class Phase1PostVerifier {
   private static final Logger log = LogManager.getLogger();
   private final Configuration hadoopConfig;
   private final URI hdfsService;
@@ -40,19 +40,31 @@ public class Phase1PostVerifier implements Verifier {
   private final String verifyDir;
   private final TableFormat format;
   private final HadoopUtilities hadoopUtils;
+  private final CanvasDataConfig config;
 
-  public Phase1PostVerifier(final URI hdfsService, final String inputDir, final String outputDir,
-      final String verifyDir) {
-    this.hdfsService = hdfsService;
-    this.inputDir = inputDir;
-    this.outputDir = outputDir;
-    this.verifyDir = verifyDir;
-    this.hadoopConfig = new Configuration();
-    this.format = new FormatLibrary().getFormat(Format.DecompressedCanvasDataFlatFiles);
-    this.hadoopUtils = new HadoopUtilities();
+  public static void main(final String[] args)
+      throws IOException, DataConfigurationException, VerificationException {
+    final String configPathString = args[0];
+    final CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class,
+        configPathString, true);
+    new Phase1PostVerifier(config).verify();
   }
 
-  @Override
+  public Phase1PostVerifier(final CanvasDataConfig config) throws DataConfigurationException {
+    this.config = config;
+    this.inputDir = config.getHdfsDir(0);
+    this.outputDir = config.getHdfsDir(1);
+    this.verifyDir = config.getVerifyHdfsDir(1);
+    this.hadoopConfig = new Configuration();
+    this.hadoopUtils = new HadoopUtilities();
+    this.format = new FormatLibrary().getFormat(Format.DecompressedCanvasDataFlatFiles);
+    try {
+      this.hdfsService = new URI("hdfs///");
+    } catch (final URISyntaxException e) {
+      throw new DataConfigurationException(e);
+    }
+  }
+
   public void verify() throws VerificationException, IOException, DataConfigurationException {
     log.info("Running post-verifier for phase 1");
     log.info("Input directory: " + inputDir);
@@ -63,17 +75,15 @@ public class Phase1PostVerifier implements Verifier {
         outputDir + "/identity_map", format).verify();
     updateInterestingTables();
 
-    hadoopConfig.set("format", format.getFormat().toString());
-    final HadoopMultipleJobRunner jobRunner = new HadoopMultipleJobRunner(hadoopConfig);
-    final List<Job> jobs = setupJobs();
-    jobRunner.runParallelJobs(jobs);
+    for (final HadoopJob job : setupJobs()) {
+      job.runJob();
+    }
   }
 
-  private List<Job> setupJobs() throws IOException {
+  private List<HadoopJob> setupJobs() throws IOException, DataConfigurationException {
     final AwsUtils aws = new AwsUtils();
-    final List<Job> jobs = new ArrayList<Job>();
-    jobs.add(
-        new PostVerifyRequestsJob(hadoopConfig, aws, hdfsService, outputDir, verifyDir).getJob());
+    final List<HadoopJob> jobs = new ArrayList<HadoopJob>();
+    jobs.add(new PostVerifyRequestsJob(config, 1));
     return jobs;
   }
 

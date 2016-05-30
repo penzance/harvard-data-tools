@@ -8,6 +8,10 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.amazonaws.services.s3.model.S3ObjectId;
+
+import edu.harvard.data.AwsUtils;
+import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.identity.IdentifierType;
@@ -35,6 +39,8 @@ public abstract class CodeGenerator {
   private static final Logger log = LogManager.getLogger();
 
   protected final File codeDir;
+  private final S3ObjectId workingDir;
+  private final DataConfig config;
 
   /**
    * Initialize the CodeGenerator class with input and output file locations.
@@ -42,9 +48,14 @@ public abstract class CodeGenerator {
    * @param codeDir
    *          the directory where generated files should be stored. If this
    *          directory does not exist it will be created.
+   * @param workingDir
+   *          S3 scratch directory to store intermediate code and data during
+   *          the pipeline's run
    */
-  public CodeGenerator(final File codeDir) {
+  public CodeGenerator(final DataConfig config, final File codeDir, final String runId) {
+    this.config = config;
     this.codeDir = codeDir;
+    this.workingDir = AwsUtils.key(config.getS3WorkingLocation(), runId);
   }
 
   /**
@@ -174,10 +185,10 @@ public abstract class CodeGenerator {
     new HiveQueryManifestGenerator(codeDir, spec).generate();
 
     log.info("Generating Redshift table definitions in " + codeDir);
-    new CreateRedshiftTableGenerator(codeDir, spec).generate();
+    new CreateRedshiftTableGenerator(codeDir, spec, config).generate();
 
     log.info("Generating Redshift copy from S3 script in " + codeDir);
-    new S3ToRedshiftLoaderGenerator(codeDir, spec).generate();
+    new S3ToRedshiftLoaderGenerator(codeDir, spec, config, workingDir).generate();
 
     log.info("Generating move unmodified files script in " + codeDir);
     new MoveUnmodifiedTableGenerator(codeDir, spec).generate();

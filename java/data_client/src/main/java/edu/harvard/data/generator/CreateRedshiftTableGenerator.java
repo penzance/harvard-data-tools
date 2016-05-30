@@ -8,27 +8,33 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import edu.harvard.data.DataConfig;
 import edu.harvard.data.schema.DataSchemaTable;
 
 public class CreateRedshiftTableGenerator {
 
   private final File dir;
-  private final GenerationSpec schemaVersions;
+  private final GenerationSpec spec;
+  private final DataConfig config;
 
-  public CreateRedshiftTableGenerator(final File dir, final GenerationSpec schemaVersions) {
+  public CreateRedshiftTableGenerator(final File dir, final GenerationSpec spec,
+      final DataConfig config) {
     this.dir = dir;
-    this.schemaVersions = schemaVersions;
+    this.spec = spec;
+    this.config = config;
   }
 
   public void generate() throws IOException {
     final File createTableFile = new File(dir, "create_redshift_tables.sql");
 
     try (final PrintStream out = new PrintStream(new FileOutputStream(createTableFile))) {
-      generateCreateTableFile(out, schemaVersions.getPhase(2));
+      generateCreateTableFile(out, spec.getPhase(3));
     }
   }
 
   private void generateCreateTableFile(final PrintStream out, final SchemaPhase phase) {
+    out.println("create schema " + config.getDatasetName() + ";");
+    out.println();
     final List<String> tableNames = new ArrayList<String>();
     for (final DataSchemaTable table : phase.getSchema().getTables().values()) {
       tableNames.add(table.getTableName());
@@ -37,7 +43,7 @@ public class CreateRedshiftTableGenerator {
     for (final String tableName : tableNames) {
       final DataSchemaTable table = phase.getSchema().getTableByName(tableName);
       if (!table.isTemporary()) {
-        out.println(SqlGenerator.generateCreateStatement(table));
+        out.println(SqlGenerator.generateCreateStatement(table, config.getDatasetName()));
       }
     }
   }

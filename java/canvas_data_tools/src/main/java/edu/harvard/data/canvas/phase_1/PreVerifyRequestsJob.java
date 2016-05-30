@@ -1,25 +1,24 @@
 package edu.harvard.data.canvas.phase_1;
 
 import java.io.IOException;
-import java.net.URI;
 
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
+import edu.harvard.data.DataConfig;
+import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.HadoopJob;
 import edu.harvard.data.canvas.bindings.phase0.Phase0Requests;
 
 class PreVerifyRequestsJob extends HadoopJob {
 
-  public PreVerifyRequestsJob(final Configuration hadoopConf, final URI hdfsService,
-      final String inputDir, final String outputDir) {
-    super(hadoopConf, null, hdfsService, inputDir, outputDir);
+  public PreVerifyRequestsJob(final DataConfig config, final int phase) throws DataConfigurationException {
+    super(config, phase);
   }
 
   @Override
@@ -32,6 +31,8 @@ class PreVerifyRequestsJob extends HadoopJob {
 
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
+    final String inputDir = config.getHdfsDir(phase - 1);
+    final String outputDir = config.getVerifyHdfsDir(phase);
     hadoopUtils.setPaths(job, hdfsService, inputDir + "/requests", outputDir + "/requests");
     return job;
   }

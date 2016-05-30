@@ -8,6 +8,7 @@ test-data
 .project
 .settings
 target
+secure
 secure.properties
 dependency-reduced-pom.xml
 log4j2.out.xml

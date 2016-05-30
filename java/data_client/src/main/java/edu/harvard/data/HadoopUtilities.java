@@ -95,6 +95,18 @@ public class HadoopUtilities {
     return parseFormat(context.getConfiguration().get("format"));
   }
 
+  public DataConfig getConfig(final Mapper<?, ?, ?, ?>.Context context)
+      throws IOException, DataConfigurationException {
+    final String configPathString = context.getConfiguration().get("config");
+    return DataConfig.parseInputFiles(DataConfig.class, configPathString, true);
+  }
+
+  public DataConfig getConfig(final Reducer<?, ?, ?, ?>.Context context)
+      throws IOException, DataConfigurationException {
+    final String configPathString = context.getConfiguration().get("config");
+    return DataConfig.parseInputFiles(DataConfig.class, configPathString, true);
+  }
+
   private TableFormat parseFormat(final String formatString) {
     if (formatString == null) {
       throw new HadoopConfigurationException(
@@ -159,6 +171,16 @@ public class HadoopUtilities {
       readers.add(new HdfsTableReader<T>(tableType, format, fs, path));
     }
     return new CombinedTableReader<T>(readers);
+  }
+
+  public List<Path> listHdfsFiles(final Configuration hadoopConfig, final Path path)
+      throws IOException {
+    final List<Path> files = new ArrayList<Path>();
+    final FileSystem fs = FileSystem.get(hadoopConfig);
+    for (final FileStatus fileStatus : fs.listStatus(path)) {
+      files.add(fileStatus.getPath());
+    }
+    return files;
   }
 
 }

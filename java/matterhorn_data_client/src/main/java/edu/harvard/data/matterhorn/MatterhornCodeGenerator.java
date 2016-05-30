@@ -1,10 +1,5 @@
 package edu.harvard.data.matterhorn;
 
-import static edu.harvard.data.generator.InfrastructureConstants.HDFS_PHASE_0_DIR;
-import static edu.harvard.data.generator.InfrastructureConstants.HDFS_PHASE_1_DIR;
-import static edu.harvard.data.generator.InfrastructureConstants.HDFS_PHASE_2_DIR;
-import static edu.harvard.data.generator.InfrastructureConstants.HDFS_PHASE_3_DIR;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -45,9 +40,12 @@ public class MatterhornCodeGenerator extends CodeGenerator {
   private final String schemaVersion;
   private final File gitDir;
 
-  public MatterhornCodeGenerator(final String schemaVersion, final File gitDir, final File codeDir)
-      throws FileNotFoundException {
-    super(codeDir);
+  private final MatterhornDataConfig config;
+
+  public MatterhornCodeGenerator(final String schemaVersion, final File gitDir, final File codeDir,
+      final MatterhornDataConfig config, final String runId) throws FileNotFoundException {
+    super(config, codeDir, runId);
+    this.config = config;
     if (!gitDir.exists() && gitDir.isDirectory()) {
       throw new FileNotFoundException(gitDir.toString());
     }
@@ -57,31 +55,39 @@ public class MatterhornCodeGenerator extends CodeGenerator {
 
   public static void main(final String[] args) throws IOException, DataConfigurationException,
   UnexpectedApiResponseException, SQLException, VerificationException {
-    if (args.length != 3) {
-      System.err
-      .println("Usage: schema_version /path/to/harvard-data-tools /path/to/output/directory");
+    if (args.length != 5) {
+      System.err.println(
+          "Usage: schema_version /path/to/config1|/path/to/config2 /path/to/harvard-data-tools /path/to/output/directory, run_id");
     }
     final String schemaVersion = args[0];
-    final File gitDir = new File(args[1]);
-    final File dir = new File(args[2]);
-
-    new MatterhornCodeGenerator(schemaVersion, gitDir, dir).generate();
+    final String configFiles = args[1];
+    final File gitDir = new File(args[2]);
+    final File dir = new File(args[3]);
+    final String runId = args[4];
+    if (!(gitDir.exists() && gitDir.isDirectory())) {
+      throw new FileNotFoundException(gitDir.toString());
+    }
+    final MatterhornDataConfig config = MatterhornDataConfig
+        .parseInputFiles(MatterhornDataConfig.class, configFiles, false);
+    new MatterhornCodeGenerator(schemaVersion, gitDir, dir, config, runId).generate();
   }
 
   @Override
   protected GenerationSpec createGenerationSpec() throws IOException, VerificationException {
     // Specify the four versions of the table bindings
-    final GenerationSpec spec = new GenerationSpec(TRANFORMATION_PHASES);
+    final GenerationSpec spec = new GenerationSpec(TRANFORMATION_PHASES, schemaVersion);
     spec.setJavaProjectName("matterhorn_generated_code");
     spec.setJavaTableEnumName("MatterhornTable");
     spec.setPrefixes("Phase0", "Phase1", "Phase2", "Phase3");
-    spec.setHdfsDirectories(HDFS_PHASE_0_DIR, HDFS_PHASE_1_DIR, HDFS_PHASE_2_DIR, HDFS_PHASE_3_DIR);
+    spec.setHdfsDirectories(config.getHdfsDir(0), config.getHdfsDir(1), config.getHdfsDir(2),
+        config.getHdfsDir(3));
     spec.setJavaBindingPackages(PHASE_ZERO_PACKAGE, PHASE_ONE_PACKAGE, PHASE_TWO_PACKAGE,
         PHASE_THREE_PACKAGE);
     spec.setJavaHadoopPackage(IDENTITY_HADOOP_PACKAGE);
     spec.setHadoopIdentityManagerClass("MatterhornIdentityHadoopManager");
     spec.setMainIdentifier(IdentifierType.HUID);
     spec.setHiveScriptDir(new File(gitDir, "hive/matterhorn"));
+    spec.setConfig(config);
 
     // Set the four schema versions in the spec.
     final DataSchema schema0 = readSchema(schemaVersion);

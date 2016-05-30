@@ -11,9 +11,13 @@ import org.apache.commons.csv.CSVRecord;
 
 import edu.harvard.data.DataTable;
 import edu.harvard.data.TableFormat;
+import edu.harvard.data.schema.DataSchemaColumn;
+import edu.harvard.data.schema.DataSchemaTable;
+import edu.harvard.data.schema.extension.ExtensionSchemaColumn;
+import edu.harvard.data.schema.extension.ExtensionSchemaTable;
 
 // Create Redshift table using:
-// CREATE TABLE identity_map (
+// CREATE TABLE pii.identity_map (
 //     research_id VARCHAR(255),
 //     huid VARCHAR(255),
 //     xid VARCHAR(255),
@@ -73,6 +77,16 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
   public IdentityMap(final TableFormat format, final CSVRecord record) {
     this();
     populate(record);
+  }
+
+  public static DataSchemaTable getIdentityMapTable() {
+    final List<DataSchemaColumn> columns = new ArrayList<DataSchemaColumn>();
+    columns.add(new ExtensionSchemaColumn("research_id", "", "varchar", 255));
+    columns.add(new ExtensionSchemaColumn("huid", "", "varchar", 255));
+    columns.add(new ExtensionSchemaColumn("xid", "", "varchar", 255));
+    columns.add(new ExtensionSchemaColumn("canvas_id", "", "bigint", 0));
+    columns.add(new ExtensionSchemaColumn("canvas_data_id", "", "bigint", 0));
+    return new ExtensionSchemaTable("identity_map", columns);
   }
 
   private void populate(final CSVRecord record) {

@@ -20,8 +20,7 @@ import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.DumpInfo;
 import edu.harvard.data.TableInfo;
 import edu.harvard.data.VerificationException;
-import edu.harvard.data.canvas.CanvasDataConfiguration;
-import edu.harvard.data.canvas.cli.ArgumentError;
+import edu.harvard.data.canvas.CanvasDataConfig;
 import edu.harvard.data.canvas.data_api.ApiClient;
 import edu.harvard.data.canvas.data_api.CanvasDataSchema;
 import edu.harvard.data.canvas.data_api.DataArtifact;
@@ -34,40 +33,12 @@ public class DumpManager {
 
   private static final Logger log = LogManager.getLogger();
 
-  private final CanvasDataConfiguration config;
+  private final CanvasDataConfig config;
   private final AwsUtils aws;
 
-  public DumpManager(final CanvasDataConfiguration config, final AwsUtils aws) {
+  public DumpManager(final CanvasDataConfig config, final AwsUtils aws) {
     this.config = config;
     this.aws = aws;
-  }
-
-  public boolean needToSaveDump(final DataDump dump) throws IOException {
-    final DumpInfo info = DumpInfo.find(dump.getDumpId());
-    if (dump.getSequence() < 189) {
-      log.warn("Dump downloader set to ignore dumps with sequence < 189");
-      return false;
-    }
-    if (info == null) {
-      log.info("Dump needs to be saved; no dump info record for " + dump.getDumpId());
-      return true;
-    }
-    if (info.getDownloaded() == null || !info.getDownloaded()) {
-      log.info("Dump needs to be saved; previous download did not complete.");
-      return true;
-    }
-    final Date downloadStart = info.getDownloadStart();
-    // Re-download any dump that was updated less than an hour before it was
-    // downloaded before.
-    final Date conservativeStart = new Date(downloadStart.getTime() - (60 * 60 * 1000));
-    if (conservativeStart.before(dump.getUpdatedAt())) {
-      log.info(
-          "Dump needs to be saved; previously downloaded less than an hour after it was last updated.");
-      return true;
-    }
-    log.info("Dump does not need to be saved; already exists at " + info.getBucket() + "/"
-        + info.getKey() + ".");
-    return false;
   }
 
   public void saveDump(final ApiClient api, final DataDump dump, final DumpInfo info)
@@ -154,7 +125,7 @@ public class DumpManager {
 
   public S3ObjectId getArchiveDumpObj(final DataDump dump) {
     final String dirName = String.format("%05d", dump.getSequence());
-    return AwsUtils.key(config.getIncomingBucket(), dirName);
+    return AwsUtils.key(config.getS3IncomingLocation(), dirName);
   }
 
   public void updateTableInfoTable(final DataDump dump) {

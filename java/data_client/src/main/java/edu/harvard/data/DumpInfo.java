@@ -146,6 +146,9 @@ public class DumpInfo {
   }
 
   public static DumpInfo find(final String dumpId) {
+    if (tableName == null) {
+      throw new RuntimeException("DumpInfo object saved before init(tableName) method called");
+    }
     log.debug("Finding dump ID " + dumpId + " from table " + tableName);
     return mapper.load(DumpInfo.class, dumpId, mapperConfig);
   }

@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.harvard.data.DataConfig;
 import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.schema.DataSchema;
 
@@ -23,8 +24,11 @@ public class GenerationSpec {
   private IdentifierType mainIdentifier;
   private String javaProjectName;
   private File hiveScriptDir;
+  private DataConfig config;
+  private final String schemaVersion;
 
-  public GenerationSpec(final int transformationPhaseCount) {
+  public GenerationSpec(final int transformationPhaseCount, final String schemaVersion) {
+    this.schemaVersion = schemaVersion;
     this.phases = new ArrayList<SchemaPhase>();
     for (int i = 0; i < transformationPhaseCount + 2; i++) {
       phases.add(new SchemaPhase());
@@ -90,6 +94,14 @@ public class GenerationSpec {
     return hiveScriptDir;
   }
 
+  public void setConfig(final DataConfig config) {
+    this.config = config;
+  }
+
+  public DataConfig getConfig() {
+    return config;
+  }
+
   public void setJavaBindingPackages(final String... packageList) {
     if (packageList.length != phases.size()) {
       throw new RuntimeException(
@@ -132,5 +144,9 @@ public class GenerationSpec {
     for (int i = 0; i < hdfsDirs.length; i++) {
       phases.get(i).setHDFSDir(hdfsDirs[i]);
     }
+  }
+
+  public String getSchemaVersion() {
+    return schemaVersion;
   }
 }

@@ -1,10 +1,5 @@
 package edu.harvard.data.canvas;
 
-import static edu.harvard.data.generator.InfrastructureConstants.HDFS_PHASE_0_DIR;
-import static edu.harvard.data.generator.InfrastructureConstants.HDFS_PHASE_1_DIR;
-import static edu.harvard.data.generator.InfrastructureConstants.HDFS_PHASE_2_DIR;
-import static edu.harvard.data.generator.InfrastructureConstants.HDFS_PHASE_3_DIR;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -37,49 +32,54 @@ public class CanvasCodeGenerator extends CodeGenerator {
 
   private final String schemaVersion;
   private final File gitDir;
+  private final CanvasDataConfig config;
 
-  public CanvasCodeGenerator(final String schemaVersion, final File gitDir, final File codeDir)
-      throws FileNotFoundException {
-    super(codeDir);
-    if (!gitDir.exists() && gitDir.isDirectory()) {
-      throw new FileNotFoundException(gitDir.toString());
-    }
+  public CanvasCodeGenerator(final String schemaVersion, final File gitDir, final File codeDir,
+      final CanvasDataConfig config, final String runId) throws FileNotFoundException {
+    super(config, codeDir, runId);
     this.gitDir = gitDir;
     this.schemaVersion = schemaVersion;
+    this.config = config;
   }
 
   public static void main(final String[] args) throws IOException, DataConfigurationException,
   UnexpectedApiResponseException, SQLException, VerificationException {
-    if (args.length != 3) {
-      System.err
-      .println("Usage: schema_version /path/to/harvard-data-tools /path/to/output/directory");
+    if (args.length != 5) {
+      System.err.println(
+          "Usage: schema_version /path/to/config1|/path/to/config2 /path/to/harvard-data-tools /path/to/output/directory, run_id");
     }
     final String schemaVersion = args[0];
-    final File gitDir = new File(args[1]);
-    final File dir = new File(args[2]);
-
-    new CanvasCodeGenerator(schemaVersion, gitDir, dir).generate();
+    final String configFiles = args[1];
+    final File gitDir = new File(args[2]);
+    final File dir = new File(args[3]);
+    final String runId = args[4];
+    if (!(gitDir.exists() && gitDir.isDirectory())) {
+      throw new FileNotFoundException(gitDir.toString());
+    }
+    final CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class,
+        configFiles, false);
+    new CanvasCodeGenerator(schemaVersion, gitDir, dir, config, runId).generate();
   }
 
   @Override
   protected GenerationSpec createGenerationSpec() throws IOException, DataConfigurationException,
   VerificationException, UnexpectedApiResponseException {
     // Specify the four versions of the table bindings
-    final GenerationSpec spec = new GenerationSpec(TRANFORMATION_PHASES);
+    final GenerationSpec spec = new GenerationSpec(TRANFORMATION_PHASES, schemaVersion);
     spec.setJavaProjectName("canvas_generated_code");
     spec.setJavaTableEnumName("CanvasTable");
     spec.setPrefixes("Phase0", "Phase1", "Phase2", "Phase3");
-    spec.setHdfsDirectories(HDFS_PHASE_0_DIR, HDFS_PHASE_1_DIR, HDFS_PHASE_2_DIR, HDFS_PHASE_3_DIR);
+    spec.setHdfsDirectories(config.getHdfsDir(0), config.getHdfsDir(1), config.getHdfsDir(2),
+        config.getHdfsDir(3));
     spec.setJavaBindingPackages(PHASE_ZERO_PACKAGE, PHASE_ONE_PACKAGE, PHASE_TWO_PACKAGE,
         PHASE_THREE_PACKAGE);
     spec.setJavaHadoopPackage(IDENTITY_HADOOP_PACKAGE);
     spec.setHadoopIdentityManagerClass("CanvasIdentityHadoopManager");
     spec.setMainIdentifier(IdentifierType.CanvasDataID);
     spec.setHiveScriptDir(new File(gitDir, "hive/canvas"));
+    spec.setConfig(config);
 
     // Get the specified schema version (or fail if that version doesn't exist).
-    final CanvasDataConfiguration config = CanvasDataConfiguration
-        .getConfiguration("secure.properties");
     final String host = config.getCanvasDataHost();
     final String key = config.getCanvasApiKey();
     final String secret = config.getCanvasApiSecret();

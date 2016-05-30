@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -20,7 +19,8 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
-import edu.harvard.data.AwsUtils;
+import edu.harvard.data.DataConfig;
+import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopJob;
@@ -29,12 +29,8 @@ import edu.harvard.data.canvas.bindings.phase1.Phase1Requests;
 
 public class PostVerifyRequestsJob extends HadoopJob {
 
-  private final String verifyDir;
-
-  public PostVerifyRequestsJob(final Configuration hadoopConf, final AwsUtils aws,
-      final URI hdfsService, final String dataDir, final String verifyDir) {
-    super(hadoopConf, aws, hdfsService, dataDir, null);
-    this.verifyDir = verifyDir;
+  public PostVerifyRequestsJob(final DataConfig config, final int phase) throws DataConfigurationException {
+    super(config, phase);
   }
 
   @Override
@@ -47,6 +43,8 @@ public class PostVerifyRequestsJob extends HadoopJob {
 
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
+    final String inputDir = config.getHdfsDir(phase);
+    final String verifyDir = config.getVerifyHdfsDir(phase);
     hadoopUtils.setPaths(job, hdfsService, inputDir + "/requests", null);
     hadoopUtils.addToCache(job, hdfsService, verifyDir + "/updated/requests");
     return job;

@@ -36,6 +36,7 @@ import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
+import edu.harvard.data.canvas.CanvasDataConfig;
 import edu.harvard.data.canvas.bindings.phase0.Phase0CanvasTable;
 
 public class Phase0PostVerifier implements Verifier {
@@ -47,11 +48,11 @@ public class Phase0PostVerifier implements Verifier {
   private final File tmpDir;
   private final TableFormat format;
 
-  public Phase0PostVerifier(final String dumpId, final AwsUtils aws, final File tmpDir,
+  public Phase0PostVerifier(final String dumpId, final AwsUtils aws, final CanvasDataConfig config,
       final ExecutorService exec) {
     this.dumpId = dumpId;
     this.aws = aws;
-    this.tmpDir = tmpDir;
+    this.tmpDir = new File(config.getScratchDir());
     this.exec = exec;
     this.format = new FormatLibrary().getFormat(Format.CanvasDataFlatFiles);
   }

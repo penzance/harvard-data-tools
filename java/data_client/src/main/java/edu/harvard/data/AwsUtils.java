@@ -95,7 +95,7 @@ public class AwsUtils {
       for (final S3ObjectSummary objectSummary : objects.getObjectSummaries()) {
         final String subKey = objectSummary.getKey().substring(prefix.length());
         final String[] keyParts = subKey.split("/");
-        if (keyParts.length == 2) {
+        if (keyParts.length >= 2) {
           keys.add(keyParts[0]);
         }
       }
@@ -184,14 +184,20 @@ public class AwsUtils {
   public void getFile(final S3ObjectId objId, final File file, final boolean gunzip)
       throws IOException {
     log.debug("Downloading " + objId + " to " + file);
-    final S3Object obj = client.getObject(new GetObjectRequest(objId.getBucket(), objId.getKey()));
     file.getParentFile().mkdirs();
+    final InputStream in = getInputStream(objId, gunzip);
+    final OutputStream out = new FileOutputStream(file);
+    IOUtils.copy(in, out);
+  }
+
+  public InputStream getInputStream(final S3ObjectId objId, final boolean gunzip)
+      throws IOException {
+    final S3Object obj = client.getObject(new GetObjectRequest(objId.getBucket(), objId.getKey()));
     InputStream in = obj.getObjectContent();
     if (gunzip) {
       in = new GZIPInputStream(in);
     }
-    final OutputStream out = new FileOutputStream(file);
-    IOUtils.copy(in, out);
+    return in;
   }
 
   public void putFile(final S3ObjectId objId, final File file) throws IOException {
@@ -211,11 +217,11 @@ public class AwsUtils {
     client.putObject(obj.getBucket(), obj.getKey(), new ByteArrayInputStream(bytes), metadata);
   }
 
-  public RedshiftSchema getRedshiftSchema(final RedshiftConfiguration config) throws SQLException {
+  public RedshiftSchema getRedshiftSchema(final DataConfig config) throws SQLException {
     final String query = "SELECT * FROM information_schema.columns WHERE table_schema='public'";
     final String url = config.getRedshiftUrl();
     try (
-        Connection connection = DriverManager.getConnection(url, config.getRedshiftUser(),
+        Connection connection = DriverManager.getConnection(url, config.getRedshiftUserName(),
             config.getRedshiftPassword());
         Statement st = connection.createStatement();
         ResultSet resultSet = st.executeQuery(query);) {
@@ -223,11 +229,11 @@ public class AwsUtils {
     }
   }
 
-  public void executeRedshiftQuery(final String query, final RedshiftConfiguration config)
+  public void executeRedshiftQuery(final String query, final DataConfig config)
       throws SQLException {
     final String url = config.getRedshiftUrl();
     log.info("Executing query \n" + query + "\n on " + url);
-    try (Connection connection = DriverManager.getConnection(url, config.getRedshiftUser(),
+    try (Connection connection = DriverManager.getConnection(url, config.getRedshiftUserName(),
         config.getRedshiftPassword()); Statement st = connection.createStatement();) {
       st.execute(query);
     }
