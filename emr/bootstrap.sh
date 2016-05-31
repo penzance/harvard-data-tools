@@ -1,5 +1,15 @@
 #!/bin/bash
 
+export DATA_SCHEMA_VERSION=$1
+export DUMPID=$2
+export GIT_BRANCH=$3
+export INTERMEDIATE_BUCKET=$4
+export AWS_ACCESS_KEY=$5
+export AWS_SECRET_KEY=$6
+export CODE_BUCKET=$7
+export STREAM=$8
+export CONFIG_PATHS=$9
+
 # - HARVARD_DATA_TOOLS_BASE: the directory where the harvard-data-tools
 #     repository has been checked out. Point to the root of the repository, e.g.
 #     /tmp/code/harvard-data-tools
@@ -16,7 +26,6 @@ export HARVARD_DATA_GENERATED_OUTPUT=/home/hadoop
 
 # - DATA_SCHEMA_VERSION: The version of the data schema for which
 #     files will be generated. Format as a string, e.g. 1.2.0
-export DATA_SCHEMA_VERSION=$1
 
 # - HDFS_PHASE_n_DIR: HDFS directories for data in each phase n
 export HDFS_PHASE_0_DIR=hdfs:///phase_0
@@ -27,14 +36,14 @@ export HDFS_PHASE_2_DIR=hdfs:///phase_2
 ssh-keyscan github.com >> /home/hadoop/.ssh/known_hosts
 
 # copy extra keys from S3 to the local FS, add to ~/.ssh/authorized_keys
-aws s3 cp s3://$2/extra_keys /home/hadoop/.
-cat /home/hadoop/extra_keys >> ~/.ssh/authorized_keys
+# aws s3 cp s3://$2/extra_keys /home/hadoop/.
+# cat /home/hadoop/extra_keys >> ~/.ssh/authorized_keys
 
 # install jdk and git
 sudo yum install -y java-devel git-core
 
 # clone our repo
-git clone -b $3 https://github.com/penzance/harvard-data-tools.git /home/hadoop/harvard-data-tools
+git clone -b $GIT_BRANCH https://github.com/penzance/harvard-data-tools.git /home/hadoop/harvard-data-tools
 
 #Install maven via instructions at https://gist.github.com/sebsto/19b99f1fa1f32cae5d00
 sudo wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
@@ -42,11 +51,10 @@ sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
 sudo yum install -y apache-maven
 
 # copy DownloadVerifySecureProperties from S3 to the local FS
-aws s3 cp s3://$2/secure.properties /home/hadoop/.
+# aws s3 cp s3://$2/secure.properties /home/hadoop/.
 
 # generate the tools
-python /home/hadoop/harvard-data-tools/python/$8_generate_tools.py
-x
+python /home/hadoop/harvard-data-tools/python/${STREAM}_generate_tools.py
 chmod 764 /home/hadoop/*.sh
 
 # setup CloudWatch logging
@@ -59,7 +67,7 @@ sudo service awslogs start
 #       but after much troubleshooting, that appeared to be impossible, so this approach was created.
 
 # Get DUMPID from tags
-DUMPID=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$(curl http://169.254.169.254/latest/meta-data/instance-id)" "Name=key,Values=dump-id" --query 'Tags[*].[Value]' --output text --region us-east-1)
+# DUMPID=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$(curl http://169.254.169.254/latest/meta-data/instance-id)" "Name=key,Values=dump-id" --query 'Tags[*].[Value]' --output text --region us-east-1)
 
 # Get FULLDUMPID from tags
 FULLDUMPPATH=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$(curl http://169.254.169.254/latest/meta-data/instance-id)" "Name=key,Values=full-dump-path" --query 'Tags[*].[Value]' --output text --region us-east-1)
@@ -71,14 +79,14 @@ FULLDUMPPATH=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$(curl h
 #DATASETNUM=$(grep -Po '(?<=\"DUMP_SEQUENCE\" : \")[^\"]*' /root/the_result.json)
 
 # Replace <intermediates3bucketandpath> placeholder with real intermediate bucket name and path
-sed -i "s@<intermediates3bucketandpath>/@s3://$4/$FULLDUMPPATH@g" /home/hadoop/s3_to_redshift_loader.sql
+sed -i "s@<intermediates3bucketandpath>/@s3://$INTERMEDIATE_BUCKET/$FULLDUMPPATH@g" /home/hadoop/s3_to_redshift_loader.sql
 
 # Replace <awskeyandsecret> placeholder with real creds
-sed -i "s@<awskeyandsecret>@aws_access_key_id=$5;aws_secret_access_key=$6@g" /home/hadoop/s3_to_redshift_loader.sql
+sed -i "s@<awskeyandsecret>@aws_access_key_id=$AWS_ACCESS_KEY;aws_secret_access_key=$AWS_SECRET_KEY@g" /home/hadoop/s3_to_redshift_loader.sql
 
 # Copy modified file to code S3 bucket, name it with data set number.
 if [ "$DUMPID" != "" ]; then
-  aws s3 cp /home/hadoop/s3_to_redshift_loader.sql s3://$7/$DUMPID.sql
+  aws s3 cp /home/hadoop/s3_to_redshift_loader.sql s3://$CODE_BUCKET/$DUMPID.sql
 else
-  aws s3 cp /home/hadoop/s3_to_redshift_loader.sql s3://$7/matterhorn.sql
+  aws s3 cp /home/hadoop/s3_to_redshift_loader.sql s3://$CODE_BUCKET/matterhorn.sql
 fi

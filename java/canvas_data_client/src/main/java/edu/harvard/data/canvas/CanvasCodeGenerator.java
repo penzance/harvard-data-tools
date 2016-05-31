@@ -60,7 +60,7 @@ public class CanvasCodeGenerator extends CodeGenerator {
     if (!(gitDir.exists() && gitDir.isDirectory())) {
       throw new FileNotFoundException(gitDir.toString());
     }
-    final CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, configFiles, true);
+    final CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, configFiles, false);
     new CanvasCodeGenerator(schemaVersion, configFiles, gitDir, dir, config).generate();
   }
 
