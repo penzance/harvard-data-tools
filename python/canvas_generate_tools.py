@@ -67,16 +67,10 @@ def run_generator():
     print "Return code: {0}".format(process.returncode)
     check_return_code(process.returncode)
 
-def copy_secure_properties():
-    secure_file = "{0}/secure.properties".format(SECURE_PROPERTIES_LOCATION)
-    resources_dir = "{0}/src/main/resources/secure.properties".format(DATA_TOOLS_DIR)
-    shutil.copyfile(secure_file, resources_dir)
-
 compile_java(DATA_CLIENT_DIR)
 compile_java(CANVAS_DATA_CLIENT_DIR)
 run_generator()
 compile_java(JAVA_BINDINGS_DIR)
-copy_secure_properties()
 compile_java(DATA_TOOLS_DIR)
 
 clean_up_files()
