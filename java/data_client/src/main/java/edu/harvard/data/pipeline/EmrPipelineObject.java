@@ -45,7 +45,7 @@ public class EmrPipelineObject extends AbstractPipelineObject {
   private String getBootstrapAction(final DataConfig params) {
     final String codeLocation = params.codeBucket + "/" + params.gitTagOrBranch + "/"
         + params.lowercaseDatasource;
-    final String bootstrapScript = "s3://" + params.codeBucket + "/bootstrap.sh";
+    final String bootstrapScript = "s3://" + params.codeBucket + "/" + params.gitTagOrBranch + "/bootstrap.sh";
     final List<String> bootstrapParams = new ArrayList<String>();
     bootstrapParams.add(bootstrapScript);
     bootstrapParams.add(params.dataSourceSchemaVersion);

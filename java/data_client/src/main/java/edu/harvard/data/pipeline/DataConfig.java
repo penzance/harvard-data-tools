@@ -110,7 +110,7 @@ public class DataConfig {
     final AwsUtils aws = new AwsUtils();
     final List<InputStream> streams = new ArrayList<InputStream>();
     try {
-      for (final String file : configPathString.split("|")) {
+      for (final String file : configPathString.split("\\|")) {
         if (file.toLowerCase().startsWith("s3://")) {
           final S3ObjectId awsFile = AwsUtils.key(file);
           if (!aws.isFile(awsFile)) {
