@@ -57,6 +57,7 @@ def run_generator():
     main_class = "edu.harvard.data.canvas.CanvasCodeGenerator"
     command = [
         'java', '-cp', generator_classpath, main_class, CURRENT_SCHEMA,
+        's3://hdt-code/api_pipeline/canvas.properties|s3://hdt-code/api_pipeline/secure.properties|s3://hdt-code/api_pipeline/tiny_emr.properties',
         GIT_BASE,
         GENERATED_CODE_DIR
     ]
