@@ -15,6 +15,8 @@ import com.amazonaws.services.datapipeline.model.Query;
 import com.amazonaws.services.datapipeline.model.QueryObjectsRequest;
 import com.amazonaws.services.datapipeline.model.QueryObjectsResult;
 import com.amazonaws.services.datapipeline.model.Selector;
+import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.s3.model.S3ObjectId;
 import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.PublishRequest;
@@ -22,7 +24,7 @@ import com.amazonaws.services.sns.model.PublishRequest;
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfigurationException;
 
-public class PipelineFailure {
+public class PipelineFailure implements RequestHandler<String, String> {
 
   private final DataConfig config;
   private final String stepId;
@@ -31,13 +33,18 @@ public class PipelineFailure {
   private final String activityType;
   private final DataPipelineClient client;
 
+  @Override
+  public String handleRequest(final String input, final Context context) {
+    return "Called with " + input;
+  }
+
   public static void main(final String[] args) throws IOException, DataConfigurationException {
     final String configPaths = args[0];
     final String stepId = args[1];
     final String pipelineId = args[2];
     final String emrId = args[3];
     final String activityType = args[4];
-    final DataConfig config = DataConfig.parseS3Files(DataConfig.class, configPaths, true);
+    final DataConfig config = DataConfig.parseInputFiles(DataConfig.class, configPaths, true);
     new PipelineFailure(config, stepId, pipelineId, emrId, activityType).process();
   }
 

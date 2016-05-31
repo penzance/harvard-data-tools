@@ -51,7 +51,7 @@ public class CanvasCodeGenerator extends CodeGenerator {
   UnexpectedApiResponseException, SQLException, VerificationException {
     if (args.length != 4) {
       System.err.println(
-          "Usage: schema_version /path/to/config1:/path/to/config2 /path/to/harvard-data-tools /path/to/output/directory");
+          "Usage: schema_version /path/to/config1|/path/to/config2 /path/to/harvard-data-tools /path/to/output/directory");
     }
     final String schemaVersion = args[0];
     final String configFiles = args[1];
@@ -60,7 +60,7 @@ public class CanvasCodeGenerator extends CodeGenerator {
     if (!(gitDir.exists() && gitDir.isDirectory())) {
       throw new FileNotFoundException(gitDir.toString());
     }
-    final CanvasDataConfig config = CanvasDataConfig.parseFiles(CanvasDataConfig.class, configFiles, true);
+    final CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, configFiles, true);
     new CanvasCodeGenerator(schemaVersion, configFiles, gitDir, dir, config).generate();
   }
 

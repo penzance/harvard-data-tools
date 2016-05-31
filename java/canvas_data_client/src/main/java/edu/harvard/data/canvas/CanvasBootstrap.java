@@ -25,7 +25,7 @@ public class CanvasBootstrap {
 
   public static void main(final String[] args) throws IOException, DataConfigurationException,
   UnexpectedApiResponseException, VerificationException {
-    CanvasDataConfig config = CanvasDataConfig.parseS3Files(CanvasDataConfig.class, args[0], false);
+    CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, args[0], false);
     DumpInfo.init(config.dumpInfoDynamoTable);
     final String host = config.canvasDataHost;
     final String key = config.canvasApiKey;
@@ -33,7 +33,7 @@ public class CanvasBootstrap {
     final ApiClient api = new ApiClient(host, key, secret);
     final DataDump dump = findNextDump(api);
     final String emrConfig = chooseEmrConfigFile(dump);
-    config = CanvasDataConfig.parseS3Files(CanvasDataConfig.class, args[0] + ":" + emrConfig, true);
+    config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, args[0] + "|" + emrConfig, true);
     if (dump == null) {
       log.info("No new dumps to download");
       sendSnsMessage(dump, config, "No new dumps to download",
@@ -44,7 +44,7 @@ public class CanvasBootstrap {
   }
 
   private static String chooseEmrConfigFile(final DataDump dump) {
-    return "hdt-code/emr.properties";
+    return "s3://hdt-code/api_pipeline/tiny_emr.properties";
   }
 
   private static DataDump findNextDump(final ApiClient api)

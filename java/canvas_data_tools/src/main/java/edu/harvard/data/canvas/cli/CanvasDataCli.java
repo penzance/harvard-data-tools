@@ -28,7 +28,7 @@ import edu.harvard.data.schema.UnexpectedApiResponseException;
 public class CanvasDataCli {
   private static final Logger log = LogManager.getLogger();
 
-  @Argument(index = 0, usage = "Colon-separated list of config files.", metaVar = "/path/to/config1:/path/to/config2", required = true)
+  @Argument(index = 0, usage = "Colon-separated list of config files.", metaVar = "/path/to/config1|/path/to/config2", required = true)
   private String configPaths;
 
   @Argument(index = 1, handler = SubCommandHandler.class, usage = "Canvas data operation.")
@@ -68,7 +68,7 @@ public class CanvasDataCli {
       // Config is set or System.exit is called.
       CanvasDataConfig config = null;
       try {
-        config = CanvasDataConfig.parseFiles(CanvasDataConfig.class, parser.configPaths, true);
+        config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, parser.configPaths, true);
         DumpInfo.init(config.dumpInfoDynamoTable);
         TableInfo.init(config.tableInfoDynamoTable);
         log.info("Using table " + config.dumpInfoDynamoTable + " for dump info.");

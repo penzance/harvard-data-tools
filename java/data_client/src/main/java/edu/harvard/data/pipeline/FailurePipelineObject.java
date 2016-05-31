@@ -11,5 +11,4 @@ public class FailurePipelineObject extends AbstractPipelineObject {
     set("runsOn", infrastructure);
     set("step", command);
   }
-
 }

@@ -22,7 +22,12 @@ public abstract class PipelineStep extends AbstractPipelineObject {
   }
 
   private AbstractPipelineObject getFailureObject() {
-    return new FailurePipelineObject(params, id, pipeline, infrastructure, type);
+    final SnsNotificationPipelineObject fail = new SnsNotificationPipelineObject(params,
+        id + "Failure");
+    fail.setMessage("There are lots of things that could go in here...");
+    fail.setSubject("Activity " + id + " Failure.");
+    fail.setTopicArn(params.failureSnsArn);
+    return fail;
   }
 
   private AbstractPipelineObject getSuccessObject() {

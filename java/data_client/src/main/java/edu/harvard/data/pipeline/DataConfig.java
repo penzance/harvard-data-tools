@@ -104,44 +104,26 @@ public class DataConfig {
     this.dataSourceSchemaVersion = getConfigParameter("data_source_schema_version", verify);
   }
 
-  public static <T extends DataConfig> T parseFiles(final Class<T> cls,
-      final String configPathString, final boolean verify)
-          throws IOException, DataConfigurationException {
-    final List<FileInputStream> streams = new ArrayList<FileInputStream>();
-    try {
-      for (final String file : configPathString.split(":")) {
-        final File f = new File(file);
-        if (!f.exists() || f.isDirectory()) {
-          throw new FileNotFoundException("Can't find configuration file " + f);
-        }
-        streams.add(new FileInputStream(file));
-      }
-      final Constructor<T> constructor = cls.getConstructor(List.class, boolean.class);
-      final T config = constructor.newInstance(streams, verify);
-      config.paths = configPathString;
-      return config;
-    } catch (NoSuchMethodException | SecurityException | InstantiationException
-        | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new DataConfigurationException(e);
-    } finally {
-      for (final FileInputStream in : streams) {
-        in.close();
-      }
-    }
-  }
-
-  public static <T extends DataConfig> T parseS3Files(final Class<T> cls,
+  public static <T extends DataConfig> T parseInputFiles(final Class<T> cls,
       final String configPathString, final boolean verify)
           throws IOException, DataConfigurationException {
     final AwsUtils aws = new AwsUtils();
     final List<InputStream> streams = new ArrayList<InputStream>();
     try {
-      for (final String file : configPathString.split(":")) {
-        final S3ObjectId awsFile = AwsUtils.key(file);
-        if (!aws.isFile(awsFile)) {
-          throw new FileNotFoundException("Can't find configuration S3 key " + file);
+      for (final String file : configPathString.split("|")) {
+        if (file.toLowerCase().startsWith("s3://")) {
+          final S3ObjectId awsFile = AwsUtils.key(file);
+          if (!aws.isFile(awsFile)) {
+            throw new FileNotFoundException("Can't find configuration S3 key " + file);
+          }
+          streams.add(aws.getInputStream(awsFile, false));
+        } else {
+          final File f = new File(file);
+          if (!f.exists() || f.isDirectory()) {
+            throw new FileNotFoundException("Can't find configuration file " + f);
+          }
+          streams.add(new FileInputStream(file));
         }
-        streams.add(aws.getInputStream(awsFile, false));
       }
       final Constructor<T> constructor = cls.getConstructor(List.class, boolean.class);
       final T config = constructor.newInstance(streams, verify);
