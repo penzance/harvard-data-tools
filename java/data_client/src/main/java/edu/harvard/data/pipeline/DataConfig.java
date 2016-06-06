@@ -40,6 +40,7 @@ public class DataConfig {
   public final String intermediateBucket;
   public final String incomingBucket;
   public final String workingBucket;
+  public final String reportBucket;
   public final String redshiftCluster;
   public final String redshiftDatabase;
   public final String redshiftPort;
@@ -49,9 +50,13 @@ public class DataConfig {
   public final String redshiftAccessSecret;
   public final String failureSnsArn;
   public final String successSnsArn;
+  public final String completionSnsArn;
   public final String scratchDir;
   public final String awsKeyId;
   public final String awsSecretKey;
+  public String pipelineDynamoTable;
+
+  public String dataToolsJar;
 
   // XXX To remove...
   public final String lowercaseDatasource;
@@ -59,12 +64,15 @@ public class DataConfig {
 
   private final Properties properties;
 
+
+
   protected DataConfig(final List<? extends InputStream> streams, final boolean verify)
       throws IOException, DataConfigurationException {
     properties = new Properties();
     for (final InputStream in : streams) {
       properties.load(in);
     }
+    this.dataToolsJar = "/home/hadoop/data_tools.jar";
 
     this.scratchDir = getConfigParameter("scratch_dir", verify);
     this.redshiftPort = getConfigParameter("redshift_port", verify);
@@ -92,6 +100,7 @@ public class DataConfig {
     this.codeBucket = getConfigParameter("code_bucket", verify);
     this.intermediateBucket = getConfigParameter("intermediate_bucket", verify);
     this.workingBucket = getConfigParameter("working_bucket", verify);
+    this.reportBucket = getConfigParameter("report_bucket", verify);
     this.redshiftCluster = getConfigParameter("redshift_cluster", verify);
     this.redshiftDatabase = getConfigParameter("redshift_database", verify);
     this.redshiftUserName = getConfigParameter("redshift_user_name", verify);
@@ -100,6 +109,8 @@ public class DataConfig {
     this.redshiftAccessSecret = getConfigParameter("redshift_access_secret", verify);
     this.failureSnsArn = getConfigParameter("failure_sns_arn", verify);
     this.successSnsArn = getConfigParameter("success_sns_arn", verify);
+    this.completionSnsArn = getConfigParameter("completion_sns_arn", verify);
+    this.pipelineDynamoTable = getConfigParameter("pipeline_dynamo_table", verify);
     this.lowercaseDatasource = getConfigParameter("lowercase_data_source", verify);
     this.dataSourceSchemaVersion = getConfigParameter("data_source_schema_version", verify);
   }

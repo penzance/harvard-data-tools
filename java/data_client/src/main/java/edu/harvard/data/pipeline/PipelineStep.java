@@ -5,39 +5,30 @@ public abstract class PipelineStep extends AbstractPipelineObject {
   AbstractPipelineObject dependsOn;
   AbstractPipelineObject infrastructure;
   private final DataPipeline pipeline;
+  protected final String pipelineId;
 
   protected PipelineStep(final DataConfig params, final String id, final String type,
-      final AbstractPipelineObject infrastructure, final DataPipeline pipeline) {
+      final AbstractPipelineObject infrastructure, final DataPipeline pipeline, final String pipelineId) {
     super(params, id, type);
     this.infrastructure = infrastructure;
     this.pipeline = pipeline;
+    this.pipelineId = pipelineId;
 
     set("retryDelay", "2 Minutes");
     set("runsOn", infrastructure);
 
-    final AbstractPipelineObject success = getSuccessObject();
-    set("onSuccess", success);
-    final AbstractPipelineObject failure = getFailureObject();
-    set("onFail", failure);
+    //    final AbstractPipelineObject success = getSuccessObject();
+    //    set("onSuccess", success);
   }
 
-  private AbstractPipelineObject getFailureObject() {
-    final SnsNotificationPipelineObject fail = new SnsNotificationPipelineObject(params,
-        id + "Failure");
-    fail.setMessage("There are lots of things that could go in here...");
-    fail.setSubject("Activity " + id + " Failure.");
-    fail.setTopicArn(params.failureSnsArn);
-    return fail;
-  }
-
-  private AbstractPipelineObject getSuccessObject() {
-    final SnsNotificationPipelineObject success = new SnsNotificationPipelineObject(params,
-        id + "Success");
-    success.setMessage("There are lots of things that could go in here...");
-    success.setSubject("Activity " + id + " Success.");
-    success.setTopicArn(params.successSnsArn);
-    return success;
-  }
+  //  private AbstractPipelineObject getSuccessObject() {
+  //    final SnsNotificationPipelineObject success = new SnsNotificationPipelineObject(params,
+  //        id + "Success");
+  //    success.setMessage("There are lots of things that could go in here...");
+  //    success.setSubject("Activity " + id + " Success.");
+  //    success.setTopicArn(params.successSnsArn);
+  //    return success;
+  //  }
 
   protected String cleanHdfs(final String path) {
     if (path.toLowerCase().startsWith("hdfs://")) {
@@ -54,7 +45,7 @@ public abstract class PipelineStep extends AbstractPipelineObject {
   }
 
   void setDependency(final AbstractPipelineObject dependsOn) {
-    set("dependsOn", new ActionSetup(params, id, infrastructure, dependsOn));
+    set("dependsOn", new ActionSetup(config, id, infrastructure, dependsOn));
   }
 
 }

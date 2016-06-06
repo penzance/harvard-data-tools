@@ -66,12 +66,7 @@ public class CanvasBootstrap {
     final GenerationSpec spec = generator.createGenerationSpec();
     final DataPipelineGenerator pipeline = new DataPipelineGenerator(
         "Canvas_Dump_" + dump.getSequence(), spec, config);
-    final String pipelineId = pipeline.generate();
-    final String subject = "Starting pipeline " + pipelineId + " for dump " + dump.getSequence()
-    + ".";
-    final String msg = "https://console.aws.amazon.com/datapipeline/?#ExecutionDetailsPlace:pipelineId="
-        + pipelineId + "\n" + api.getDump(dump.getDumpId());
-    sendSnsMessage(dump, config, subject, msg);
+    pipeline.generate();
   }
 
   private static void sendSnsMessage(final DataDump dump, final CanvasDataConfig config,

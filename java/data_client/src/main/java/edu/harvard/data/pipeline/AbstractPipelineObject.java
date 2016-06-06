@@ -12,7 +12,7 @@ import edu.harvard.data.DataConfigurationException;
 
 public abstract class AbstractPipelineObject {
 
-  protected final DataConfig params;
+  protected final DataConfig config;
   protected final List<Field> fields;
   protected String id;
   protected String name;
@@ -21,7 +21,7 @@ public abstract class AbstractPipelineObject {
   protected String type;
 
   protected AbstractPipelineObject(final DataConfig params, final String id, final String type) {
-    this.params = params;
+    this.config = params;
     this.id = id;
     this.name = id;
     this.children = new HashSet<AbstractPipelineObject>();

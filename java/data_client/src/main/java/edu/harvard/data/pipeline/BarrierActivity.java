@@ -13,4 +13,8 @@ public class BarrierActivity extends AbstractPipelineObject {
     set("dependsOn", step);
   }
 
+  public void setSuccess(final SnsNotificationPipelineObject success) {
+    set("onSuccess", success);
+  }
+
 }
