@@ -11,7 +11,6 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.TableNameOverride;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
 // When changing this class, remember to update the hdt-monitor pipelines.html template
@@ -20,7 +19,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 public class PipelineExecutionRecord {
   private static final Logger log = LogManager.getLogger();
 
-  public enum Status { Starting, Running, Failed, Succcess }
+  public enum Status { Starting, Running, Failure, Success }
 
   private static DynamoDBMapper mapper;
   private static DynamoDBMapperConfig mapperConfig;
@@ -42,7 +41,7 @@ public class PipelineExecutionRecord {
   @DynamoDBHashKey(attributeName = "pipeline_id")
   private String pipelineId;
 
-  @DynamoDBRangeKey(attributeName = "pipeline_created")
+  @DynamoDBAttribute(attributeName = "pipeline_created")
   private Date pipelineCreated;
 
   @DynamoDBAttribute(attributeName = "pipeline_name")
