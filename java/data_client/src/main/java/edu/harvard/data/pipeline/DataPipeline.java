@@ -34,7 +34,7 @@ public class DataPipeline extends AbstractPipelineObject {
 
   private AbstractPipelineObject getFailureObject() throws JsonProcessingException {
     final PipelineCompletionMessage completion = new PipelineCompletionMessage(pipelineId,
-        config.reportBucket, config.failureSnsArn);
+        config.reportBucket, config.failureSnsArn, config.pipelineDynamoTable);
     final String msg = new ObjectMapper().writeValueAsString(completion);
     final SnsNotificationPipelineObject failure = new SnsNotificationPipelineObject(config,
         "FailureSnsAlert", "PipelineFailed", msg, config.completionSnsArn);

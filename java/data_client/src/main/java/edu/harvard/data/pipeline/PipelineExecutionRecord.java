@@ -11,11 +11,16 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.TableNameOverride;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
+// When changing this class, remember to update the hdt-monitor pipelines.html template
+// as well if needed.
 @DynamoDBTable(tableName = "DummyTableName")
 public class PipelineExecutionRecord {
   private static final Logger log = LogManager.getLogger();
+
+  public enum Status { Starting, Running, Failed, Succcess }
 
   private static DynamoDBMapper mapper;
   private static DynamoDBMapperConfig mapperConfig;
@@ -37,14 +42,17 @@ public class PipelineExecutionRecord {
   @DynamoDBHashKey(attributeName = "pipeline_id")
   private String pipelineId;
 
+  @DynamoDBRangeKey(attributeName = "pipeline_created")
+  private Date pipelineCreated;
+
   @DynamoDBAttribute(attributeName = "pipeline_name")
   private String pipelineName;
 
-  @DynamoDBAttribute(attributeName = "pipeline_created")
-  private Date pipelineCreated;
-
   @DynamoDBAttribute(attributeName = "pipeline_start")
   private Date pipelineStart;
+
+  @DynamoDBAttribute(attributeName = "pipeline_end")
+  private Date pipelineEnd;
 
   @DynamoDBAttribute(attributeName = "config")
   private String configString;
@@ -55,8 +63,11 @@ public class PipelineExecutionRecord {
   @DynamoDBAttribute(attributeName = "current_step_start")
   private Date currentStepStart;
 
-  @DynamoDBAttribute(attributeName = "previousSteps")
+  @DynamoDBAttribute(attributeName = "previous_steps")
   private String previousSteps;
+
+  @DynamoDBAttribute(attributeName = "status")
+  private String status;
 
   public static PipelineExecutionRecord find(final String pipelineId) {
     if (tableName == null) {
@@ -136,6 +147,22 @@ public class PipelineExecutionRecord {
 
   public void setPipelineCreated(final Date pipelineCreated) {
     this.pipelineCreated = pipelineCreated;
+  }
+
+  public String getStatus() {
+    return status;
+  }
+
+  public void setStatus(final String status) {
+    this.status = status;
+  }
+
+  public Date getPipelineEnd() {
+    return pipelineEnd;
+  }
+
+  public void setPipelineEnd(final Date pipelineEnd) {
+    this.pipelineEnd = pipelineEnd;
   }
 
 }

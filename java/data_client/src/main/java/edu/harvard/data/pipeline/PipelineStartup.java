@@ -17,6 +17,7 @@ public class PipelineStartup {
     // TODO: Check for missing record
 
     record.setPipelineStart(new Date());
+    record.setStatus(PipelineExecutionRecord.Status.Running.toString());
     record.save();
   }
 

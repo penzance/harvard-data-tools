@@ -58,6 +58,7 @@ public class DataPipelineGenerator {
     record.setPipelineName(pipelineName);
     record.setConfigString(config.paths);
     record.setPipelineCreated(new Date());
+    record.setStatus(PipelineExecutionRecord.Status.Starting.toString());
     record.save();
   }
 
@@ -83,11 +84,10 @@ public class DataPipelineGenerator {
 
   private BarrierActivity populateStartup() throws JsonProcessingException {
     final BarrierActivity barrier = new BarrierActivity(config, "StartupBarrier", infrastructure);
-    final String subject = "Activating pipeline " + pipelineName;
-    final String msg = "Pipeline started";
-    final SnsNotificationPipelineObject startup = new SnsNotificationPipelineObject(config,
-        "StartupSNSMessage", subject, msg, config.successSnsArn);
-    barrier.setSuccess(startup);
+
+    final StartupActivity startup = new StartupActivity(config, "PipelineStartup", infrastructure,
+        pipelineId);
+    barrier.addDependency(startup);
     pipeline.addChild(barrier);
     return barrier;
   }
@@ -143,7 +143,7 @@ public class DataPipelineGenerator {
   private void populateCleanup(final BarrierActivity previousBarrier, final String pipelineId)
       throws JsonProcessingException {
     final PipelineCompletionMessage success = new PipelineCompletionMessage(pipelineId,
-        config.reportBucket, config.successSnsArn);
+        config.reportBucket, config.successSnsArn, config.pipelineDynamoTable);
     final String msg = new ObjectMapper().writeValueAsString(success);
     final SnsNotificationPipelineObject completion = new SnsNotificationPipelineObject(config,
         "CompletionSnsAlert", "PipelineSuccess", msg, config.completionSnsArn);

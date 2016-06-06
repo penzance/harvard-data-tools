@@ -11,6 +11,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.TableNameOverride;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
 // TODO: This is a direct copy/paste from data-tools, and needs to be fixed.
@@ -45,11 +46,11 @@ public class PipelineExecutionRecord {
   @DynamoDBHashKey(attributeName = "pipeline_id")
   private String pipelineId;
 
+  @DynamoDBRangeKey(attributeName = "pipeline_created")
+  private Date pipelineCreated;
+
   @DynamoDBAttribute(attributeName = "pipeline_name")
   private String pipelineName;
-
-  @DynamoDBAttribute(attributeName = "pipeline_created")
-  private Date pipelineCreated;
 
   @DynamoDBAttribute(attributeName = "pipeline_start")
   private Date pipelineStart;

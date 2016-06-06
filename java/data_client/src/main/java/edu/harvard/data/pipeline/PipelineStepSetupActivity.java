@@ -10,7 +10,7 @@ class PipelineStepSetupActivity extends AbstractPipelineObject {
   protected PipelineStepSetupActivity(final DataConfig params, final String id,
       final AbstractPipelineObject infrastructure, final AbstractPipelineObject dependsOn,
       final String pipelineId, final String step) {
-    super(params, id + "LoggingSetup", "ShellCommandActivity");
+    super(params, id + "LoggingSetup", "EmrActivity");
     set("runsOn", infrastructure);
     if (dependsOn != null) {
       set("dependsOn", dependsOn);

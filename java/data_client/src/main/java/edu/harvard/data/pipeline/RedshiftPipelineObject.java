@@ -10,7 +10,7 @@ public class RedshiftPipelineObject extends AbstractPipelineObject {
     set("clusterId", params.redshiftCluster);
     set("username", params.redshiftUserName);
     set("*password", params.redshiftPassword);
-    set("databaseName", params.redshiftUserName);
+    set("databaseName", params.redshiftDatabase);
     db.setFields(fields);
   }
 
