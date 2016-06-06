@@ -139,3 +139,30 @@ public class PipelineExecutionRecord {
   }
 
 }
+
+class PreviousStepDescription {
+  private String step;
+  private Date start;
+  private Date end;
+
+  public PreviousStepDescription() {}
+
+  public PreviousStepDescription(final String step, final Date start, final Date end) {
+    this.step = step;
+    this.start = start;
+    this.end = end;
+  }
+
+  public String getStep() {
+    return step;
+  }
+
+  public Date getStart() {
+    return start;
+  }
+
+  public Date getEnd() {
+    return end;
+  }
+
+}
