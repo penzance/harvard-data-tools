@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,8 @@ import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.PublishRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+
+import edu.harvard.data.PipelineExecutionRecord.Status;
 
 public class PipelineComplete implements RequestHandler<SNSEvent, String> {
   private static final Logger log = LogManager.getLogger();
@@ -81,6 +84,7 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
       this.pipelineId = data.get("pipelineId");
       this.outputKey = key(data.get("reportBucket"), this.pipelineId + ".json");
       this.snsArn = data.get("snsArn");
+      PipelineExecutionRecord.init(data.get("pipelineDynamoTable"));
       this.process();
     } catch (final IOException e) {
       return e.toString();
@@ -103,7 +107,20 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
     s3Client.putObject(outputKey.getBucket(), outputKey.getKey(), new ByteArrayInputStream(bytes),
         metadata);
     System.out.println("Wrote output to " + outputKey);
+    updateDynamo();
     sendSnsMessage();
+  }
+
+  private void updateDynamo() {
+    final PipelineExecutionRecord record = PipelineExecutionRecord.find(pipelineId);
+    // TODO: Check if record doesn't exist.
+    record.setPipelineEnd(new Date());
+    if (report.getFailure() == null) {
+      record.setStatus(Status.Succcess.toString());
+    } else {
+      record.setStatus(Status.Failed.toString());
+    }
+    record.save();
   }
 
   private void getPipelineObjects() {
@@ -138,7 +155,9 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
     for (final String objName : pipelineObjects.keySet()) {
       final PipelineObject obj = pipelineObjects.get(objName).getPipelineObject();
       final String endTime = getStringField(obj.getFields(), "@actualEndTime");
-      objects.put(endTime, pipelineObjects.get(objName));
+      if (endTime != null) {
+        objects.put(endTime, pipelineObjects.get(objName));
+      }
     }
     final List<String> times = new ArrayList<String>(objects.keySet());
     Collections.sort(times);
