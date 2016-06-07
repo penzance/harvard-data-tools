@@ -35,7 +35,7 @@ public class UpdateRedshiftCommand implements Command {
         config.canvasApiKey, config.canvasApiSecret);
     final DumpInfo info = DumpInfo.find(dumpId);
 
-    final CanvasCodeGenerator generator = new CanvasCodeGenerator(null, null, null, null, config);
+    final CanvasCodeGenerator generator = new CanvasCodeGenerator(null, null, null, config, null);
     final DataSchema schema0 = api.getSchema(info.getSchemaVersion());
     final DataSchema schema3 = generator.transformSchema(schema0).get(3);
     try {

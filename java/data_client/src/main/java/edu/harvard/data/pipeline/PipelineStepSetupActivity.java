@@ -20,7 +20,7 @@ class PipelineStepSetupActivity extends AbstractPipelineObject {
 
   private String getLaunchString(final String pipelineId, final String step) {
     final List<String> args = new ArrayList<String>();
-    args.add(config.dataToolsJar); // Jar name
+    args.add(config.emrCodeDir + "/" + config.dataToolsJar); // Jar name
     args.add(PipelineStepSetup.class.getCanonicalName()); // Class name
     args.add(pipelineId); // args[0] in main class
     args.add(config.pipelineDynamoTable); // args[1] in main class

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.harvard.data.identity.IdentifierType;
+import edu.harvard.data.pipeline.DataConfig;
 import edu.harvard.data.schema.DataSchema;
 
 /**
@@ -23,6 +24,7 @@ public class GenerationSpec {
   private IdentifierType mainIdentifier;
   private String javaProjectName;
   private File hiveScriptDir;
+  private DataConfig config;
 
   public GenerationSpec(final int transformationPhaseCount) {
     this.phases = new ArrayList<SchemaPhase>();
@@ -88,6 +90,14 @@ public class GenerationSpec {
 
   public File getHiveScriptDir() {
     return hiveScriptDir;
+  }
+
+  public void setConfig(final DataConfig config) {
+    this.config = config;
+  }
+
+  public DataConfig getConfig() {
+    return config;
   }
 
   public void setJavaBindingPackages(final String... packageList) {

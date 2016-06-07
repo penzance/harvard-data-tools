@@ -10,25 +10,41 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.amazonaws.services.s3.model.S3ObjectId;
+
+import edu.harvard.data.identity.IdentityMap;
 import edu.harvard.data.schema.DataSchemaColumn;
 import edu.harvard.data.schema.DataSchemaTable;
 
 public class S3ToRedshiftLoaderGenerator {
 
   private final File dir;
-  private final GenerationSpec schemaVersions;
+  private final GenerationSpec spec;
+  private final S3ObjectId workingDir;
 
-  public S3ToRedshiftLoaderGenerator(final File dir, final GenerationSpec schemaVersions) {
+  public S3ToRedshiftLoaderGenerator(final File dir, final GenerationSpec spec,
+      final S3ObjectId workingDir) {
     this.dir = dir;
-    this.schemaVersions = schemaVersions;
+    this.spec = spec;
+    this.workingDir = workingDir;
   }
 
   public void generate() throws IOException {
-    final File createTableFile = new File(dir, "s3_to_redshift_loader.sql");
+    final File createTableFile = new File(dir, spec.getConfig().redshiftLoadScript);
+    final File identityTableFile = new File(dir, spec.getConfig().identityRedshiftLoadScript);
 
     try (final PrintStream out = new PrintStream(new FileOutputStream(createTableFile))) {
-      generateRedshiftLoaderFile(out, schemaVersions.getPhase(3));
+      generateRedshiftLoaderFile(out, spec.getPhase(3));
     }
+    try (final PrintStream out = new PrintStream(new FileOutputStream(identityTableFile))) {
+      generateIdentityRedshiftLoaderFile(out, spec.getPhase(3));
+    }
+  }
+
+  private void generateIdentityRedshiftLoaderFile(final PrintStream out, final SchemaPhase phase) {
+    final DataSchemaTable table = IdentityMap.getIdentityMapTable();
+    final String columnList = getColumnList(table);
+    outputPartialTableUpdate(out, table, columnList);
   }
 
   private void generateRedshiftLoaderFile(final PrintStream out, final SchemaPhase phase) {
@@ -40,19 +56,7 @@ public class S3ToRedshiftLoaderGenerator {
     Collections.sort(tableNames);
     for (final String tableName : tableNames) {
       final DataSchemaTable table = phase.getSchema().getTableByName(tableName);
-      String columnList = "(";
-      for (int i = 0; i < table.getColumns().size(); i++) {
-        final DataSchemaColumn column = table.getColumns().get(i);
-        String columnName = column.getName();
-        if (columnName.contains(".")) {
-          columnName = columnName.substring(columnName.lastIndexOf(".") + 1);
-        }
-        if (i > 0) {
-          columnList += ",";
-        }
-        columnList += columnName;
-      }
-      columnList += ")";
+      final String columnList = getColumnList(table);
 
       if (!table.isTemporary()) {
         final Set<String> partialTables = new HashSet<String>();
@@ -61,13 +65,31 @@ public class S3ToRedshiftLoaderGenerator {
         partialTables.add("event");
         partialTables.add("video");
         partialTables.add("session");
-        if (partialTables.contains(table.getTableName())) { // TODO: Make this dynamic for the dump being processed.
+        // TODO: Make this dynamic for the dump being processed.
+        if (partialTables.contains(table.getTableName())) {
           outputPartialTableUpdate(out, table, columnList);
         } else {
           outputTableOverwrite(out, table, columnList);
         }
       }
     }
+  }
+
+  private String getColumnList(final DataSchemaTable table) {
+    String columnList = "(";
+    for (int i = 0; i < table.getColumns().size(); i++) {
+      final DataSchemaColumn column = table.getColumns().get(i);
+      String columnName = column.getName();
+      if (columnName.contains(".")) {
+        columnName = columnName.substring(columnName.lastIndexOf(".") + 1);
+      }
+      if (i > 0) {
+        columnList += ",";
+      }
+      columnList += columnName;
+    }
+    columnList += ")";
+    return columnList;
   }
 
   private void outputPartialTableUpdate(final PrintStream out, final DataSchemaTable table,
@@ -82,9 +104,8 @@ public class S3ToRedshiftLoaderGenerator {
     out.println("CREATE TEMPORARY TABLE " + stageTableName + " (LIKE " + tableName + ");");
 
     // Copy the final incoming data into final the stage table
-    out.println("COPY " + stageTableName + " " + columnList
-        + " FROM '<intermediates3bucketandpath>/" + tableName
-        + "/' CREDENTIALS '<awskeyandsecret>' DELIMITER '\\t' TRUNCATECOLUMNS GZIP;");
+    out.println("COPY " + stageTableName + " " + columnList + " FROM " + getLocation(tableName)
+    + " CREDENTIALS " + getCredentials() + " DELIMITER '\\t' TRUNCATECOLUMNS GZIP;");
 
     // Use an inner join with the staging table to delete the rows from the
     // target table that are being updated.
@@ -117,8 +138,8 @@ public class S3ToRedshiftLoaderGenerator {
     out.println("TRUNCATE " + tableName + ";");
     out.println("VACUUM " + tableName + ";");
     out.println("ANALYZE " + tableName + ";");
-    out.println("COPY " + tableName + " " + columnList + " FROM '<intermediates3bucketandpath>/"
-        + tableName + "/' CREDENTIALS '<awskeyandsecret>' DELIMITER '\\t' TRUNCATECOLUMNS GZIP;");
+    out.println("COPY " + tableName + " " + columnList + " FROM " + getLocation(tableName)
+    + " CREDENTIALS " + getCredentials() + " DELIMITER '\\t' TRUNCATECOLUMNS GZIP;");
     out.println("VACUUM " + tableName + ";");
     out.println("ANALYZE " + tableName + ";");
     out.println();
@@ -133,5 +154,14 @@ public class S3ToRedshiftLoaderGenerator {
     out.println("-- for Redshift update strategies.");
     out.println();
     out.println();
+  }
+
+  private String getCredentials() {
+    return "'aws_access_key_id=" + spec.getConfig().awsKeyId + ";aws_secret_access_key="
+        + spec.getConfig().awsSecretKey + "'";
+  }
+
+  private String getLocation(final String tableName) {
+    return "'s3://" + workingDir.getBucket() + "/" + workingDir.getKey() + "/" + tableName + "/'";
   }
 }

@@ -16,6 +16,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.VerificationException;
@@ -45,9 +46,12 @@ public class MatterhornCodeGenerator extends CodeGenerator {
   private final String schemaVersion;
   private final File gitDir;
 
-  public MatterhornCodeGenerator(final String schemaVersion, final File gitDir, final File codeDir)
-      throws FileNotFoundException {
-    super(codeDir);
+  private final MatterhornDataConfig config;
+
+  public MatterhornCodeGenerator(final String schemaVersion, final File gitDir, final File codeDir,
+      final MatterhornDataConfig config, final String pipelineId) throws FileNotFoundException {
+    super(codeDir, AwsUtils.key(config.workingBucket, pipelineId));
+    this.config = config;
     if (!gitDir.exists() && gitDir.isDirectory()) {
       throw new FileNotFoundException(gitDir.toString());
     }
@@ -57,15 +61,21 @@ public class MatterhornCodeGenerator extends CodeGenerator {
 
   public static void main(final String[] args) throws IOException, DataConfigurationException,
   UnexpectedApiResponseException, SQLException, VerificationException {
-    if (args.length != 3) {
-      System.err
-      .println("Usage: schema_version /path/to/harvard-data-tools /path/to/output/directory");
+    if (args.length != 5) {
+      System.err.println(
+          "Usage: schema_version /path/to/config1|/path/to/config2 /path/to/harvard-data-tools /path/to/output/directory pipeline_id");
     }
     final String schemaVersion = args[0];
-    final File gitDir = new File(args[1]);
-    final File dir = new File(args[2]);
-
-    new MatterhornCodeGenerator(schemaVersion, gitDir, dir).generate();
+    final String configFiles = args[1];
+    final File gitDir = new File(args[2]);
+    final File dir = new File(args[3]);
+    final String pipelineId = args[4];
+    if (!(gitDir.exists() && gitDir.isDirectory())) {
+      throw new FileNotFoundException(gitDir.toString());
+    }
+    final MatterhornDataConfig config = MatterhornDataConfig.parseInputFiles(MatterhornDataConfig.class,
+        configFiles, false);
+    new MatterhornCodeGenerator(schemaVersion, gitDir, dir, config, pipelineId).generate();
   }
 
   @Override
@@ -82,6 +92,7 @@ public class MatterhornCodeGenerator extends CodeGenerator {
     spec.setHadoopIdentityManagerClass("MatterhornIdentityHadoopManager");
     spec.setMainIdentifier(IdentifierType.HUID);
     spec.setHiveScriptDir(new File(gitDir, "hive/matterhorn"));
+    spec.setConfig(config);
 
     // Set the four schema versions in the spec.
     final DataSchema schema0 = readSchema(schemaVersion);

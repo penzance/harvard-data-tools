@@ -9,9 +9,12 @@ import edu.harvard.data.DataConfigurationException;
 
 public class EmrPipelineObject extends AbstractPipelineObject {
 
-  protected EmrPipelineObject(final DataConfig params, final String id)
+  private final String pipelineId;
+
+  protected EmrPipelineObject(final DataConfig params, final String id, final String pipelineId)
       throws DataConfigurationException {
     super(params, id, "EmrCluster");
+    this.pipelineId = pipelineId;
     set("useOnDemandOnLastAttempt", "true");
     set("keyPair", params.keypair);
     set("releaseLabel", params.emrReleaseLabel);
@@ -58,6 +61,8 @@ public class EmrPipelineObject extends AbstractPipelineObject {
     bootstrapParams.add(params.codeBucket);
     bootstrapParams.add(params.lowercaseDatasource);
     bootstrapParams.add(params.paths);
+    bootstrapParams.add(pipelineId);
+    bootstrapParams.add(params.emrCodeDir);
     return StringUtils.join(bootstrapParams, ",");
   }
 }

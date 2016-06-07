@@ -19,7 +19,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 public class PipelineExecutionRecord {
   private static final Logger log = LogManager.getLogger();
 
-  public enum Status { Starting, Running, Failure, Success }
+  public enum Status { Created, Starting, Running, Failure, Success }
 
   private static DynamoDBMapper mapper;
   private static DynamoDBMapperConfig mapperConfig;

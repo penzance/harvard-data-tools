@@ -58,9 +58,10 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
 
   public static void main(final String[] args) throws IOException {
     final PipelineComplete p = new PipelineComplete();
-    p.pipelineId = "df-06338439LCL5ZTNDRPC";
+    p.pipelineId = "df-0207758LL182UCPY2WI";
     p.outputKey = p.key("hdt-pipeline-reports", p.pipelineId + ".json");
     p.snsArn = "arn:aws:sns:us-east-1:364469542718:hdtdevcanvas-FailureSNS-4W2G2I1H8I65";
+    PipelineExecutionRecord.init("hdt-pipeline");
     p.process();
   }
 
@@ -209,6 +210,9 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
       getStepPath(obj, stepName, logs);
       getContainerUrl(logs);
       break;
+      //    case "EmrActivity":
+      //      System.out.println(obj + "\n\n");
+      //      break;
     case "EmrCluster":
       break;
     default:

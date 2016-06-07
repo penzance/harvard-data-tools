@@ -46,8 +46,8 @@ public class DataConfig {
   public final String redshiftPort;
   public final String redshiftUserName;
   public final String redshiftPassword;
-  public final String redshiftAccessKey;
-  public final String redshiftAccessSecret;
+  public final String redshiftAccessKey; // Same as the awsKeyID
+  public final String redshiftAccessSecret; // Same as the awsSecretKey
   public final String failureSnsArn;
   public final String successSnsArn;
   public final String completionSnsArn;
@@ -56,7 +56,10 @@ public class DataConfig {
   public final String awsSecretKey;
   public String pipelineDynamoTable;
 
+  public String emrCodeDir;
   public String dataToolsJar;
+  public String identityRedshiftLoadScript;
+  public String redshiftLoadScript;
 
   // XXX To remove...
   public final String lowercaseDatasource;
@@ -64,15 +67,16 @@ public class DataConfig {
 
   private final Properties properties;
 
-
-
   protected DataConfig(final List<? extends InputStream> streams, final boolean verify)
       throws IOException, DataConfigurationException {
     properties = new Properties();
     for (final InputStream in : streams) {
       properties.load(in);
     }
-    this.dataToolsJar = "/home/hadoop/data_tools.jar";
+    this.dataToolsJar = "data_tools.jar";
+    this.identityRedshiftLoadScript = "s3_to_redshift_identity_loader.sql";
+    this.redshiftLoadScript = "s3_to_redshift_loader.sql";
+    this.emrCodeDir = "/home/hadoop/code";
 
     this.scratchDir = getConfigParameter("scratch_dir", verify);
     this.redshiftPort = getConfigParameter("redshift_port", verify);

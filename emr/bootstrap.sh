@@ -9,6 +9,8 @@ export AWS_SECRET_KEY=$6
 export CODE_BUCKET=$7
 export STREAM=$8
 export CONFIG_PATHS=$9
+export PIPELINE_ID=$10
+export HARVARD_DATA_GENERATED_OUTPUT=$11
 
 # - HARVARD_DATA_TOOLS_BASE: the directory where the harvard-data-tools
 #     repository has been checked out. Point to the root of the repository, e.g.
@@ -19,10 +21,6 @@ export HARVARD_DATA_TOOLS_BASE=/home/hadoop/harvard-data-tools
 #     file modelled after the template in:
 #     java/aws_data_tools/src/main/resources/secure.properties.example
 export SECURE_PROPERTIES_LOCATION=/home/hadoop
-
-# - HARVARD_DATA_GENERATED_OUTPUT: the directory where generated scripts and
-#     .jar files should be stored.
-export HARVARD_DATA_GENERATED_OUTPUT=/home/hadoop
 
 # - DATA_SCHEMA_VERSION: The version of the data schema for which
 #     files will be generated. Format as a string, e.g. 1.2.0
@@ -70,7 +68,7 @@ sudo service awslogs start
 # DUMPID=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$(curl http://169.254.169.254/latest/meta-data/instance-id)" "Name=key,Values=dump-id" --query 'Tags[*].[Value]' --output text --region us-east-1)
 
 # Get FULLDUMPID from tags
-FULLDUMPPATH=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$(curl http://169.254.169.254/latest/meta-data/instance-id)" "Name=key,Values=full-dump-path" --query 'Tags[*].[Value]' --output text --region us-east-1)
+#FULLDUMPPATH=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$(curl http://169.254.169.254/latest/meta-data/instance-id)" "Name=key,Values=full-dump-path" --query 'Tags[*].[Value]' --output text --region us-east-1)
 
 # Credit for the following grep magic goes to http://stackoverflow.com/a/20488535
 # Get the path to the data files in the intermediate S3 bucket, assign to env variable
@@ -79,14 +77,14 @@ FULLDUMPPATH=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$(curl h
 #DATASETNUM=$(grep -Po '(?<=\"DUMP_SEQUENCE\" : \")[^\"]*' /root/the_result.json)
 
 # Replace <intermediates3bucketandpath> placeholder with real intermediate bucket name and path
-sed -i "s@<intermediates3bucketandpath>/@s3://$INTERMEDIATE_BUCKET/$FULLDUMPPATH@g" /home/hadoop/s3_to_redshift_loader.sql
+#sed -i "s@<intermediates3bucketandpath>/@s3://$INTERMEDIATE_BUCKET/$FULLDUMPPATH@g" /home/hadoop/s3_to_redshift_loader.sql
 
 # Replace <awskeyandsecret> placeholder with real creds
-sed -i "s@<awskeyandsecret>@aws_access_key_id=$AWS_ACCESS_KEY;aws_secret_access_key=$AWS_SECRET_KEY@g" /home/hadoop/s3_to_redshift_loader.sql
+#sed -i "s@<awskeyandsecret>@aws_access_key_id=$AWS_ACCESS_KEY;aws_secret_access_key=$AWS_SECRET_KEY@g" /home/hadoop/s3_to_redshift_loader.sql
 
 # Copy modified file to code S3 bucket, name it with data set number.
-if [ "$DUMPID" != "" ]; then
-  aws s3 cp /home/hadoop/s3_to_redshift_loader.sql s3://$CODE_BUCKET/$DUMPID.sql
-else
-  aws s3 cp /home/hadoop/s3_to_redshift_loader.sql s3://$CODE_BUCKET/matterhorn.sql
-fi
+#if [ "$DUMPID" != "" ]; then
+#  aws s3 cp /home/hadoop/s3_to_redshift_loader.sql s3://$CODE_BUCKET/$DUMPID.sql
+#else
+#  aws s3 cp /home/hadoop/s3_to_redshift_loader.sql s3://$CODE_BUCKET/matterhorn.sql
+#fi

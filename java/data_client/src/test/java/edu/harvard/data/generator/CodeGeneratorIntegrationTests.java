@@ -313,7 +313,7 @@ class TestCodeGenerator extends CodeGenerator {
 
   public TestCodeGenerator(final File codeDir, final File hiveDir, final DataSchema schema0)
       throws FileNotFoundException {
-    super(codeDir);
+    super(codeDir, null);
     this.hiveDir = hiveDir;
     this.schema0 = schema0;
   }

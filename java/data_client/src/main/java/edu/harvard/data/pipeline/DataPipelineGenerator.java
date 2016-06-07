@@ -19,6 +19,9 @@ import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.generator.GenerationSpec;
 
+// TODO: Step to store SQL scripts into working bucket.
+// TODO: Cut down on the number of parameters being passed around.
+
 public class DataPipelineGenerator {
   private static final Logger log = LogManager.getLogger();
 
@@ -58,54 +61,30 @@ public class DataPipelineGenerator {
     record.setPipelineName(pipelineName);
     record.setConfigString(config.paths);
     record.setPipelineCreated(new Date());
-    record.setStatus(PipelineExecutionRecord.Status.Starting.toString());
+    record.setStatus(PipelineExecutionRecord.Status.Created.toString());
     record.save();
   }
 
   private void populatePipeline() throws DataConfigurationException, JsonProcessingException {
-    infrastructure = populateInfrastructure();
-    BarrierActivity previousBarrier;
-    previousBarrier = populateStartup();
-    previousBarrier = populateUnload(previousBarrier);
-    previousBarrier = populateS3ToHdfs(previousBarrier);
-    previousBarrier = populateHdfsToS3(previousBarrier);
+    populateInfrastructure();
+
+    final Phase1PipelineSetup phase1 = new Phase1PipelineSetup(spec, config, infrastructure);
+    final EmrStartupPipelineSetup setup = new EmrStartupPipelineSetup(config, infrastructure);
+
+    AbstractPipelineObject previousStep;
+    previousStep = setup.populate();
+    previousStep = phase1.populate(previousStep);
 
     // Must be last
-    populateCleanup(previousBarrier, pipelineId);
+    pipeline.addChild(previousStep);
+    populateCleanup(previousStep, pipelineId);
   }
 
-  private DataPipelineInfrastructure populateInfrastructure() throws DataConfigurationException {
-    final DataPipelineInfrastructure infra = new DataPipelineInfrastructure(pipeline, config, name);
-    pipeline.setField("schedule", infra.schedule);
-    pipeline.addChild(infra.redshift);
-    pipeline.addChild(infra.emr);
-    return infra;
-  }
-
-  private BarrierActivity populateStartup() throws JsonProcessingException {
-    final BarrierActivity barrier = new BarrierActivity(config, "StartupBarrier", infrastructure);
-
-    final StartupActivity startup = new StartupActivity(config, "PipelineStartup", infrastructure,
-        pipelineId);
-    barrier.addDependency(startup);
-    pipeline.addChild(barrier);
-    return barrier;
-  }
-
-  private BarrierActivity populateUnload(final BarrierActivity previousBarrier) {
-    final BarrierActivity barrier = new BarrierActivity(config, "RedshiftUnloadBarrier",
-        infrastructure);
-
-    final String sql = "SELECT * FROM identity_map";
-    final S3ObjectId dest = AwsUtils.key(config.workingBucket, pipelineId, "unloaded_tables",
-        "identity_map");
-    final UnloadTablePipelineActivity unloadId = new UnloadTablePipelineActivity(config,
-        infrastructure, "UnloadIdentity", sql, dest, pipelineId);
-    unloadId.setDependency(previousBarrier);
-    barrier.addDependency(unloadId);
-
-    pipeline.addChild(barrier);
-    return barrier;
+  private void populateInfrastructure() throws DataConfigurationException {
+    infrastructure = new DataPipelineInfrastructure(pipeline, config, name, pipelineId);
+    pipeline.setField("schedule", infrastructure.schedule);
+    pipeline.addChild(infrastructure.redshift);
+    pipeline.addChild(infrastructure.emr);
   }
 
   private BarrierActivity populateS3ToHdfs(final BarrierActivity previousBarrier) {
@@ -140,14 +119,14 @@ public class DataPipelineGenerator {
     return barrier;
   }
 
-  private void populateCleanup(final BarrierActivity previousBarrier, final String pipelineId)
+  private void populateCleanup(final AbstractPipelineObject previousStep, final String pipelineId)
       throws JsonProcessingException {
     final PipelineCompletionMessage success = new PipelineCompletionMessage(pipelineId,
         config.reportBucket, config.successSnsArn, config.pipelineDynamoTable);
     final String msg = new ObjectMapper().writeValueAsString(success);
     final SnsNotificationPipelineObject completion = new SnsNotificationPipelineObject(config,
         "CompletionSnsAlert", "PipelineSuccess", msg, config.completionSnsArn);
-    previousBarrier.setSuccess(completion);
+    previousStep.setSuccess(completion);
   }
 
 }
@@ -157,13 +136,15 @@ class DataPipelineInfrastructure {
   final RedshiftPipelineObject redshift;
   final EmrPipelineObject emr;
   final DataPipeline pipeline;
+  final String pipelineId;
 
   public DataPipelineInfrastructure(final DataPipeline pipeline, final DataConfig config,
-      final String name) throws DataConfigurationException {
+      final String name, final String pipelineId) throws DataConfigurationException {
     this.pipeline = pipeline;
+    this.pipelineId = pipelineId;
     schedule = new SchedulePipelineObject(config, "DefaultSchedule");
     schedule.setName("RunOnce");
     redshift = new RedshiftPipelineObject(config, "RedshiftDatabase");
-    emr = new EmrPipelineObject(config, name + "_Emr_Cluster");
+    emr = new EmrPipelineObject(config, name + "_Emr_Cluster", pipelineId);
   }
 }

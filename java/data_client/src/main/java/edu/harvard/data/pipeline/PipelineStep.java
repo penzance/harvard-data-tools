@@ -7,10 +7,10 @@ public abstract class PipelineStep extends AbstractPipelineObject {
   private final DataPipeline pipeline;
   protected final String pipelineId;
 
-  protected PipelineStep(final DataConfig params, final String id, final String type,
+  protected PipelineStep(final DataConfig config, final String id, final String type,
       final AbstractPipelineObject infrastructure, final DataPipeline pipeline,
       final String pipelineId) {
-    super(params, id, type);
+    super(config, id, type);
     this.infrastructure = infrastructure;
     this.pipeline = pipeline;
     this.pipelineId = pipelineId;

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.canvas.data_api.ApiClient;
@@ -39,9 +40,9 @@ public class CanvasCodeGenerator extends CodeGenerator {
   private final File gitDir;
   private final CanvasDataConfig config;
 
-  public CanvasCodeGenerator(final String schemaVersion, final String configFiles,
-      final File gitDir, final File codeDir, final CanvasDataConfig config) throws FileNotFoundException {
-    super(codeDir);
+  public CanvasCodeGenerator(final String schemaVersion, final File gitDir, final File codeDir,
+      final CanvasDataConfig config, final String pipelineId) throws FileNotFoundException {
+    super(codeDir, AwsUtils.key(config.workingBucket, pipelineId));
     this.gitDir = gitDir;
     this.schemaVersion = schemaVersion;
     this.config = config;
@@ -49,19 +50,21 @@ public class CanvasCodeGenerator extends CodeGenerator {
 
   public static void main(final String[] args) throws IOException, DataConfigurationException,
   UnexpectedApiResponseException, SQLException, VerificationException {
-    if (args.length != 4) {
+    if (args.length != 5) {
       System.err.println(
-          "Usage: schema_version /path/to/config1|/path/to/config2 /path/to/harvard-data-tools /path/to/output/directory");
+          "Usage: schema_version /path/to/config1|/path/to/config2 /path/to/harvard-data-tools /path/to/output/directory pipeline_id");
     }
     final String schemaVersion = args[0];
     final String configFiles = args[1];
     final File gitDir = new File(args[2]);
     final File dir = new File(args[3]);
+    final String pipelineId = args[4];
     if (!(gitDir.exists() && gitDir.isDirectory())) {
       throw new FileNotFoundException(gitDir.toString());
     }
-    final CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, configFiles, false);
-    new CanvasCodeGenerator(schemaVersion, configFiles, gitDir, dir, config).generate();
+    final CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class,
+        configFiles, false);
+    new CanvasCodeGenerator(schemaVersion, gitDir, dir, config, pipelineId).generate();
   }
 
   @Override
@@ -79,7 +82,7 @@ public class CanvasCodeGenerator extends CodeGenerator {
     spec.setHadoopIdentityManagerClass("CanvasIdentityHadoopManager");
     spec.setMainIdentifier(IdentifierType.CanvasDataID);
     spec.setHiveScriptDir(new File(gitDir, "hive/canvas"));
-
+    spec.setConfig(config);
 
     // Get the specified schema version (or fail if that version doesn't exist).
     final String host = config.canvasDataHost;

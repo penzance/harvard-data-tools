@@ -25,7 +25,8 @@ public class CanvasBootstrap {
 
   public static void main(final String[] args) throws IOException, DataConfigurationException,
   UnexpectedApiResponseException, VerificationException {
-    CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, args[0], false);
+    CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, args[0],
+        false);
     DumpInfo.init(config.dumpInfoDynamoTable);
     final String host = config.canvasDataHost;
     final String key = config.canvasApiKey;
@@ -33,7 +34,8 @@ public class CanvasBootstrap {
     final ApiClient api = new ApiClient(host, key, secret);
     final DataDump dump = findNextDump(api);
     final String emrConfig = chooseEmrConfigFile(dump);
-    config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, args[0] + "|" + emrConfig, true);
+    config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, args[0] + "|" + emrConfig,
+        true);
     if (dump == null) {
       log.info("No new dumps to download");
       sendSnsMessage(dump, config, "No new dumps to download",
@@ -62,7 +64,7 @@ public class CanvasBootstrap {
   UnexpectedApiResponseException, IOException, VerificationException {
     log.info("Saving dump " + dump);
     final CanvasCodeGenerator generator = new CanvasCodeGenerator(dump.getSchemaVersion(),
-        configFiles, new File("/Users/mcgachey/work/harvard/harvard-data-tools"), null, config);
+        new File("/Users/mcgachey/work/harvard/harvard-data-tools"), null, config, null);
     final GenerationSpec spec = generator.createGenerationSpec();
     final DataPipelineGenerator pipeline = new DataPipelineGenerator(
         "Canvas_Dump_" + dump.getSequence(), spec, config);

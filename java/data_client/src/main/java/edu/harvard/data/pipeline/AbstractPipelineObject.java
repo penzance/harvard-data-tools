@@ -20,8 +20,8 @@ public abstract class AbstractPipelineObject {
   protected boolean finalized;
   protected String type;
 
-  protected AbstractPipelineObject(final DataConfig params, final String id, final String type) {
-    this.config = params;
+  protected AbstractPipelineObject(final DataConfig config, final String id, final String type) {
+    this.config = config;
     this.id = id;
     this.name = id;
     this.children = new HashSet<AbstractPipelineObject>();
@@ -42,6 +42,10 @@ public abstract class AbstractPipelineObject {
   protected void set(final String key, final AbstractPipelineObject ref) {
     fields.add(new Field().withKey(key).withRefValue(ref.id));
     children.add(ref);
+  }
+
+  public void setSuccess(final SnsNotificationPipelineObject success) {
+    set("onSuccess", success);
   }
 
   protected Set<AbstractPipelineObject> getChildren() {
