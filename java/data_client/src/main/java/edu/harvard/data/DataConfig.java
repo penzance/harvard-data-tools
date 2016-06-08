@@ -38,6 +38,7 @@ public class DataConfig {
   private final String workingBucket;
   public final String reportBucket;
   public final String redshiftCluster;
+  public final String redshiftServer;
   public final String redshiftDatabase;
   public final String redshiftPort;
   public final String redshiftUserName;
@@ -111,6 +112,7 @@ public class DataConfig {
     this.workingBucket = getConfigParameter("working_bucket", verify);
     this.reportBucket = getConfigParameter("report_bucket", verify);
     this.redshiftCluster = getConfigParameter("redshift_cluster", verify);
+    this.redshiftServer = getConfigParameter("redshift_server", verify);
     this.redshiftDatabase = getConfigParameter("redshift_database", verify);
     this.redshiftUserName = getConfigParameter("redshift_user_name", verify);
     this.redshiftPassword = getConfigParameter("redshift_password", verify);
@@ -170,7 +172,7 @@ public class DataConfig {
   }
 
   public String getRedshiftUrl() {
-    return "jdbc:postgresql://" + redshiftCluster + ":" + redshiftPort + "/" + redshiftDatabase;
+    return "jdbc:postgresql://" + redshiftServer + ":" + redshiftPort + "/" + redshiftDatabase;
   }
 
   public S3ObjectId getS3WorkingLocation() {

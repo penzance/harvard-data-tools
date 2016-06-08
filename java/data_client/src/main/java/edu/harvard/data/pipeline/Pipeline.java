@@ -52,7 +52,7 @@ public class Pipeline {
         config.reportBucket, config.completionSnsArn, config.pipelineDynamoTable);
     final String failMsg = new ObjectMapper().writeValueAsString(completion);
     final String failSubj = "Pipeline " + name + " Failed";
-    defaultObj.set("onFail", factory.getSns("FailureSnsAlert", failSubj, failMsg, config.failureSnsArn));
+    defaultObj.set("onFail", factory.getSns("FailureSnsAlert", failSubj, failMsg, config.completionSnsArn));
     return defaultObj;
   }
 
