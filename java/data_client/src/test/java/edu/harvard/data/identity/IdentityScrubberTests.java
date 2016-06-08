@@ -128,7 +128,7 @@ class TestIdentityScrubber extends IdentityScrubber<String> {
 
   public TestIdentityScrubber(final String configPathString)
       throws IOException, DataConfigurationException {
-    super(configPathString);
+    super();
   }
 
   @Override
