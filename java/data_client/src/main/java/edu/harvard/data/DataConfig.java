@@ -71,7 +71,7 @@ public class DataConfig {
 
   private final Properties properties;
 
-  protected DataConfig(final List<? extends InputStream> streams, final boolean verify)
+  public DataConfig(final List<? extends InputStream> streams, final boolean verify)
       throws IOException, DataConfigurationException {
     properties = new Properties();
     for (final InputStream in : streams) {

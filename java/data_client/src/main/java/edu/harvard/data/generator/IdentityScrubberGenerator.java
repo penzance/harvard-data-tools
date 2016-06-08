@@ -70,25 +70,6 @@ public class IdentityScrubberGenerator {
     out.println("}");
   }
 
-  /*
-   *   public UserDimIdentityScrubber(final String configPathString)
-      throws IOException, DataConfigurationException {
-    super(configPathString);
-  }
-
-  public static void main(final String[] args) throws IOException, DataConfigurationException {
-    final UserDimIdentityScrubber instance = new UserDimIdentityScrubber(args[0]);
-    final Job job = instance.getJob("user_dim", UserDimIdentityScrubber.class);
-    try {
-      job.waitForCompletion(true);
-    } catch (ClassNotFoundException | InterruptedException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-
-   */
-
   private void outputImportStatements(final PrintStream out, final String idType) {
     out.println("import " + IOException.class.getCanonicalName() + ";");
     out.println("import " + CSVRecord.class.getCanonicalName() + ";");
