@@ -95,6 +95,18 @@ public class HadoopUtilities {
     return parseFormat(context.getConfiguration().get("format"));
   }
 
+  public DataConfig getConfig(final Mapper<?, ?, ?, ?>.Context context)
+      throws IOException, DataConfigurationException {
+    final String configPathString = context.getConfiguration().get("config");
+    return DataConfig.parseInputFiles(DataConfig.class, configPathString, true);
+  }
+
+  public DataConfig getConfig(final Reducer<?, ?, ?, ?>.Context context)
+      throws IOException, DataConfigurationException {
+    final String configPathString = context.getConfiguration().get("config");
+    return DataConfig.parseInputFiles(DataConfig.class, configPathString, true);
+  }
+
   private TableFormat parseFormat(final String formatString) {
     if (formatString == null) {
       throw new HadoopConfigurationException(

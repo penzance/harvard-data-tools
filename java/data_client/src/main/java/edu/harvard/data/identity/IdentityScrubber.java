@@ -50,28 +50,19 @@ import edu.harvard.data.io.TableReader;
 public abstract class IdentityScrubber<T> extends Mapper<Object, Text, Text, NullWritable> {
   private static final Logger log = LogManager.getLogger();
 
+  private final HadoopUtilities hadoopUtils;
+  private final Configuration hadoopConfig;
   protected TableFormat format;
   protected Map<T, IdentityMap> identities;
-  private final HadoopUtilities hadoopUtils;
   private IdentifierType mainIdentifier;
-  private final Configuration hadoopConfig;
-  private final DataConfig config;
-  private final String inputDir;
-  private final String outputDir;
+  private DataConfig config;
+  private String inputDir;
+  private String outputDir;
   private URI hdfsService;
 
-  public IdentityScrubber(final String configPathString)
-      throws IOException, DataConfigurationException {
+  public IdentityScrubber() {
     this.hadoopUtils = new HadoopUtilities();
     this.hadoopConfig = new Configuration();
-    this.config = DataConfig.parseInputFiles(DataConfig.class, configPathString, true);
-    this.inputDir = config.getHdfsDir(0);
-    this.outputDir = config.getHdfsDir(1);
-    try {
-      hdfsService = new URI("hdfs///");
-    } catch (final URISyntaxException e) {
-      throw new DataConfigurationException(e);
-    }
   }
 
   @SuppressWarnings("rawtypes")
@@ -92,6 +83,7 @@ public abstract class IdentityScrubber<T> extends Mapper<Object, Text, Text, Nul
     }
     hadoopConfig.set("format", Format.DecompressedCanvasDataFlatFiles.toString());
     hadoopConfig.set("mainIdentifier", config.mainIdentifier.toString());
+    hadoopConfig.set("config", config.paths);
 
     return job;
   }
@@ -116,6 +108,18 @@ public abstract class IdentityScrubber<T> extends Mapper<Object, Text, Text, Nul
     super.setup(context);
     this.format = hadoopUtils.getFormat(context);
     this.mainIdentifier = hadoopUtils.getMainIdentifier(context);
+    try {
+      this.config = hadoopUtils.getConfig(context);
+    } catch (final DataConfigurationException e) {
+      throw new IOException(e);
+    }
+    this.inputDir = config.getHdfsDir(0);
+    this.outputDir = config.getHdfsDir(1);
+    try {
+      hdfsService = new URI("hdfs///");
+    } catch (final URISyntaxException e) {
+      throw new IOException(e);
+    }
     this.identities = new HashMap<T, IdentityMap>();
     try (TableReader<IdentityMap> in = hadoopUtils.getHdfsTableReader(context, format,
         IdentityMap.class)) {
