@@ -89,7 +89,7 @@ public abstract class IdentityScrubber<T> extends Mapper<Object, Text, Text, Nul
     }
     hadoopUtils.setPaths(job, hdfsService, config.getHdfsDir(0) + "/" + tableName, config.getHdfsDir(1) + "/" + tableName);
     for (final Path path : hadoopUtils.listHdfsFiles(hadoopConfig,
-        new Path(outputDir + "/identity_map"))) {
+        new Path(config.getHdfsDir(1) + "/identity_map"))) {
       job.addCacheFile(path.toUri());
     }
     hadoopConfig.set("format", Format.DecompressedCanvasDataFlatFiles.toString());
