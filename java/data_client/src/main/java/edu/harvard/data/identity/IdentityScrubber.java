@@ -82,6 +82,11 @@ public abstract class IdentityScrubber<T> extends Mapper<Object, Text, Text, Nul
     } catch (final URISyntaxException e) {
       throw new IOException(e);
     }
+    try {
+      config = DataConfig.parseInputFiles(DataConfig.class, configString, true);
+    } catch (final DataConfigurationException e) {
+      throw new IOException(e);
+    }
     hadoopUtils.setPaths(job, hdfsService, config.getHdfsDir(0) + "/" + tableName, config.getHdfsDir(1) + "/" + tableName);
     for (final Path path : hadoopUtils.listHdfsFiles(hadoopConfig,
         new Path(outputDir + "/identity_map"))) {

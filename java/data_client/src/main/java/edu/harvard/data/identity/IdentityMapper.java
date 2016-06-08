@@ -98,7 +98,6 @@ public class IdentityMapper<T> {
     for (final CSVRecord csvRecord : parser.getRecords()) {
       idMapper.readRecord(csvRecord);
       final Map<String, T> hadoopKeys = idMapper.getMainIdentifiers();
-      log.info("Hadoop keys: " + hadoopKeys);
       if (hadoopKeys.size() == 1) {
         // If there's only one main ID, we can use this table to figure
         // out other identities for that individual.
