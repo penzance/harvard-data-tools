@@ -18,6 +18,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.DataConfig;
+import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.generator.GeneratedCodeManager;
 
@@ -59,6 +60,8 @@ public class IdentityMapHadoopJob {
       log.info("Adding identity file " + path + " to map job cache");
       job.addCacheFile(path.toUri());
     }
+    hadoopConfig.set("format", Format.DecompressedCanvasDataFlatFiles.toString());
+    hadoopConfig.set("mainIdentifier", config.mainIdentifier.toString());
 
     final List<String> tables = codeManager.getIdentityTableNames();
     final List<Class<? extends Mapper>> mapperClasses = codeManager.getIdentityMapperClasses();

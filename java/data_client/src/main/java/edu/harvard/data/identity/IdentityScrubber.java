@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.DataTable;
+import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.generator.IdentityScrubberGenerator;
@@ -89,6 +90,9 @@ public abstract class IdentityScrubber<T> extends Mapper<Object, Text, Text, Nul
         new Path(outputDir + "/identity_map"))) {
       job.addCacheFile(path.toUri());
     }
+    hadoopConfig.set("format", Format.DecompressedCanvasDataFlatFiles.toString());
+    hadoopConfig.set("mainIdentifier", config.mainIdentifier.toString());
+
     return job;
   }
 

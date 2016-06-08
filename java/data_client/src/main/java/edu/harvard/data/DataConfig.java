@@ -13,6 +13,8 @@ import java.util.Properties;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
 
+import edu.harvard.data.identity.IdentifierType;
+
 public class DataConfig {
 
   public String paths;
@@ -51,6 +53,7 @@ public class DataConfig {
   public final String scratchDir;
   public final String awsKeyId;
   public final String awsSecretKey;
+  public final IdentifierType mainIdentifier;
   public String pipelineDynamoTable;
   public String maximumRetries;
 
@@ -67,9 +70,6 @@ public class DataConfig {
   public final String dataSourceSchemaVersion;
 
   private final Properties properties;
-
-
-
 
   protected DataConfig(final List<? extends InputStream> streams, final boolean verify)
       throws IOException, DataConfigurationException {
@@ -123,6 +123,7 @@ public class DataConfig {
     this.completionSnsArn = getConfigParameter("completion_sns_arn", verify);
     this.pipelineDynamoTable = getConfigParameter("pipeline_dynamo_table", verify);
     this.datasource = getConfigParameter("data_source", verify);
+    this.mainIdentifier = IdentifierType.valueOf(getConfigParameter("main_identifier", verify));
     this.dataSourceSchemaVersion = getConfigParameter("data_source_schema_version", verify);
     this.maximumRetries = getConfigParameter("maximum_retries", verify);
   }
