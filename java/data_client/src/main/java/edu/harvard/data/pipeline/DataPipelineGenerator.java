@@ -14,15 +14,15 @@ import com.amazonaws.services.datapipeline.model.CreatePipelineRequest;
 import com.amazonaws.services.datapipeline.model.CreatePipelineResult;
 import com.amazonaws.services.datapipeline.model.PutPipelineDefinitionRequest;
 import com.amazonaws.services.datapipeline.model.PutPipelineDefinitionResult;
+import com.amazonaws.services.s3.model.S3ObjectId;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
+import edu.harvard.data.generator.GeneratedCodeManager;
 import edu.harvard.data.generator.GenerationSpec;
-
-// TODO: Step to store SQL scripts into working bucket.
-// TODO: Cut down on the number of parameters being passed around.
 
 public class DataPipelineGenerator {
   private static final Logger log = LogManager.getLogger();
@@ -31,15 +31,20 @@ public class DataPipelineGenerator {
   private final DataConfig config;
   private final String name;
   private String pipelineId;
+  private final S3ObjectId dataLocation;
+  private final GeneratedCodeManager codeManager;
 
   public DataPipelineGenerator(final String name, final GenerationSpec spec,
-      final DataConfig config) {
+      final DataConfig config, final S3ObjectId dataLocation, final GeneratedCodeManager codeManager) {
     this.name = name;
     this.spec = spec;
     this.config = config;
+    this.dataLocation = dataLocation;
+    this.codeManager = codeManager;
   }
 
   public void generate() throws DataConfigurationException, IOException {
+    log.info("Data at " + AwsUtils.uri(dataLocation));
     PipelineExecutionRecord.init(config.pipelineDynamoTable);
     final DataPipelineClient client = new DataPipelineClient();
     final CreatePipelineRequest create = getCreateRequest();
@@ -74,8 +79,9 @@ public class DataPipelineGenerator {
   private Pipeline populatePipeline() throws DataConfigurationException, JsonProcessingException {
     final PipelineFactory factory = new PipelineFactory(config, pipelineId);
     final Pipeline pipeline = new Pipeline(name, spec, config, pipelineId, factory);
-    final EmrStartupPipelineSetup setup = new EmrStartupPipelineSetup(pipeline, factory);
-    final Phase1PipelineSetup phase1 = new Phase1PipelineSetup(pipeline, factory);
+    final EmrStartupPipelineSetup setup = new EmrStartupPipelineSetup(pipeline, factory,
+        dataLocation);
+    final Phase1PipelineSetup phase1 = new Phase1PipelineSetup(pipeline, factory, codeManager);
     final List<Phase2PipelineSetup> phase2 = new ArrayList<Phase2PipelineSetup>();
     for (int i = 0; i < 2; i++) {
       phase2.add(new Phase2PipelineSetup(pipeline, factory, i));
@@ -85,10 +91,10 @@ public class DataPipelineGenerator {
     PipelineObjectBase previousStep;
     previousStep = setup.populate();
     previousStep = phase1.populate(previousStep);
-    //    for (final Phase2PipelineSetup subphase : phase2) {
-    //      previousStep = subphase.populate(previousStep);
-    //    }
-    //    previousStep = phase3.populate(previousStep);
+    // for (final Phase2PipelineSetup subphase : phase2) {
+    // previousStep = subphase.populate(previousStep);
+    // }
+    // previousStep = phase3.populate(previousStep);
     previousStep.setSuccess(getSuccessAction(factory));
     return pipeline;
   }

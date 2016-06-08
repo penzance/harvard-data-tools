@@ -50,7 +50,7 @@ public class MatterhornCodeGenerator extends CodeGenerator {
 
   public MatterhornCodeGenerator(final String schemaVersion, final File gitDir, final File codeDir,
       final MatterhornDataConfig config, final String pipelineId) throws FileNotFoundException {
-    super(codeDir, AwsUtils.key(config.workingBucket, pipelineId));
+    super(codeDir, AwsUtils.key(config.getS3WorkingLocation(), pipelineId));
     this.config = config;
     if (!gitDir.exists() && gitDir.isDirectory()) {
       throw new FileNotFoundException(gitDir.toString());

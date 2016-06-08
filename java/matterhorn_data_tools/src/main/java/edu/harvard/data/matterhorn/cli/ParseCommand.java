@@ -28,7 +28,7 @@ public class ParseCommand implements Command {
     for (final S3ObjectSummary obj : aws.listKeys(config.dropboxBucket)) {
       if (obj.getKey().endsWith(".gz")) {
         log.info("Parsing file " + obj.getBucketName() + "/" + obj.getKey());
-        new InputParser(config, aws, AwsUtils.key(obj), config.incomingBucket).parseFile();
+        new InputParser(config, aws, AwsUtils.key(obj), config.getS3IncomingLocation()).parseFile();
       }
     }
     return ReturnStatus.OK;

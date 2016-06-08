@@ -42,7 +42,7 @@ public class CanvasCodeGenerator extends CodeGenerator {
 
   public CanvasCodeGenerator(final String schemaVersion, final File gitDir, final File codeDir,
       final CanvasDataConfig config, final String pipelineId) throws FileNotFoundException {
-    super(codeDir, AwsUtils.key(config.workingBucket, pipelineId));
+    super(codeDir, AwsUtils.key(config.getS3WorkingLocation(), pipelineId));
     this.gitDir = gitDir;
     this.schemaVersion = schemaVersion;
     this.config = config;

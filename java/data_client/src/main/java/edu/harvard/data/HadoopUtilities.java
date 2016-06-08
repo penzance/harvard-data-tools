@@ -161,4 +161,14 @@ public class HadoopUtilities {
     return new CombinedTableReader<T>(readers);
   }
 
+  public List<Path> listHdfsFiles(final Configuration hadoopConfig, final Path path)
+      throws IOException {
+    final List<Path> files = new ArrayList<Path>();
+    final FileSystem fs = FileSystem.get(hadoopConfig);
+    for (final FileStatus fileStatus : fs.listStatus(path)) {
+      files.add(fileStatus.getPath());
+    }
+    return files;
+  }
+
 }

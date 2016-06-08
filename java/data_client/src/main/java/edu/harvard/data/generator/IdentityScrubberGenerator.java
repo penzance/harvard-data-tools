@@ -1,13 +1,16 @@
 package edu.harvard.data.generator;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.csv.CSVRecord;
+import org.apache.hadoop.mapreduce.Job;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.DataTable;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.identity.IdentifierType;
@@ -59,17 +62,67 @@ public class IdentityScrubberGenerator {
     out.println();
     out.println("public class " + className + " extends IdentityScrubber<" + idType + "> {");
     out.println();
+    outputMainMethod(out);
+    out.println();
+    outputConstructor(out);
+    out.println();
     outputPopulateRecord(out);
     out.println("}");
   }
 
+  /*
+   *   public UserDimIdentityScrubber(final String configPathString)
+      throws IOException, DataConfigurationException {
+    super(configPathString);
+  }
+
+  public static void main(final String[] args) throws IOException, DataConfigurationException {
+    final UserDimIdentityScrubber instance = new UserDimIdentityScrubber(args[0]);
+    final Job job = instance.getJob("user_dim", UserDimIdentityScrubber.class);
+    try {
+      job.waitForCompletion(true);
+    } catch (ClassNotFoundException | InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+
+   */
+
   private void outputImportStatements(final PrintStream out, final String idType) {
+    out.println("import " + IOException.class.getCanonicalName() + ";");
     out.println("import " + CSVRecord.class.getCanonicalName() + ";");
     out.println("import " + IdentifierType.class.getCanonicalName() + ";");
     out.println("import " + DataTable.class.getCanonicalName() + ";");
+    out.println("import " + DataConfigurationException.class.getCanonicalName() + ";");
     out.println("import " + IdentityScrubber.class.getCanonicalName() + ";");
+    out.println("import " + Job.class.getCanonicalName() + ";");
     out.println("import " + phase0ModelPackage + "." + phase0ModelClass + ";");
     out.println("import " + phase1ModelPackage + "." + phase1ModelClass + ";");
+  }
+
+  private void outputMainMethod(final PrintStream out) {
+    final String tableName = table.getTableName();
+    out.println("  public static void main(final String[] args)");
+    out.println("  throws " + IOException.class.getSimpleName() + ", "
+        + DataConfigurationException.class.getSimpleName() + " {");
+    out.println("    final " + className + " instance = new " + className + "(args[0]);");
+    out.println(
+        "    final Job job = instance.getJob(\"" + tableName + "\", " + className + ".class);");
+    out.println("    try {");
+    out.println("      job.waitForCompletion(true);");
+    out.println("    } catch (ClassNotFoundException | InterruptedException e) {");
+    out.println("      throw new RuntimeException(e);");
+    out.println("    }");
+    out.println("  }");
+  }
+
+  private void outputConstructor(final PrintStream out) {
+    out.println("  public " + className + "(final String configPathString)");
+    out.println("  throws " + IOException.class.getSimpleName() + ", "
+        + DataConfigurationException.class.getSimpleName() + " {");
+    out.println("    super(configPathString);");
+    out.println("  }");
   }
 
   private void outputPopulateRecord(final PrintStream out) throws VerificationException {

@@ -34,9 +34,8 @@ public class DataConfig {
   public final String gitTagOrBranch;
   public final String logBucket;
   public final String codeBucket;
-  public final String intermediateBucket;
-  public final String incomingBucket;
-  public final String workingBucket;
+  private final String incomingBucket;
+  private final String workingBucket;
   public final String reportBucket;
   public final String redshiftCluster;
   public final String redshiftDatabase;
@@ -52,18 +51,21 @@ public class DataConfig {
   public final String awsKeyId;
   public final String awsSecretKey;
   public String pipelineDynamoTable;
+  public String maximumRetries;
 
   public String emrCodeDir;
   public String dataToolsJar;
   public String identityRedshiftLoadScript;
   public String redshiftLoadScript;
   public String redshiftStagingDir;
+  private final String hdfsBase;
 
   // XXX To remove...
-  public final String lowercaseDatasource;
+  public final String datasource;
   public final String dataSourceSchemaVersion;
 
   private final Properties properties;
+
 
 
   protected DataConfig(final List<? extends InputStream> streams, final boolean verify)
@@ -77,6 +79,7 @@ public class DataConfig {
     this.redshiftLoadScript = "s3_to_redshift_loader.sql";
     this.redshiftStagingDir = "redshift_staging";
     this.emrCodeDir = "/home/hadoop/code";
+    this.hdfsBase = "/phase_";
 
     this.scratchDir = getConfigParameter("scratch_dir", verify);
     this.redshiftPort = getConfigParameter("redshift_port", verify);
@@ -102,7 +105,6 @@ public class DataConfig {
     this.gitTagOrBranch = getConfigParameter("git_tag_or_branch", verify);
     this.logBucket = getConfigParameter("log_bucket", verify);
     this.codeBucket = getConfigParameter("code_bucket", verify);
-    this.intermediateBucket = getConfigParameter("intermediate_bucket", verify);
     this.workingBucket = getConfigParameter("working_bucket", verify);
     this.reportBucket = getConfigParameter("report_bucket", verify);
     this.redshiftCluster = getConfigParameter("redshift_cluster", verify);
@@ -115,8 +117,9 @@ public class DataConfig {
     this.successSnsArn = getConfigParameter("success_sns_arn", verify);
     this.completionSnsArn = getConfigParameter("completion_sns_arn", verify);
     this.pipelineDynamoTable = getConfigParameter("pipeline_dynamo_table", verify);
-    this.lowercaseDatasource = getConfigParameter("lowercase_data_source", verify);
+    this.datasource = getConfigParameter("data_source", verify);
     this.dataSourceSchemaVersion = getConfigParameter("data_source_schema_version", verify);
+    this.maximumRetries = getConfigParameter("maximum_retries", verify);
   }
 
   public static <T extends DataConfig> T parseInputFiles(final Class<T> cls,
@@ -165,6 +168,18 @@ public class DataConfig {
 
   public String getRedshiftUrl() {
     return "jdbc:postgresql://" + redshiftCluster + ":" + redshiftPort + "/" + redshiftDatabase;
+  }
+
+  public S3ObjectId getS3WorkingLocation() {
+    return AwsUtils.key(workingBucket, datasource);
+  }
+
+  public S3ObjectId getS3IncomingLocation() {
+    return AwsUtils.key(incomingBucket, datasource);
+  }
+
+  public String getHdfsDir(final int phase) {
+    return hdfsBase + phase;
   }
 
 }

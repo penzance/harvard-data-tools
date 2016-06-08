@@ -1,17 +1,26 @@
 package edu.harvard.data.identity;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import edu.harvard.data.DataConfig;
+import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.DataTable;
 import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.TableFormat;
@@ -44,9 +53,43 @@ public abstract class IdentityScrubber<T> extends Mapper<Object, Text, Text, Nul
   protected Map<T, IdentityMap> identities;
   private final HadoopUtilities hadoopUtils;
   private IdentifierType mainIdentifier;
+  private final Configuration hadoopConfig;
+  private final DataConfig config;
+  private final String inputDir;
+  private final String outputDir;
+  private URI hdfsService;
 
-  public IdentityScrubber() {
+  public IdentityScrubber(final String configPathString)
+      throws IOException, DataConfigurationException {
     this.hadoopUtils = new HadoopUtilities();
+    this.hadoopConfig = new Configuration();
+    this.config = DataConfig.parseInputFiles(DataConfig.class, configPathString, true);
+    this.inputDir = config.getHdfsDir(0);
+    this.outputDir = config.getHdfsDir(1);
+    try {
+      hdfsService = new URI("hdfs///");
+    } catch (final URISyntaxException e) {
+      throw new DataConfigurationException(e);
+    }
+  }
+
+  @SuppressWarnings("rawtypes")
+  protected Job getJob(final String tableName, final Class<? extends Mapper> cls) throws IOException {
+    final Job job = Job.getInstance(hadoopConfig, "canvas-" + tableName + "-scrubber");
+    job.setJarByClass(IdentityScrubber.class);
+    job.setMapperClass(cls);
+    job.setMapOutputKeyClass(Text.class);
+    job.setMapOutputValueClass(NullWritable.class);
+    job.setNumReduceTasks(0);
+
+    job.setInputFormatClass(TextInputFormat.class);
+    job.setOutputFormatClass(TextOutputFormat.class);
+    hadoopUtils.setPaths(job, hdfsService, inputDir + "/" + tableName, outputDir + "/" + tableName);
+    for (final Path path : hadoopUtils.listHdfsFiles(hadoopConfig,
+        new Path(outputDir + "/identity_map"))) {
+      job.addCacheFile(path.toUri());
+    }
+    return job;
   }
 
   /**
@@ -78,7 +121,6 @@ public abstract class IdentityScrubber<T> extends Mapper<Object, Text, Text, Nul
     }
     log.info("Completed setup for " + this);
   }
-
 
   @Override
   public void map(final Object key, final Text value, final Context context)

@@ -154,7 +154,7 @@ public class DumpManager {
 
   public S3ObjectId getArchiveDumpObj(final DataDump dump) {
     final String dirName = String.format("%05d", dump.getSequence());
-    return AwsUtils.key(config.incomingBucket, dirName);
+    return AwsUtils.key(config.getS3IncomingLocation(), dirName);
   }
 
   public void updateTableInfoTable(final DataDump dump) {

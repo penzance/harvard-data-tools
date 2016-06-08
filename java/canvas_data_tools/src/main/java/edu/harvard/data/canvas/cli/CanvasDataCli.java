@@ -144,7 +144,6 @@ public class CanvasDataCli {
     log.error("Canvas data host: " + config.canvasDataHost);
     log.error("DynamoDB dump info table: " + config.dumpInfoDynamoTable);
     log.error("Local scratch directory: " + config.scratchDir);
-    log.error("S3 archive location: " + config.incomingBucket);
     System.exit(status.getCode());
   }
 }

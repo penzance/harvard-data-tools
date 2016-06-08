@@ -30,7 +30,7 @@ public class InputParser {
   private final MatterhornDataConfig config;
   private final AwsUtils aws;
   private final S3ObjectId inputObj;
-  private final String outputBucket;
+  private final S3ObjectId outputLocation;
   private File originalFile;
   private File eventFile;
   private File videoFile;
@@ -40,11 +40,11 @@ public class InputParser {
   private final TableFormat outFormat;
 
   public InputParser(final MatterhornDataConfig config, final AwsUtils aws,
-      final S3ObjectId inputObj, final String outputBucket) {
+      final S3ObjectId inputObj, final S3ObjectId outputLocation) {
     this.config = config;
     this.aws = aws;
     this.inputObj = inputObj;
-    this.outputBucket = outputBucket;
+    this.outputLocation = outputLocation;
     final FormatLibrary formatLibrary = new FormatLibrary();
     this.inFormat = formatLibrary.getFormat(Format.Matterhorn);
     this.outFormat = formatLibrary.getFormat(Format.CanvasDataFlatFiles);
@@ -72,8 +72,8 @@ public class InputParser {
     final String videoFileName = "video-" + date + ".gz";
     eventFile = new File(config.scratchDir, eventFileName);
     videoFile = new File(config.scratchDir, videoFileName);
-    eventOutputObj = AwsUtils.key(outputBucket, "event", eventFileName);
-    videoOutputObj = AwsUtils.key(outputBucket, "video", videoFileName);
+    eventOutputObj = AwsUtils.key(outputLocation, "event", eventFileName);
+    videoOutputObj = AwsUtils.key(outputLocation, "video", videoFileName);
     log.info("Parsing " + filename + " to " + eventFile + ", " + videoFile);
     log.info("Event key: " + eventOutputObj);
     log.info("Video key: " + videoOutputObj);
