@@ -40,10 +40,10 @@ public class Phase1PipelineSetup {
       // Take out ID lease
       previousStep = unloadIdentity(previousStep);
       previousStep = copyIdentityToHdfs(previousStep);
-      // Hadoop preverify
+      previousStep = identityPreverify(previousStep);
       previousStep = hadoopIdentityMap(previousStep);
       previousStep = hadoopIdentityScrub(previousStep);
-      // Hadoop postverify
+      previousStep = identityPostverify(previousStep);
       previousStep = copyIdentityToS3(previousStep);
       previousStep = loadIdentity(previousStep);
       // Release ID lease
@@ -51,24 +51,49 @@ public class Phase1PipelineSetup {
     return previousStep;
   }
 
+  private PipelineObjectBase identityPreverify(final PipelineObjectBase previousStep) {
+    final Class<?> cls = codeManager.getIdentityPreverifyJob();
+    final List<String> args = new ArrayList<String>();
+    args.add(config.paths);
+    final PipelineObjectBase verify = factory.getEmrActivity("IdentityPreverify", pipeline.getEmr(),
+        cls, args);
+    verify.addDependency(previousStep);
+    return verify;
+  }
+
+  private PipelineObjectBase identityPostverify(final PipelineObjectBase previousStep) {
+    final Class<?> cls = codeManager.getIdentityPostverifyJob();
+    final List<String> args = new ArrayList<String>();
+    args.add(config.paths);
+    final PipelineObjectBase verify = factory.getEmrActivity("IdentityPostverify",
+        pipeline.getEmr(), cls, args);
+    verify.addDependency(previousStep);
+    return verify;
+  }
+
   private PipelineObjectBase hadoopIdentityMap(final PipelineObjectBase previousStep) {
     final Class<?> cls = codeManager.getIdentityMapHadoopJob();
     final List<String> args = new ArrayList<String>();
-    final PipelineObjectBase identity = factory.getEmrActivity("IdentityHadoop", pipeline.getEmr(), cls, args);
+    args.add(config.paths);
+    final PipelineObjectBase identity = factory.getEmrActivity("IdentityHadoop", pipeline.getEmr(),
+        cls, args);
     identity.addDependency(previousStep);
     return identity;
   }
 
   @SuppressWarnings("rawtypes")
-  private PipelineObjectBase hadoopIdentityScrub(PipelineObjectBase previousStep) {
+  private PipelineObjectBase hadoopIdentityScrub(final PipelineObjectBase previousStep) {
+    final PipelineObjectBase barrier = factory.getSynchronizationBarrier("IdentityScrubBarrier",
+        pipeline.getEmr());
     for (final Class<? extends Mapper> cls : codeManager.getIdentityScrubberClasses()) {
       final List<String> args = new ArrayList<String>();
       args.add(config.paths);
-      final PipelineObjectBase step = factory.getEmrActivity(cls.getSimpleName(), pipeline.getEmr(), cls, args);
+      final PipelineObjectBase step = factory.getEmrActivity(cls.getSimpleName(), pipeline.getEmr(),
+          cls, args);
       step.addDependency(previousStep);
-      previousStep = step;
+      barrier.addDependency(step);
     }
-    return previousStep;
+    return barrier;
   }
 
   private PipelineObjectBase unloadIdentity(final PipelineObjectBase previousStep) {

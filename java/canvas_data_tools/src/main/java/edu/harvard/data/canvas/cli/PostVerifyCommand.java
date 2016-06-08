@@ -72,7 +72,8 @@ public class PostVerifyCommand implements Command {
     case 0:
       return new Phase0PostVerifier(dumpId, aws, new File(config.scratchDir), exec);
     case 1:
-      return new Phase1PostVerifier(hdfsService, inputDir, outputDir, verifyDir);
+      break;
+      //      return new Phase1PostVerifier(hdfsService, inputDir, outputDir, verifyDir);
     case 2:
       return new Phase2PostVerifier();
     case 3:

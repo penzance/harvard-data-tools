@@ -22,6 +22,7 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.DataTable;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopCacheFileMocker;
@@ -48,7 +49,7 @@ public class IdentityScrubberTests {
 
   @Before
   @SuppressWarnings("unchecked")
-  public void beforeTest() throws IOException {
+  public void beforeTest() throws IOException, DataConfigurationException {
     config = mock(Configuration.class);
     when(config.get("format")).thenReturn(Format.DecompressedCanvasDataFlatFiles.toString());
     when(config.get("mainIdentifier")).thenReturn(MAIN_IDENTIFIER.toString());
@@ -59,7 +60,7 @@ public class IdentityScrubberTests {
     HadoopCacheFileMocker.mockInputStream(fs, URI1, ID_MAP_FILE1);
     HadoopCacheFileMocker.mockInputStream(fs, URI2, ID_MAP_FILE2);
     HadoopCacheFileMocker.mockInputStream(fs, URI3, ID_MAP_FILE3);
-    identityScrubber = new TestIdentityScrubber();
+    identityScrubber = new TestIdentityScrubber("config_path");
 
   }
 
@@ -124,6 +125,11 @@ public class IdentityScrubberTests {
 }
 
 class TestIdentityScrubber extends IdentityScrubber<String> {
+
+  public TestIdentityScrubber(final String configPathString)
+      throws IOException, DataConfigurationException {
+    super(configPathString);
+  }
 
   @Override
   protected DataTable populateRecord(final CSVRecord csvRecord) {

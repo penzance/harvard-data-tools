@@ -59,12 +59,14 @@ public class DataConfig {
   public String redshiftLoadScript;
   public String redshiftStagingDir;
   private final String hdfsBase;
+  private final String hdfsVerifyBase;
 
   // XXX To remove...
   public final String datasource;
   public final String dataSourceSchemaVersion;
 
   private final Properties properties;
+
 
 
 
@@ -80,6 +82,7 @@ public class DataConfig {
     this.redshiftStagingDir = "redshift_staging";
     this.emrCodeDir = "/home/hadoop/code";
     this.hdfsBase = "/phase_";
+    this.hdfsVerifyBase = "/verify" + this.hdfsBase;
 
     this.scratchDir = getConfigParameter("scratch_dir", verify);
     this.redshiftPort = getConfigParameter("redshift_port", verify);
@@ -180,6 +183,10 @@ public class DataConfig {
 
   public String getHdfsDir(final int phase) {
     return hdfsBase + phase;
+  }
+
+  public String getVerifyHdfsDir(final int phase) {
+    return hdfsVerifyBase + phase;
   }
 
 }

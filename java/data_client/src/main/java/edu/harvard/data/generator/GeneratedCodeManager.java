@@ -12,4 +12,6 @@ public interface GeneratedCodeManager {
   List<Class<? extends Mapper>> getIdentityScrubberClasses();
   List<String> getIdentityTableNames();
   Class<? extends IdentityMapHadoopJob> getIdentityMapHadoopJob();
+  Class<?> getIdentityPreverifyJob();
+  Class<?> getIdentityPostverifyJob();
 }
