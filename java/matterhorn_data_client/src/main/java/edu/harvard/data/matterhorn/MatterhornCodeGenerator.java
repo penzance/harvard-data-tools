@@ -1,10 +1,5 @@
 package edu.harvard.data.matterhorn;
 
-import static edu.harvard.data.generator.InfrastructureConstants.HDFS_PHASE_0_DIR;
-import static edu.harvard.data.generator.InfrastructureConstants.HDFS_PHASE_1_DIR;
-import static edu.harvard.data.generator.InfrastructureConstants.HDFS_PHASE_2_DIR;
-import static edu.harvard.data.generator.InfrastructureConstants.HDFS_PHASE_3_DIR;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -85,7 +80,8 @@ public class MatterhornCodeGenerator extends CodeGenerator {
     spec.setJavaProjectName("matterhorn_generated_code");
     spec.setJavaTableEnumName("MatterhornTable");
     spec.setPrefixes("Phase0", "Phase1", "Phase2", "Phase3");
-    spec.setHdfsDirectories(HDFS_PHASE_0_DIR, HDFS_PHASE_1_DIR, HDFS_PHASE_2_DIR, HDFS_PHASE_3_DIR);
+    spec.setHdfsDirectories(config.getHdfsDir(0), config.getHdfsDir(1), config.getHdfsDir(2),
+        config.getHdfsDir(3));
     spec.setJavaBindingPackages(PHASE_ZERO_PACKAGE, PHASE_ONE_PACKAGE, PHASE_TWO_PACKAGE,
         PHASE_THREE_PACKAGE);
     spec.setJavaHadoopPackage(IDENTITY_HADOOP_PACKAGE);

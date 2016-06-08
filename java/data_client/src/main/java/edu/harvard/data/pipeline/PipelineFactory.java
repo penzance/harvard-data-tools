@@ -21,8 +21,7 @@ public class PipelineFactory {
   }
 
   public PipelineObjectBase getSchedule() {
-    final PipelineObjectBase obj = new PipelineObjectBase(config, "DefaultSchedule",
-        "Schedule");
+    final PipelineObjectBase obj = new PipelineObjectBase(config, "DefaultSchedule", "Schedule");
     obj.setName("RunOnce");
     obj.set("occurrences", "1");
     obj.set("startAt", "FIRST_ACTIVATION_DATE_TIME");
@@ -94,7 +93,8 @@ public class PipelineFactory {
     return obj;
   }
 
-  public PipelineObjectBase getSynchronizationBarrier(final String id, final PipelineObjectBase infrastructure) {
+  public PipelineObjectBase getSynchronizationBarrier(final String id,
+      final PipelineObjectBase infrastructure) {
     final PipelineObjectBase obj = new PipelineObjectBase(config, id, "ShellCommandActivity");
     setupActivity(obj, infrastructure);
     obj.set("command", "ls");
@@ -109,6 +109,14 @@ public class PipelineFactory {
     final String jar = config.emrCodeDir + "/" + config.dataToolsJar;
     obj.set("step", jar + "," + cls.getCanonicalName() + "," + params);
     obj.set("retryDelay", "2 Minutes");
+    return obj;
+  }
+
+  public PipelineObjectBase getShellActivity(final String id, final String cmd,
+      final PipelineObjectBase infrastructure) {
+    final PipelineObjectBase obj = new PipelineObjectBase(config, id, "ShellCommandActivity");
+    setupActivity(obj, infrastructure);
+    obj.set("command", cmd);
     return obj;
   }
 
@@ -129,7 +137,8 @@ public class PipelineFactory {
   }
 
   public PipelineObjectBase getUnloadActivity(final String id, final String sql,
-      final S3ObjectId dest, final PipelineObjectBase database, final PipelineObjectBase infrastructure) {
+      final S3ObjectId dest, final PipelineObjectBase database,
+      final PipelineObjectBase infrastructure) {
     final PipelineObjectBase obj = new PipelineObjectBase(config, id, "SqlActivity");
     setupActivity(obj, infrastructure);
     final String query = "UNLOAD ('" + sql + "') TO '" + AwsUtils.uri(dest)
@@ -170,7 +179,8 @@ public class PipelineFactory {
 
   ////////////////
 
-  private void setupActivity(final PipelineObjectBase obj, final PipelineObjectBase infrastructure) {
+  private void setupActivity(final PipelineObjectBase obj,
+      final PipelineObjectBase infrastructure) {
     obj.set("runsOn", infrastructure);
     obj.set("maximumRetries", config.maximumRetries);
     allObjects.add(obj);

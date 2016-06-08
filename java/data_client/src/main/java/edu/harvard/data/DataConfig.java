@@ -191,4 +191,8 @@ public class DataConfig {
     return hdfsVerifyBase + phase;
   }
 
+  public String getMoveUnmodifiedScript(final int phase) {
+    return "phase_" + phase + "_move_unmodified_files.sh";
+  }
+
 }

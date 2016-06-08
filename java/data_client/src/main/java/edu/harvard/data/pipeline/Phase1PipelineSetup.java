@@ -46,9 +46,18 @@ public class Phase1PipelineSetup {
       previousStep = identityPostverify(previousStep);
       previousStep = copyIdentityToS3(previousStep);
       previousStep = loadIdentity(previousStep);
+      previousStep = moveUnmodifiedTables(previousStep);
       // Release ID lease
     }
     return previousStep;
+  }
+
+  private PipelineObjectBase moveUnmodifiedTables(final PipelineObjectBase previousStep) {
+    final String script = config.emrCodeDir + "/" + config.getMoveUnmodifiedScript(1);
+    final PipelineObjectBase move = factory.getShellActivity("Phase1MoveUnmodifiedFiles", script,
+        pipeline.getEmr());
+    move.addDependency(previousStep);
+    return move;
   }
 
   private PipelineObjectBase identityPreverify(final PipelineObjectBase previousStep) {

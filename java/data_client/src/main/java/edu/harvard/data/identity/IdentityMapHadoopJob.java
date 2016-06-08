@@ -18,7 +18,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.DataConfig;
-import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.generator.GeneratedCodeManager;
 
@@ -33,10 +32,10 @@ public class IdentityMapHadoopJob {
 
   private final GeneratedCodeManager codeManager;
 
-  public IdentityMapHadoopJob(final String configPathString, final GeneratedCodeManager codeManager)
-      throws IOException, DataConfigurationException {
+  public IdentityMapHadoopJob(final DataConfig config, final GeneratedCodeManager codeManager)
+      throws IOException {
+    this.config = config;
     this.codeManager = codeManager;
-    this.config = DataConfig.parseInputFiles(DataConfig.class, configPathString, true);
     this.inputDir = config.getHdfsDir(0);
     this.outputDir = config.getHdfsDir(1);
     this.hadoopConfig = new Configuration();
