@@ -35,7 +35,6 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import edu.harvard.data.pipeline.DataConfig;
 import edu.harvard.data.schema.redshift.RedshiftSchema;
 
 // TODO: Convert RuntimeExceptions to checked.

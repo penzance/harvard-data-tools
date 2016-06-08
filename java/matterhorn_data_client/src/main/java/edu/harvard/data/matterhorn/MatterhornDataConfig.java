@@ -6,8 +6,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
-import edu.harvard.data.pipeline.DataConfig;
 
 public class MatterhornDataConfig extends DataConfig {
 

@@ -58,7 +58,7 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
 
   public static void main(final String[] args) throws IOException {
     final PipelineComplete p = new PipelineComplete();
-    p.pipelineId = "df-0207758LL182UCPY2WI";
+    p.pipelineId = "df-052812836GPN05A3P0AP";
     p.outputKey = p.key("hdt-pipeline-reports", p.pipelineId + ".json");
     p.snsArn = "arn:aws:sns:us-east-1:364469542718:hdtdevcanvas-FailureSNS-4W2G2I1H8I65";
     PipelineExecutionRecord.init("hdt-pipeline");
@@ -117,7 +117,7 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
     // TODO: Check if record doesn't exist.
     record.setPipelineEnd(new Date());
     if (report.getFailure() == null) {
-      record.setStatus(Status.Succcess.toString());
+      record.setStatus(Status.Success.toString());
     } else {
       record.setStatus(Status.Failed.toString());
     }
@@ -210,9 +210,9 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
       getStepPath(obj, stepName, logs);
       getContainerUrl(logs);
       break;
-      //    case "EmrActivity":
-      //      System.out.println(obj + "\n\n");
-      //      break;
+    case "EmrActivity":
+      getTaskExecutorPaths(obj, logs);
+      break;
     case "EmrCluster":
       break;
     default:

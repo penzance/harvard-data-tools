@@ -1,16 +1,11 @@
 #!/bin/bash
 
-export DATA_SCHEMA_VERSION=$1
-export DUMPID=$2
-export GIT_BRANCH=$3
-export INTERMEDIATE_BUCKET=$4
-export AWS_ACCESS_KEY=$5
-export AWS_SECRET_KEY=$6
-export CODE_BUCKET=$7
-export STREAM=$8
-export CONFIG_PATHS=$9
-export PIPELINE_ID=$10
-export HARVARD_DATA_GENERATED_OUTPUT=$11
+export DATA_SCHEMA_VERSION=$1  # Used by code generator
+export GIT_BRANCH=$2
+export GENERATOR=$3
+export CONFIG_PATHS=$4 # Used by code generator
+export PIPELINE_ID=$5 # Used by code generator
+export HARVARD_DATA_GENERATED_OUTPUT=$6  # Used by code generator
 
 # - HARVARD_DATA_TOOLS_BASE: the directory where the harvard-data-tools
 #     repository has been checked out. Point to the root of the repository, e.g.
@@ -30,30 +25,25 @@ export HDFS_PHASE_0_DIR=hdfs:///phase_0
 export HDFS_PHASE_1_DIR=hdfs:///phase_1
 export HDFS_PHASE_2_DIR=hdfs:///phase_2
 
+echo env
+
 # add github.com to known_hosts
 ssh-keyscan github.com >> /home/hadoop/.ssh/known_hosts
 
-# copy extra keys from S3 to the local FS, add to ~/.ssh/authorized_keys
-# aws s3 cp s3://$2/extra_keys /home/hadoop/.
-# cat /home/hadoop/extra_keys >> ~/.ssh/authorized_keys
-
 # install jdk and git
 sudo yum install -y java-devel git-core
-
-# clone our repo
-git clone -b $GIT_BRANCH https://github.com/penzance/harvard-data-tools.git /home/hadoop/harvard-data-tools
 
 #Install maven via instructions at https://gist.github.com/sebsto/19b99f1fa1f32cae5d00
 sudo wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
 sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
 sudo yum install -y apache-maven
 
-# copy DownloadVerifySecureProperties from S3 to the local FS
-# aws s3 cp s3://$2/secure.properties /home/hadoop/.
+# clone our repo
+git clone -b $GIT_BRANCH https://github.com/penzance/harvard-data-tools.git $HARVARD_DATA_TOOLS_BASE
 
 # generate the tools
-python /home/hadoop/harvard-data-tools/python/${STREAM}_generate_tools.py
-chmod 764 /home/hadoop/*.sh
+python /home/hadoop/harvard-data-tools/python/$GENERATOR
+chmod 764 $HARVARD_DATA_GENERATED_OUTPUT/*.sh
 
 # setup CloudWatch logging
 sudo yum install -y awslogs

@@ -162,6 +162,7 @@ public class S3ToRedshiftLoaderGenerator {
   }
 
   private String getLocation(final String tableName) {
-    return "'s3://" + workingDir.getBucket() + "/" + workingDir.getKey() + "/" + tableName + "/'";
+    return "'s3://" + workingDir.getBucket() + "/" + workingDir.getKey() + "/"
+        + spec.getConfig().redshiftStagingDir + "/" + tableName + "/'";
   }
 }

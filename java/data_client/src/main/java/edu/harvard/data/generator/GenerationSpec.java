@@ -4,8 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.harvard.data.DataConfig;
 import edu.harvard.data.identity.IdentifierType;
-import edu.harvard.data.pipeline.DataConfig;
 import edu.harvard.data.schema.DataSchema;
 
 /**

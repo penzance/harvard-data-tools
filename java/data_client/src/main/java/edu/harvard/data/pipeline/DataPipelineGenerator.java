@@ -1,7 +1,10 @@
 package edu.harvard.data.pipeline;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,11 +14,10 @@ import com.amazonaws.services.datapipeline.model.CreatePipelineRequest;
 import com.amazonaws.services.datapipeline.model.CreatePipelineResult;
 import com.amazonaws.services.datapipeline.model.PutPipelineDefinitionRequest;
 import com.amazonaws.services.datapipeline.model.PutPipelineDefinitionResult;
-import com.amazonaws.services.s3.model.S3ObjectId;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import edu.harvard.data.AwsUtils;
+import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.generator.GenerationSpec;
 
@@ -27,10 +29,7 @@ public class DataPipelineGenerator {
 
   private final GenerationSpec spec;
   private final DataConfig config;
-  private DataPipeline pipeline;
-  private DataPipelineInfrastructure infrastructure;
   private final String name;
-  private String pipelineName;
   private String pipelineId;
 
   public DataPipelineGenerator(final String name, final GenerationSpec spec,
@@ -43,108 +42,64 @@ public class DataPipelineGenerator {
   public void generate() throws DataConfigurationException, IOException {
     PipelineExecutionRecord.init(config.pipelineDynamoTable);
     final DataPipelineClient client = new DataPipelineClient();
-    pipelineName = name + "_Pipeline";
-    pipeline = new DataPipeline(config, spec, pipelineName);
-    final CreatePipelineRequest create = pipeline.getCreateRequest();
+    final CreatePipelineRequest create = getCreateRequest();
     final CreatePipelineResult createResult = client.createPipeline(create);
     pipelineId = createResult.getPipelineId();
     log.info(createResult);
-    populatePipeline();
+
+    final Pipeline pipeline = populatePipeline();
+
     final PutPipelineDefinitionRequest definition = pipeline.getDefineRequest(pipelineId);
     final PutPipelineDefinitionResult defineResult = client.putPipelineDefinition(definition);
     logPipelineToDynamo();
     log.info(defineResult);
   }
 
+  private CreatePipelineRequest getCreateRequest() {
+    final CreatePipelineRequest createRequest = new CreatePipelineRequest();
+    createRequest.setName(name);
+    createRequest.setUniqueId(UUID.randomUUID().toString());
+    return createRequest;
+  }
+
   private void logPipelineToDynamo() {
     final PipelineExecutionRecord record = new PipelineExecutionRecord(pipelineId);
-    record.setPipelineName(pipelineName);
+    record.setPipelineName(name);
     record.setConfigString(config.paths);
     record.setPipelineCreated(new Date());
     record.setStatus(PipelineExecutionRecord.Status.Created.toString());
     record.save();
   }
 
-  private void populatePipeline() throws DataConfigurationException, JsonProcessingException {
-    populateInfrastructure();
+  private Pipeline populatePipeline() throws DataConfigurationException, JsonProcessingException {
+    final PipelineFactory factory = new PipelineFactory(config, pipelineId);
+    final Pipeline pipeline = new Pipeline(name, spec, config, pipelineId, factory);
+    final EmrStartupPipelineSetup setup = new EmrStartupPipelineSetup(pipeline, factory);
+    final Phase1PipelineSetup phase1 = new Phase1PipelineSetup(pipeline, factory);
+    final List<Phase2PipelineSetup> phase2 = new ArrayList<Phase2PipelineSetup>();
+    for (int i = 0; i < 2; i++) {
+      phase2.add(new Phase2PipelineSetup(pipeline, factory, i));
+    }
+    final Phase3PipelineSetup phase3 = new Phase3PipelineSetup(pipeline, factory);
 
-    final Phase1PipelineSetup phase1 = new Phase1PipelineSetup(spec, config, infrastructure);
-    final EmrStartupPipelineSetup setup = new EmrStartupPipelineSetup(config, infrastructure);
-
-    AbstractPipelineObject previousStep;
+    PipelineObjectBase previousStep;
     previousStep = setup.populate();
     previousStep = phase1.populate(previousStep);
-
-    // Must be last
-    pipeline.addChild(previousStep);
-    populateCleanup(previousStep, pipelineId);
+    //    for (final Phase2PipelineSetup subphase : phase2) {
+    //      previousStep = subphase.populate(previousStep);
+    //    }
+    //    previousStep = phase3.populate(previousStep);
+    previousStep.setSuccess(getSuccessAction(factory));
+    return pipeline;
   }
 
-  private void populateInfrastructure() throws DataConfigurationException {
-    infrastructure = new DataPipelineInfrastructure(pipeline, config, name, pipelineId);
-    pipeline.setField("schedule", infrastructure.schedule);
-    pipeline.addChild(infrastructure.redshift);
-    pipeline.addChild(infrastructure.emr);
-  }
-
-  private BarrierActivity populateS3ToHdfs(final BarrierActivity previousBarrier) {
-    final BarrierActivity barrier = new BarrierActivity(config, "MoveS3ToHdfsBarrier",
-        infrastructure);
-
-    final S3ObjectId src = AwsUtils.key(config.workingBucket, pipelineId, "unloaded_tables",
-        "identity_map");
-    final String dest = "/phase_0/identity_map";
-    final MoveS3ToHdfsPipelineActivity moveIdToHdfs = new MoveS3ToHdfsPipelineActivity(config,
-        infrastructure, "MoveIdentityToHdfs", src, dest, pipelineId);
-    moveIdToHdfs.setDependency(previousBarrier);
-    barrier.addDependency(moveIdToHdfs);
-
-    pipeline.addChild(barrier);
-    return barrier;
-  }
-
-  private BarrierActivity populateHdfsToS3(final BarrierActivity previousBarrier) {
-    final BarrierActivity barrier = new BarrierActivity(config, "MoveHdfsToS3Barrier",
-        infrastructure);
-
-    final String src = "/phase_0/identity_map";
-    final S3ObjectId dest = AwsUtils.key(config.workingBucket, pipelineId, "restored_tables",
-        "identity_map");
-    final MoveHdfsToS3PipelineActivity moveIdToS3 = new MoveHdfsToS3PipelineActivity(config,
-        "MoveIdentityToS3", infrastructure, src, dest, pipelineId);
-    moveIdToS3.setDependency(previousBarrier);
-    barrier.addDependency(moveIdToS3);
-
-    pipeline.addChild(barrier);
-    return barrier;
-  }
-
-  private void populateCleanup(final AbstractPipelineObject previousStep, final String pipelineId)
+  private PipelineObjectBase getSuccessAction(final PipelineFactory factory)
       throws JsonProcessingException {
+    final String subject = "PipelineSuccess";
     final PipelineCompletionMessage success = new PipelineCompletionMessage(pipelineId,
         config.reportBucket, config.successSnsArn, config.pipelineDynamoTable);
     final String msg = new ObjectMapper().writeValueAsString(success);
-    final SnsNotificationPipelineObject completion = new SnsNotificationPipelineObject(config,
-        "CompletionSnsAlert", "PipelineSuccess", msg, config.completionSnsArn);
-    previousStep.setSuccess(completion);
+    return factory.getSns("PipelineComplete", subject, msg, config.completionSnsArn);
   }
 
-}
-
-class DataPipelineInfrastructure {
-  final SchedulePipelineObject schedule;
-  final RedshiftPipelineObject redshift;
-  final EmrPipelineObject emr;
-  final DataPipeline pipeline;
-  final String pipelineId;
-
-  public DataPipelineInfrastructure(final DataPipeline pipeline, final DataConfig config,
-      final String name, final String pipelineId) throws DataConfigurationException {
-    this.pipeline = pipeline;
-    this.pipelineId = pipelineId;
-    schedule = new SchedulePipelineObject(config, "DefaultSchedule");
-    schedule.setName("RunOnce");
-    redshift = new RedshiftPipelineObject(config, "RedshiftDatabase");
-    emr = new EmrPipelineObject(config, name + "_Emr_Cluster", pipelineId);
-  }
 }

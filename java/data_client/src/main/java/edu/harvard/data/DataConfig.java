@@ -1,4 +1,4 @@
-package edu.harvard.data.pipeline;
+package edu.harvard.data;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,9 +12,6 @@ import java.util.List;
 import java.util.Properties;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
-
-import edu.harvard.data.AwsUtils;
-import edu.harvard.data.DataConfigurationException;
 
 public class DataConfig {
 
@@ -60,12 +57,14 @@ public class DataConfig {
   public String dataToolsJar;
   public String identityRedshiftLoadScript;
   public String redshiftLoadScript;
+  public String redshiftStagingDir;
 
   // XXX To remove...
   public final String lowercaseDatasource;
   public final String dataSourceSchemaVersion;
 
   private final Properties properties;
+
 
   protected DataConfig(final List<? extends InputStream> streams, final boolean verify)
       throws IOException, DataConfigurationException {
@@ -76,6 +75,7 @@ public class DataConfig {
     this.dataToolsJar = "data_tools.jar";
     this.identityRedshiftLoadScript = "s3_to_redshift_identity_loader.sql";
     this.redshiftLoadScript = "s3_to_redshift_loader.sql";
+    this.redshiftStagingDir = "redshift_staging";
     this.emrCodeDir = "/home/hadoop/code";
 
     this.scratchDir = getConfigParameter("scratch_dir", verify);

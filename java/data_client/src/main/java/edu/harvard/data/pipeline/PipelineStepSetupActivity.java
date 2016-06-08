@@ -5,10 +5,12 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
-class PipelineStepSetupActivity extends AbstractPipelineObject {
+import edu.harvard.data.DataConfig;
+
+class PipelineStepSetupActivity extends PipelineObjectBase {
 
   protected PipelineStepSetupActivity(final DataConfig params, final String id,
-      final AbstractPipelineObject infrastructure, final AbstractPipelineObject dependsOn,
+      final PipelineObjectBase infrastructure, final PipelineObjectBase dependsOn,
       final String pipelineId, final String step) {
     super(params, id + "LoggingSetup", "EmrActivity");
     set("runsOn", infrastructure);
