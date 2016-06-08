@@ -77,6 +77,11 @@ public abstract class IdentityScrubber<T> extends Mapper<Object, Text, Text, Nul
 
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
+    try {
+      hdfsService = new URI("hdfs///");
+    } catch (final URISyntaxException e) {
+      throw new IOException(e);
+    }
     hadoopUtils.setPaths(job, hdfsService, inputDir + "/" + tableName, outputDir + "/" + tableName);
     for (final Path path : hadoopUtils.listHdfsFiles(hadoopConfig,
         new Path(outputDir + "/identity_map"))) {
