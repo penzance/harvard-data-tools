@@ -45,12 +45,22 @@ public class IdentityMapHadoopJob {
 
   @SuppressWarnings("rawtypes")
   protected void run() throws IOException {
+    final IdentifierType mainIdentifier = config.mainIdentifier;
+    hadoopConfig.set("format", Format.DecompressedCanvasDataFlatFiles.toString());
+    hadoopConfig.set("mainIdentifier", config.mainIdentifier.toString());
     final Job job = Job.getInstance(hadoopConfig, "identity-map");
     job.setJarByClass(IdentityMapHadoopJob.class);
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(NullWritable.class);
-    job.setReducerClass(LongIdentityReducer.class);
-    job.setMapOutputKeyClass(LongWritable.class);
+    if (mainIdentifier.getType() == Long.class) {
+      job.setReducerClass(LongIdentityReducer.class);
+      job.setMapOutputKeyClass(LongWritable.class);
+    } else if (mainIdentifier.getType() == String.class) {
+      job.setReducerClass(StringIdentityReducer.class);
+      job.setMapOutputKeyClass(Text.class);
+    } else {
+      throw new RuntimeException("Unknown main identifier type: " + mainIdentifier.getType());
+    }
     job.setMapOutputValueClass(HadoopIdentityKey.class);
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
@@ -60,8 +70,6 @@ public class IdentityMapHadoopJob {
       log.info("Adding identity file " + path + " to map job cache");
       job.addCacheFile(path.toUri());
     }
-    hadoopConfig.set("format", Format.DecompressedCanvasDataFlatFiles.toString());
-    hadoopConfig.set("mainIdentifier", config.mainIdentifier.toString());
 
     final List<String> tables = codeManager.getIdentityTableNames();
     final List<Class<? extends Mapper>> mapperClasses = codeManager.getIdentityMapperClasses();
