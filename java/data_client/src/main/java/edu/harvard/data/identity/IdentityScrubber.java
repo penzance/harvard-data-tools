@@ -68,6 +68,8 @@ public abstract class IdentityScrubber<T> extends Mapper<Object, Text, Text, Nul
   @SuppressWarnings("rawtypes")
   protected Job getJob(final String tableName, final Class<? extends Mapper> cls,
       final String configString) throws IOException {
+    hadoopConfig.set("format", Format.DecompressedCanvasDataFlatFiles.toString());
+    hadoopConfig.set("config", configString);
     final Job job = Job.getInstance(hadoopConfig, "canvas-" + tableName + "-scrubber");
     job.setJarByClass(IdentityScrubber.class);
     job.setMapperClass(cls);
@@ -92,8 +94,6 @@ public abstract class IdentityScrubber<T> extends Mapper<Object, Text, Text, Nul
         new Path(config.getHdfsDir(1) + "/identity_map"))) {
       job.addCacheFile(path.toUri());
     }
-    hadoopConfig.set("format", Format.DecompressedCanvasDataFlatFiles.toString());
-    hadoopConfig.set("config", configString);
 
     return job;
   }
