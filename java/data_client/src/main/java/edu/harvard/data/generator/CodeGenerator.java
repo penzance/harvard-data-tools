@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
 
+import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.identity.IdentifierType;
@@ -38,6 +39,7 @@ public abstract class CodeGenerator {
 
   protected final File codeDir;
   private final S3ObjectId workingDir;
+  private final DataConfig config;
 
   /**
    * Initialize the CodeGenerator class with input and output file locations.
@@ -49,7 +51,8 @@ public abstract class CodeGenerator {
    *          S3 scratch directory to store intermediate code and data during
    *          the pipeline's run
    */
-  public CodeGenerator(final File codeDir, final S3ObjectId workingDir) {
+  public CodeGenerator(final DataConfig config, final File codeDir, final S3ObjectId workingDir) {
+    this.config = config;
     this.codeDir = codeDir;
     this.workingDir = workingDir;
   }
@@ -181,10 +184,10 @@ public abstract class CodeGenerator {
     new HiveQueryManifestGenerator(codeDir, spec).generate();
 
     log.info("Generating Redshift table definitions in " + codeDir);
-    new CreateRedshiftTableGenerator(codeDir, spec).generate();
+    new CreateRedshiftTableGenerator(codeDir, spec, config).generate();
 
     log.info("Generating Redshift copy from S3 script in " + codeDir);
-    new S3ToRedshiftLoaderGenerator(codeDir, spec, workingDir).generate();
+    new S3ToRedshiftLoaderGenerator(codeDir, spec, config, workingDir).generate();
 
     log.info("Generating move unmodified files script in " + codeDir);
     new MoveUnmodifiedTableGenerator(codeDir, spec).generate();

@@ -37,7 +37,7 @@ public class CanvasCodeGenerator extends CodeGenerator {
 
   public CanvasCodeGenerator(final String schemaVersion, final File gitDir, final File codeDir,
       final CanvasDataConfig config, final String pipelineId) throws FileNotFoundException {
-    super(codeDir, AwsUtils.key(config.getS3WorkingLocation(), pipelineId));
+    super(config, codeDir, AwsUtils.key(config.getS3WorkingLocation(), pipelineId));
     this.gitDir = gitDir;
     this.schemaVersion = schemaVersion;
     this.config = config;
@@ -66,7 +66,7 @@ public class CanvasCodeGenerator extends CodeGenerator {
   protected GenerationSpec createGenerationSpec() throws IOException, DataConfigurationException,
   VerificationException, UnexpectedApiResponseException {
     // Specify the four versions of the table bindings
-    final GenerationSpec spec = new GenerationSpec(TRANFORMATION_PHASES);
+    final GenerationSpec spec = new GenerationSpec(TRANFORMATION_PHASES, schemaVersion);
     spec.setJavaProjectName("canvas_generated_code");
     spec.setJavaTableEnumName("CanvasTable");
     spec.setPrefixes("Phase0", "Phase1", "Phase2", "Phase3");

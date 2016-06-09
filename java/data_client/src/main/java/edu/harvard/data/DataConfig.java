@@ -19,6 +19,8 @@ public class DataConfig {
 
   public String paths;
 
+  public final String datasetName;
+  public final String datasource;
   public final String dataPipelineRole;
   public final String dataPipelineResourceRoleArn;
   public final String keypair;
@@ -59,15 +61,13 @@ public class DataConfig {
 
   public String emrCodeDir;
   public String dataToolsJar;
+  public String identityRedshiftSchema;
   public String identityRedshiftLoadScript;
   public String redshiftLoadScript;
   public String redshiftStagingDir;
   private final String hdfsBase;
   private final String hdfsVerifyBase;
 
-  // XXX To remove...
-  public final String datasource;
-  public final String dataSourceSchemaVersion;
 
   private final Properties properties;
 
@@ -81,6 +81,7 @@ public class DataConfig {
     this.identityRedshiftLoadScript = "s3_to_redshift_identity_loader.sql";
     this.redshiftLoadScript = "s3_to_redshift_loader.sql";
     this.redshiftStagingDir = "redshift_staging";
+    this.identityRedshiftSchema = "pii";
     this.emrCodeDir = "/home/hadoop/code";
     this.hdfsBase = "/phase_";
     this.hdfsVerifyBase = "/verify" + this.hdfsBase;
@@ -91,6 +92,8 @@ public class DataConfig {
     this.awsKeyId = getConfigParameter("aws_key_id", verify);
     this.awsSecretKey = getConfigParameter("aws_secret_key", verify);
 
+    this.datasource = getConfigParameter("data_source", verify);
+    this.datasetName = getConfigParameter("dataset_name", verify);
     this.dataPipelineRole = getConfigParameter("data_pipeline_role", verify);
     this.dataPipelineResourceRoleArn = getConfigParameter("data_pipeline_resource_role_arn",
         verify);
@@ -122,9 +125,7 @@ public class DataConfig {
     this.successSnsArn = getConfigParameter("success_sns_arn", verify);
     this.completionSnsArn = getConfigParameter("completion_sns_arn", verify);
     this.pipelineDynamoTable = getConfigParameter("pipeline_dynamo_table", verify);
-    this.datasource = getConfigParameter("data_source", verify);
     this.mainIdentifier = IdentifierType.valueOf(getConfigParameter("main_identifier", verify));
-    this.dataSourceSchemaVersion = getConfigParameter("data_source_schema_version", verify);
     this.maximumRetries = getConfigParameter("maximum_retries", verify);
   }
 

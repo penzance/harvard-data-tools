@@ -313,7 +313,7 @@ class TestCodeGenerator extends CodeGenerator {
 
   public TestCodeGenerator(final File codeDir, final File hiveDir, final DataSchema schema0)
       throws FileNotFoundException {
-    super(codeDir, null);
+    super(null, codeDir, null);
     this.hiveDir = hiveDir;
     this.schema0 = schema0;
   }
@@ -321,7 +321,7 @@ class TestCodeGenerator extends CodeGenerator {
   @Override
   protected GenerationSpec createGenerationSpec() throws IOException, DataConfigurationException,
   VerificationException, UnexpectedApiResponseException {
-    final GenerationSpec spec = new GenerationSpec(2);
+    final GenerationSpec spec = new GenerationSpec(2, "schema_version");
     spec.setJavaProjectName("integration_test_generated_code");
     spec.setJavaTableEnumName("ItegrationTestTable");
     spec.setPrefixes("Phase0", "Phase1", "Phase2", "Phase3");

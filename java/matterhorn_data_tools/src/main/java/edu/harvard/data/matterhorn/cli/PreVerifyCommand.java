@@ -16,7 +16,6 @@ import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
 import edu.harvard.data.matterhorn.MatterhornDataConfig;
 import edu.harvard.data.matterhorn.phase_0.Phase0PreVerifier;
-import edu.harvard.data.matterhorn.phase_1.Phase1PreVerifier;
 import edu.harvard.data.matterhorn.phase_2.Phase2PreVerifier;
 import edu.harvard.data.matterhorn.phase_3.Phase3PreVerifier;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
@@ -66,7 +65,8 @@ public class PreVerifyCommand implements Command {
     case 0:
       return new Phase0PreVerifier();
     case 1:
-      return new Phase1PreVerifier(config, hdfsService, inputDir, outputDir);
+      //      return new Phase1PreVerifier(config, hdfsService, inputDir, outputDir);
+      break;
     case 2:
       return new Phase2PreVerifier();
     case 3:

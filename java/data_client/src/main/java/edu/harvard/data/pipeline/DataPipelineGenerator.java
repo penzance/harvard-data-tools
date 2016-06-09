@@ -33,7 +33,8 @@ public class DataPipelineGenerator {
   private final GeneratedCodeManager codeManager;
 
   public DataPipelineGenerator(final String name, final GenerationSpec spec,
-      final DataConfig config, final S3ObjectId dataLocation, final GeneratedCodeManager codeManager) {
+      final DataConfig config, final S3ObjectId dataLocation,
+      final GeneratedCodeManager codeManager) {
     this.name = name;
     this.spec = spec;
     this.config = config;
@@ -76,7 +77,8 @@ public class DataPipelineGenerator {
 
   private Pipeline populatePipeline() throws DataConfigurationException, JsonProcessingException {
     final PipelineFactory factory = new PipelineFactory(config, pipelineId);
-    final Pipeline pipeline = new Pipeline(name, spec, config, pipelineId, factory);
+    final Pipeline pipeline = new Pipeline(name, spec, config, pipelineId, factory,
+        spec.getSchemaVersion());
     final EmrStartupPipelineSetup setup = new EmrStartupPipelineSetup(pipeline, factory,
         dataLocation);
     final Phase1PipelineSetup phase1 = new Phase1PipelineSetup(pipeline, factory, codeManager);

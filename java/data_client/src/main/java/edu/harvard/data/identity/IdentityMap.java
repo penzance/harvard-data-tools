@@ -17,7 +17,7 @@ import edu.harvard.data.schema.extension.ExtensionSchemaColumn;
 import edu.harvard.data.schema.extension.ExtensionSchemaTable;
 
 // Create Redshift table using:
-// CREATE TABLE identity_map (
+// CREATE TABLE pii.identity_map (
 //     research_id VARCHAR(255),
 //     huid VARCHAR(255),
 //     xid VARCHAR(255),

@@ -18,7 +18,6 @@ import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
 import edu.harvard.data.matterhorn.MatterhornDataConfig;
 import edu.harvard.data.matterhorn.phase_0.Phase0PostVerifier;
-import edu.harvard.data.matterhorn.phase_1.Phase1PostVerifier;
 import edu.harvard.data.matterhorn.phase_2.Phase2PostVerifier;
 import edu.harvard.data.matterhorn.phase_3.Phase3PostVerifier;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
@@ -72,7 +71,8 @@ public class PostVerifyCommand implements Command {
     case 0:
       return new Phase0PostVerifier(dumpId, aws, new File(config.scratchDir), exec);
     case 1:
-      return new Phase1PostVerifier(hdfsService, inputDir, outputDir, verifyDir);
+      //      return new Phase1PostVerifier(hdfsService, inputDir, outputDir, verifyDir);
+      break;
     case 2:
       return new Phase2PostVerifier();
     case 3:

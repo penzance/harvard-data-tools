@@ -24,13 +24,15 @@ public class Pipeline {
   private final PipelineObjectBase redshift;
   private final PipelineObjectBase emr;
   private final PipelineObjectBase schedule;
+  private final String schemaVersion;
 
   public Pipeline(final String name, final GenerationSpec spec, final DataConfig config,
-      final String pipelineId, final PipelineFactory factory) throws JsonProcessingException {
+      final String pipelineId, final PipelineFactory factory, final String schemaVersion) throws JsonProcessingException {
     this.name = name;
     this.config = config;
     this.pipelineId = pipelineId;
     this.factory = factory;
+    this.schemaVersion = schemaVersion;
     this.schedule = factory.getSchedule();
     this.redshift = factory.getRedshift();
     this.emr = createEmr();
@@ -67,7 +69,7 @@ public class Pipeline {
         "bootstrap.sh");
     final List<String> bootstrapParams = new ArrayList<String>();
     bootstrapParams.add(AwsUtils.uri(script));
-    bootstrapParams.add(config.dataSourceSchemaVersion);
+    bootstrapParams.add(schemaVersion);
     bootstrapParams.add(config.gitTagOrBranch);
     bootstrapParams.add(config.datasource.toLowerCase() + "_generate_tools.py");
     bootstrapParams.add(config.paths);

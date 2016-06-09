@@ -45,7 +45,7 @@ public class MatterhornCodeGenerator extends CodeGenerator {
 
   public MatterhornCodeGenerator(final String schemaVersion, final File gitDir, final File codeDir,
       final MatterhornDataConfig config) throws FileNotFoundException {
-    super(codeDir, AwsUtils.key(config.getS3WorkingLocation()));
+    super(config, codeDir, AwsUtils.key(config.getS3WorkingLocation()));
     this.config = config;
     if (!gitDir.exists() && gitDir.isDirectory()) {
       throw new FileNotFoundException(gitDir.toString());
@@ -55,7 +55,7 @@ public class MatterhornCodeGenerator extends CodeGenerator {
   }
 
   public static void main(final String[] args) throws IOException, DataConfigurationException,
-      UnexpectedApiResponseException, SQLException, VerificationException {
+  UnexpectedApiResponseException, SQLException, VerificationException {
     if (args.length != 4) {
       System.err.println(
           "Usage: schema_version /path/to/config1|/path/to/config2 /path/to/harvard-data-tools /path/to/output/directory");
@@ -75,7 +75,7 @@ public class MatterhornCodeGenerator extends CodeGenerator {
   @Override
   protected GenerationSpec createGenerationSpec() throws IOException, VerificationException {
     // Specify the four versions of the table bindings
-    final GenerationSpec spec = new GenerationSpec(TRANFORMATION_PHASES);
+    final GenerationSpec spec = new GenerationSpec(TRANFORMATION_PHASES, schemaVersion);
     spec.setJavaProjectName("matterhorn_generated_code");
     spec.setJavaTableEnumName("MatterhornTable");
     spec.setPrefixes("Phase0", "Phase1", "Phase2", "Phase3");

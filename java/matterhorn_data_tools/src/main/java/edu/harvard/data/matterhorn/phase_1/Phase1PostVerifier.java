@@ -1,7 +1,6 @@
 package edu.harvard.data.matterhorn.phase_1;
 
 import java.io.IOException;
-import java.net.URI;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -9,12 +8,20 @@ import org.apache.logging.log4j.Logger;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
+import edu.harvard.data.matterhorn.MatterhornDataConfig;
 
 public class Phase1PostVerifier implements Verifier {
   private static final Logger log = LogManager.getLogger();
 
-  public Phase1PostVerifier(final URI hdfsService, final String inputDir, final String outputDir,
-      final String verifyDir) {
+  public static void main(final String[] args)
+      throws IOException, DataConfigurationException, VerificationException {
+    final String configPathString = args[0];
+    final MatterhornDataConfig config = MatterhornDataConfig.parseInputFiles(MatterhornDataConfig.class,
+        configPathString, true);
+    new Phase1PostVerifier(config).verify();
+  }
+
+  public Phase1PostVerifier(final MatterhornDataConfig config) throws DataConfigurationException {
   }
 
   @Override

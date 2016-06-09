@@ -25,8 +25,10 @@ public class GenerationSpec {
   private String javaProjectName;
   private File hiveScriptDir;
   private DataConfig config;
+  private final String schemaVersion;
 
-  public GenerationSpec(final int transformationPhaseCount) {
+  public GenerationSpec(final int transformationPhaseCount, final String schemaVersion) {
+    this.schemaVersion = schemaVersion;
     this.phases = new ArrayList<SchemaPhase>();
     for (int i = 0; i < transformationPhaseCount + 2; i++) {
       phases.add(new SchemaPhase());
@@ -142,5 +144,9 @@ public class GenerationSpec {
     for (int i = 0; i < hdfsDirs.length; i++) {
       phases.get(i).setHDFSDir(hdfsDirs[i]);
     }
+  }
+
+  public String getSchemaVersion() {
+    return schemaVersion;
   }
 }

@@ -11,8 +11,10 @@ import edu.harvard.data.schema.DataSchemaTable;
 import edu.harvard.data.schema.existing.ExistingSchemaTable;
 
 public class SqlGenerator {
-  public static String generateCreateStatement(final DataSchemaTable table) {
-    String s = "CREATE TABLE " + table.getTableName() + " (\n";
+  public static String generateCreateStatement(final DataSchemaTable table,
+      final String redshiftSchema) {
+    final String tableName = redshiftSchema + "." + table.getTableName();
+    String s = "CREATE TABLE " + tableName + " (\n";
     final List<DataSchemaColumn> columns = table.getColumns();
     for (int i = 0; i < columns.size(); i++) {
       final DataSchemaColumn column = columns.get(i);
@@ -33,15 +35,17 @@ public class SqlGenerator {
   }
 
   public static String generateAlterStatement(final DataSchemaTable table,
-      final DataSchemaColumn column) {
+      final String redshiftSchema, final DataSchemaColumn column) {
+    final String tableName = redshiftSchema + "." + table.getTableName();
+
     final String redshiftType = column.getType().getRedshiftType(column.getLength());
-    return "ALTER TABLE " + table.getTableName() + " ADD COLUMN " + column.getName() + " "
-    + redshiftType + ";";
+    return "ALTER TABLE " + tableName + " ADD COLUMN " + column.getName() + " " + redshiftType
+        + ";";
   }
 
   public static String generateUnloadStatement(final ExistingSchemaTable table,
-      final DataSchemaTable tableSchema, final String s3Location, final String awsKey,
-      final String awsSecret, final Date dataBeginDate) {
+      final String redshiftSchema, final DataSchemaTable tableSchema, final String s3Location,
+      final String awsKey, final String awsSecret, final Date dataBeginDate) {
     String s = "UNLOAD ('SELECT ";
     final List<DataSchemaColumn> columns = tableSchema.getColumns();
     for (int i = 0; i < columns.size(); i++) {
@@ -50,7 +54,7 @@ public class SqlGenerator {
         s += ", ";
       }
     }
-    s += " FROM " + table.getSourceTable();
+    s += " FROM " + redshiftSchema + "." + table.getSourceTable();
 
     if (table.getDays() != null) {
       final Calendar fromDate = new GregorianCalendar();
@@ -64,8 +68,9 @@ public class SqlGenerator {
       + "\\'";
     }
 
-    s += "') TO '" + s3Location + "/" + table.getTableName() + "/' CREDENTIALS 'aws_access_key_id=" + awsKey
-        + ";aws_secret_access_key=" + awsSecret + "' delimiter '\\t' ALLOWOVERWRITE;";
+    s += "') TO '" + s3Location + "/" + redshiftSchema + "." + table.getTableName()
+    + "/' CREDENTIALS 'aws_access_key_id=" + awsKey + ";aws_secret_access_key=" + awsSecret
+    + "' delimiter '\\t' ALLOWOVERWRITE;";
 
     return s;
   }

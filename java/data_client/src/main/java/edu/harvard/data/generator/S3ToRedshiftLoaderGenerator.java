@@ -12,6 +12,7 @@ import java.util.Set;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
 
+import edu.harvard.data.DataConfig;
 import edu.harvard.data.identity.IdentityMap;
 import edu.harvard.data.schema.DataSchemaColumn;
 import edu.harvard.data.schema.DataSchemaTable;
@@ -21,9 +22,11 @@ public class S3ToRedshiftLoaderGenerator {
   private final File dir;
   private final GenerationSpec spec;
   private final S3ObjectId workingDir;
+  private final DataConfig config;
 
   public S3ToRedshiftLoaderGenerator(final File dir, final GenerationSpec spec,
-      final S3ObjectId workingDir) {
+      final DataConfig config, final S3ObjectId workingDir) {
+    this.config = config;
     this.dir = dir;
     this.spec = spec;
     this.workingDir = workingDir;
@@ -44,7 +47,7 @@ public class S3ToRedshiftLoaderGenerator {
   private void generateIdentityRedshiftLoaderFile(final PrintStream out, final SchemaPhase phase) {
     final DataSchemaTable table = IdentityMap.getIdentityMapTable();
     final String columnList = getColumnList(table);
-    outputPartialTableUpdate(out, table, columnList);
+    outputPartialTableUpdate(out, table, config.identityRedshiftSchema, columnList);
   }
 
   private void generateRedshiftLoaderFile(final PrintStream out, final SchemaPhase phase) {
@@ -67,9 +70,9 @@ public class S3ToRedshiftLoaderGenerator {
         partialTables.add("session");
         // TODO: Make this dynamic for the dump being processed.
         if (partialTables.contains(table.getTableName())) {
-          outputPartialTableUpdate(out, table, columnList);
+          outputPartialTableUpdate(out, table, config.datasetName, columnList);
         } else {
-          outputTableOverwrite(out, table, columnList);
+          outputTableOverwrite(out, table, config.datasetName, columnList);
         }
       }
     }
@@ -93,9 +96,9 @@ public class S3ToRedshiftLoaderGenerator {
   }
 
   private void outputPartialTableUpdate(final PrintStream out, final DataSchemaTable table,
-      final String columnList) {
-    final String tableName = table.getTableName();
-    final String stageTableName = tableName + "_stage";
+      final String redshiftSchema, final String columnList) {
+    final String tableName = redshiftSchema + "." + table.getTableName();
+    final String stageTableName = table.getTableName() + "_stage";
     final String joinField = table.getColumns().get(0).getName();
 
     out.println("------- Table " + tableName + "-------");
@@ -130,8 +133,8 @@ public class S3ToRedshiftLoaderGenerator {
   }
 
   private void outputTableOverwrite(final PrintStream out, final DataSchemaTable table,
-      final String columnList) {
-    final String tableName = table.getTableName();
+      final String redshiftSchema, final String columnList) {
+    final String tableName = redshiftSchema + "." + table.getTableName();
 
     out.println("------- Table " + tableName + "-------");
 

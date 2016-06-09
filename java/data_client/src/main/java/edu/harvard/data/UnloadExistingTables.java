@@ -27,7 +27,7 @@ public class UnloadExistingTables {
     for (final String tableName : existingSchema.getTables().keySet()) {
       final ExistingSchemaTable table = existingSchema.getTables().get(tableName);
       log.info("Unloading " + tableName);
-      final String unload = SqlGenerator.generateUnloadStatement(table,
+      final String unload = SqlGenerator.generateUnloadStatement(table, config.datasetName,
           schema.getTableByName(tableName), s3Location, config.awsKeyId,
           config.awsSecretKey, dataBeginDate);
       aws.executeRedshiftQuery(unload, config);
