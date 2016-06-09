@@ -1,4 +1,4 @@
-package edu.harvard.data.canvas.togenerate;
+package edu.harvard.data.canvas;
 
 import java.io.IOException;
 

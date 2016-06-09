@@ -47,7 +47,7 @@ public class IdentityMapHadoopJob {
   protected void run() throws IOException {
     final IdentifierType mainIdentifier = config.mainIdentifier;
     hadoopConfig.set("format", Format.DecompressedCanvasDataFlatFiles.toString());
-    hadoopConfig.set("mainIdentifier", config.mainIdentifier.toString());
+    hadoopConfig.set("mainIdentifier", mainIdentifier.toString());
     final Job job = Job.getInstance(hadoopConfig, "identity-map");
     job.setJarByClass(IdentityMapHadoopJob.class);
     job.setOutputKeyClass(Text.class);

@@ -13,7 +13,6 @@ import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.canvas.data_api.ApiClient;
 import edu.harvard.data.canvas.data_api.DataDump;
-import edu.harvard.data.canvas.togenerate.CanvasCodeManager;
 import edu.harvard.data.generator.GenerationSpec;
 import edu.harvard.data.pipeline.DataPipelineGenerator;
 import edu.harvard.data.schema.UnexpectedApiResponseException;

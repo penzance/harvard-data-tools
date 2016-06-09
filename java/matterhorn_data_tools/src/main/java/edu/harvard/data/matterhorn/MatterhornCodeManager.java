@@ -1,35 +1,30 @@
-package edu.harvard.data.canvas.togenerate;
+package edu.harvard.data.matterhorn;
 
 import java.util.List;
 
 import org.apache.hadoop.mapreduce.Mapper;
 
-import edu.harvard.data.canvas.identity.CanvasIdentityHadoopManager;
-import edu.harvard.data.canvas.phase_1.Phase1PostVerifier;
-import edu.harvard.data.canvas.phase_1.Phase1PreVerifier;
 import edu.harvard.data.generator.GeneratedCodeManager;
 import edu.harvard.data.identity.IdentityMapHadoopJob;
+import edu.harvard.data.matterhorn.identity.MatterhornIdentityHadoopManager;
+import edu.harvard.data.matterhorn.phase_1.Phase1PreVerifier;
 
-@SuppressWarnings("rawtypes")
-public class CanvasCodeManager implements GeneratedCodeManager {
+public class MatterhornCodeManager implements GeneratedCodeManager {
 
-  private final CanvasIdentityHadoopManager identity;
+  private final MatterhornIdentityHadoopManager identity;
 
-  public CanvasCodeManager() {
-    this.identity = new CanvasIdentityHadoopManager();
+  public MatterhornCodeManager() {
+    this.identity = new MatterhornIdentityHadoopManager();
   }
 
   @Override
-  public Class<? extends IdentityMapHadoopJob> getIdentityMapHadoopJob() {
-    return CanvasIdentityMapHadoopJob.class;
-  }
-
-  @Override
+  @SuppressWarnings("rawtypes")
   public List<Class<? extends Mapper>> getIdentityMapperClasses() {
     return identity.getMapperClasses();
   }
 
   @Override
+  @SuppressWarnings("rawtypes")
   public List<Class<? extends Mapper>> getIdentityScrubberClasses() {
     return identity.getScrubberClasses();
   }
@@ -40,12 +35,18 @@ public class CanvasCodeManager implements GeneratedCodeManager {
   }
 
   @Override
+  public Class<? extends IdentityMapHadoopJob> getIdentityMapHadoopJob() {
+    return MatterhornIdentityMapHadoopJob.class;
+  }
+
+  @Override
   public Class<?> getIdentityPreverifyJob() {
     return Phase1PreVerifier.class;
   }
 
   @Override
   public Class<?> getIdentityPostverifyJob() {
-    return Phase1PostVerifier.class;
+    return MatterhornIdentityMapHadoopJob.class;
   }
+
 }

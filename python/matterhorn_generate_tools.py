@@ -19,6 +19,7 @@ GIT_BASE = os.environ['HARVARD_DATA_TOOLS_BASE']
 GENERATED_CODE_DIR = os.environ['HARVARD_DATA_GENERATED_OUTPUT']
 SECURE_PROPERTIES_LOCATION = os.environ['SECURE_PROPERTIES_LOCATION']
 CURRENT_SCHEMA = os.environ['DATA_SCHEMA_VERSION']
+CONFIG_PATHS = os.environ['CONFIG_PATHS']
 
 DATA_CLIENT_DIR = "{0}/java/data_client".format(GIT_BASE)
 DATA_TOOLS_DIR = "{0}/java/matterhorn_data_tools".format(GIT_BASE)
@@ -56,7 +57,9 @@ def run_generator():
     )
     main_class = "edu.harvard.data.matterhorn.MatterhornCodeGenerator"
     command = [
-        'java', '-cp', generator_classpath, main_class, CURRENT_SCHEMA,
+        'java', '-cp', generator_classpath, main_class,
+        CURRENT_SCHEMA,
+        CONFIG_PATHS,
         GIT_BASE,
         GENERATED_CODE_DIR
     ]
