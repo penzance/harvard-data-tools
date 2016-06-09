@@ -7,6 +7,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 import edu.harvard.data.generator.GeneratedCodeManager;
 import edu.harvard.data.identity.IdentityMapHadoopJob;
 import edu.harvard.data.matterhorn.identity.MatterhornIdentityHadoopManager;
+import edu.harvard.data.matterhorn.phase_1.Phase1PostVerifier;
 import edu.harvard.data.matterhorn.phase_1.Phase1PreVerifier;
 
 public class MatterhornCodeManager implements GeneratedCodeManager {
@@ -46,7 +47,7 @@ public class MatterhornCodeManager implements GeneratedCodeManager {
 
   @Override
   public Class<?> getIdentityPostverifyJob() {
-    return MatterhornIdentityMapHadoopJob.class;
+    return Phase1PostVerifier.class;
   }
 
 }

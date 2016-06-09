@@ -71,7 +71,7 @@ public class Pipeline {
     bootstrapParams.add(AwsUtils.uri(script));
     bootstrapParams.add(schemaVersion);
     bootstrapParams.add(config.gitTagOrBranch);
-    bootstrapParams.add(config.datasource.toLowerCase() + "_generate_tools.py");
+    bootstrapParams.add(config.dataSource.toLowerCase() + "_generate_tools.py");
     bootstrapParams.add(config.paths);
     bootstrapParams.add(pipelineId);
     bootstrapParams.add(config.emrCodeDir);

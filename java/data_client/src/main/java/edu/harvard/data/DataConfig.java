@@ -20,7 +20,7 @@ public class DataConfig {
   public String paths;
 
   public final String datasetName;
-  public final String datasource;
+  public final String dataSource;
   public final String dataPipelineRole;
   public final String dataPipelineResourceRoleArn;
   public final String keypair;
@@ -92,7 +92,7 @@ public class DataConfig {
     this.awsKeyId = getConfigParameter("aws_key_id", verify);
     this.awsSecretKey = getConfigParameter("aws_secret_key", verify);
 
-    this.datasource = getConfigParameter("data_source", verify);
+    this.dataSource = getConfigParameter("data_source", verify);
     this.datasetName = getConfigParameter("dataset_name", verify);
     this.dataPipelineRole = getConfigParameter("data_pipeline_role", verify);
     this.dataPipelineResourceRoleArn = getConfigParameter("data_pipeline_resource_role_arn",
@@ -178,11 +178,11 @@ public class DataConfig {
   }
 
   public S3ObjectId getS3WorkingLocation() {
-    return AwsUtils.key(workingBucket, datasource);
+    return AwsUtils.key(workingBucket, dataSource);
   }
 
   public S3ObjectId getS3IncomingLocation() {
-    return AwsUtils.key(incomingBucket, datasource);
+    return AwsUtils.key(incomingBucket, dataSource);
   }
 
   public String getHdfsDir(final int phase) {
