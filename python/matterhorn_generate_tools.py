@@ -78,7 +78,6 @@ compile_java(DATA_CLIENT_DIR)
 compile_java(MATTERHORN_DATA_CLIENT_DIR)
 run_generator()
 compile_java(JAVA_BINDINGS_DIR)
-copy_secure_properties()
 compile_java(DATA_TOOLS_DIR)
 
 clean_up_files()
