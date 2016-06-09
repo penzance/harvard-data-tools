@@ -1,9 +1,7 @@
 package edu.harvard.data.pipeline;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
@@ -82,19 +80,14 @@ public class DataPipelineGenerator {
     final EmrStartupPipelineSetup setup = new EmrStartupPipelineSetup(pipeline, factory,
         dataLocation);
     final Phase1PipelineSetup phase1 = new Phase1PipelineSetup(pipeline, factory, codeManager);
-    final List<Phase2PipelineSetup> phase2 = new ArrayList<Phase2PipelineSetup>();
-    for (int i = 0; i < 2; i++) {
-      phase2.add(new Phase2PipelineSetup(pipeline, factory, i));
-    }
+    final Phase2PipelineSetup phase2 = new Phase2PipelineSetup(pipeline, factory, spec);
     final Phase3PipelineSetup phase3 = new Phase3PipelineSetup(pipeline, factory);
 
     PipelineObjectBase previousStep;
     previousStep = setup.populate();
     previousStep = phase1.populate(previousStep);
-    // for (final Phase2PipelineSetup subphase : phase2) {
-    // previousStep = subphase.populate(previousStep);
-    // }
-    // previousStep = phase3.populate(previousStep);
+    previousStep = phase2.populate(previousStep);
+    previousStep = phase3.populate(previousStep);
     previousStep.setSuccess(getSuccessAction(factory));
     return pipeline;
   }

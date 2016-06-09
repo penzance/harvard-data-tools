@@ -45,9 +45,9 @@ public class Phase1PostVerifier {
   public static void main(final String[] args)
       throws IOException, DataConfigurationException, VerificationException {
     final String configPathString = args[0];
-    final CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, configPathString,
-        true);
-    new Phase1PreVerifier(config).verify();
+    final CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class,
+        configPathString, true);
+    new Phase1PostVerifier(config).verify();
   }
 
   public Phase1PostVerifier(final CanvasDataConfig config) throws DataConfigurationException {
