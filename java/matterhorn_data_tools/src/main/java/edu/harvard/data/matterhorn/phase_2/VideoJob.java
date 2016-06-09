@@ -22,7 +22,7 @@ import edu.harvard.data.TableFormat;
 import edu.harvard.data.matterhorn.bindings.phase1.Phase1Video;
 import edu.harvard.data.matterhorn.bindings.phase2.Phase2Video;
 
-class VideoJob extends HadoopJob {
+public class VideoJob extends HadoopJob {
 
   public VideoJob(final Configuration hadoopConf, final AwsUtils aws, final URI hdfsService,
       final String inputDir, final String outputDir) {

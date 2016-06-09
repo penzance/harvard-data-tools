@@ -27,7 +27,7 @@ import edu.harvard.data.TableFormat;
 import edu.harvard.data.canvas.bindings.phase2.Phase2Requests;
 import edu.harvard.data.canvas.bindings.phase3.Phase3Sessions;
 
-class SessionsJob extends HadoopJob {
+public class SessionsJob extends HadoopJob {
 
   public SessionsJob(final Configuration hadoopConf, final AwsUtils aws, final URI hdfsService,
       final String inputDir, final String outputDir) {

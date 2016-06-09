@@ -44,8 +44,8 @@ public class MatterhornCodeGenerator extends CodeGenerator {
   private final MatterhornDataConfig config;
 
   public MatterhornCodeGenerator(final String schemaVersion, final File gitDir, final File codeDir,
-      final MatterhornDataConfig config) throws FileNotFoundException {
-    super(config, codeDir, AwsUtils.key(config.getS3WorkingLocation()));
+      final MatterhornDataConfig config, final String pipelineId) throws FileNotFoundException {
+    super(config, codeDir, AwsUtils.key(config.getS3WorkingLocation(), pipelineId));
     this.config = config;
     if (!gitDir.exists() && gitDir.isDirectory()) {
       throw new FileNotFoundException(gitDir.toString());
@@ -56,20 +56,21 @@ public class MatterhornCodeGenerator extends CodeGenerator {
 
   public static void main(final String[] args) throws IOException, DataConfigurationException,
   UnexpectedApiResponseException, SQLException, VerificationException {
-    if (args.length != 4) {
+    if (args.length != 5) {
       System.err.println(
-          "Usage: schema_version /path/to/config1|/path/to/config2 /path/to/harvard-data-tools /path/to/output/directory");
+          "Usage: schema_version /path/to/config1|/path/to/config2 /path/to/harvard-data-tools /path/to/output/directory pipeline_id");
     }
     final String schemaVersion = args[0];
     final String configFiles = args[1];
     final File gitDir = new File(args[2]);
     final File dir = new File(args[3]);
+    final String pipelineId = args[4];
     if (!(gitDir.exists() && gitDir.isDirectory())) {
       throw new FileNotFoundException(gitDir.toString());
     }
     final MatterhornDataConfig config = MatterhornDataConfig
         .parseInputFiles(MatterhornDataConfig.class, configFiles, false);
-    new MatterhornCodeGenerator(schemaVersion, gitDir, dir, config).generate();
+    new MatterhornCodeGenerator(schemaVersion, gitDir, dir, config, pipelineId).generate();
   }
 
   @Override

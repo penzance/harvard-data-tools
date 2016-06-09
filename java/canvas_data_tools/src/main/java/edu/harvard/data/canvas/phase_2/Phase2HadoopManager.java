@@ -11,6 +11,7 @@ import org.apache.hadoop.mapreduce.Job;
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary.Format;
+import edu.harvard.data.HadoopJob;
 import edu.harvard.data.canvas.CanvasDataConfig;
 
 public class Phase2HadoopManager {
@@ -20,7 +21,15 @@ public class Phase2HadoopManager {
     hadoopConfig.set("format", Format.DecompressedCanvasDataFlatFiles.toString());
     final List<Job> jobs = new ArrayList<Job>();
     jobs.add(new RequestJob(hadoopConfig, config, aws, hdfsService, inputDir, outputDir).getJob());
-    jobs.add(new AdminRequestJob(hadoopConfig, config, aws, hdfsService, inputDir, outputDir).getJob());
+    jobs.add(
+        new AdminRequestJob(hadoopConfig, config, aws, hdfsService, inputDir, outputDir).getJob());
+    return jobs;
+  }
+
+  public static List<Class<? extends HadoopJob>> getJobs() {
+    final List<Class<? extends HadoopJob>> jobs = new ArrayList<Class<? extends HadoopJob>>();
+    jobs.add(RequestJob.class);
+    jobs.add(AdminRequestJob.class);
     return jobs;
   }
 

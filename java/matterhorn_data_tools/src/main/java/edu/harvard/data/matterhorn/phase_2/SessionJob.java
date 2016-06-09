@@ -25,7 +25,7 @@ import edu.harvard.data.TableFormat;
 import edu.harvard.data.matterhorn.bindings.phase1.Phase1Event;
 import edu.harvard.data.matterhorn.bindings.phase2.Phase2Session;
 
-class SessionJob extends HadoopJob {
+public class SessionJob extends HadoopJob {
 
   public SessionJob(final Configuration hadoopConf, final AwsUtils aws, final URI hdfsService,
       final String inputDir, final String outputDir) {

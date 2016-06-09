@@ -24,7 +24,7 @@ public class MatterhornBootstrap {
         .parseInputFiles(MatterhornDataConfig.class, configPath, true);
     final S3ObjectId dumpLocation = AwsUtils.key(config.getS3IncomingLocation(), "TestData");
     final MatterhornCodeGenerator generator = new MatterhornCodeGenerator(schemaVersion, gitDir,
-        null, config);
+        null, config, null);
 
     final GenerationSpec spec = generator.createGenerationSpec();
     final DataPipelineGenerator pipeline = new DataPipelineGenerator("Matterhorn", spec, config,

@@ -26,7 +26,7 @@ import edu.harvard.data.canvas.CanvasDataConfig;
 import edu.harvard.data.canvas.bindings.phase1.Phase1Requests;
 import edu.harvard.data.canvas.bindings.phase2.Phase2Requests;
 
-class RequestJob extends HadoopJob {
+public class RequestJob extends HadoopJob {
 
   public RequestJob(final Configuration hadoopConf, final CanvasDataConfig dataConfig,
       final AwsUtils aws, final URI hdfsService, final String inputDir, final String outputDir) {

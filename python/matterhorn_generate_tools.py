@@ -20,6 +20,7 @@ GENERATED_CODE_DIR = os.environ['HARVARD_DATA_GENERATED_OUTPUT']
 SECURE_PROPERTIES_LOCATION = os.environ['SECURE_PROPERTIES_LOCATION']
 CURRENT_SCHEMA = os.environ['DATA_SCHEMA_VERSION']
 CONFIG_PATHS = os.environ['CONFIG_PATHS']
+PIPELINE_ID = os.environ['PIPELINE_ID']
 
 DATA_CLIENT_DIR = "{0}/java/data_client".format(GIT_BASE)
 DATA_TOOLS_DIR = "{0}/java/matterhorn_data_tools".format(GIT_BASE)
@@ -61,7 +62,8 @@ def run_generator():
         CURRENT_SCHEMA,
         CONFIG_PATHS,
         GIT_BASE,
-        GENERATED_CODE_DIR
+        GENERATED_CODE_DIR,
+        PIPELINE_ID
     ]
     print "Running {0} in {1}".format(command, GENERATED_CODE_DIR)
     process = subprocess.Popen(command)
