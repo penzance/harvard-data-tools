@@ -64,7 +64,7 @@ public class Phase2PipelineSetup {
   }
 
   private PipelineObjectBase moveUnmodifiedFiles(final int phase) {
-    final String cmd = config.getMoveUnmodifiedScript(phase);
+    final String cmd = config.emrCodeDir + "/" + config.getMoveUnmodifiedScript(phase);
     final String id = "Phase" + phase + "MoveUnmodifiedFiles";
     final PipelineObjectBase moveUnmodified = factory.getShellActivity(id, cmd, pipeline.getEmr());
     return moveUnmodified;
