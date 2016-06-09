@@ -25,8 +25,8 @@ public class Phase2PipelineSetup {
   }
 
   private PipelineObjectBase skipPhase2(final PipelineObjectBase previousStep) {
-    final String cmd = "hadoop fs -mv hdfs://" + config.getHdfsDir(1) + "/ hdfs://"
-        + config.getHdfsDir(2) + "/";
+    final String cmd = "hadoop fs -mkdir " + config.getHdfsDir(2) + "; hadoop fs -mv hdfs://"
+        + config.getHdfsDir(1) + "/* hdfs://" + config.getHdfsDir(2) + "/";
     final PipelineObjectBase skip = factory.getShellActivity("SkipPhase2", cmd, pipeline.getEmr());
     skip.addDependency(previousStep);
     return skip;

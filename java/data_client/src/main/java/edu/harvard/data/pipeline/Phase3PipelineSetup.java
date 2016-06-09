@@ -32,7 +32,7 @@ public class Phase3PipelineSetup {
   }
 
   private PipelineObjectBase copyDataToS3(final PipelineObjectBase previousStep) {
-    final PipelineObjectBase copy = factory.getS3DistCpActivity("CopyAllTablesToS3", config.getVerifyHdfsDir(2),
+    final PipelineObjectBase copy = factory.getS3DistCpActivity("CopyAllTablesToS3", config.getHdfsDir(2),
         redshiftStagingS3, pipeline.getEmr());
     copy.addDependency(previousStep);
     return copy;
