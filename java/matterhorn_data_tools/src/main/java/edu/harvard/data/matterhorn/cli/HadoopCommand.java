@@ -20,7 +20,6 @@ import edu.harvard.data.VerificationException;
 import edu.harvard.data.matterhorn.HadoopMultipleJobRunner;
 import edu.harvard.data.matterhorn.MatterhornDataConfig;
 import edu.harvard.data.matterhorn.phase_1.Phase1HadoopManager;
-import edu.harvard.data.matterhorn.phase_2.Phase2HadoopManager;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class HadoopCommand implements Command {
@@ -76,8 +75,9 @@ public class HadoopCommand implements Command {
     case 1:
       break;
     case 2:
-      return Phase2HadoopManager.getJobs(aws, hadoopConfig, config, hdfsService, inputDir,
-          outputDir);
+      //      return Phase2HadoopManager.getJobs(aws, hadoopConfig, config, hdfsService, inputDir,
+      //          outputDir);
+      break;
     case 3:
       break;
     default:

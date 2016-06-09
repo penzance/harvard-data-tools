@@ -15,7 +15,6 @@ import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.mapreduce.Job;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,11 +22,11 @@ import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
+import edu.harvard.data.HadoopJob;
 import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.canvas.CanvasDataConfig;
-import edu.harvard.data.canvas.HadoopMultipleJobRunner;
 import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.identity.IdentityMap;
 import edu.harvard.data.io.HdfsTableReader;
@@ -41,6 +40,7 @@ public class Phase1PostVerifier {
   private final String verifyDir;
   private final TableFormat format;
   private final HadoopUtilities hadoopUtils;
+  private final CanvasDataConfig config;
 
   public static void main(final String[] args)
       throws IOException, DataConfigurationException, VerificationException {
@@ -51,6 +51,7 @@ public class Phase1PostVerifier {
   }
 
   public Phase1PostVerifier(final CanvasDataConfig config) throws DataConfigurationException {
+    this.config = config;
     this.inputDir = config.getHdfsDir(0);
     this.outputDir = config.getHdfsDir(1);
     this.verifyDir = config.getVerifyHdfsDir(0);
@@ -74,17 +75,15 @@ public class Phase1PostVerifier {
         outputDir + "/identity_map", format).verify();
     updateInterestingTables();
 
-    hadoopConfig.set("format", format.getFormat().toString());
-    final HadoopMultipleJobRunner jobRunner = new HadoopMultipleJobRunner(hadoopConfig);
-    final List<Job> jobs = setupJobs();
-    jobRunner.runParallelJobs(jobs);
+    for (final HadoopJob job : setupJobs()) {
+      job.runJob();
+    }
   }
 
-  private List<Job> setupJobs() throws IOException {
+  private List<HadoopJob> setupJobs() throws IOException, DataConfigurationException {
     final AwsUtils aws = new AwsUtils();
-    final List<Job> jobs = new ArrayList<Job>();
-    jobs.add(
-        new PostVerifyRequestsJob(hadoopConfig, aws, hdfsService, outputDir, verifyDir).getJob());
+    final List<HadoopJob> jobs = new ArrayList<HadoopJob>();
+    jobs.add(new PostVerifyRequestsJob(config, 1));
     return jobs;
   }
 

@@ -82,7 +82,7 @@ public class DataPipelineGenerator {
     final EmrStartupPipelineSetup setup = new EmrStartupPipelineSetup(pipeline, factory,
         dataLocation);
     final Phase1PipelineSetup phase1 = new Phase1PipelineSetup(pipeline, factory, codeManager);
-    final Phase2PipelineSetup phase2 = new Phase2PipelineSetup(pipeline, factory, spec);
+    final Phase2PipelineSetup phase2 = new Phase2PipelineSetup(pipeline, factory, codeManager);
     final Phase3PipelineSetup phase3 = new Phase3PipelineSetup(pipeline, factory);
 
     PipelineObjectBase previousStep;

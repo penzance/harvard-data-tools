@@ -2,29 +2,65 @@ package edu.harvard.data;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import edu.harvard.data.FormatLibrary.Format;
 
 public abstract class HadoopJob {
+  private static final Logger log = LogManager.getLogger();
 
   protected Configuration hadoopConf;
-  protected AwsUtils aws;
   protected String inputDir;
   protected String outputDir;
   protected HadoopUtilities hadoopUtils;
   protected final URI hdfsService;
+  protected List<URI> cacheFiles;
 
-  public HadoopJob(final Configuration hadoopConf, final AwsUtils aws, final URI hdfsService,
-      final String inputDir, final String outputDir) {
-    this.hadoopConf = hadoopConf;
-    this.aws = aws;
-    this.inputDir = inputDir;
-    this.outputDir = outputDir;
-    this.hdfsService = hdfsService;
+  public HadoopJob(final DataConfig config, final int phase) throws DataConfigurationException {
     this.hadoopUtils = new HadoopUtilities();
+    this.inputDir = config.getHdfsDir(phase - 1);
+    this.outputDir = config.getHdfsDir(phase);
+    this.cacheFiles = new ArrayList<URI>();
+    try {
+      this.hdfsService = new URI("hdfs///");
+    } catch (final URISyntaxException e) {
+      throw new DataConfigurationException(e);
+    }
+    this.hadoopConf = new Configuration();
+    final TableFormat format = new FormatLibrary().getFormat(Format.DecompressedCanvasDataFlatFiles);
+    hadoopConf.set("format", format.getFormat().toString());
+    hadoopConf.set("config", config.paths);
+  }
+
+  public void runJob() throws IOException, DataConfigurationException {
+    final Job job = getJob();
+    for (final URI file : cacheFiles) {
+      job.addCacheFile(file);
+    }
+    job.setJarByClass(HadoopJob.class);
+    try {
+      log.info("Submitted job " + job.getJobName());
+      job.submit();
+      job.waitForCompletion(true);
+    } catch (final ClassNotFoundException e) {
+      throw new DataConfigurationException(e);
+    } catch (final InterruptedException e) {
+      log.error("Job submission interrupted", e);
+    }
+  }
+
+  public void addCacheFile(final URI file) {
+    this.cacheFiles.add(file);
   }
 
   public abstract Job getJob() throws IOException;
+
 
 }

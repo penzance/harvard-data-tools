@@ -2,14 +2,12 @@ package edu.harvard.data.canvas.phase_2;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -17,7 +15,8 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
-import edu.harvard.data.AwsUtils;
+import edu.harvard.data.DataConfig;
+import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopJob;
@@ -29,9 +28,16 @@ import edu.harvard.data.canvas.bindings.phase2.Phase2Requests;
 
 public class AdminRequestJob extends HadoopJob {
 
-  public AdminRequestJob(final Configuration hadoopConf, final CanvasDataConfig dataConfig,
-      final AwsUtils aws, final URI hdfsService, final String inputDir, final String outputDir) {
-    super(hadoopConf, aws, hdfsService, inputDir, outputDir);
+  public static void main(final String[] args) throws IOException, DataConfigurationException {
+    final String configPathString = args[0];
+    final int phase = Integer.parseInt(args[1]);
+    final CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, configPathString,
+        true);
+    new AdminRequestJob(config, phase).runJob();
+  }
+
+  public AdminRequestJob(final DataConfig config, final int phase) throws DataConfigurationException {
+    super(config, phase);
   }
 
   @Override

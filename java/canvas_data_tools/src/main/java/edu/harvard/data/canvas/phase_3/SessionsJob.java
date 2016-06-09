@@ -1,7 +1,6 @@
 package edu.harvard.data.canvas.phase_3;
 
 import java.io.IOException;
-import java.net.URI;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.csv.CSVParser;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -18,20 +16,30 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
-import edu.harvard.data.AwsUtils;
+import edu.harvard.data.DataConfig;
+import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopJob;
 import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.TableFormat;
+import edu.harvard.data.canvas.CanvasDataConfig;
 import edu.harvard.data.canvas.bindings.phase2.Phase2Requests;
 import edu.harvard.data.canvas.bindings.phase3.Phase3Sessions;
+import edu.harvard.data.canvas.phase_2.RequestJob;
 
 public class SessionsJob extends HadoopJob {
 
-  public SessionsJob(final Configuration hadoopConf, final AwsUtils aws, final URI hdfsService,
-      final String inputDir, final String outputDir) {
-    super(hadoopConf, aws, hdfsService, inputDir, outputDir);
+  public static void main(final String[] args) throws IOException, DataConfigurationException {
+    final String configPathString = args[0];
+    final int phase = Integer.parseInt(args[1]);
+    final CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, configPathString,
+        true);
+    new RequestJob(config, phase).runJob();
+  }
+
+  public SessionsJob(final DataConfig config, final int phase) throws DataConfigurationException {
+    super(config, phase);
   }
 
   @Override

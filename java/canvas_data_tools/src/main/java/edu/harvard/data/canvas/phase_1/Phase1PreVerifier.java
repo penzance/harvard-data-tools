@@ -8,17 +8,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.mapreduce.Job;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
+import edu.harvard.data.HadoopJob;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.canvas.CanvasDataConfig;
-import edu.harvard.data.canvas.HadoopMultipleJobRunner;
 
 public class Phase1PreVerifier {
   private static final Logger log = LogManager.getLogger();
@@ -63,18 +62,15 @@ public class Phase1PreVerifier {
       throw new IOException(e);
     }
 
-    final HadoopMultipleJobRunner jobRunner = new HadoopMultipleJobRunner(hadoopConfig);
-    hadoopConfig.set("format", format.getFormat().toString());
-    final List<Job> jobs = setupJobs();
-    for (final Job job : jobs) {
+    for (final HadoopJob job : setupJobs()) {
+      job.runJob();
       job.addCacheFile(URI.create(interestingIdFile));
     }
-    jobRunner.runParallelJobs(jobs);
   }
 
-  private List<Job> setupJobs() throws IOException {
-    final List<Job> jobs = new ArrayList<Job>();
-    jobs.add(new PreVerifyRequestsJob(hadoopConfig, hdfsService, inputDir, outputDir).getJob());
+  private List<HadoopJob> setupJobs() throws IOException, DataConfigurationException {
+    final List<HadoopJob> jobs = new ArrayList<HadoopJob>();
+    jobs.add(new PreVerifyRequestsJob(config, 1));
     return jobs;
   }
 
