@@ -44,7 +44,7 @@ public class UnloadExistingTablesCommand implements Command {
 
     final DataSchema base = api.getSchema(info.getSchemaVersion());
     final CanvasCodeGenerator generator = new CanvasCodeGenerator(null, null,
-        null, config, null);
+        null, config);
     final ExistingSchema existingSchema = ExistingSchema
         .readExistingSchemas(CanvasCodeGenerator.PHASE_ZERO_TABLES_JSON);
     final DataSchema schema0 = generator.transformSchema(base).get(0);

@@ -2,9 +2,6 @@
 # - HARVARD_DATA_TOOLS_BASE: the directory where the harvard-data-tools
 #     repository has been checked out. Point to the root of the repository, e.g.
 #     /tmp/code/harvard-data-tools
-# - SECURE_PROPERTIES_LOCATION: a directory containing the secure.properties
-#     file modelled after the template in:
-#     java/aws_data_tools/src/main/resources/secure.properties.example
 # - HARVARD_DATA_GENERATED_OUTPUT: the directory where generated scripts and
 #     .jar files should be stored.
 # - CANVAS_DATA_SCHEMA_VERSION: The version of the Canvas Data schema for which
@@ -17,7 +14,6 @@ import sys
 
 GIT_BASE = os.environ['HARVARD_DATA_TOOLS_BASE']
 GENERATED_CODE_DIR = os.environ['HARVARD_DATA_GENERATED_OUTPUT']
-SECURE_PROPERTIES_LOCATION = os.environ['SECURE_PROPERTIES_LOCATION']
 CURRENT_SCHEMA = os.environ['DATA_SCHEMA_VERSION']
 CONFIG_PATHS = os.environ['CONFIG_PATHS']
 PIPELINE_ID = os.environ['PIPELINE_ID']
@@ -54,7 +50,6 @@ def run_generator():
         "{0}/target/matterhorn_data_client-1.0.0.jar".format(MATTERHORN_DATA_CLIENT_DIR),
         "{0}/target/data_client-1.0.0.jar".format(DATA_CLIENT_DIR),
         SCHEMA_JSON_DIR,
-        SECURE_PROPERTIES_LOCATION
     )
     main_class = "edu.harvard.data.matterhorn.MatterhornCodeGenerator"
     command = [
@@ -70,11 +65,6 @@ def run_generator():
     process.wait()
     print "Return code: {0}".format(process.returncode)
     check_return_code(process.returncode)
-
-def copy_secure_properties():
-    secure_file = "{0}/secure.properties".format(SECURE_PROPERTIES_LOCATION)
-    resources_dir = "{0}/src/main/resources/secure.properties".format(DATA_TOOLS_DIR)
-    shutil.copyfile(secure_file, resources_dir)
 
 compile_java(DATA_CLIENT_DIR)
 compile_java(MATTERHORN_DATA_CLIENT_DIR)

@@ -36,8 +36,8 @@ public class CanvasCodeGenerator extends CodeGenerator {
   private final CanvasDataConfig config;
 
   public CanvasCodeGenerator(final String schemaVersion, final File gitDir, final File codeDir,
-      final CanvasDataConfig config, final String pipelineId) throws FileNotFoundException {
-    super(config, codeDir, AwsUtils.key(config.getS3WorkingLocation(), pipelineId));
+      final CanvasDataConfig config) throws FileNotFoundException {
+    super(config, codeDir, AwsUtils.key(config.getS3WorkingLocation()));
     this.gitDir = gitDir;
     this.schemaVersion = schemaVersion;
     this.config = config;
@@ -45,21 +45,20 @@ public class CanvasCodeGenerator extends CodeGenerator {
 
   public static void main(final String[] args) throws IOException, DataConfigurationException,
   UnexpectedApiResponseException, SQLException, VerificationException {
-    if (args.length != 5) {
+    if (args.length != 4) {
       System.err.println(
-          "Usage: schema_version /path/to/config1|/path/to/config2 /path/to/harvard-data-tools /path/to/output/directory pipeline_id");
+          "Usage: schema_version /path/to/config1|/path/to/config2 /path/to/harvard-data-tools /path/to/output/directory");
     }
     final String schemaVersion = args[0];
     final String configFiles = args[1];
     final File gitDir = new File(args[2]);
     final File dir = new File(args[3]);
-    final String pipelineId = args[4];
     if (!(gitDir.exists() && gitDir.isDirectory())) {
       throw new FileNotFoundException(gitDir.toString());
     }
     final CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class,
         configFiles, false);
-    new CanvasCodeGenerator(schemaVersion, gitDir, dir, config, pipelineId).generate();
+    new CanvasCodeGenerator(schemaVersion, gitDir, dir, config).generate();
   }
 
   @Override
