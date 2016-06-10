@@ -1,0 +1,13 @@
+{ "tables": {
+    "tableName" : {
+      "columns" : [
+        {
+          "name" : "column_name",
+          "type" : "varchar",
+          "length": 0
+        }
+      ]
+    }
+  } 
+}
+

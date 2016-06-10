@@ -7,6 +7,7 @@ export CONFIG_PATHS="s3://hdt-code/api_pipeline/canvas.properties|s3://hdt-code/
 export HARVARD_DATA_GENERATED_OUTPUT=/home/ec2-user/code
 export DATA_SET_ID=29781907-7b5b-4370-b7f2-4e28b5116396
 export PHASE_0_THREADS=1
+export PHASE_0_HEAP_SIZE=512m
 
 # add github.com to known_hosts
 ssh-keyscan github.com >> /home/ec2-user/.ssh/known_hosts
@@ -26,4 +27,4 @@ git clone -b $GIT_BRANCH https://github.com/penzance/harvard-data-tools.git $HAR
 python $HARVARD_DATA_TOOLS_BASE/python/$GENERATOR
 
 # run phase 0
-python $HARVARD_DATA_TOOLS_BASE/python/$PHASE_0
+java -Duser.timezone=$SERVER_TIMEZONE -Xmx$PHASE_0_HEAP_SIZE -cp /home/ec2-user/code/data_tools.jar edu.harvard.data.canvas.CanvasPhase0 $CONFIG_PATHS $DATA_SET_ID $PHASE_0_THREADS

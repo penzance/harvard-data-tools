@@ -1,0 +1,11 @@
+{ "tables": {
+    "tableName" : {
+      "columns" : [
+        {
+          "name" : "column_name"
+        }
+      ]
+    }
+  } 
+}
+

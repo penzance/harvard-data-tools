@@ -49,7 +49,7 @@ public class CanvasPipelineBootstrap {
     final S3ObjectId dumpLocation = AwsUtils.key(config.getS3IncomingLocation(),
         String.format("%05d", dump.getSequence()));
     final CanvasCodeGenerator generator = new CanvasCodeGenerator(dump.getSchemaVersion(), gitDir,
-        null, config);
+        null, config, null);
     final GenerationSpec spec = generator.createGenerationSpec();
     final DataPipelineGenerator pipeline = new DataPipelineGenerator(
         "Canvas_Dump_" + dump.getSequence(), spec, config, dumpLocation, new CanvasCodeManager());

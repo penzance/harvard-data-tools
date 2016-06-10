@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
 
+import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.VerificationException;
@@ -51,10 +52,10 @@ public abstract class CodeGenerator {
    *          S3 scratch directory to store intermediate code and data during
    *          the pipeline's run
    */
-  public CodeGenerator(final DataConfig config, final File codeDir, final S3ObjectId workingDir) {
+  public CodeGenerator(final DataConfig config, final File codeDir, final String pipelineId) {
     this.config = config;
     this.codeDir = codeDir;
-    this.workingDir = workingDir;
+    this.workingDir = AwsUtils.key(config.getS3WorkingLocation(), pipelineId);
   }
 
   /**

@@ -25,17 +25,6 @@ public class DataConfig {
   private final String dataPipelineResourceRoleArn;
   private final String keypair;
   private final String subnetId;
-  private final String emrReleaseLabel;
-  private final String emrTerminateAfter;
-  private final String emrMasterInstanceType;
-  private final String emrMasterBidPrice;
-  private final String emrCoreInstanceCount;
-  private final String emrCoreInstanceType;
-  private final String emrCoreBidPrice;
-  private final String emrTaskInstanceCount;
-  private final String emrTaskInstanceType;
-  private final String emrTaskBidPrice;
-  private final String emrMaximumRetries;
   private final String gitTagOrBranch;
   private final String logBucket;
   private final String codeBucket;
@@ -56,6 +45,24 @@ public class DataConfig {
   private final String awsSecretKey;
   private final IdentifierType mainIdentifier;
   private final String pipelineDynamoTable;
+
+  private final String emrReleaseLabel;
+  private final String emrTerminateAfter;
+  private final String emrMasterInstanceType;
+  private final String emrMasterBidPrice;
+  private final String emrCoreInstanceCount;
+  private final String emrCoreInstanceType;
+  private final String emrCoreBidPrice;
+  private final String emrTaskInstanceCount;
+  private final String emrTaskInstanceType;
+  private final String emrTaskBidPrice;
+  private final String emrMaximumRetries;
+
+  private final String phase0InstanceType;
+  private final String phase0BidPrice;
+  private final String phase0TerminateAfter;
+  private final String phase0Threads;
+  private final String phase0HeapSize;
 
   private final String emrCodeDir;
   private final String dataToolsJar;
@@ -96,16 +103,6 @@ public class DataConfig {
         verify);
     this.keypair = getConfigParameter("keypair", verify);
     this.subnetId = getConfigParameter("subnet_id", verify);
-    this.emrReleaseLabel = getConfigParameter("emr_release_label", verify);
-    this.emrTerminateAfter = getConfigParameter("emr_terminate_after", verify);
-    this.emrMasterInstanceType = getConfigParameter("emr_master_instance_type", verify);
-    this.emrCoreInstanceType = getConfigParameter("emr_core_instance_type", verify);
-    this.emrTaskInstanceType = getConfigParameter("emr_task_instance_type", verify);
-    this.emrMasterBidPrice = getConfigParameter("emr_master_bid_price", false);
-    this.emrCoreBidPrice = getConfigParameter("emr_core_bid_price", false);
-    this.emrTaskBidPrice = getConfigParameter("emr_task_bid_price", false);
-    this.emrCoreInstanceCount = getConfigParameter("emr_core_instance_count", verify);
-    this.emrTaskInstanceCount = getConfigParameter("emr_task_instance_count", verify);
     this.gitTagOrBranch = getConfigParameter("git_tag_or_branch", verify);
     this.logBucket = getConfigParameter("log_bucket", verify);
     this.codeBucket = getConfigParameter("code_bucket", verify);
@@ -122,7 +119,24 @@ public class DataConfig {
     this.pipelineDynamoTable = getConfigParameter("pipeline_dynamo_table", verify);
     this.mainIdentifier = IdentifierType.valueOf(getConfigParameter("main_identifier", verify));
     this.emrMaximumRetries = getConfigParameter("emr_maximum_retries", verify);
+    this.emrReleaseLabel = getConfigParameter("emr_release_label", verify);
+    this.emrTerminateAfter = getConfigParameter("emr_terminate_after", verify);
+    this.emrMasterInstanceType = getConfigParameter("emr_master_instance_type", verify);
+    this.emrCoreInstanceType = getConfigParameter("emr_core_instance_type", verify);
+    this.emrTaskInstanceType = getConfigParameter("emr_task_instance_type", verify);
+    this.emrMasterBidPrice = getConfigParameter("emr_master_bid_price", false);
+    this.emrCoreBidPrice = getConfigParameter("emr_core_bid_price", false);
+    this.emrTaskBidPrice = getConfigParameter("emr_task_bid_price", false);
+    this.emrCoreInstanceCount = getConfigParameter("emr_core_instance_count", verify);
+    this.emrTaskInstanceCount = getConfigParameter("emr_task_instance_count", verify);
+
+    this.phase0InstanceType = getConfigParameter("phase_0_instance_type", verify);
+    this.phase0BidPrice = getConfigParameter("phase_0_bid_price", verify);
+    this.phase0TerminateAfter = getConfigParameter("phase_0_terminate_after", verify);
+    this.phase0Threads = getConfigParameter("phase_0_threads", verify);
+    this.phase0HeapSize = getConfigParameter("phase_0_heap_size", verify);
   }
+
 
   public static <T extends DataConfig> T parseInputFiles(final Class<T> cls,
       final String configPathString, final boolean verify)
@@ -370,6 +384,30 @@ public class DataConfig {
 
   public void setPaths(final String paths) {
     this.paths = paths;
+  }
+
+  public String getPhase0InstanceType() {
+    return phase0InstanceType;
+  }
+
+
+  public String getPhase0BidPrice() {
+    return phase0BidPrice;
+  }
+
+
+  public String getPhase0TerminateAfter() {
+    return phase0TerminateAfter;
+  }
+
+
+  public String getPhase0Threads() {
+    return phase0Threads;
+  }
+
+
+  public String getPhase0HeapSize() {
+    return phase0HeapSize;
   }
 
 }
