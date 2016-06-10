@@ -50,12 +50,12 @@ public class CanvasPhase0Bootstrap {
         configPathString += "|" + path;
       }
       config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, configPathString, true);
-      createPhase0(config);
+      createPhase0(config, dump);
     }
     // No dump to download
   }
 
-  private static void createPhase0(final CanvasDataConfig config) throws IOException {
+  private static void createPhase0(final CanvasDataConfig config, final DataDump dump) throws IOException {
     final AmazonEC2Client ec2client = new AmazonEC2Client();
 
     final LaunchSpecification spec = new LaunchSpecification();
@@ -63,7 +63,7 @@ public class CanvasPhase0Bootstrap {
     spec.setInstanceType(config.getPhase0InstanceType());
     spec.setKeyName(config.getKeypair());
     spec.setSubnetId(config.getSubnetId());
-    spec.setUserData(getUserData());
+    spec.setUserData(getUserData(dump));
     final IamInstanceProfileSpecification instanceProfile = new IamInstanceProfileSpecification();
     instanceProfile.setArn(config.getDataPipelineResourceRoleArn());
     spec.setIamInstanceProfile(instanceProfile);
@@ -86,12 +86,13 @@ public class CanvasPhase0Bootstrap {
     // TODO: Check in case the startup failed.
   }
 
-  private static String getUserData() throws IOException {
+  private static String getUserData(final DataDump dump) throws IOException {
     final AwsUtils aws = new AwsUtils();
     final S3ObjectId bootstrapScript = AwsUtils
         .key("s3://hdt-code/api_pipeline/phase-0-bootstrap.sh");
 
-    String userData = "";
+    String userData = "#! /bin/bash\n";
+    userData += "export DATA_SET_ID=" + dump.getDumpId() + "\n";
     try (final BufferedReader in = new BufferedReader(
         new InputStreamReader(aws.getInputStream(bootstrapScript, false)))) {
       String line = in.readLine();
