@@ -5,7 +5,7 @@ export PHASE_0=canvas_phase_0.py
 export DATA_SCHEMA_VERSION=1.10.2
 export CONFIG_PATHS="s3://hdt-code/api_pipeline/canvas.properties|s3://hdt-code/api_pipeline/secure.properties"
 export HARVARD_DATA_GENERATED_OUTPUT=/home/ec2-user/code
-
+export CANVAS_DATA_RESULT_FILE=/tmp/result.json
 
 # add github.com to known_hosts
 ssh-keyscan github.com >> /home/ec2-user/.ssh/known_hosts

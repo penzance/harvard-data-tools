@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.DumpInfo;
+import edu.harvard.data.TableInfo;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.canvas.CanvasDataConfig;
 import edu.harvard.data.canvas.cli.ArgumentError;
@@ -35,12 +36,14 @@ public class DownloadDump {
     final File output = new File(args[2]);
     final AwsUtils aws = new AwsUtils();
     final CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class,
-        configPathString, true);
+        configPathString, false);
     final DumpManager manager = new DumpManager(config, aws);
     final ApiClient api = new ApiClient(config.getCanvasDataHost(), config.getCanvasApiKey(),
         config.getCanvasApiSecret());
     final DataDump dump = api.getDump(dumpId);
     final CanvasDataSchema schema = (CanvasDataSchema) api.getSchema(dump.getSchemaVersion());
+    DumpInfo.init(config.getDumpInfoDynamoTable());
+    TableInfo.init(config.getTableInfoDynamoTable());
     log.info("Saving " + dump.getSequence());
     final long start = System.currentTimeMillis();
     try {
