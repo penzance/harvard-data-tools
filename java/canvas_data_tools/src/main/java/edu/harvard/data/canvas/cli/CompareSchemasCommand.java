@@ -34,8 +34,8 @@ public class CompareSchemasCommand implements Command {
         config.getCanvasApiKey(), config.getCanvasApiSecret());
     final DumpInfo info = DumpInfo.find(dumpId);
     
-    if (info.getSchemaVersion().equals("1.10.2")) {
-      log.info("Accepting schema version 1.10.2.");
+    if (info.getSchemaVersion().equals("1.10.3")) {
+      log.info("Accepting schema version 1.10.3.");
       return ReturnStatus.OK;
     }
 
