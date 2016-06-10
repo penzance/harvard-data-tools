@@ -90,8 +90,12 @@ public class CanvasPhase0 {
 
   private void verify() throws VerificationException, IOException {
     final ExecutorService exec = Executors.newFixedThreadPool(threads);
-    final Phase0PostVerifier verifier = new Phase0PostVerifier(dumpId, aws, config, exec);
-    verifier.verify();
+    try {
+      final Phase0PostVerifier verifier = new Phase0PostVerifier(dumpId, aws, config, exec);
+      verifier.verify();
+    } finally {
+      exec.shutdownNow();
+    }
   }
 }
 
