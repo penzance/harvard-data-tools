@@ -137,7 +137,7 @@ public class MatterhornDataCli {
     for (final String arg : args) {
       log.error("  " + arg);
     }
-    log.error("Local scratch directory: " + config.scratchDir);
+    log.error("Local scratch directory: " + config.getScratchDir());
     System.exit(status.getCode());
   }
 }

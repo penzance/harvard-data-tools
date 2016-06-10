@@ -17,7 +17,7 @@ import edu.harvard.data.identity.IdentifierType;
 
 public class DataConfig {
 
-  public String paths;
+  protected String paths;
 
   private final String datasetName;
   private final String dataSource;
@@ -40,32 +40,31 @@ public class DataConfig {
   private final String logBucket;
   private final String codeBucket;
   private final String incomingBucket;
-  public final String workingBucket;
-  public final String reportBucket;
-  public final String redshiftCluster;
-  public final String redshiftServer;
-  public final String redshiftDatabase;
-  public final String redshiftPort;
-  public final String redshiftUserName;
-  public final String redshiftPassword;
-  public final String failureSnsArn;
-  public final String successSnsArn;
-  public final String completionSnsArn;
-  public final String scratchDir;
-  public final String awsKeyId;
-  public final String awsSecretKey;
-  public final IdentifierType mainIdentifier;
-  public String pipelineDynamoTable;
+  private final String workingBucket;
+  private final String reportBucket;
+  private final String redshiftCluster;
+  private final String redshiftServer;
+  private final String redshiftDatabase;
+  private final String redshiftPort;
+  private final String redshiftUserName;
+  private final String redshiftPassword;
+  private final String failureSnsArn;
+  private final String successSnsArn;
+  private final String completionSnsArn;
+  private final String scratchDir;
+  private final String awsKeyId;
+  private final String awsSecretKey;
+  private final IdentifierType mainIdentifier;
+  private final String pipelineDynamoTable;
 
-  public final String emrCodeDir;
-  public final String dataToolsJar;
-  public final String identityRedshiftSchema;
-  public final String identityRedshiftLoadScript;
-  public final String redshiftLoadScript;
-  public final String redshiftStagingDir;
+  private final String emrCodeDir;
+  private final String dataToolsJar;
+  private final String identityRedshiftSchema;
+  private final String identityRedshiftLoadScript;
+  private final String redshiftLoadScript;
+  private final String redshiftStagingDir;
   private final String hdfsBase;
   private final String hdfsVerifyBase;
-
 
   private final Properties properties;
 
@@ -275,6 +274,102 @@ public class DataConfig {
 
   public String getIncomingBucket() {
     return incomingBucket;
+  }
+
+  public String getWorkingBucket() {
+    return workingBucket;
+  }
+
+  public String getReportBucket() {
+    return reportBucket;
+  }
+
+  public String getRedshiftCluster() {
+    return redshiftCluster;
+  }
+
+  public String getRedshiftServer() {
+    return redshiftServer;
+  }
+
+  public String getRedshiftDatabase() {
+    return redshiftDatabase;
+  }
+
+  public String getRedshiftPort() {
+    return redshiftPort;
+  }
+
+  public String getRedshiftUserName() {
+    return redshiftUserName;
+  }
+
+  public String getRedshiftPassword() {
+    return redshiftPassword;
+  }
+
+  public String getFailureSnsArn() {
+    return failureSnsArn;
+  }
+
+  public String getSuccessSnsArn() {
+    return successSnsArn;
+  }
+
+  public String getCompletionSnsArn() {
+    return completionSnsArn;
+  }
+
+  public String getScratchDir() {
+    return scratchDir;
+  }
+
+  public String getAwsKeyId() {
+    return awsKeyId;
+  }
+
+  public String getAwsSecretKey() {
+    return awsSecretKey;
+  }
+
+  public IdentifierType getMainIdentifier() {
+    return mainIdentifier;
+  }
+
+  public String getPipelineDynamoTable() {
+    return pipelineDynamoTable;
+  }
+
+  public String getEmrCodeDir() {
+    return emrCodeDir;
+  }
+
+  public String getDataToolsJar() {
+    return dataToolsJar;
+  }
+
+  public String getIdentityRedshiftSchema() {
+    return identityRedshiftSchema;
+  }
+
+  public String getIdentityRedshiftLoadScript() {
+    return identityRedshiftLoadScript;
+  }
+
+  public String getRedshiftLoadScript() {
+    return redshiftLoadScript;
+  }
+
+  public String getRedshiftStagingDir() {
+    return redshiftStagingDir;
+  }
+
+  public String getPaths() {
+    return paths;
+  }
+
+  public void setPaths(final String paths) {
+    this.paths = paths;
   }
 
 }

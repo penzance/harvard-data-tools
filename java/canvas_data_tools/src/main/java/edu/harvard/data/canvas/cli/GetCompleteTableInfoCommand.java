@@ -49,8 +49,8 @@ public class GetCompleteTableInfoCommand implements Command {
   public ReturnStatus execute(final CanvasDataConfig config, final ExecutorService exec)
       throws IOException, UnexpectedApiResponseException, DataConfigurationException,
       VerificationException {
-    final ApiClient api = new ApiClient(config.canvasDataHost, config.canvasApiKey,
-        config.canvasApiSecret);
+    final ApiClient api = new ApiClient(config.getCanvasDataHost(), config.getCanvasApiKey(),
+        config.getCanvasApiSecret());
     final AwsUtils aws = new AwsUtils();
     final DataDump dump = api.getDump(latestSequence);
     if (dump == null) {

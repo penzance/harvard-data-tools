@@ -36,7 +36,7 @@ public abstract class HadoopJob {
     this.hadoopConf = new Configuration();
     final TableFormat format = new FormatLibrary().getFormat(Format.DecompressedCanvasDataFlatFiles);
     hadoopConf.set("format", format.getFormat().toString());
-    hadoopConf.set("config", config.paths);
+    hadoopConf.set("config", config.getPaths());
   }
 
   public void runJob() throws IOException, DataConfigurationException {

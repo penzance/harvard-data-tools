@@ -43,12 +43,12 @@ public class EmrStartupPipelineSetup {
     final Class<?> cls = PipelineStartup.class;
     final List<String> args = new ArrayList<String>();
     args.add(pipelineId); // args[0] in main class
-    args.add(config.pipelineDynamoTable); // args[1] in main class
+    args.add(config.getPipelineDynamoTable()); // args[1] in main class
     return factory.getEmrActivity("PipelineStartup", pipeline.getEmr(), cls, args);
   }
 
   private PipelineObjectBase copyGeneratedCode() {
-    final String src = config.emrCodeDir;
+    final String src = config.getEmrCodeDir();
     final S3ObjectId dest = AwsUtils.key(workingDir, "code");
     return factory.getS3CopyActivity("CopyGeneratedCode", src, dest, pipeline.getEmr());
   }

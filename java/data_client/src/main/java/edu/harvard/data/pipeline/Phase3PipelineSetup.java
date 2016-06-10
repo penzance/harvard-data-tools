@@ -22,7 +22,7 @@ public class Phase3PipelineSetup {
     this.codeManager = codeManager;
     this.config = pipeline.getConfig();
     this.workingDir = AwsUtils.key(config.getS3WorkingLocation(), pipeline.getId());
-    this.redshiftStagingS3 = AwsUtils.key(workingDir, config.redshiftStagingDir);
+    this.redshiftStagingS3 = AwsUtils.key(workingDir, config.getRedshiftStagingDir());
   }
 
   public PipelineObjectBase populate(final PipelineObjectBase previousPhase) {
@@ -43,7 +43,7 @@ public class Phase3PipelineSetup {
   }
 
   private PipelineObjectBase loadData(final PipelineObjectBase previousStep) {
-    final S3ObjectId script = AwsUtils.key(workingDir, "code", config.redshiftLoadScript);
+    final S3ObjectId script = AwsUtils.key(workingDir, "code", config.getRedshiftLoadScript());
     final PipelineObjectBase load = factory.getSqlScriptActivity("LoadAllTablesToRedshift", script,
         pipeline.getRedshift(), pipeline.getEmr());
     load.addDependency(previousStep);

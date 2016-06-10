@@ -31,8 +31,8 @@ public class UpdateRedshiftCommand implements Command {
       throws IOException, UnexpectedApiResponseException, DataConfigurationException,
       VerificationException {
     final AwsUtils aws = new AwsUtils();
-    final ApiClient api = new ApiClient(config.canvasDataHost,
-        config.canvasApiKey, config.canvasApiSecret);
+    final ApiClient api = new ApiClient(config.getCanvasDataHost(),
+        config.getCanvasApiKey(), config.getCanvasApiSecret());
     final DumpInfo info = DumpInfo.find(dumpId);
 
     final CanvasCodeGenerator generator = new CanvasCodeGenerator(null, null, null, config, null);

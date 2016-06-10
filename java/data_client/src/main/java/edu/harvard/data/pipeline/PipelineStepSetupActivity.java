@@ -22,10 +22,10 @@ class PipelineStepSetupActivity extends PipelineObjectBase {
 
   private String getLaunchString(final String pipelineId, final String step) {
     final List<String> args = new ArrayList<String>();
-    args.add(config.emrCodeDir + "/" + config.dataToolsJar); // Jar name
+    args.add(config.getEmrCodeDir() + "/" + config.getDataToolsJar()); // Jar name
     args.add(PipelineStepSetup.class.getCanonicalName()); // Class name
     args.add(pipelineId); // args[0] in main class
-    args.add(config.pipelineDynamoTable); // args[1] in main class
+    args.add(config.getPipelineDynamoTable()); // args[1] in main class
     args.add(step); // args[2] in main class
     return StringUtils.join(args, ",");
   }

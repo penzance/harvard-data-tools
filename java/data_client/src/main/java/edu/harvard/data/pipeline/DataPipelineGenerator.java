@@ -44,7 +44,7 @@ public class DataPipelineGenerator {
 
   public void generate() throws DataConfigurationException, IOException {
     log.info("Data at " + AwsUtils.uri(dataLocation));
-    PipelineExecutionRecord.init(config.pipelineDynamoTable);
+    PipelineExecutionRecord.init(config.getPipelineDynamoTable());
     final DataPipelineClient client = new DataPipelineClient();
     final CreatePipelineRequest create = getCreateRequest();
     final CreatePipelineResult createResult = client.createPipeline(create);
@@ -69,7 +69,7 @@ public class DataPipelineGenerator {
   private void logPipelineToDynamo() {
     final PipelineExecutionRecord record = new PipelineExecutionRecord(pipelineId);
     record.setPipelineName(name);
-    record.setConfigString(config.paths);
+    record.setConfigString(config.getPaths());
     record.setPipelineCreated(new Date());
     record.setStatus(PipelineExecutionRecord.Status.Created.toString());
     record.save();
@@ -98,9 +98,9 @@ public class DataPipelineGenerator {
       throws JsonProcessingException {
     final String subject = "PipelineSuccess";
     final PipelineCompletionMessage success = new PipelineCompletionMessage(pipelineId,
-        config.reportBucket, config.successSnsArn, config.pipelineDynamoTable);
+        config.getReportBucket(), config.getSuccessSnsArn(), config.getPipelineDynamoTable());
     final String msg = new ObjectMapper().writeValueAsString(success);
-    return factory.getSns("PipelineComplete", subject, msg, config.completionSnsArn);
+    return factory.getSns("PipelineComplete", subject, msg, config.getCompletionSnsArn());
   }
 
 }

@@ -25,8 +25,8 @@ public class DiffSchemaCommand implements Command {
   @Override
   public ReturnStatus execute(final CanvasDataConfig config, final ExecutorService exec) throws IOException,
   UnexpectedApiResponseException, DataConfigurationException, VerificationException {
-    final ApiClient api = new ApiClient(config.canvasDataHost,
-        config.canvasApiKey, config.canvasApiSecret);
+    final ApiClient api = new ApiClient(config.getCanvasDataHost(),
+        config.getCanvasApiKey(), config.getCanvasApiSecret());
     final CanvasDataSchema s1 = (CanvasDataSchema) api.getSchema(v1);
     final CanvasDataSchema s2 = (CanvasDataSchema) api.getSchema(v2);
     System.out.println("Former schema: " + v1);

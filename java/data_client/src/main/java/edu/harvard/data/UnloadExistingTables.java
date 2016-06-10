@@ -28,8 +28,8 @@ public class UnloadExistingTables {
       final ExistingSchemaTable table = existingSchema.getTables().get(tableName);
       log.info("Unloading " + tableName);
       final String unload = SqlGenerator.generateUnloadStatement(table, config.getDatasetName(),
-          schema.getTableByName(tableName), s3Location, config.awsKeyId,
-          config.awsSecretKey, dataBeginDate);
+          schema.getTableByName(tableName), s3Location, config.getAwsKeyId(),
+          config.getAwsSecretKey(), dataBeginDate);
       aws.executeRedshiftQuery(unload, config);
     }
   }

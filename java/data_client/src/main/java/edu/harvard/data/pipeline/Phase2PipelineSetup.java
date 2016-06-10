@@ -55,7 +55,7 @@ public class Phase2PipelineSetup {
       final PipelineObjectBase previousStep, final int phase) {
     final String id = "Phase" + phase + "Hadoop" + cls.getSimpleName();
     final List<String> args = new ArrayList<String>();
-    args.add(config.paths);
+    args.add(config.getPaths());
     args.add("" + phase);
     final PipelineObjectBase job = factory.getEmrActivity(id, pipeline.getEmr(),
         cls, args);
@@ -64,7 +64,7 @@ public class Phase2PipelineSetup {
   }
 
   private PipelineObjectBase moveUnmodifiedFiles(final int phase) {
-    final String cmd = config.emrCodeDir + "/" + config.getMoveUnmodifiedScript(phase);
+    final String cmd = config.getEmrCodeDir() + "/" + config.getMoveUnmodifiedScript(phase);
     final String id = "Phase" + phase + "MoveUnmodifiedFiles";
     final PipelineObjectBase moveUnmodified = factory.getShellActivity(id, cmd, pipeline.getEmr());
     return moveUnmodified;

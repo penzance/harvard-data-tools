@@ -56,10 +56,10 @@ public class PipelineFactory {
   public PipelineObjectBase getRedshift() {
     final PipelineObjectBase obj = new PipelineObjectBase(config, "RedshiftDatabase",
         "RedshiftDatabase");
-    obj.set("clusterId", config.redshiftCluster);
-    obj.set("username", config.redshiftUserName);
-    obj.set("*password", config.redshiftPassword);
-    obj.set("databaseName", config.redshiftDatabase);
+    obj.set("clusterId", config.getRedshiftCluster());
+    obj.set("username", config.getRedshiftUserName());
+    obj.set("*password", config.getRedshiftPassword());
+    obj.set("databaseName", config.getRedshiftDatabase());
     allObjects.add(obj);
     return obj;
   }
@@ -106,7 +106,7 @@ public class PipelineFactory {
     final PipelineObjectBase obj = new PipelineObjectBase(config, id, "EmrActivity");
     setupActivity(obj, infrastructure);
     final String params = StringUtils.join(args, ",");
-    final String jar = config.emrCodeDir + "/" + config.dataToolsJar;
+    final String jar = config.getEmrCodeDir() + "/" + config.getDataToolsJar();
     obj.set("step", jar + "," + cls.getCanonicalName() + "," + params);
     obj.set("retryDelay", "2 Minutes");
     return obj;
@@ -194,7 +194,7 @@ public class PipelineFactory {
   }
 
   private String getCredentials() {
-    return "'aws_access_key_id=" + config.awsKeyId + ";aws_secret_access_key=" + config.awsSecretKey
+    return "'aws_access_key_id=" + config.getAwsKeyId() + ";aws_secret_access_key=" + config.getAwsSecretKey()
         + "'";
   }
 

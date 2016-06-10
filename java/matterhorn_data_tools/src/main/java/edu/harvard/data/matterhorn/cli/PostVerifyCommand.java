@@ -69,7 +69,7 @@ public class PostVerifyCommand implements Command {
     final AwsUtils aws = new AwsUtils();
     switch (phase) {
     case 0:
-      return new Phase0PostVerifier(dumpId, aws, new File(config.scratchDir), exec);
+      return new Phase0PostVerifier(dumpId, aws, new File(config.getScratchDir()), exec);
     case 1:
       //      return new Phase1PostVerifier(hdfsService, inputDir, outputDir, verifyDir);
       break;

@@ -45,8 +45,8 @@ public class DownloadDumpCommand implements Command {
       VerificationException, ArgumentError {
     final AwsUtils aws = new AwsUtils();
     final DumpManager manager = new DumpManager(config, aws);
-    final ApiClient api = new ApiClient(config.canvasDataHost, config.canvasApiKey,
-        config.canvasApiSecret);
+    final ApiClient api = new ApiClient(config.getCanvasDataHost(), config.getCanvasApiKey(),
+        config.getCanvasApiSecret());
     final List<DataDump> orderedDumps = sortDumps(api.getDumps());
     for (final DataDump dump : orderedDumps) {
       if (manager.needToSaveDump(dump)) {

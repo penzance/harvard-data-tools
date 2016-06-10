@@ -33,8 +33,8 @@ public class S3ToRedshiftLoaderGenerator {
   }
 
   public void generate() throws IOException {
-    final File createTableFile = new File(dir, spec.getConfig().redshiftLoadScript);
-    final File identityTableFile = new File(dir, spec.getConfig().identityRedshiftLoadScript);
+    final File createTableFile = new File(dir, spec.getConfig().getRedshiftLoadScript());
+    final File identityTableFile = new File(dir, spec.getConfig().getIdentityRedshiftLoadScript());
 
     try (final PrintStream out = new PrintStream(new FileOutputStream(createTableFile))) {
       generateRedshiftLoaderFile(out, spec.getPhase(3));
@@ -47,7 +47,7 @@ public class S3ToRedshiftLoaderGenerator {
   private void generateIdentityRedshiftLoaderFile(final PrintStream out, final SchemaPhase phase) {
     final DataSchemaTable table = IdentityMap.getIdentityMapTable();
     final String columnList = getColumnList(table);
-    outputPartialTableUpdate(out, table, config.identityRedshiftSchema, columnList);
+    outputPartialTableUpdate(out, table, config.getIdentityRedshiftSchema(), columnList);
   }
 
   private void generateRedshiftLoaderFile(final PrintStream out, final SchemaPhase phase) {
@@ -162,12 +162,12 @@ public class S3ToRedshiftLoaderGenerator {
   }
 
   private String getCredentials() {
-    return "'aws_access_key_id=" + spec.getConfig().awsKeyId + ";aws_secret_access_key="
-        + spec.getConfig().awsSecretKey + "'";
+    return "'aws_access_key_id=" + spec.getConfig().getAwsKeyId() + ";aws_secret_access_key="
+        + spec.getConfig().getAwsSecretKey() + "'";
   }
 
   private String getLocation(final String tableName) {
     return "'s3://" + workingDir.getBucket() + "/" + workingDir.getKey() + "/"
-        + spec.getConfig().redshiftStagingDir + "/" + tableName + "/'";
+        + spec.getConfig().getRedshiftStagingDir() + "/" + tableName + "/'";
   }
 }

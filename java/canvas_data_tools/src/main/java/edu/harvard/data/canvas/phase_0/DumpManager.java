@@ -149,7 +149,7 @@ public class DumpManager {
 
   private File getScratchDumpDir(final DataDump dump) {
     final String dirName = String.format("%05d", dump.getSequence());
-    return new File(config.scratchDir, dirName);
+    return new File(config.getScratchDir(), dirName);
   }
 
   public S3ObjectId getArchiveDumpObj(final DataDump dump) {

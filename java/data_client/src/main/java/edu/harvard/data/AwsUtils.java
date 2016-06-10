@@ -221,8 +221,8 @@ public class AwsUtils {
     final String query = "SELECT * FROM information_schema.columns WHERE table_schema='public'";
     final String url = config.getRedshiftUrl();
     try (
-        Connection connection = DriverManager.getConnection(url, config.redshiftUserName,
-            config.redshiftPassword);
+        Connection connection = DriverManager.getConnection(url, config.getRedshiftUserName(),
+            config.getRedshiftPassword());
         Statement st = connection.createStatement();
         ResultSet resultSet = st.executeQuery(query);) {
       return new RedshiftSchema(resultSet);
@@ -233,8 +233,8 @@ public class AwsUtils {
       throws SQLException {
     final String url = config.getRedshiftUrl();
     log.info("Executing query \n" + query + "\n on " + url);
-    try (Connection connection = DriverManager.getConnection(url, config.redshiftUserName,
-        config.redshiftPassword); Statement st = connection.createStatement();) {
+    try (Connection connection = DriverManager.getConnection(url, config.getRedshiftUserName(),
+        config.getRedshiftPassword()); Statement st = connection.createStatement();) {
       st.execute(query);
     }
   }

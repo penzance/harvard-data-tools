@@ -21,8 +21,8 @@ public class DumpInfoCommand implements Command {
   public ReturnStatus execute(final CanvasDataConfig config, final ExecutorService exec)
       throws IOException, UnexpectedApiResponseException, DataConfigurationException,
       VerificationException {
-    final ApiClient api = new ApiClient(config.canvasDataHost, config.canvasApiKey,
-        config.canvasApiSecret);
+    final ApiClient api = new ApiClient(config.getCanvasDataHost(), config.getCanvasApiKey(),
+        config.getCanvasApiSecret());
     System.out.println(api.getDump(sequence));
     return ReturnStatus.OK;
   }

@@ -30,7 +30,7 @@ public class Phase1PipelineSetup {
     this.config = pipeline.getConfig();
     this.workingDir = AwsUtils.key(config.getS3WorkingLocation(), pipeline.getId());
     this.unloadIdentityS3 = AwsUtils.key(workingDir, "unloaded_tables", "identity_map");
-    this.redshiftStagingS3 = AwsUtils.key(workingDir, config.redshiftStagingDir, "identity_map");
+    this.redshiftStagingS3 = AwsUtils.key(workingDir, config.getRedshiftStagingDir(), "identity_map");
     this.identityHdfs = config.getHdfsDir(0) + "/identity_map";
   }
 
@@ -53,7 +53,7 @@ public class Phase1PipelineSetup {
   }
 
   private PipelineObjectBase moveUnmodifiedTables(final PipelineObjectBase previousStep) {
-    final String script = config.emrCodeDir + "/" + config.getMoveUnmodifiedScript(1);
+    final String script = config.getEmrCodeDir() + "/" + config.getMoveUnmodifiedScript(1);
     final PipelineObjectBase move = factory.getShellActivity("Phase1MoveUnmodifiedFiles", script,
         pipeline.getEmr());
     move.addDependency(previousStep);
@@ -63,7 +63,7 @@ public class Phase1PipelineSetup {
   private PipelineObjectBase identityPreverify(final PipelineObjectBase previousStep) {
     final Class<?> cls = codeManager.getIdentityPreverifyJob();
     final List<String> args = new ArrayList<String>();
-    args.add(config.paths);
+    args.add(config.getPaths());
     final PipelineObjectBase verify = factory.getEmrActivity("IdentityPreverify", pipeline.getEmr(),
         cls, args);
     verify.addDependency(previousStep);
@@ -73,7 +73,7 @@ public class Phase1PipelineSetup {
   private PipelineObjectBase identityPostverify(final PipelineObjectBase previousStep) {
     final Class<?> cls = codeManager.getIdentityPostverifyJob();
     final List<String> args = new ArrayList<String>();
-    args.add(config.paths);
+    args.add(config.getPaths());
     final PipelineObjectBase verify = factory.getEmrActivity("IdentityPostverify",
         pipeline.getEmr(), cls, args);
     verify.addDependency(previousStep);
@@ -83,7 +83,7 @@ public class Phase1PipelineSetup {
   private PipelineObjectBase hadoopIdentityMap(final PipelineObjectBase previousStep) {
     final Class<?> cls = codeManager.getIdentityMapHadoopJob();
     final List<String> args = new ArrayList<String>();
-    args.add(config.paths);
+    args.add(config.getPaths());
     final PipelineObjectBase identity = factory.getEmrActivity("IdentityHadoop", pipeline.getEmr(),
         cls, args);
     identity.addDependency(previousStep);
@@ -96,7 +96,7 @@ public class Phase1PipelineSetup {
         pipeline.getEmr());
     for (final Class<? extends Mapper> cls : codeManager.getIdentityScrubberClasses()) {
       final List<String> args = new ArrayList<String>();
-      args.add(config.paths);
+      args.add(config.getPaths());
       final PipelineObjectBase step = factory.getEmrActivity(cls.getSimpleName(), pipeline.getEmr(),
           cls, args);
       step.addDependency(previousStep);
@@ -128,7 +128,7 @@ public class Phase1PipelineSetup {
   }
 
   private PipelineObjectBase loadIdentity(final PipelineObjectBase previousStep) {
-    final S3ObjectId script = AwsUtils.key(workingDir, "code", config.identityRedshiftLoadScript);
+    final S3ObjectId script = AwsUtils.key(workingDir, "code", config.getIdentityRedshiftLoadScript());
     final PipelineObjectBase load = factory.getSqlScriptActivity("LoadIdentityToRedshift", script,
         pipeline.getRedshift(), pipeline.getEmr());
     load.addDependency(previousStep);

@@ -51,10 +51,10 @@ public class Pipeline {
       throws JsonProcessingException {
     final PipelineObjectBase defaultObj = factory.getDefault(schedule);
     final PipelineCompletionMessage completion = new PipelineCompletionMessage(pipelineId,
-        config.reportBucket, config.failureSnsArn, config.pipelineDynamoTable);
+        config.getReportBucket(), config.getFailureSnsArn(), config.getPipelineDynamoTable());
     final String failMsg = new ObjectMapper().writeValueAsString(completion);
     final String failSubj = "Pipeline " + name + " Failed";
-    defaultObj.set("onFail", factory.getSns("FailureSnsAlert", failSubj, failMsg, config.completionSnsArn));
+    defaultObj.set("onFail", factory.getSns("FailureSnsAlert", failSubj, failMsg, config.getCompletionSnsArn()));
     return defaultObj;
   }
 
@@ -72,9 +72,9 @@ public class Pipeline {
     bootstrapParams.add(schemaVersion);
     bootstrapParams.add(config.getGitTagOrBranch());
     bootstrapParams.add(config.getDataSource().toLowerCase() + "_generate_tools.py");
-    bootstrapParams.add(config.paths);
+    bootstrapParams.add(config.getPaths());
     bootstrapParams.add(pipelineId);
-    bootstrapParams.add(config.emrCodeDir);
+    bootstrapParams.add(config.getEmrCodeDir());
     return StringUtils.join(bootstrapParams, ",");
   }
 

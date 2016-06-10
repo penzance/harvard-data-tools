@@ -67,11 +67,11 @@ public class InputParser {
     final String key = inputObj.getKey();
     final String filename = key.substring(key.lastIndexOf("/") + 1);
     final String date = filename.substring(filename.indexOf(".") + 1, filename.indexOf(".jsonl"));
-    originalFile = new File(config.scratchDir, filename);
+    originalFile = new File(config.getScratchDir(), filename);
     final String eventFileName = "event-" + date + ".gz";
     final String videoFileName = "video-" + date + ".gz";
-    eventFile = new File(config.scratchDir, eventFileName);
-    videoFile = new File(config.scratchDir, videoFileName);
+    eventFile = new File(config.getScratchDir(), eventFileName);
+    videoFile = new File(config.getScratchDir(), videoFileName);
     eventOutputObj = AwsUtils.key(outputLocation, "event", eventFileName);
     videoOutputObj = AwsUtils.key(outputLocation, "video", videoFileName);
     log.info("Parsing " + filename + " to " + eventFile + ", " + videoFile);

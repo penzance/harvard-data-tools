@@ -157,8 +157,8 @@ public class VerificationPeople {
     queryString = queryString.substring(0, queryString.length() - 2) + ");";
     log.info("Executing query \n" + queryString + "\n on " + url);
     try (
-        Connection connection = DriverManager.getConnection(url, config.redshiftUserName,
-            config.redshiftPassword);
+        Connection connection = DriverManager.getConnection(url, config.getRedshiftUserName(),
+            config.getRedshiftPassword());
         PreparedStatement statement = connection.prepareStatement(queryString);) {
       for (int i = 0; i < people.size(); i++) {
         statement.setLong(i + 1, people.get(i));

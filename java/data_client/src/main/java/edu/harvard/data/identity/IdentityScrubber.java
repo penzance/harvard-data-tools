@@ -113,7 +113,7 @@ public abstract class IdentityScrubber<T> extends Mapper<Object, Text, Text, Nul
     } catch (final DataConfigurationException e) {
       throw new IOException(e);
     }
-    final IdentifierType mainIdentifier = config.mainIdentifier;
+    final IdentifierType mainIdentifier = config.getMainIdentifier();
     this.identities = new HashMap<T, IdentityMap>();
     try (TableReader<IdentityMap> in = hadoopUtils.getHdfsTableReader(context, format,
         IdentityMap.class)) {

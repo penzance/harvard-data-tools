@@ -69,9 +69,9 @@ public class CanvasDataCli {
       CanvasDataConfig config = null;
       try {
         config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, parser.configPaths, true);
-        DumpInfo.init(config.dumpInfoDynamoTable);
-        TableInfo.init(config.tableInfoDynamoTable);
-        log.info("Using table " + config.dumpInfoDynamoTable + " for dump info.");
+        DumpInfo.init(config.getDumpInfoDynamoTable());
+        TableInfo.init(config.getTableInfoDynamoTable());
+        log.info("Using table " + config.getDumpInfoDynamoTable() + " for dump info.");
       } catch (final DataConfigurationException e) {
         log.fatal("Invalid configuration. Field", e);
         System.exit(ReturnStatus.CONFIG_ERROR.getCode());
@@ -141,9 +141,9 @@ public class CanvasDataCli {
     for (final String arg : args) {
       log.error("  " + arg);
     }
-    log.error("Canvas data host: " + config.canvasDataHost);
-    log.error("DynamoDB dump info table: " + config.dumpInfoDynamoTable);
-    log.error("Local scratch directory: " + config.scratchDir);
+    log.error("Canvas data host: " + config.getCanvasDataHost());
+    log.error("DynamoDB dump info table: " + config.getDumpInfoDynamoTable());
+    log.error("Local scratch directory: " + config.getScratchDir());
     System.exit(status.getCode());
   }
 }

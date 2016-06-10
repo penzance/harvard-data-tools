@@ -30,8 +30,8 @@ public class CompareSchemasCommand implements Command {
   @Override
   public ReturnStatus execute(final CanvasDataConfig config, final ExecutorService exec)
       throws IOException, DataConfigurationException, UnexpectedApiResponseException {
-    final ApiClient api = new ApiClient(config.canvasDataHost,
-        config.canvasApiKey, config.canvasApiSecret);
+    final ApiClient api = new ApiClient(config.getCanvasDataHost(),
+        config.getCanvasApiKey(), config.getCanvasApiSecret());
     final DumpInfo info = DumpInfo.find(dumpId);
 
     if (expectedVersion.equals(info.getSchemaVersion())) {

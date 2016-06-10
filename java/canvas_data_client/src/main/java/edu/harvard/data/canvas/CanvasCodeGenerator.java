@@ -81,9 +81,9 @@ public class CanvasCodeGenerator extends CodeGenerator {
     spec.setConfig(config);
 
     // Get the specified schema version (or fail if that version doesn't exist).
-    final String host = config.canvasDataHost;
-    final String key = config.canvasApiKey;
-    final String secret = config.canvasApiSecret;
+    final String host = config.getCanvasDataHost();
+    final String key = config.getCanvasApiKey();
+    final String secret = config.getCanvasApiSecret();
     final ApiClient api = new ApiClient(host, key, secret);
 
     // Set the four schema versions in the spec.
