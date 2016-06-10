@@ -45,19 +45,17 @@ public class SessionsJob extends HadoopJob {
   @Override
   public Job getJob() throws IOException {
     final Job job = Job.getInstance(hadoopConf, "sessions-hadoop");
-
     job.setInputFormatClass(TextInputFormat.class);
-
     job.setMapperClass(SessionsMapper.class);
     job.setMapOutputKeyClass(Text.class);
     job.setMapOutputValueClass(Text.class);
-
     job.setReducerClass(SessionsReducer.class);
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(NullWritable.class);
-
     job.setOutputFormatClass(TextOutputFormat.class);
 
+    final String inputDir = config.getHdfsDir(phase - 1);
+    final String outputDir = config.getHdfsDir(phase);
     hadoopUtils.setPaths(job, hdfsService, inputDir + "/requests", outputDir + "/sessions");
     return job;
   }

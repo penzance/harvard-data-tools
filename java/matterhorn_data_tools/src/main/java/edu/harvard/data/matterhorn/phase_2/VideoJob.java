@@ -48,6 +48,8 @@ public class VideoJob extends HadoopJob {
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(NullWritable.class);
     job.setOutputFormatClass(TextOutputFormat.class);
+    final String inputDir = config.getHdfsDir(phase - 1);
+    final String outputDir = config.getHdfsDir(phase);
     hadoopUtils.setPaths(job, hdfsService, inputDir + "/video", outputDir + "/video");
     return job;
   }

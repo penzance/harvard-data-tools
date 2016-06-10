@@ -29,11 +29,8 @@ import edu.harvard.data.canvas.bindings.phase1.Phase1Requests;
 
 public class PostVerifyRequestsJob extends HadoopJob {
 
-  private final String verifyDir;
-
   public PostVerifyRequestsJob(final DataConfig config, final int phase) throws DataConfigurationException {
     super(config, phase);
-    this.verifyDir = config.getVerifyHdfsDir(phase);
   }
 
   @Override
@@ -46,6 +43,8 @@ public class PostVerifyRequestsJob extends HadoopJob {
 
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
+    final String inputDir = config.getHdfsDir(phase);
+    final String verifyDir = config.getVerifyHdfsDir(phase);
     hadoopUtils.setPaths(job, hdfsService, inputDir + "/requests", null);
     hadoopUtils.addToCache(job, hdfsService, verifyDir + "/updated/requests");
     return job;

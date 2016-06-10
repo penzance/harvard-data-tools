@@ -17,16 +17,16 @@ public abstract class HadoopJob {
   private static final Logger log = LogManager.getLogger();
 
   protected Configuration hadoopConf;
-  protected String inputDir;
-  protected String outputDir;
   protected HadoopUtilities hadoopUtils;
   protected final URI hdfsService;
   protected List<URI> cacheFiles;
+  protected final int phase;
+  protected final DataConfig config;
 
   public HadoopJob(final DataConfig config, final int phase) throws DataConfigurationException {
+    this.phase = phase;
+    this.config = config;
     this.hadoopUtils = new HadoopUtilities();
-    this.inputDir = config.getHdfsDir(phase - 1);
-    this.outputDir = config.getHdfsDir(phase);
     this.cacheFiles = new ArrayList<URI>();
     try {
       this.hdfsService = new URI("hdfs///");

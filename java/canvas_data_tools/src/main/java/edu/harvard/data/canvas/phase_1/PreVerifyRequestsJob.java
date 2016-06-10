@@ -31,6 +31,8 @@ class PreVerifyRequestsJob extends HadoopJob {
 
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
+    final String inputDir = config.getHdfsDir(phase - 1);
+    final String outputDir = config.getVerifyHdfsDir(phase);
     hadoopUtils.setPaths(job, hdfsService, inputDir + "/requests", outputDir + "/requests");
     return job;
   }

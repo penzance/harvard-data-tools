@@ -46,6 +46,8 @@ class RequestPerFileJob extends HadoopJob {
     job.setMapOutputValueClass(LongWritable.class);
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
+    final String inputDir = config.getHdfsDir(phase - 1);
+    final String outputDir = config.getHdfsDir(phase);
     hadoopUtils.setPaths(job, hdfsService, inputDir + "/requests", outputDir + "/requests_per_file");
     return job;
   }

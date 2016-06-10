@@ -46,6 +46,8 @@ class EventTypeJob extends HadoopJob {
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(NullWritable.class);
     job.setOutputFormatClass(TextOutputFormat.class);
+    final String inputDir = config.getHdfsDir(phase - 1);
+    final String outputDir = config.getHdfsDir(phase);
     hadoopUtils.setPaths(job, hdfsService, inputDir + "/event", outputDir + "/event_types");
     return job;
   }
