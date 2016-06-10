@@ -43,7 +43,7 @@ public class CanvasCodeManager extends GeneratedCodeManager {
   public Map<Integer, List<Class<? extends HadoopJob>>> getHadoopProcessingJobs() {
     addJob(RequestJob.class, 2);
     addJob(AdminRequestJob.class, 2);
-    addJob(SessionsJob.class, 2);
+    addJob(SessionsJob.class, 3);
     return jobs;
   }
 

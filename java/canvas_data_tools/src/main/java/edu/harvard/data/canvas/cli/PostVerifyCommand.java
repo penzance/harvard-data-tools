@@ -1,6 +1,5 @@
 package edu.harvard.data.canvas.cli;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -17,8 +16,6 @@ import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.Verifier;
 import edu.harvard.data.canvas.CanvasDataConfig;
-import edu.harvard.data.canvas.phase_0.Phase0PostVerifier;
-import edu.harvard.data.canvas.phase_1.Phase1PostVerifier;
 import edu.harvard.data.canvas.phase_2.Phase2PostVerifier;
 import edu.harvard.data.canvas.phase_3.Phase3PostVerifier;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
@@ -70,7 +67,7 @@ public class PostVerifyCommand implements Command {
     final AwsUtils aws = new AwsUtils();
     switch (phase) {
     case 0:
-      return new Phase0PostVerifier(dumpId, aws, new File(config.getScratchDir()), exec);
+      //      return new Phase0PostVerifier(dumpId, aws, new File(config.getScratchDir()), exec);
     case 1:
       break;
       //      return new Phase1PostVerifier(hdfsService, inputDir, outputDir, verifyDir);
