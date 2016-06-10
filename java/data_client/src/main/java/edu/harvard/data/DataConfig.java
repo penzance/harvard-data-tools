@@ -63,6 +63,8 @@ public class DataConfig {
   private final String phase0TerminateAfter;
   private final String phase0Threads;
   private final String phase0HeapSize;
+  private final String phase0Ami;
+  private final String phase0SecurityGroup;
 
   private final String emrCodeDir;
   private final String dataToolsJar;
@@ -135,8 +137,9 @@ public class DataConfig {
     this.phase0TerminateAfter = getConfigParameter("phase_0_terminate_after", verify);
     this.phase0Threads = getConfigParameter("phase_0_threads", verify);
     this.phase0HeapSize = getConfigParameter("phase_0_heap_size", verify);
+    this.phase0Ami = getConfigParameter("phase_0_ami", verify);
+    this.phase0SecurityGroup = getConfigParameter("phase_0_security_group", verify);
   }
-
 
   public static <T extends DataConfig> T parseInputFiles(final Class<T> cls,
       final String configPathString, final boolean verify)
@@ -390,24 +393,28 @@ public class DataConfig {
     return phase0InstanceType;
   }
 
-
   public String getPhase0BidPrice() {
     return phase0BidPrice;
   }
-
 
   public String getPhase0TerminateAfter() {
     return phase0TerminateAfter;
   }
 
-
   public String getPhase0Threads() {
     return phase0Threads;
   }
 
-
   public String getPhase0HeapSize() {
     return phase0HeapSize;
+  }
+
+  public String getPhase0Ami() {
+    return phase0Ami;
+  }
+
+  public String getPhase0SecurityGroup() {
+    return phase0SecurityGroup;
   }
 
 }

@@ -28,7 +28,7 @@ public class CreateRedshiftTableGenerator {
     final File createTableFile = new File(dir, "create_redshift_tables.sql");
 
     try (final PrintStream out = new PrintStream(new FileOutputStream(createTableFile))) {
-      generateCreateTableFile(out, spec.getPhase(2));
+      generateCreateTableFile(out, spec.getPhase(3));
     }
   }
 

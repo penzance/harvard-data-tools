@@ -42,34 +42,6 @@ public class DumpManager {
     this.aws = aws;
   }
 
-  public boolean needToSaveDump(final DataDump dump) throws IOException {
-    final DumpInfo info = DumpInfo.find(dump.getDumpId());
-    if (dump.getSequence() < 189) {
-      log.warn("Dump downloader set to ignore dumps with sequence < 189");
-      return false;
-    }
-    if (info == null) {
-      log.info("Dump needs to be saved; no dump info record for " + dump.getDumpId());
-      return true;
-    }
-    if (info.getDownloaded() == null || !info.getDownloaded()) {
-      log.info("Dump needs to be saved; previous download did not complete.");
-      return true;
-    }
-    final Date downloadStart = info.getDownloadStart();
-    // Re-download any dump that was updated less than an hour before it was
-    // downloaded before.
-    final Date conservativeStart = new Date(downloadStart.getTime() - (60 * 60 * 1000));
-    if (conservativeStart.before(dump.getUpdatedAt())) {
-      log.info(
-          "Dump needs to be saved; previously downloaded less than an hour after it was last updated.");
-      return true;
-    }
-    log.info("Dump does not need to be saved; already exists at " + info.getBucket() + "/"
-        + info.getKey() + ".");
-    return false;
-  }
-
   public void saveDump(final ApiClient api, final DataDump dump, final DumpInfo info)
       throws IOException, UnexpectedApiResponseException, DataConfigurationException,
       VerificationException, ArgumentError {

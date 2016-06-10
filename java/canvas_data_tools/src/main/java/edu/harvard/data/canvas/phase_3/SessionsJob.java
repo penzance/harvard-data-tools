@@ -26,7 +26,6 @@ import edu.harvard.data.TableFormat;
 import edu.harvard.data.canvas.CanvasDataConfig;
 import edu.harvard.data.canvas.bindings.phase2.Phase2Requests;
 import edu.harvard.data.canvas.bindings.phase3.Phase3Sessions;
-import edu.harvard.data.canvas.phase_2.RequestJob;
 
 public class SessionsJob extends HadoopJob {
 
@@ -35,7 +34,7 @@ public class SessionsJob extends HadoopJob {
     final int phase = Integer.parseInt(args[1]);
     final CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, configPathString,
         true);
-    new RequestJob(config, phase).runJob();
+    new SessionsJob(config, phase).runJob();
   }
 
   public SessionsJob(final DataConfig config, final int phase) throws DataConfigurationException {
