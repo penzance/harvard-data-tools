@@ -45,7 +45,7 @@ def clean_up_files():
     shutil.rmtree("{0}/java".format(GENERATED_CODE_DIR))
 
 def run_generator():
-    generator_classpath = "{0}:{1}:{2}:{3}".format(
+    generator_classpath = "{0}:{1}:{2}".format(
         "{0}/target/canvas_data_client-1.0.0.jar".format(CANVAS_DATA_CLIENT_DIR),
         "{0}/target/data_client-1.0.0.jar".format(DATA_CLIENT_DIR),
         SCHEMA_JSON_DIR,
