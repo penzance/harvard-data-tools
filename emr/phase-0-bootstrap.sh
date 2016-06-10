@@ -23,3 +23,6 @@ git clone -b $GIT_BRANCH https://github.com/penzance/harvard-data-tools.git $HAR
 
 # generate the tools
 python $HARVARD_DATA_TOOLS_BASE/python/$GENERATOR
+
+# run phase 0
+python $HARVARD_DATA_TOOLS_BASE/python/$PHASE_0
