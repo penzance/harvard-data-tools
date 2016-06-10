@@ -59,6 +59,7 @@ public class CanvasPhase0 {
     downloadDump();
     checkSchema();
     verify();
+    System.out.println("Done");
   }
 
   private void setup()
@@ -96,7 +97,9 @@ public class CanvasPhase0 {
       verifier.verify();
     } finally {
       if (exec != null) {
+        System.out.println("Shutting down executor");
         exec.shutdownNow();
+        System.out.println("Shut down executor");
       }
     }
   }
