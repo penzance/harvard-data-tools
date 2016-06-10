@@ -35,11 +35,11 @@ public class UpdateRedshift {
       final DataSchemaTable table = additions.get(tableName);
       if (!table.isTemporary()) {
         if (table.getNewlyGenerated()) {
-          final String create = SqlGenerator.generateCreateStatement(table, config.datasetName);
+          final String create = SqlGenerator.generateCreateStatement(table, config.getDatasetName());
           aws.executeRedshiftQuery(create, config);
         } else {
           for (final DataSchemaColumn column : table.getColumns()) {
-            final String alter = SqlGenerator.generateAlterStatement(table, config.datasetName,
+            final String alter = SqlGenerator.generateAlterStatement(table, config.getDatasetName(),
                 column);
             aws.executeRedshiftQuery(alter, config);
           }

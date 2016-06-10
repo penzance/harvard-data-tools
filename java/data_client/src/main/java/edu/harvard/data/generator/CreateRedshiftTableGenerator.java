@@ -33,7 +33,7 @@ public class CreateRedshiftTableGenerator {
   }
 
   private void generateCreateTableFile(final PrintStream out, final SchemaPhase phase) {
-    out.println("create schema " + config.datasetName + ";");
+    out.println("create schema " + config.getDatasetName() + ";");
     out.println();
     final List<String> tableNames = new ArrayList<String>();
     for (final DataSchemaTable table : phase.getSchema().getTables().values()) {
@@ -43,7 +43,7 @@ public class CreateRedshiftTableGenerator {
     for (final String tableName : tableNames) {
       final DataSchemaTable table = phase.getSchema().getTableByName(tableName);
       if (!table.isTemporary()) {
-        out.println(SqlGenerator.generateCreateStatement(table, config.datasetName));
+        out.println(SqlGenerator.generateCreateStatement(table, config.getDatasetName()));
       }
     }
   }

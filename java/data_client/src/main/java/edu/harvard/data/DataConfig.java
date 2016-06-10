@@ -19,27 +19,28 @@ public class DataConfig {
 
   public String paths;
 
-  public final String datasetName;
-  public final String dataSource;
-  public final String dataPipelineRole;
-  public final String dataPipelineResourceRoleArn;
-  public final String keypair;
-  public final String appSubnet;
-  public final String emrReleaseLabel;
-  public final String emrTerminateAfter;
-  public final String emrMasterInstanceType;
-  public final String emrMasterBidPrice;
-  public final String emrCoreInstanceCount;
-  public final String emrCoreInstanceType;
-  public final String emrCoreBidPrice;
-  public final String emrTaskInstanceCount;
-  public final String emrTaskInstanceType;
-  public final String emrTaskBidPrice;
-  public final String gitTagOrBranch;
-  public final String logBucket;
-  public final String codeBucket;
+  private final String datasetName;
+  private final String dataSource;
+  private final String dataPipelineRole;
+  private final String dataPipelineResourceRoleArn;
+  private final String keypair;
+  private final String subnetId;
+  private final String emrReleaseLabel;
+  private final String emrTerminateAfter;
+  private final String emrMasterInstanceType;
+  private final String emrMasterBidPrice;
+  private final String emrCoreInstanceCount;
+  private final String emrCoreInstanceType;
+  private final String emrCoreBidPrice;
+  private final String emrTaskInstanceCount;
+  private final String emrTaskInstanceType;
+  private final String emrTaskBidPrice;
+  private final String emrMaximumRetries;
+  private final String gitTagOrBranch;
+  private final String logBucket;
+  private final String codeBucket;
   private final String incomingBucket;
-  private final String workingBucket;
+  public final String workingBucket;
   public final String reportBucket;
   public final String redshiftCluster;
   public final String redshiftServer;
@@ -47,8 +48,6 @@ public class DataConfig {
   public final String redshiftPort;
   public final String redshiftUserName;
   public final String redshiftPassword;
-  public final String redshiftAccessKey; // Same as the awsKeyID
-  public final String redshiftAccessSecret; // Same as the awsSecretKey
   public final String failureSnsArn;
   public final String successSnsArn;
   public final String completionSnsArn;
@@ -57,14 +56,13 @@ public class DataConfig {
   public final String awsSecretKey;
   public final IdentifierType mainIdentifier;
   public String pipelineDynamoTable;
-  public String maximumRetries;
 
-  public String emrCodeDir;
-  public String dataToolsJar;
-  public String identityRedshiftSchema;
-  public String identityRedshiftLoadScript;
-  public String redshiftLoadScript;
-  public String redshiftStagingDir;
+  public final String emrCodeDir;
+  public final String dataToolsJar;
+  public final String identityRedshiftSchema;
+  public final String identityRedshiftLoadScript;
+  public final String redshiftLoadScript;
+  public final String redshiftStagingDir;
   private final String hdfsBase;
   private final String hdfsVerifyBase;
 
@@ -98,7 +96,7 @@ public class DataConfig {
     this.dataPipelineResourceRoleArn = getConfigParameter("data_pipeline_resource_role_arn",
         verify);
     this.keypair = getConfigParameter("keypair", verify);
-    this.appSubnet = getConfigParameter("app_subnet", verify);
+    this.subnetId = getConfigParameter("subnet_id", verify);
     this.emrReleaseLabel = getConfigParameter("emr_release_label", verify);
     this.emrTerminateAfter = getConfigParameter("emr_terminate_after", verify);
     this.emrMasterInstanceType = getConfigParameter("emr_master_instance_type", verify);
@@ -119,14 +117,12 @@ public class DataConfig {
     this.redshiftDatabase = getConfigParameter("redshift_database", verify);
     this.redshiftUserName = getConfigParameter("redshift_user_name", verify);
     this.redshiftPassword = getConfigParameter("redshift_password", verify);
-    this.redshiftAccessKey = getConfigParameter("redshift_access_key", verify);
-    this.redshiftAccessSecret = getConfigParameter("redshift_access_secret", verify);
     this.failureSnsArn = getConfigParameter("failure_sns_arn", verify);
     this.successSnsArn = getConfigParameter("success_sns_arn", verify);
     this.completionSnsArn = getConfigParameter("completion_sns_arn", verify);
     this.pipelineDynamoTable = getConfigParameter("pipeline_dynamo_table", verify);
     this.mainIdentifier = IdentifierType.valueOf(getConfigParameter("main_identifier", verify));
-    this.maximumRetries = getConfigParameter("maximum_retries", verify);
+    this.emrMaximumRetries = getConfigParameter("emr_maximum_retries", verify);
   }
 
   public static <T extends DataConfig> T parseInputFiles(final Class<T> cls,
@@ -195,6 +191,90 @@ public class DataConfig {
 
   public String getMoveUnmodifiedScript(final int phase) {
     return "phase_" + phase + "_move_unmodified_files.sh";
+  }
+
+  public String getDatasetName() {
+    return datasetName;
+  }
+
+  public String getDataSource() {
+    return dataSource;
+  }
+
+  public String getDataPipelineRole() {
+    return dataPipelineRole;
+  }
+
+  public String getDataPipelineResourceRoleArn() {
+    return dataPipelineResourceRoleArn;
+  }
+
+  public String getKeypair() {
+    return keypair;
+  }
+
+  public String getSubnetId() {
+    return subnetId;
+  }
+
+  public String getEmrReleaseLabel() {
+    return emrReleaseLabel;
+  }
+
+  public String getEmrTerminateAfter() {
+    return emrTerminateAfter;
+  }
+
+  public String getEmrMasterInstanceType() {
+    return emrMasterInstanceType;
+  }
+
+  public String getEmrMasterBidPrice() {
+    return emrMasterBidPrice;
+  }
+
+  public String getEmrCoreInstanceCount() {
+    return emrCoreInstanceCount;
+  }
+
+  public String getEmrCoreInstanceType() {
+    return emrCoreInstanceType;
+  }
+
+  public String getEmrCoreBidPrice() {
+    return emrCoreBidPrice;
+  }
+
+  public String getEmrTaskInstanceCount() {
+    return emrTaskInstanceCount;
+  }
+
+  public String getEmrTaskInstanceType() {
+    return emrTaskInstanceType;
+  }
+
+  public String getEmrTaskBidPrice() {
+    return emrTaskBidPrice;
+  }
+
+  public String getEmrMaximumRetries() {
+    return emrMaximumRetries;
+  }
+
+  public String getGitTagOrBranch() {
+    return gitTagOrBranch;
+  }
+
+  public String getLogBucket() {
+    return logBucket;
+  }
+
+  public String getCodeBucket() {
+    return codeBucket;
+  }
+
+  public String getIncomingBucket() {
+    return incomingBucket;
   }
 
 }

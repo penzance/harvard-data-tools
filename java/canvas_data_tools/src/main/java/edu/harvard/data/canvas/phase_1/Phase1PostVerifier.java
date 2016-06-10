@@ -54,7 +54,7 @@ public class Phase1PostVerifier {
     this.config = config;
     this.inputDir = config.getHdfsDir(0);
     this.outputDir = config.getHdfsDir(1);
-    this.verifyDir = config.getVerifyHdfsDir(0);
+    this.verifyDir = config.getVerifyHdfsDir(1);
     this.hadoopConfig = new Configuration();
     this.hadoopUtils = new HadoopUtilities();
     this.format = new FormatLibrary().getFormat(Format.DecompressedCanvasDataFlatFiles);

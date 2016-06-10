@@ -51,7 +51,7 @@ public class Pipeline {
       throws JsonProcessingException {
     final PipelineObjectBase defaultObj = factory.getDefault(schedule);
     final PipelineCompletionMessage completion = new PipelineCompletionMessage(pipelineId,
-        config.reportBucket, config.completionSnsArn, config.pipelineDynamoTable);
+        config.reportBucket, config.failureSnsArn, config.pipelineDynamoTable);
     final String failMsg = new ObjectMapper().writeValueAsString(completion);
     final String failSubj = "Pipeline " + name + " Failed";
     defaultObj.set("onFail", factory.getSns("FailureSnsAlert", failSubj, failMsg, config.completionSnsArn));
@@ -65,13 +65,13 @@ public class Pipeline {
   }
 
   private String emrBootstrapAction() {
-    final S3ObjectId script = AwsUtils.key(config.codeBucket, config.gitTagOrBranch,
+    final S3ObjectId script = AwsUtils.key(config.getCodeBucket(), config.getGitTagOrBranch(),
         "bootstrap.sh");
     final List<String> bootstrapParams = new ArrayList<String>();
     bootstrapParams.add(AwsUtils.uri(script));
     bootstrapParams.add(schemaVersion);
-    bootstrapParams.add(config.gitTagOrBranch);
-    bootstrapParams.add(config.dataSource.toLowerCase() + "_generate_tools.py");
+    bootstrapParams.add(config.getGitTagOrBranch());
+    bootstrapParams.add(config.getDataSource().toLowerCase() + "_generate_tools.py");
     bootstrapParams.add(config.paths);
     bootstrapParams.add(pipelineId);
     bootstrapParams.add(config.emrCodeDir);

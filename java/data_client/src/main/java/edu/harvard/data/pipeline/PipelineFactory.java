@@ -34,9 +34,9 @@ public class PipelineFactory {
     final PipelineObjectBase obj = new PipelineObjectBase(config, "Default", "Default");
     obj.set("failureAndRerunMode", "CASCADE");
     obj.set("scheduleType", "cron");
-    obj.set("role", config.dataPipelineRole);
-    obj.set("resourceRole", config.dataPipelineResourceRoleArn);
-    obj.set("pipelineLogUri", "s3://" + config.logBucket);
+    obj.set("role", config.getDataPipelineRole());
+    obj.set("resourceRole", config.getDataPipelineResourceRoleArn());
+    obj.set("pipelineLogUri", "s3://" + config.getLogBucket());
     obj.set("schedule", schedule);
     allObjects.add(obj);
     return obj;
@@ -45,7 +45,7 @@ public class PipelineFactory {
   public PipelineObjectBase getSns(final String id, final String subject, final String msg,
       final String topicArn) {
     final PipelineObjectBase obj = new PipelineObjectBase(config, id, "SnsAlarm");
-    obj.set("role", config.dataPipelineRole);
+    obj.set("role", config.getDataPipelineRole());
     obj.set("subject", subject);
     obj.set("message", msg);
     obj.set("topicArn", topicArn);
@@ -67,26 +67,26 @@ public class PipelineFactory {
   public PipelineObjectBase getEmr(final String name) {
     final PipelineObjectBase obj = new PipelineObjectBase(config, name, "EmrCluster");
     obj.set("useOnDemandOnLastAttempt", "true");
-    obj.set("keyPair", config.keypair);
-    obj.set("releaseLabel", config.emrReleaseLabel);
-    obj.set("terminateAfter", config.emrTerminateAfter);
-    obj.set("subnetId", config.appSubnet);
-    obj.set("masterInstanceType", config.emrMasterInstanceType);
-    if (config.emrMasterBidPrice != null) {
-      obj.set("masterInstanceBidPrice", config.emrMasterBidPrice);
+    obj.set("keyPair", config.getKeypair());
+    obj.set("releaseLabel", config.getEmrReleaseLabel());
+    obj.set("terminateAfter", config.getEmrTerminateAfter());
+    obj.set("subnetId", config.getSubnetId());
+    obj.set("masterInstanceType", config.getEmrMasterInstanceType());
+    if (config.getEmrMasterBidPrice() != null) {
+      obj.set("masterInstanceBidPrice", config.getEmrMasterBidPrice());
     }
-    if (Integer.parseInt(config.emrCoreInstanceCount) > 0) {
-      obj.set("coreInstanceType", config.emrCoreInstanceType);
-      obj.set("coreInstanceCount", config.emrCoreInstanceCount);
-      if (config.emrCoreBidPrice != null) {
-        obj.set("coreInstanceBidPrice", config.emrCoreBidPrice);
+    if (Integer.parseInt(config.getEmrCoreInstanceCount()) > 0) {
+      obj.set("coreInstanceType", config.getEmrCoreInstanceType());
+      obj.set("coreInstanceCount", config.getEmrCoreInstanceCount());
+      if (config.getEmrCoreBidPrice() != null) {
+        obj.set("coreInstanceBidPrice", config.getEmrCoreBidPrice());
       }
     }
-    if (Integer.parseInt(config.emrTaskInstanceCount) > 0) {
-      obj.set("taskInstanceType", config.emrTaskInstanceType);
-      obj.set("taskInstanceCount", config.emrTaskInstanceCount);
-      if (config.emrTaskBidPrice != null) {
-        obj.set("taskInstanceBidPrice", config.emrTaskBidPrice);
+    if (Integer.parseInt(config.getEmrTaskInstanceCount()) > 0) {
+      obj.set("taskInstanceType", config.getEmrTaskInstanceType());
+      obj.set("taskInstanceCount", config.getEmrTaskInstanceCount());
+      if (config.getEmrTaskBidPrice() != null) {
+        obj.set("taskInstanceBidPrice", config.getEmrTaskBidPrice());
       }
     }
     allObjects.add(obj);
@@ -182,7 +182,7 @@ public class PipelineFactory {
   private void setupActivity(final PipelineObjectBase obj,
       final PipelineObjectBase infrastructure) {
     obj.set("runsOn", infrastructure);
-    obj.set("maximumRetries", config.maximumRetries);
+    obj.set("maximumRetries", config.getEmrMaximumRetries());
     allObjects.add(obj);
   }
 

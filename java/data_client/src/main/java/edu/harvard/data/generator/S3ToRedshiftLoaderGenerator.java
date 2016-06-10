@@ -70,9 +70,9 @@ public class S3ToRedshiftLoaderGenerator {
         partialTables.add("session");
         // TODO: Make this dynamic for the dump being processed.
         if (partialTables.contains(table.getTableName())) {
-          outputPartialTableUpdate(out, table, config.datasetName, columnList);
+          outputPartialTableUpdate(out, table, config.getDatasetName(), columnList);
         } else {
-          outputTableOverwrite(out, table, config.datasetName, columnList);
+          outputTableOverwrite(out, table, config.getDatasetName(), columnList);
         }
       }
     }
