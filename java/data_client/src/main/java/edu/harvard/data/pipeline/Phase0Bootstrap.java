@@ -123,7 +123,7 @@ public abstract class Phase0Bootstrap {
 
     String envString = "";
     for (final String key : env.keySet()) {
-      envString += "export " + key + "=" + env.get(key) + "\n";
+      envString += "export " + key + "=\"" + env.get(key) + "\"\n";
     }
 
     return envString;
