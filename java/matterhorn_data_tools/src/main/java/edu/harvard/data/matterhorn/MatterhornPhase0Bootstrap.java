@@ -37,7 +37,9 @@ public class MatterhornPhase0Bootstrap extends Phase0Bootstrap {
 
   @Override
   protected Map<String, String> getCustomEc2Environment() {
-    return new HashMap<String, String>();
+    final Map<String, String> env = new HashMap<String, String>();
+    env.put("DATA_SCHEMA_VERSION", "1.0"); // XXX: Remove
+    return env;
   }
 
   @Override
