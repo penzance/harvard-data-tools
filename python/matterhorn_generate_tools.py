@@ -49,8 +49,7 @@ def run_generator():
     generator_classpath = "{0}:{1}:{2}:{3}".format(
         "{0}/target/matterhorn_data_client-1.0.0.jar".format(MATTERHORN_DATA_CLIENT_DIR),
         "{0}/target/data_client-1.0.0.jar".format(DATA_CLIENT_DIR),
-        SCHEMA_JSON_DIR,
-        RUN_ID
+        SCHEMA_JSON_DIR
     )
     main_class = "edu.harvard.data.matterhorn.MatterhornCodeGenerator"
     command = [
@@ -59,7 +58,7 @@ def run_generator():
         CONFIG_PATHS,
         GIT_BASE,
         GENERATED_CODE_DIR,
-        PIPELINE_ID
+        RUN_ID
     ]
     print "Running {0} in {1}".format(command, GENERATED_CODE_DIR)
     process = subprocess.Popen(command)
