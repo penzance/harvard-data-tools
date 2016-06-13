@@ -23,6 +23,7 @@ public class DataConfig {
   private final String dataSource;
   private final String dataPipelineRole;
   private final String dataPipelineResourceRoleArn;
+  private final String dataPipelineCreatorRoleArn;
   private final String keypair;
   private final String subnetId;
   private final String gitTagOrBranch;
@@ -111,6 +112,7 @@ public class DataConfig {
     this.dataPipelineRole = getConfigParameter("data_pipeline_role", verify);
     this.dataPipelineResourceRoleArn = getConfigParameter("data_pipeline_resource_role_arn",
         verify);
+    this.dataPipelineCreatorRoleArn = getConfigParameter("data_pipeline_creator_role_arn", verify);
     this.keypair = getConfigParameter("keypair", verify);
     this.subnetId = getConfigParameter("subnet_id", verify);
     this.gitTagOrBranch = getConfigParameter("git_tag_or_branch", verify);
@@ -460,6 +462,10 @@ public class DataConfig {
 
   public String getPipelineSetupClass() {
     return pipelineSetupClass;
+  }
+
+  public String getDataPipelineCreatorRoleArn() {
+    return dataPipelineCreatorRoleArn;
   }
 
 }

@@ -25,14 +25,16 @@ public class Pipeline {
   private final PipelineObjectBase emr;
   private final PipelineObjectBase schedule;
   private final String schemaVersion;
+  private final String runId;
 
   public Pipeline(final String name, final GenerationSpec spec, final DataConfig config,
-      final String pipelineId, final PipelineFactory factory, final String schemaVersion) throws JsonProcessingException {
+      final String pipelineId, final PipelineFactory factory, final String schemaVersion, final String runId) throws JsonProcessingException {
     this.name = name;
     this.config = config;
     this.pipelineId = pipelineId;
     this.factory = factory;
     this.schemaVersion = schemaVersion;
+    this.runId = runId;
     this.schedule = factory.getSchedule();
     this.redshift = factory.getRedshift();
     this.emr = createEmr();
@@ -73,7 +75,7 @@ public class Pipeline {
     bootstrapParams.add(config.getGitTagOrBranch());
     bootstrapParams.add(config.getDataSource().toLowerCase() + "_generate_tools.py");
     bootstrapParams.add(config.getPaths());
-    bootstrapParams.add(pipelineId);
+    bootstrapParams.add(runId);
     bootstrapParams.add(config.getEmrCodeDir());
     return StringUtils.join(bootstrapParams, ",");
   }

@@ -4,7 +4,7 @@ export DATA_SCHEMA_VERSION=$1  # Used by code generator
 export GIT_BRANCH=$2
 export GENERATOR=$3
 export CONFIG_PATHS=$4 # Used by code generator
-export PIPELINE_ID=$5 # Used by code generator
+export RUN_ID=$5 # Used by code generator
 export HARVARD_DATA_GENERATED_OUTPUT=$6  # Used by code generator
 
 # - HARVARD_DATA_TOOLS_BASE: the directory where the harvard-data-tools

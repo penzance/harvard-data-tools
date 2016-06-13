@@ -83,7 +83,7 @@ public class CanvasPhase0 {
 
   private void checkSchema() throws VerificationException {
     // TODO: Create dynamo table to track valid schemas.
-    if (!schema.getVersion().equals("1.10.2")) {
+    if (!schema.getVersion().equals("1.10.3")) {
       throw new VerificationException("Unexpected schema version " + schema.getVersion());
     }
   }

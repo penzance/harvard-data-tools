@@ -56,7 +56,7 @@ public class CanvasPhase0Bootstrap {
     // No dump to download
   }
 
-  private static void createPhase0(final CanvasDataConfig config, final DataDump dump)
+  private static void createPhase0(final DataConfig config, final DataDump dump)
       throws IOException {
     final AmazonEC2Client ec2client = new AmazonEC2Client();
 
@@ -67,7 +67,7 @@ public class CanvasPhase0Bootstrap {
     spec.setSubnetId(config.getSubnetId());
     spec.setUserData(getUserData(config, dump));
     final IamInstanceProfileSpecification instanceProfile = new IamInstanceProfileSpecification();
-    instanceProfile.setArn(config.getDataPipelineResourceRoleArn());
+    instanceProfile.setArn(config.getDataPipelineCreatorRoleArn());
     spec.setIamInstanceProfile(instanceProfile);
 
     final RequestSpotInstancesRequest request = new RequestSpotInstancesRequest();
@@ -88,7 +88,7 @@ public class CanvasPhase0Bootstrap {
     // TODO: Check in case the startup failed.
   }
 
-  private static String getUserData(final CanvasDataConfig config, final DataDump dump)
+  private static String getUserData(final DataConfig config, final DataDump dump)
       throws IOException {
     final AwsUtils aws = new AwsUtils();
     final S3ObjectId bootstrapScript = config.getPhase0BootstrapScript();
@@ -114,7 +114,7 @@ public class CanvasPhase0Bootstrap {
     return paths;
   }
 
-  private static String getBootstrapEnvironment(final CanvasDataConfig config, final DataDump dump) {
+  private static String getBootstrapEnvironment(final DataConfig config, final DataDump dump) {
     String env = "";
     env += "export GIT_BRANCH=" + config.getGitTagOrBranch() + "\n";
     env += "export HARVARD_DATA_TOOLS_BASE=" + config.getEc2GitDir() + "\n";
@@ -128,12 +128,12 @@ public class CanvasPhase0Bootstrap {
     env += "export PIPELINE_SETUP_CLASS=" + config.getPipelineSetupClass() + "\n";
     env += "export DATA_SET_ID=" + dump.getDumpId() + "\n";
 
-    env += "export DATA_SCHEMA_VERSION=1.10.2\n\n"; // XXX: Remove
+    env += "export DATA_SCHEMA_VERSION=1.10.3\n\n"; // XXX: Remove
 
     return env;
   }
 
-  private static String getRunId(final CanvasDataConfig config) {
+  private static String getRunId(final DataConfig config) {
     final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH:mm");
     return config.getDatasetName() + "_" + format.format(new Date());
   }

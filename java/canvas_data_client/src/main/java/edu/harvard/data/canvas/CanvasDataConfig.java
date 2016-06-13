@@ -52,5 +52,4 @@ public class CanvasDataConfig extends DataConfig {
   public String getTableInfoDynamoTable() {
     return tableInfoDynamoTable;
   }
-
 }

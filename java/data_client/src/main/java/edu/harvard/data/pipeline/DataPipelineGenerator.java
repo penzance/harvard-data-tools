@@ -80,7 +80,7 @@ public class DataPipelineGenerator {
   private Pipeline populatePipeline() throws DataConfigurationException, JsonProcessingException {
     final PipelineFactory factory = new PipelineFactory(config, pipelineId);
     final Pipeline pipeline = new Pipeline(name, spec, config, pipelineId, factory,
-        spec.getSchemaVersion());
+        spec.getSchemaVersion(), runId);
     final EmrStartupPipelineSetup setup = new EmrStartupPipelineSetup(pipeline, factory,
         dataLocation, runId);
     final Phase1PipelineSetup phase1 = new Phase1PipelineSetup(pipeline, factory, codeManager, runId);
