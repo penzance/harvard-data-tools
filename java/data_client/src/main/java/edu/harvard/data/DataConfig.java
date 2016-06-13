@@ -46,6 +46,7 @@ public class DataConfig {
   private final String awsSecretKey;
   private final IdentifierType mainIdentifier;
   private final String pipelineDynamoTable;
+  private final String serverTimezone;
 
   private final String emrReleaseLabel;
   private final String emrTerminateAfter;
@@ -115,6 +116,7 @@ public class DataConfig {
     this.dataPipelineCreatorRoleArn = getConfigParameter("data_pipeline_creator_role_arn", verify);
     this.keypair = getConfigParameter("keypair", verify);
     this.subnetId = getConfigParameter("subnet_id", verify);
+    this.serverTimezone = getConfigParameter("server_timezone", verify);
     this.gitTagOrBranch = getConfigParameter("git_tag_or_branch", verify);
     this.logBucket = getConfigParameter("log_bucket", verify);
     this.codeBucket = getConfigParameter("code_bucket", verify);
@@ -466,6 +468,10 @@ public class DataConfig {
 
   public String getDataPipelineCreatorRoleArn() {
     return dataPipelineCreatorRoleArn;
+  }
+
+  public String getServerTimezone() {
+    return serverTimezone;
   }
 
 }

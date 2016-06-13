@@ -119,6 +119,7 @@ public abstract class Phase0Bootstrap {
     env.put("PHASE_0_CLASS", config.getPhase0Class());
     env.put("RUN_ID", getRunId(config));
     env.put("PIPELINE_SETUP_CLASS", config.getPipelineSetupClass());
+    env.put("SERVER_TIMEZONE", config.getServerTimezone());
     env.putAll(getCustomEc2Environment());
 
     String envString = "";
