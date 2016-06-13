@@ -24,4 +24,4 @@ java -Duser.timezone=$SERVER_TIMEZONE -Xmx$PHASE_0_HEAP_SIZE -cp /home/ec2-user/
 java -cp /home/ec2-user/code/data_tools.jar:$HARVARD_DATA_TOOLS_BASE/schema $PIPELINE_SETUP_CLASS $CONFIG_PATHS $HARVARD_DATA_TOOLS_BASE $RUN_ID $DATA_SET_ID
 
 # Shut down; the pipeline will take over.
-# sudo halt now
+sudo halt now
