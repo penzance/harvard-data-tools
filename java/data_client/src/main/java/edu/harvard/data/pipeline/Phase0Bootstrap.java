@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -14,12 +13,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.amazonaws.services.ec2.AmazonEC2Client;
-import com.amazonaws.services.ec2.model.DescribeSpotInstanceRequestsRequest;
-import com.amazonaws.services.ec2.model.DescribeSpotInstanceRequestsResult;
 import com.amazonaws.services.ec2.model.IamInstanceProfileSpecification;
 import com.amazonaws.services.ec2.model.LaunchSpecification;
-import com.amazonaws.services.ec2.model.RequestSpotInstancesRequest;
-import com.amazonaws.services.ec2.model.RequestSpotInstancesResult;
 import com.amazonaws.services.s3.model.S3ObjectId;
 import com.amazonaws.util.Base64;
 
@@ -35,6 +30,7 @@ public abstract class Phase0Bootstrap {
   protected DataConfig config;
   private String configPathString;
   private final Class<? extends DataConfig> configClass;
+  protected String runId;
 
   protected abstract List<S3ObjectId> getInfrastructureConfigPaths();
   protected abstract Map<String, String> getCustomEc2Environment();
@@ -45,6 +41,7 @@ public abstract class Phase0Bootstrap {
       final Class<? extends DataConfig> configClass) throws IOException, DataConfigurationException {
     this.configPathString = configPathString;
     this.configClass = configClass;
+    this.runId = getRunId();
     this.config = DataConfig.parseInputFiles(configClass, configPathString, false);
   }
 
@@ -71,21 +68,21 @@ public abstract class Phase0Bootstrap {
     instanceProfile.setArn(config.getDataPipelineCreatorRoleArn());
     spec.setIamInstanceProfile(instanceProfile);
 
-    final RequestSpotInstancesRequest request = new RequestSpotInstancesRequest();
-    request.setSpotPrice(config.getPhase0BidPrice());
-    request.setInstanceCount(1);
-    request.setLaunchSpecification(spec);
-
-    final RequestSpotInstancesResult result = ec2client.requestSpotInstances(request);
-    System.out.println(result);
-
-    final List<String> instanceIds = new ArrayList<String>();
-    instanceIds.add(result.getSpotInstanceRequests().get(0).getSpotInstanceRequestId());
-    final DescribeSpotInstanceRequestsRequest describe = new DescribeSpotInstanceRequestsRequest();
-    describe.setSpotInstanceRequestIds(instanceIds);
-    final DescribeSpotInstanceRequestsResult description = ec2client
-        .describeSpotInstanceRequests(describe);
-    System.out.println(description);
+    //    final RequestSpotInstancesRequest request = new RequestSpotInstancesRequest();
+    //    request.setSpotPrice(config.getPhase0BidPrice());
+    //    request.setInstanceCount(1);
+    //    request.setLaunchSpecification(spec);
+    //
+    //    final RequestSpotInstancesResult result = ec2client.requestSpotInstances(request);
+    //    System.out.println(result);
+    //
+    //    final List<String> instanceIds = new ArrayList<String>();
+    //    instanceIds.add(result.getSpotInstanceRequests().get(0).getSpotInstanceRequestId());
+    //    final DescribeSpotInstanceRequestsRequest describe = new DescribeSpotInstanceRequestsRequest();
+    //    describe.setSpotInstanceRequestIds(instanceIds);
+    //    final DescribeSpotInstanceRequestsResult description = ec2client
+    //        .describeSpotInstanceRequests(describe);
+    //    System.out.println(description);
     // TODO: Check in case the startup failed.
   }
 
@@ -117,7 +114,7 @@ public abstract class Phase0Bootstrap {
     env.put("PHASE_0_THREADS", config.getPhase0Threads());
     env.put("PHASE_0_HEAP_SIZE", config.getPhase0HeapSize());
     env.put("PHASE_0_CLASS", config.getPhase0Class());
-    env.put("RUN_ID", getRunId(config));
+    env.put("RUN_ID", runId);
     env.put("PIPELINE_SETUP_CLASS", config.getPipelineSetupClass());
     env.put("SERVER_TIMEZONE", config.getServerTimezone());
     env.putAll(getCustomEc2Environment());
@@ -130,8 +127,7 @@ public abstract class Phase0Bootstrap {
     return envString;
   }
 
-
-  private static String getRunId(final DataConfig config) {
+  private String getRunId() {
     final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH:mm");
     return config.getDatasetName() + "_" + format.format(new Date());
   }

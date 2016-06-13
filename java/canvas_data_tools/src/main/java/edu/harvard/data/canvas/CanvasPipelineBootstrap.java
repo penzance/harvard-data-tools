@@ -28,11 +28,12 @@ public class CanvasPipelineBootstrap {
         false);
     gitDir = new File(args[1]);
     final String runId = args[2];
+    final String dumpId = args[3];
     final String host = config.getCanvasDataHost();
     final String key = config.getCanvasApiKey();
     final String secret = config.getCanvasApiSecret();
     final ApiClient api = new ApiClient(host, key, secret);
-    final DataDump dump = api.getDump(229);
+    final DataDump dump = api.getDump(dumpId);
     final String emrConfig = chooseEmrConfigFile(dump);
     config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, args[0] + "|" + emrConfig,
         true);

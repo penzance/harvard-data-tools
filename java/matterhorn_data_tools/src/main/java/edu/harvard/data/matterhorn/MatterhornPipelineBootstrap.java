@@ -19,10 +19,11 @@ public class MatterhornPipelineBootstrap {
     final String configPath = args[0];
     final File gitDir = new File(args[1]);
     final String runId = args[2];
+    final String datasetId = args[3];
 
     final MatterhornDataConfig config = MatterhornDataConfig
         .parseInputFiles(MatterhornDataConfig.class, configPath, true);
-    final S3ObjectId dumpLocation = AwsUtils.key(config.getS3IncomingLocation(), "TestData");
+    final S3ObjectId dumpLocation = AwsUtils.key(config.getS3IncomingLocation(), datasetId);
     final MatterhornCodeGenerator generator = new MatterhornCodeGenerator("1.0", gitDir,
         null, config, null);
 

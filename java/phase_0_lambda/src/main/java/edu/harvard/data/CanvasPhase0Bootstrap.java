@@ -65,7 +65,7 @@ public class CanvasPhase0Bootstrap extends Phase0Bootstrap {
   @Override
   protected Map<String, String> getCustomEc2Environment() {
     final Map<String, String> env = new HashMap<String, String>();
-    env.put("DATA_SET_ID", config.getPipelineSetupClass());
+    env.put("DATA_SET_ID", dump.getDumpId());
     env.put("DATA_SCHEMA_VERSION", "1.10.3"); // XXX: Remove
     return env;
   }
