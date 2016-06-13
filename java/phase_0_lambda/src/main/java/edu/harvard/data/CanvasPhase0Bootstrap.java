@@ -94,7 +94,7 @@ public class CanvasPhase0Bootstrap {
     final S3ObjectId bootstrapScript = config.getPhase0BootstrapScript();
 
     String userData = "#! /bin/bash\n";
-    userData += getBootstrapEnvironment(config);
+    userData += getBootstrapEnvironment(config, dump);
     try (final BufferedReader in = new BufferedReader(
         new InputStreamReader(aws.getInputStream(bootstrapScript, false)))) {
       String line = in.readLine();
@@ -114,20 +114,21 @@ public class CanvasPhase0Bootstrap {
     return paths;
   }
 
-  private static String getBootstrapEnvironment(final CanvasDataConfig config) {
+  private static String getBootstrapEnvironment(final CanvasDataConfig config, final DataDump dump) {
     String env = "";
     env += "export GIT_BRANCH=" + config.getGitTagOrBranch() + "\n";
     env += "export HARVARD_DATA_TOOLS_BASE=" + config.getEc2GitDir() + "\n";
     env += "export GENERATOR=" + config.getCodeGeneratorScript() + "\n";
-    env += "export CONFIG_PATHS=" + config.getPaths();
-    env += "export HARVARD_DATA_GENERATED_OUTPUT=" + config.getEc2CodeDir();
-    env += "export PHASE_0_THREADS=" + config.getPhase0Threads();
-    env += "export PHASE_0_HEAP_SIZE=" + config.getPhase0HeapSize();
-    env += "export PHASE_0_CLASS=" + config.getPhase0Class();
-    env += "export RUN_ID=" + getRunId(config);
-    env += "export PIPELINE_SETUP_CLASS=" + config.getPipelineSetupClass();
+    env += "export CONFIG_PATHS=\"" + config.getPaths() + "\"\n";
+    env += "export HARVARD_DATA_GENERATED_OUTPUT=" + config.getEc2CodeDir() + "\n";
+    env += "export PHASE_0_THREADS=" + config.getPhase0Threads() + "\n";
+    env += "export PHASE_0_HEAP_SIZE=" + config.getPhase0HeapSize() + "\n";
+    env += "export PHASE_0_CLASS=" + config.getPhase0Class() + "\n";
+    env += "export RUN_ID=" + getRunId(config) + "\n";
+    env += "export PIPELINE_SETUP_CLASS=" + config.getPipelineSetupClass() + "\n";
+    env += "export DATA_SET_ID=" + dump.getDumpId() + "\n";
 
-    env += "export DATA_SCHEMA_VERSION=1.10.2"; // XXX: Remove
+    env += "export DATA_SCHEMA_VERSION=1.10.2\n\n"; // XXX: Remove
 
     return env;
   }
