@@ -27,6 +27,7 @@ public class CanvasPipelineBootstrap {
     CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, args[0],
         false);
     gitDir = new File(args[1]);
+    final String runId = args[2];
     final String host = config.getCanvasDataHost();
     final String key = config.getCanvasApiKey();
     final String secret = config.getCanvasApiSecret();
@@ -35,7 +36,7 @@ public class CanvasPipelineBootstrap {
     final String emrConfig = chooseEmrConfigFile(dump);
     config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, args[0] + "|" + emrConfig,
         true);
-    setupRun(dump, config, api);
+    setupRun(dump, config, api, runId);
   }
 
   private static String chooseEmrConfigFile(final DataDump dump) {
@@ -43,7 +44,7 @@ public class CanvasPipelineBootstrap {
   }
 
   private static void setupRun(final DataDump dump, final CanvasDataConfig config,
-      final ApiClient api) throws DataConfigurationException,
+      final ApiClient api, final String runId) throws DataConfigurationException,
   UnexpectedApiResponseException, IOException, VerificationException {
     log.info("Saving dump " + dump);
     final S3ObjectId dumpLocation = AwsUtils.key(config.getS3IncomingLocation(),
@@ -52,7 +53,7 @@ public class CanvasPipelineBootstrap {
         null, config, null);
     final GenerationSpec spec = generator.createGenerationSpec();
     final DataPipelineGenerator pipeline = new DataPipelineGenerator(
-        "Canvas_Dump_" + dump.getSequence(), spec, config, dumpLocation, new CanvasCodeManager());
+        "Canvas_Dump_" + dump.getSequence(), spec, config, dumpLocation, new CanvasCodeManager(), runId);
     pipeline.generate();
   }
 

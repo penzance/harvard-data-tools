@@ -16,12 +16,12 @@ public class Phase3PipelineSetup {
   private final GeneratedCodeManager codeManager;
 
   public Phase3PipelineSetup(final Pipeline pipeline, final PipelineFactory factory,
-      final GeneratedCodeManager codeManager) {
+      final GeneratedCodeManager codeManager, final String runId) {
     this.factory = factory;
     this.pipeline = pipeline;
     this.codeManager = codeManager;
     this.config = pipeline.getConfig();
-    this.workingDir = AwsUtils.key(config.getS3WorkingLocation(), pipeline.getId());
+    this.workingDir = AwsUtils.key(config.getS3WorkingLocation(), runId);
     this.redshiftStagingS3 = AwsUtils.key(workingDir, config.getRedshiftStagingDir());
   }
 

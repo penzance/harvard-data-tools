@@ -31,15 +31,17 @@ public class DataPipelineGenerator {
   private String pipelineId;
   private final S3ObjectId dataLocation;
   private final GeneratedCodeManager codeManager;
+  private final String runId;
 
   public DataPipelineGenerator(final String name, final GenerationSpec spec,
       final DataConfig config, final S3ObjectId dataLocation,
-      final GeneratedCodeManager codeManager) {
+      final GeneratedCodeManager codeManager, final String runId) {
     this.name = name;
     this.spec = spec;
     this.config = config;
     this.dataLocation = dataLocation;
     this.codeManager = codeManager;
+    this.runId = runId;
   }
 
   public void generate() throws DataConfigurationException, IOException {
@@ -80,10 +82,10 @@ public class DataPipelineGenerator {
     final Pipeline pipeline = new Pipeline(name, spec, config, pipelineId, factory,
         spec.getSchemaVersion());
     final EmrStartupPipelineSetup setup = new EmrStartupPipelineSetup(pipeline, factory,
-        dataLocation);
-    final Phase1PipelineSetup phase1 = new Phase1PipelineSetup(pipeline, factory, codeManager);
+        dataLocation, runId);
+    final Phase1PipelineSetup phase1 = new Phase1PipelineSetup(pipeline, factory, codeManager, runId);
     final Phase2PipelineSetup phase2 = new Phase2PipelineSetup(pipeline, factory, codeManager);
-    final Phase3PipelineSetup phase3 = new Phase3PipelineSetup(pipeline, factory, codeManager);
+    final Phase3PipelineSetup phase3 = new Phase3PipelineSetup(pipeline, factory, codeManager, runId);
 
     PipelineObjectBase previousStep;
     previousStep = setup.populate();

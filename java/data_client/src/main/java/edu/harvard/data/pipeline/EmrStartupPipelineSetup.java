@@ -18,13 +18,13 @@ public class EmrStartupPipelineSetup {
   private final S3ObjectId dataLocation;
 
   public EmrStartupPipelineSetup(final Pipeline pipeline, final PipelineFactory factory,
-      final S3ObjectId dataLocation) {
+      final S3ObjectId dataLocation, final String runId) {
     this.factory = factory;
     this.dataLocation = dataLocation;
     this.config = pipeline.getConfig();
     this.pipeline = pipeline;
     this.pipelineId = pipeline.getId();
-    this.workingDir = AwsUtils.key(config.getS3WorkingLocation(), pipelineId);
+    this.workingDir = AwsUtils.key(config.getS3WorkingLocation(), runId);
   }
 
   public PipelineObjectBase populate() {

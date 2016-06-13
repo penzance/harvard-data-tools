@@ -23,12 +23,12 @@ public class Phase1PipelineSetup {
   private final GeneratedCodeManager codeManager;
 
   public Phase1PipelineSetup(final Pipeline pipeline, final PipelineFactory factory,
-      final GeneratedCodeManager codeManager) {
+      final GeneratedCodeManager codeManager, final String runId) {
     this.factory = factory;
     this.pipeline = pipeline;
     this.codeManager = codeManager;
     this.config = pipeline.getConfig();
-    this.workingDir = AwsUtils.key(config.getS3WorkingLocation(), pipeline.getId());
+    this.workingDir = AwsUtils.key(config.getS3WorkingLocation(), runId);
     this.unloadIdentityS3 = AwsUtils.key(workingDir, "unloaded_tables", "identity_map");
     this.redshiftStagingS3 = AwsUtils.key(workingDir, config.getRedshiftStagingDir(), "identity_map");
     this.identityHdfs = config.getHdfsDir(0) + "/identity_map";

@@ -19,6 +19,7 @@ public class MatterhornBootstrap {
     final String configPath = args[0];
     final File gitDir = new File(args[1]);
     final String schemaVersion = args[2];
+    final String runId = args[3];
 
     final MatterhornDataConfig config = MatterhornDataConfig
         .parseInputFiles(MatterhornDataConfig.class, configPath, true);
@@ -28,7 +29,7 @@ public class MatterhornBootstrap {
 
     final GenerationSpec spec = generator.createGenerationSpec();
     final DataPipelineGenerator pipeline = new DataPipelineGenerator("Matterhorn", spec, config,
-        dumpLocation, new MatterhornCodeManager());
+        dumpLocation, new MatterhornCodeManager(), runId);
     pipeline.generate();
   }
 

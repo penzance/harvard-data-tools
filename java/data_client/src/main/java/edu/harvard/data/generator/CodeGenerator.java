@@ -52,10 +52,10 @@ public abstract class CodeGenerator {
    *          S3 scratch directory to store intermediate code and data during
    *          the pipeline's run
    */
-  public CodeGenerator(final DataConfig config, final File codeDir, final String pipelineId) {
+  public CodeGenerator(final DataConfig config, final File codeDir, final String runId) {
     this.config = config;
     this.codeDir = codeDir;
-    this.workingDir = AwsUtils.key(config.getS3WorkingLocation(), pipelineId);
+    this.workingDir = AwsUtils.key(config.getS3WorkingLocation(), runId);
   }
 
   /**

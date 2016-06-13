@@ -66,6 +66,8 @@ public class DataConfig {
   private final String phase0Ami;
   private final String phase0SecurityGroup;
 
+  private final String ec2GitDir;
+  private final String ec2CodeDir;
   private final String emrCodeDir;
   private final String dataToolsJar;
   private final String identityRedshiftSchema;
@@ -74,6 +76,10 @@ public class DataConfig {
   private final String redshiftStagingDir;
   private final String hdfsBase;
   private final String hdfsVerifyBase;
+
+  protected String codeGeneratorScript;
+  protected String phase0Class;
+  protected String pipelineSetupClass;
 
   private final Properties properties;
 
@@ -91,6 +97,8 @@ public class DataConfig {
     this.emrCodeDir = "/home/hadoop/code";
     this.hdfsBase = "/phase_";
     this.hdfsVerifyBase = "/verify" + this.hdfsBase;
+    this.ec2GitDir = "/home/ec2-user/harvard-data-tools";
+    this.ec2CodeDir = "/home/ec2-user/code";
 
     this.scratchDir = getConfigParameter("scratch_dir", verify);
     this.redshiftPort = getConfigParameter("redshift_port", verify);
@@ -185,6 +193,19 @@ public class DataConfig {
     return param;
   }
 
+  protected void checkParameters() throws DataConfigurationException {
+    checkParameter("codeGeneratorScript", codeGeneratorScript);
+    checkParameter("phase0Class", phase0Class);
+    checkParameter("pipelineSetupClass", pipelineSetupClass);
+  }
+
+  private void checkParameter(final String key, final String value)
+      throws DataConfigurationException {
+    if (value == null) {
+      throw new DataConfigurationException("Configuration parameter " + key + " not set.");
+    }
+  }
+
   public String getRedshiftUrl() {
     return "jdbc:postgresql://" + redshiftServer + ":" + redshiftPort + "/" + redshiftDatabase;
   }
@@ -195,6 +216,14 @@ public class DataConfig {
 
   public S3ObjectId getS3IncomingLocation() {
     return AwsUtils.key(incomingBucket, dataSource);
+  }
+
+  public S3ObjectId getCodeLocation() {
+    return AwsUtils.key(codeBucket, gitTagOrBranch);
+  }
+
+  public S3ObjectId getPhase0BootstrapScript() {
+    return AwsUtils.key(getCodeLocation(), "phase-0-bootstrap.sh");
   }
 
   public String getHdfsDir(final int phase) {
@@ -291,10 +320,6 @@ public class DataConfig {
 
   public String getIncomingBucket() {
     return incomingBucket;
-  }
-
-  public String getWorkingBucket() {
-    return workingBucket;
   }
 
   public String getReportBucket() {
@@ -415,6 +440,26 @@ public class DataConfig {
 
   public String getPhase0SecurityGroup() {
     return phase0SecurityGroup;
+  }
+
+  public String getEc2GitDir() {
+    return ec2GitDir;
+  }
+
+  public String getCodeGeneratorScript() {
+    return codeGeneratorScript;
+  }
+
+  public String getEc2CodeDir() {
+    return ec2CodeDir;
+  }
+
+  public String getPhase0Class() {
+    return phase0Class;
+  }
+
+  public String getPipelineSetupClass() {
+    return pipelineSetupClass;
   }
 
 }
