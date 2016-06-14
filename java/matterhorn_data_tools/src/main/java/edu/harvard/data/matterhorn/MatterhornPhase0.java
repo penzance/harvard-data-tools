@@ -11,7 +11,6 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
-import edu.harvard.data.matterhorn.cli.InputParser;
 
 public class MatterhornPhase0 {
 

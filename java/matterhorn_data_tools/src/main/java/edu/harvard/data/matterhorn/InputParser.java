@@ -1,4 +1,4 @@
-package edu.harvard.data.matterhorn.cli;
+package edu.harvard.data.matterhorn;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +18,6 @@ import edu.harvard.data.TableFormat;
 import edu.harvard.data.io.FileTableReader;
 import edu.harvard.data.io.JsonFileReader;
 import edu.harvard.data.io.TableWriter;
-import edu.harvard.data.matterhorn.EventJsonDocumentParser;
 import edu.harvard.data.matterhorn.MatterhornDataConfig;
 import edu.harvard.data.matterhorn.bindings.phase0.Phase0Event;
 import edu.harvard.data.matterhorn.bindings.phase0.Phase0Video;

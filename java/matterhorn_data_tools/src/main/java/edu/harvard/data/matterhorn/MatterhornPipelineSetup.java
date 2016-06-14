@@ -12,7 +12,7 @@ import edu.harvard.data.generator.GenerationSpec;
 import edu.harvard.data.pipeline.DataPipelineGenerator;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
-public class MatterhornPipelineBootstrap {
+public class MatterhornPipelineSetup {
 
   public static void main(final String[] args) throws IOException, DataConfigurationException,
   UnexpectedApiResponseException, VerificationException {

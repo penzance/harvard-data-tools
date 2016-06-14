@@ -21,7 +21,6 @@ import edu.harvard.data.DumpInfo;
 import edu.harvard.data.TableInfo;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.canvas.CanvasDataConfig;
-import edu.harvard.data.canvas.cli.ArgumentError;
 import edu.harvard.data.canvas.data_api.ApiClient;
 import edu.harvard.data.canvas.data_api.CanvasDataSchema;
 import edu.harvard.data.canvas.data_api.DataArtifact;

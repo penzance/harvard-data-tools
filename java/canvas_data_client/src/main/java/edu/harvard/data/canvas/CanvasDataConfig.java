@@ -25,7 +25,7 @@ public class CanvasDataConfig extends DataConfig {
     this.tableInfoDynamoTable = getConfigParameter("table_info_dynamo_table", verify);
 
     this.codeGeneratorScript = "canvas_generate_tools.py";
-    this.pipelineSetupClass = "edu.harvard.data.canvas.CanvasPipelineBootstrap";
+    this.pipelineSetupClass = "edu.harvard.data.canvas.CanvasPipelineSetup";
     this.phase0Class = "edu.harvard.data.canvas.CanvasPhase0";
     if (verify) {
       checkParameters();

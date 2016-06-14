@@ -1,6 +1,0 @@
-{ "tables": {
-    "like_table" : {
-    	"like": "fake_table"
-    }
-  } 
-}

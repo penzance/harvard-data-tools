@@ -9,10 +9,6 @@ import edu.harvard.data.HadoopJob;
 import edu.harvard.data.generator.GeneratedCodeManager;
 import edu.harvard.data.identity.IdentityMapHadoopJob;
 import edu.harvard.data.matterhorn.identity.MatterhornIdentityHadoopManager;
-import edu.harvard.data.matterhorn.phase_1.Phase1PostVerifier;
-import edu.harvard.data.matterhorn.phase_1.Phase1PreVerifier;
-import edu.harvard.data.matterhorn.phase_2.SessionJob;
-import edu.harvard.data.matterhorn.phase_2.VideoJob;
 
 public class MatterhornCodeManager extends GeneratedCodeManager {
 

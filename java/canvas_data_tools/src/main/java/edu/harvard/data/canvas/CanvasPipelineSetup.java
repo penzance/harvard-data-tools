@@ -17,15 +17,15 @@ import edu.harvard.data.generator.GenerationSpec;
 import edu.harvard.data.pipeline.DataPipelineGenerator;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
-public class CanvasPipelineBootstrap {
+public class CanvasPipelineSetup {
 
   private static final Logger log = LogManager.getLogger();
   private static File gitDir;
 
   public static void main(final String[] args) throws IOException, DataConfigurationException,
   UnexpectedApiResponseException, VerificationException {
-    CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, args[0],
-        false);
+    final CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class,
+        args[0], true);
     gitDir = new File(args[1]);
     final String runId = args[2];
     final String dumpId = args[3];
@@ -34,14 +34,7 @@ public class CanvasPipelineBootstrap {
     final String secret = config.getCanvasApiSecret();
     final ApiClient api = new ApiClient(host, key, secret);
     final DataDump dump = api.getDump(dumpId);
-    final String emrConfig = chooseEmrConfigFile(dump);
-    config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, args[0] + "|" + emrConfig,
-        true);
     setupRun(dump, config, api, runId);
-  }
-
-  private static String chooseEmrConfigFile(final DataDump dump) {
-    return "s3://hdt-code/api_pipeline/tiny_emr.properties";
   }
 
   private static void setupRun(final DataDump dump, final CanvasDataConfig config,
@@ -54,7 +47,8 @@ public class CanvasPipelineBootstrap {
         null, config, null);
     final GenerationSpec spec = generator.createGenerationSpec();
     final DataPipelineGenerator pipeline = new DataPipelineGenerator(
-        "Canvas_Dump_" + dump.getSequence(), spec, config, dumpLocation, new CanvasCodeManager(), runId);
+        "Canvas_Dump_" + dump.getSequence(), spec, config, dumpLocation, new CanvasCodeManager(),
+        runId);
     pipeline.generate();
   }
 

@@ -1,9 +1,6 @@
-package edu.harvard.data.matterhorn.phase_2;
+package edu.harvard.data.matterhorn;
 
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.csv.CSVParser;
 import org.apache.hadoop.io.NullWritable;
@@ -22,48 +19,48 @@ import edu.harvard.data.HadoopJob;
 import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.matterhorn.MatterhornDataConfig;
-import edu.harvard.data.matterhorn.bindings.phase1.Phase1Event;
-import edu.harvard.data.matterhorn.bindings.phase2.Phase2Session;
+import edu.harvard.data.matterhorn.bindings.phase1.Phase1Video;
+import edu.harvard.data.matterhorn.bindings.phase2.Phase2Video;
 
-public class SessionJob extends HadoopJob {
+public class VideoJob extends HadoopJob {
 
   public static void main(final String[] args) throws IOException, DataConfigurationException {
     final String configPathString = args[0];
     final int phase = Integer.parseInt(args[1]);
     final MatterhornDataConfig config = MatterhornDataConfig
         .parseInputFiles(MatterhornDataConfig.class, configPathString, true);
-    new SessionJob(config, phase).runJob();
+    new VideoJob(config, phase).runJob();
   }
 
-  public SessionJob(final DataConfig config, final int phase) throws DataConfigurationException {
+  public VideoJob(final DataConfig config, final int phase) throws DataConfigurationException {
     super(config, phase);
   }
 
   @Override
   public Job getJob() throws IOException {
-    final Job job = Job.getInstance(hadoopConf, "session-hadoop");
+    final Job job = Job.getInstance(hadoopConf, "video-hadoop");
     job.setInputFormatClass(TextInputFormat.class);
-    job.setMapperClass(SessionMapper.class);
+    job.setMapperClass(VideoFileMapper.class);
     job.setMapOutputKeyClass(Text.class);
     job.setMapOutputValueClass(Text.class);
 
-    job.setReducerClass(SessionReducer.class);
+    job.setReducerClass(VideoFileReducer.class);
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(NullWritable.class);
     job.setOutputFormatClass(TextOutputFormat.class);
     final String inputDir = config.getHdfsDir(phase - 1);
     final String outputDir = config.getHdfsDir(phase);
-    hadoopUtils.setPaths(job, hdfsService, inputDir + "/event", outputDir + "/session");
+    hadoopUtils.setPaths(job, hdfsService, inputDir + "/video", outputDir + "/video");
     return job;
   }
 }
 
-class SessionMapper extends Mapper<Object, Text, Text, Text> {
+class VideoFileMapper extends Mapper<Object, Text, Text, Text> {
 
   private TableFormat format;
   private final HadoopUtilities hadoopUtils;
 
-  public SessionMapper() {
+  public VideoFileMapper() {
     this.hadoopUtils = new HadoopUtilities();
   }
 
@@ -77,17 +74,17 @@ class SessionMapper extends Mapper<Object, Text, Text, Text> {
   public void map(final Object key, final Text value, final Context context)
       throws IOException, InterruptedException {
     final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
-    final Phase1Event event = new Phase1Event(format, parser.getRecords().get(0));
-    context.write(new Text(event.getSessionId()), hadoopUtils.convertToText(event, format));
+    final Phase1Video video = new Phase1Video(format, parser.getRecords().get(0));
+    context.write(new Text(video.getId()), hadoopUtils.convertToText(video, format));
   }
 }
 
-class SessionReducer extends Reducer<Text, Text, Text, NullWritable> {
+class VideoFileReducer extends Reducer<Text, Text, Text, NullWritable> {
 
   private TableFormat format;
   private final HadoopUtilities hadoopUtils;
 
-  public SessionReducer() {
+  public VideoFileReducer() {
     this.hadoopUtils = new HadoopUtilities();
   }
 
@@ -100,57 +97,34 @@ class SessionReducer extends Reducer<Text, Text, Text, NullWritable> {
   @Override
   public void reduce(final Text key, final Iterable<Text> values, final Context context)
       throws IOException, InterruptedException {
-    long latest = Long.MIN_VALUE;
-    long earliest = Long.MAX_VALUE;
-    final Map<String, Integer> ips = new HashMap<String, Integer>();
-    final Map<String, Integer> ids = new HashMap<String, Integer>();
-    final Map<String, Integer> mpids = new HashMap<String, Integer>();
-    int events = 0;
+    final Phase2Video video = new Phase2Video();
+    video.setId(key.toString());
     for (final Text value : values) {
       final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
-      events++;
-      final Phase1Event event = new Phase1Event(format, parser.getRecords().get(0));
-      addItem(ips, event.getIp());
-      addItem(ids, event.getHuidResearchUuid());
-      addItem(mpids, event.getMpid());
-      final long time = event.getCreated().getTime();
-      if (time > latest) {
-        latest = time;
-      }
-      if (time < earliest) {
-        earliest = time;
-      }
-    }
-    final Phase2Session session = new Phase2Session();
-    session.setSessionId(key.toString());
-    session.setEventCount(events);
-    session.setIpCount(ips.size());
-    session.setMainIp(getMainValue(ips));
-    session.setUserCount(ids.size());
-    session.setMainUser(getMainValue(ids));
-    session.setVideoCount(mpids.size());
-    session.setMainVideo(getMainValue(mpids));
-    session.setEndTime(new Timestamp(latest));
-    session.setStartTime(new Timestamp(earliest));
-    session.setDuration(latest - earliest);
-    context.write(hadoopUtils.convertToText(session, format), NullWritable.get());
-  }
+      final Phase1Video v = new Phase1Video(format, parser.getRecords().get(0));
 
-  private String getMainValue(final Map<String, Integer> ips) {
-    int max = -1;
-    String value = null;
-    for (final String key : ips.keySet()) {
-      if (ips.get(key) > max) {
-        value = key;
-        max = ips.get(key);
+      if (video.getCdn() == null && v.getCdn() != null) {
+        video.setCdn(v.getCdn());
+      }
+      if (video.getSeries() == null && v.getSeries() != null) {
+        video.setSeries(v.getSeries());
+      }
+      if (video.getCourse() == null && v.getCourse() != null) {
+        video.setCourse(v.getCourse());
+      }
+      if (video.getType() == null && v.getType() != null) {
+        video.setType(v.getType());
+      }
+      if (video.getTitle() == null && v.getTitle() != null) {
+        video.setTitle(v.getTitle());
+      }
+      if (video.getYear() == null && v.getYear() != null) {
+        video.setYear(v.getYear());
+      }
+      if (video.getTerm() == null && v.getTerm() != null) {
+        video.setTerm(v.getTerm());
       }
     }
-    return value;
-  }
-
-  private void addItem(final Map<String, Integer> map, final String key) {
-    if (!map.containsKey(key)) {
-      map.put(key, 0);
-    }
+    context.write(hadoopUtils.convertToText(video, format), NullWritable.get());
   }
 }
