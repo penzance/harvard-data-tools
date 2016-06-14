@@ -106,7 +106,7 @@ public class Phase1PipelineSetup {
   }
 
   private PipelineObjectBase unloadIdentity(final PipelineObjectBase previousStep) {
-    final String sql = "SELECT * FROM identity_map";
+    final String sql = "SELECT * FROM pii.identity_map";
     final PipelineObjectBase unloadId = factory.getUnloadActivity("UnloadIdentity", sql,
         unloadIdentityS3, pipeline.getRedshift(), pipeline.getEmr());
     unloadId.addDependency(previousStep);
