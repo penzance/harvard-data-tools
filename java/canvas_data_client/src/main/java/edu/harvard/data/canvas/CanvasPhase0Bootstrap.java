@@ -1,4 +1,4 @@
-package edu.harvard.data;
+package edu.harvard.data.canvas;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,9 +10,12 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.s3.model.S3ObjectId;
 
-import edu.harvard.data.canvas.CanvasDataConfig;
+import edu.harvard.data.AwsUtils;
+import edu.harvard.data.DataConfigurationException;
+import edu.harvard.data.DumpInfo;
 import edu.harvard.data.canvas.data_api.ApiClient;
 import edu.harvard.data.canvas.data_api.DataDump;
 import edu.harvard.data.pipeline.Phase0Bootstrap;
@@ -22,17 +25,17 @@ public class CanvasPhase0Bootstrap extends Phase0Bootstrap {
 
   private DataDump dump;
 
-  protected CanvasPhase0Bootstrap(final String configPathString)
-      throws IOException, DataConfigurationException {
-    super(configPathString, CanvasDataConfig.class);
-  }
-
   private static final Logger log = LogManager.getLogger();
 
-  public static void main(final String[] args)
-      throws IOException, DataConfigurationException, UnexpectedApiResponseException {
-    final CanvasPhase0Bootstrap bootstrap = new CanvasPhase0Bootstrap(args[0]);
-    bootstrap.run();
+  @Override
+  public String handleRequest(final String configPathString, final Context context) {
+    try {
+      super.init(configPathString, CanvasDataConfig.class);
+      super.run();
+    } catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
+      return "Error: " + e.getMessage();
+    }
+    return "";
   }
 
   @Override

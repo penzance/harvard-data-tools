@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.s3.model.S3ObjectId;
 
 import edu.harvard.data.AwsUtils;
@@ -15,15 +16,15 @@ import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class MatterhornPhase0Bootstrap extends Phase0Bootstrap {
 
-  public static void main(final String[] args)
-      throws IOException, DataConfigurationException, UnexpectedApiResponseException {
-    final MatterhornPhase0Bootstrap bootstrap = new MatterhornPhase0Bootstrap(args[0]);
-    bootstrap.run();
-  }
-
-  protected MatterhornPhase0Bootstrap(final String configPathString)
-      throws IOException, DataConfigurationException {
-    super(configPathString, MatterhornDataConfig.class);
+  @Override
+  public String handleRequest(final String configPathString, final Context context) {
+    try {
+      super.init(configPathString, MatterhornDataConfig.class);
+      super.run();
+    } catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
+      return "Error: " + e.getMessage();
+    }
+    return "";
   }
 
   @Override

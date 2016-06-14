@@ -20,6 +20,7 @@ import com.amazonaws.services.ec2.model.IamInstanceProfileSpecification;
 import com.amazonaws.services.ec2.model.LaunchSpecification;
 import com.amazonaws.services.ec2.model.RequestSpotInstancesRequest;
 import com.amazonaws.services.ec2.model.RequestSpotInstancesResult;
+import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.s3.model.S3ObjectId;
 import com.amazonaws.util.Base64;
 
@@ -28,13 +29,13 @@ import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
-public abstract class Phase0Bootstrap {
+public abstract class Phase0Bootstrap implements RequestHandler<String, String> {
 
   private static final Logger log = LogManager.getLogger();
 
   protected DataConfig config;
   private String configPathString;
-  private final Class<? extends DataConfig> configClass;
+  private Class<? extends DataConfig> configClass;
   protected String runId;
 
   protected abstract List<S3ObjectId> getInfrastructureConfigPaths();
@@ -42,7 +43,7 @@ public abstract class Phase0Bootstrap {
   protected abstract boolean newDataAvailable()
       throws IOException, DataConfigurationException, UnexpectedApiResponseException;
 
-  protected Phase0Bootstrap(final String configPathString,
+  protected void init(final String configPathString,
       final Class<? extends DataConfig> configClass) throws IOException, DataConfigurationException {
     this.configPathString = configPathString;
     this.configClass = configClass;
