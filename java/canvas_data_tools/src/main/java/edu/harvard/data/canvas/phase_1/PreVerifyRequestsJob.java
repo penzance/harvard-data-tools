@@ -13,6 +13,7 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.HadoopJob;
+import edu.harvard.data.NoInputDataException;
 import edu.harvard.data.canvas.bindings.phase0.Phase0Requests;
 
 class PreVerifyRequestsJob extends HadoopJob {
@@ -22,7 +23,7 @@ class PreVerifyRequestsJob extends HadoopJob {
   }
 
   @Override
-  public Job getJob() throws IOException {
+  public Job getJob() throws IOException, NoInputDataException {
     final Job job = Job.getInstance(hadoopConf, "preverify-requests");
     job.setMapperClass(PreVerifyRequestMapper.class);
     job.setMapOutputKeyClass(Text.class);

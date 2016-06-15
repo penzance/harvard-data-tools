@@ -20,6 +20,7 @@ import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopJob;
+import edu.harvard.data.NoInputDataException;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.canvas.CanvasDataConfig;
 import edu.harvard.data.canvas.bindings.phase1.Phase1Requests;
@@ -40,7 +41,7 @@ public class RequestJob extends HadoopJob {
   }
 
   @Override
-  public Job getJob() throws IOException {
+  public Job getJob() throws IOException, NoInputDataException {
     final Job job = Job.getInstance(hadoopConf, "requests-hadoop");
     job.setMapperClass(RequestMapper.class);
     job.setMapOutputKeyClass(Text.class);

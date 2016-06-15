@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -87,8 +88,10 @@ public class DumpManager {
   }
 
   public void archiveFile(final DataDump dump, final String table, final File downloadFile) {
-    final S3ObjectId archiveObj = getArchiveDumpObj(dump);
+    final S3ObjectId archiveObj = getArchiveDumpObj(dump.getSequence());
     final S3ObjectId infoObj = AwsUtils.key(archiveObj, table, downloadFile.getName());
+
+    // Move the object to the archive bucket.
     aws.getClient().putObject(infoObj.getBucket(), infoObj.getKey(), downloadFile);
     log.info("Uploaded " + downloadFile + " to " + infoObj);
     downloadFile.delete();
@@ -96,13 +99,16 @@ public class DumpManager {
 
   public S3ObjectId finalizeDump(final DataDump dump, final CanvasDataSchema schema)
       throws IOException {
-    final S3ObjectId archiveObj = getArchiveDumpObj(dump);
+    final S3ObjectId archiveObj = getArchiveDumpObj(dump.getSequence());
     aws.writeJson(AwsUtils.key(archiveObj, "schema.json"), schema);
     aws.writeJson(AwsUtils.key(archiveObj, "dump_info.json"), dump);
     final Set<String> dirs = new HashSet<String>();
     for (final S3ObjectId directory : aws.listDirectories(archiveObj)) {
       dirs.add(directory.getKey());
     }
+    // XXX We can probably get rid of the empty_files; if we generate the S3
+    // copy scripts to take advantage of file lists we can be more precise
+    // about what directories we try to copy.
     for (final DataSchemaTable table : schema.getTables().values()) {
       final S3ObjectId tableKey = AwsUtils.key(archiveObj, table.getTableName());
       if (!dirs.contains(tableKey.getKey())) {
@@ -123,8 +129,8 @@ public class DumpManager {
     return new File(config.getScratchDir(), dirName);
   }
 
-  public S3ObjectId getArchiveDumpObj(final DataDump dump) {
-    final String dirName = String.format("%05d", dump.getSequence());
+  public S3ObjectId getArchiveDumpObj(final long dumpSequence) {
+    final String dirName = String.format("%05d", dumpSequence);
     return AwsUtils.key(config.getS3IncomingLocation(), dirName);
   }
 
@@ -137,5 +143,17 @@ public class DumpManager {
         info.save();
       }
     }
+  }
+
+  public Map<String, List<S3ObjectId>> getDumpIndex(final long dumpSequence) {
+    final Map<String, List<S3ObjectId>> directories = new HashMap<String, List<S3ObjectId>>();
+    final S3ObjectId dumpDir = getArchiveDumpObj(dumpSequence);
+    for (final S3ObjectId tableDir : aws.listDirectories(dumpDir)) {
+      final String tableName = tableDir.getKey().substring(tableDir.getKey().lastIndexOf("/") + 1);
+      final List<S3ObjectId> tableDirs = new ArrayList<S3ObjectId>();
+      tableDirs.add(tableDir);
+      directories.put(tableName, tableDirs);
+    }
+    return directories;
   }
 }

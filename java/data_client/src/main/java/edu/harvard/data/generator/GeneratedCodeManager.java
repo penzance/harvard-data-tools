@@ -26,9 +26,10 @@ public abstract class GeneratedCodeManager {
     jobs.get(phase).add(job);
   }
 
-  public abstract List<Class<? extends Mapper>> getIdentityMapperClasses();
+  // Table name to class
+  public abstract Map<String, Class<? extends Mapper>> getIdentityMapperClasses();
 
-  public abstract List<Class<? extends Mapper>> getIdentityScrubberClasses();
+  public abstract Map<String, Class<? extends Mapper>> getIdentityScrubberClasses();
 
   public abstract List<String> getIdentityTableNames();
 

@@ -22,6 +22,7 @@ import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopJob;
 import edu.harvard.data.HadoopUtilities;
+import edu.harvard.data.NoInputDataException;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.canvas.CanvasDataConfig;
 import edu.harvard.data.canvas.bindings.phase2.Phase2Requests;
@@ -42,7 +43,7 @@ public class SessionsJob extends HadoopJob {
   }
 
   @Override
-  public Job getJob() throws IOException {
+  public Job getJob() throws IOException, NoInputDataException {
     final Job job = Job.getInstance(hadoopConf, "sessions-hadoop");
     job.setInputFormatClass(TextInputFormat.class);
     job.setMapperClass(SessionsMapper.class);

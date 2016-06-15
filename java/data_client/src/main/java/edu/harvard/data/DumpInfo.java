@@ -1,6 +1,9 @@
 package edu.harvard.data;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,7 +15,10 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.TableNameOverride;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
+import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedScanList;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.s3.model.S3ObjectId;
 
 @DynamoDBTable(tableName = "DummyTableName")
@@ -147,10 +153,30 @@ public class DumpInfo {
 
   public static DumpInfo find(final String dumpId) {
     if (tableName == null) {
-      throw new RuntimeException("DumpInfo object saved before init(tableName) method called");
+      throw new RuntimeException("DumpInfo.find called before init(tableName) method");
     }
     log.debug("Finding dump ID " + dumpId + " from table " + tableName);
     return mapper.load(DumpInfo.class, dumpId, mapperConfig);
+  }
+
+  public static List<DumpInfo> getAllDumpsSince(final long startSequence) {
+    if (tableName == null) {
+      throw new RuntimeException("DumpInfo.getAllDumpsSince called before init(tableName) method");
+    }
+    final DynamoDBScanExpression scan = new DynamoDBScanExpression();
+    scan.setFilterExpression("#sequence >= :start");
+    scan.setExpressionAttributeNames(Collections.singletonMap("#sequence", "sequence"));
+    scan.setExpressionAttributeValues(
+        Collections.singletonMap(":start", new AttributeValue().withN("" + startSequence)));
+    log.debug("Finding all dumps since " + startSequence + " from table " + tableName);
+    final PaginatedScanList<DumpInfo> results = mapper.scan(DumpInfo.class, scan, mapperConfig);
+    results.loadAllResults();
+
+    final List<DumpInfo> dumps = new ArrayList<DumpInfo>();
+    for (final DumpInfo result : results) {
+      dumps.add(result);
+    }
+    return dumps;
   }
 
   @DynamoDBIgnore
@@ -164,5 +190,14 @@ public class DumpInfo {
     }
     log.info("Saving dump info sequence " + sequence + " to table " + tableName);
     mapper.save(this, mapperConfig);
+  }
+
+  public void resetDownloadAndVerify() {
+    this.downloaded = false;
+    this.downloadEnd = null;
+    this.downloadStart = null;
+    this.verified = false;
+    this.bucket = null;
+    this.save();
   }
 }

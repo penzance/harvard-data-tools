@@ -17,8 +17,8 @@ import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopJob;
 import edu.harvard.data.HadoopUtilities;
+import edu.harvard.data.NoInputDataException;
 import edu.harvard.data.TableFormat;
-import edu.harvard.data.matterhorn.MatterhornDataConfig;
 import edu.harvard.data.matterhorn.bindings.phase1.Phase1Video;
 import edu.harvard.data.matterhorn.bindings.phase2.Phase2Video;
 
@@ -37,7 +37,7 @@ public class VideoJob extends HadoopJob {
   }
 
   @Override
-  public Job getJob() throws IOException {
+  public Job getJob() throws IOException, NoInputDataException {
     final Job job = Job.getInstance(hadoopConf, "video-hadoop");
     job.setInputFormatClass(TextInputFormat.class);
     job.setMapperClass(VideoFileMapper.class);

@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,8 +39,8 @@ public class IdentityJobGenerator {
     javaSrcBase.mkdirs();
 
     final List<String> tableNames = new ArrayList<String>();
-    final List<String> mapperNames = new ArrayList<String>();
-    final List<String> scrubberNames = new ArrayList<String>();
+    final Map<String, String> mapperNames = new HashMap<String, String>();
+    final Map<String, String> scrubberNames = new HashMap<String, String>();
     final String hadoopPackage = spec.getIdentityHadoopPackage();
     final String version = schema.getVersion();
 
@@ -67,14 +68,14 @@ public class IdentityJobGenerator {
       }
 
       tableNames.add(tableName);
-      mapperNames.add(mapperClass);
-      scrubberNames.add(scrubberClass);
+      mapperNames.put(tableName, mapperClass);
+      scrubberNames.put(tableName, scrubberClass);
     }
 
     final String managerClass = spec.getHadoopIdentityManagerClass();
     final File managerFile = new File(javaSrcBase, managerClass + ".java");
     try (final PrintStream out = new PrintStream(new FileOutputStream(managerFile))) {
-      new IdentityManagerGenerator(hadoopPackage, managerClass, tableNames, mapperNames,
+      new IdentityManagerGenerator(hadoopPackage, managerClass, mapperNames,
           scrubberNames).generate(out);
     }
   }

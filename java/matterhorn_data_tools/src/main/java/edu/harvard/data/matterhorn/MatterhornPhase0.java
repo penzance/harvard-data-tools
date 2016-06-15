@@ -19,19 +19,20 @@ public class MatterhornPhase0 {
 
   public static void main(final String[] args) throws IOException, DataConfigurationException {
     final String configPathString = args[0];
-    final String datasetId = args[1];
-    final int threads = Integer.parseInt(args[2]);
+    final String runId = args[1];
+    final String datasetId = args[2];
+    final int threads = Integer.parseInt(args[3]);
     final MatterhornDataConfig config = DataConfig.parseInputFiles(MatterhornDataConfig.class,
         configPathString, false);
     final MatterhornPhase0 phase0 = new MatterhornPhase0(config);
-    phase0.run(datasetId, threads);
+    phase0.run(datasetId, runId, threads);
   }
 
   public MatterhornPhase0(final MatterhornDataConfig config) {
     this.config = config;
   }
 
-  private void run(final String datasetId, final int threads) throws IOException {
+  private void run(final String datasetId, final String runId, final int threads) throws IOException {
     log.info("Parsing files");
     final AwsUtils aws = new AwsUtils();
     for (final S3ObjectSummary obj : aws.listKeys(config.dropboxBucket)) {
@@ -41,5 +42,6 @@ public class MatterhornPhase0 {
         new InputParser(config, aws, AwsUtils.key(obj), outputLocation).parseFile();
       }
     }
+    // XXX Produce directory index
   }
 }

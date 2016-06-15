@@ -30,12 +30,12 @@ public class CanvasCodeManager extends GeneratedCodeManager {
   }
 
   @Override
-  public List<Class<? extends Mapper>> getIdentityMapperClasses() {
+  public Map<String, Class<? extends Mapper>> getIdentityMapperClasses() {
     return identity.getMapperClasses();
   }
 
   @Override
-  public List<Class<? extends Mapper>> getIdentityScrubberClasses() {
+  public Map<String, Class<? extends Mapper>> getIdentityScrubberClasses() {
     return identity.getScrubberClasses();
   }
 

@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.DataTable;
+import edu.harvard.data.NoInputDataException;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.identity.IdentitySchemaTransformer;
@@ -73,32 +74,20 @@ public class IdentityScrubberGenerator {
     out.println("import " + IdentifierType.class.getCanonicalName() + ";");
     out.println("import " + DataTable.class.getCanonicalName() + ";");
     out.println("import " + IdentityScrubber.class.getCanonicalName() + ";");
+    out.println("import " + NoInputDataException.class.getCanonicalName() + ";");
     out.println("import " + Job.class.getCanonicalName() + ";");
     out.println("import " + phase0ModelPackage + "." + phase0ModelClass + ";");
     out.println("import " + phase1ModelPackage + "." + phase1ModelClass + ";");
   }
 
-  /*
-   *   public static void main(final String[] args)
-      throws IOException, DataConfigurationException {
-    final UserDimIdentityScrubber instance = new UserDimIdentityScrubber();
-    final Job job = instance.getJob("user_dim", UserDimIdentityScrubber.class, args[0]);
-    try {
-      job.waitForCompletion(true);
-    } catch (ClassNotFoundException | InterruptedException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-   */
-
   private void outputMainMethod(final PrintStream out) {
     final String tableName = table.getTableName();
     out.println("  public static void main(final String[] args)");
-    out.println("  throws " + IOException.class.getSimpleName() + " {");
+    out.println("  throws " + IOException.class.getSimpleName() + ", "
+        + NoInputDataException.class.getSimpleName() + " {");
     out.println("    final " + className + " instance = new " + className + "();");
-    out.println(
-        "    final Job job = instance.getJob(\"" + tableName + "\", " + className + ".class, args[0]);");
+    out.println("    final Job job = instance.getJob(\"" + tableName + "\", " + className
+        + ".class, args[0]);");
     out.println("    try {");
     out.println("      job.waitForCompletion(true);");
     out.println("    } catch (ClassNotFoundException | InterruptedException e) {");

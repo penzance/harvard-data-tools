@@ -20,7 +20,6 @@ import com.amazonaws.services.ec2.model.IamInstanceProfileSpecification;
 import com.amazonaws.services.ec2.model.LaunchSpecification;
 import com.amazonaws.services.ec2.model.RequestSpotInstancesRequest;
 import com.amazonaws.services.ec2.model.RequestSpotInstancesResult;
-import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.s3.model.S3ObjectId;
 import com.amazonaws.util.Base64;
 
@@ -29,7 +28,7 @@ import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
-public abstract class Phase0Bootstrap implements RequestHandler<String, String> {
+public abstract class Phase0Bootstrap {
 
   private static final Logger log = LogManager.getLogger();
 
@@ -89,7 +88,7 @@ public abstract class Phase0Bootstrap implements RequestHandler<String, String> 
     final DescribeSpotInstanceRequestsResult description = ec2client
         .describeSpotInstanceRequests(describe);
     System.out.println(description);
-    // TODO: Check in case the startup failed.
+    //    TODO: final Check in case final the startup failed.
   }
 
   private String getUserData(final DataConfig config) throws IOException {

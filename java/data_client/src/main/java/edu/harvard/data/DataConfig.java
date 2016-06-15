@@ -230,6 +230,10 @@ public class DataConfig {
     return AwsUtils.key(getCodeLocation(), "phase-0-bootstrap.sh");
   }
 
+  public S3ObjectId getIndexFileS3Location(final String runId) {
+    return AwsUtils.key(getS3WorkingLocation(), runId, "directoryList.json");
+  }
+
   public String getHdfsDir(final int phase) {
     return hdfsBase + phase;
   }

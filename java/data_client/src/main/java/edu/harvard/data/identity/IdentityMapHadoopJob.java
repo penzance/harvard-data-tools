@@ -1,7 +1,7 @@
 package edu.harvard.data.identity;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -71,11 +71,10 @@ public class IdentityMapHadoopJob {
       job.addCacheFile(path.toUri());
     }
 
-    final List<String> tables = codeManager.getIdentityTableNames();
-    final List<Class<? extends Mapper>> mapperClasses = codeManager.getIdentityMapperClasses();
-    for (int i = 0; i < mapperClasses.size(); i++) {
-      final Path path = new Path(inputDir + "/" + tables.get(i) + "/");
-      MultipleInputs.addInputPath(job, path, TextInputFormat.class, mapperClasses.get(i));
+    final Map<String, Class<? extends Mapper>> mapperClasses = codeManager.getIdentityMapperClasses();
+    for (final String table : mapperClasses.keySet()) {
+      final Path path = new Path(inputDir + "/" + table + "/");
+      MultipleInputs.addInputPath(job, path, TextInputFormat.class, mapperClasses.get(table));
       log.info("Adding mapper for path " + path);
     }
     FileOutputFormat.setOutputPath(job, new Path(outputDir + "/identity_map"));

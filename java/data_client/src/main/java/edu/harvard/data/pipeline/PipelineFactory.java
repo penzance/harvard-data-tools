@@ -157,6 +157,21 @@ public class PipelineFactory {
     return obj;
   }
 
+  public PipelineObjectBase getS3DistCpActivity(final String id, final InputTableIndex dataIndex,
+      final String dest, final PipelineObjectBase infrastructure) {
+    final PipelineObjectBase obj = new PipelineObjectBase(config, id, "ShellCommandActivity");
+    setupActivity(obj, infrastructure);
+    String cmd = "";
+    for (final String table : dataIndex.getTableNames()) {
+      for (final String dir : dataIndex.getDirectories(table)) {
+        cmd += "s3-dist-cp --src=" + AwsUtils.key(dir) + " --dest=hdfs://" + cleanHdfs(dest) + "/"
+            + table + " --outputCodec=none;\n";
+      }
+    }
+    obj.set("command", cmd);
+    return obj;
+  }
+
   public PipelineObjectBase getS3DistCpActivity(final String id, final S3ObjectId src,
       final String dest, final PipelineObjectBase infrastructure) {
     final PipelineObjectBase obj = new PipelineObjectBase(config, id, "ShellCommandActivity");
@@ -194,8 +209,8 @@ public class PipelineFactory {
   }
 
   private String getCredentials() {
-    return "'aws_access_key_id=" + config.getAwsKeyId() + ";aws_secret_access_key=" + config.getAwsSecretKey()
-        + "'";
+    return "'aws_access_key_id=" + config.getAwsKeyId() + ";aws_secret_access_key="
+        + config.getAwsSecretKey() + "'";
   }
 
   public List<PipelineObject> getAllObjects() {

@@ -24,6 +24,7 @@ import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.DataTable;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopUtilities;
+import edu.harvard.data.NoInputDataException;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.generator.IdentityScrubberGenerator;
 import edu.harvard.data.io.TableReader;
@@ -52,7 +53,7 @@ public abstract class IdentityScrubber<T> extends Mapper<Object, Text, Text, Nul
 
   @SuppressWarnings("rawtypes")
   protected Job getJob(final String tableName, final Class<? extends Mapper> cls,
-      final String configString) throws IOException {
+      final String configString) throws IOException, NoInputDataException {
     try {
       final HadoopUtilities hadoopUtils = new HadoopUtilities();
       final DataConfig config = DataConfig.parseInputFiles(DataConfig.class, configString, true);

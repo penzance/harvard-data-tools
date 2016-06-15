@@ -13,40 +13,32 @@ import com.amazonaws.services.datapipeline.model.CreatePipelineRequest;
 import com.amazonaws.services.datapipeline.model.CreatePipelineResult;
 import com.amazonaws.services.datapipeline.model.PutPipelineDefinitionRequest;
 import com.amazonaws.services.datapipeline.model.PutPipelineDefinitionResult;
-import com.amazonaws.services.s3.model.S3ObjectId;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.generator.GeneratedCodeManager;
-import edu.harvard.data.generator.GenerationSpec;
 
 public class DataPipelineGenerator {
   private static final Logger log = LogManager.getLogger();
 
-  private final GenerationSpec spec;
   private final DataConfig config;
-  private final String name;
-  private String pipelineId;
-  private final S3ObjectId dataLocation;
   private final GeneratedCodeManager codeManager;
   private final String runId;
+  private final InputTableIndex dataIndex;
+  private String pipelineId;
 
-  public DataPipelineGenerator(final String name, final GenerationSpec spec,
-      final DataConfig config, final S3ObjectId dataLocation,
+  public DataPipelineGenerator(final DataConfig config, final InputTableIndex dataIndex,
       final GeneratedCodeManager codeManager, final String runId) {
-    this.name = name;
-    this.spec = spec;
     this.config = config;
-    this.dataLocation = dataLocation;
+    this.dataIndex = dataIndex;
     this.codeManager = codeManager;
     this.runId = runId;
   }
 
   public void generate() throws DataConfigurationException, IOException {
-    log.info("Data at " + AwsUtils.uri(dataLocation));
+    log.info("Data at " + dataIndex);
     PipelineExecutionRecord.init(config.getPipelineDynamoTable());
     final DataPipelineClient client = new DataPipelineClient();
     final CreatePipelineRequest create = getCreateRequest();
@@ -62,20 +54,20 @@ public class DataPipelineGenerator {
 
     final ActivatePipelineRequest activate = new ActivatePipelineRequest();
     activate.setPipelineId(pipelineId);
-    client.activatePipeline(activate);
+    //    client.activatePipeline(activate);
     log.info(defineResult);
   }
 
   private CreatePipelineRequest getCreateRequest() {
     final CreatePipelineRequest createRequest = new CreatePipelineRequest();
-    createRequest.setName(name);
+    createRequest.setName(runId);
     createRequest.setUniqueId(UUID.randomUUID().toString());
     return createRequest;
   }
 
   private void logPipelineToDynamo() {
     final PipelineExecutionRecord record = new PipelineExecutionRecord(pipelineId);
-    record.setPipelineName(name);
+    record.setPipelineName(runId);
     record.setConfigString(config.getPaths());
     record.setPipelineCreated(new Date());
     record.setStatus(PipelineExecutionRecord.Status.Created.toString());
@@ -84,13 +76,15 @@ public class DataPipelineGenerator {
 
   private Pipeline populatePipeline() throws DataConfigurationException, JsonProcessingException {
     final PipelineFactory factory = new PipelineFactory(config, pipelineId);
-    final Pipeline pipeline = new Pipeline(name, spec, config, pipelineId, factory,
-        spec.getSchemaVersion(), runId);
-    final EmrStartupPipelineSetup setup = new EmrStartupPipelineSetup(pipeline, factory,
-        dataLocation, runId);
-    final Phase1PipelineSetup phase1 = new Phase1PipelineSetup(pipeline, factory, codeManager, runId);
+    final Pipeline pipeline = new Pipeline(runId, config, pipelineId, factory,
+        dataIndex.getSchemaVersion(), runId);
+    final EmrStartupPipelineSetup setup = new EmrStartupPipelineSetup(pipeline, factory, dataIndex,
+        runId);
+    final Phase1PipelineSetup phase1 = new Phase1PipelineSetup(pipeline, factory, codeManager,
+        runId, dataIndex);
     final Phase2PipelineSetup phase2 = new Phase2PipelineSetup(pipeline, factory, codeManager);
-    final Phase3PipelineSetup phase3 = new Phase3PipelineSetup(pipeline, factory, codeManager, runId);
+    final Phase3PipelineSetup phase3 = new Phase3PipelineSetup(pipeline, factory, codeManager,
+        runId);
 
     PipelineObjectBase previousStep;
     previousStep = setup.populate();

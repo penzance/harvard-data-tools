@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.s3.model.S3ObjectId;
 
 import edu.harvard.data.AwsUtils;
@@ -21,16 +22,18 @@ import edu.harvard.data.canvas.data_api.DataDump;
 import edu.harvard.data.pipeline.Phase0Bootstrap;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
-public class CanvasPhase0Bootstrap extends Phase0Bootstrap {
+public class CanvasPhase0Bootstrap extends Phase0Bootstrap implements RequestHandler<BootstrapParameters, String> {
 
-  private DataDump dump;
+  private String dumpId;
+  private BootstrapParameters params;
 
   private static final Logger log = LogManager.getLogger();
 
   @Override
-  public String handleRequest(final String configPathString, final Context context) {
+  public String handleRequest(final BootstrapParameters params, final Context context) {
     try {
-      super.init(configPathString, CanvasDataConfig.class);
+      super.init(params.getConfigPathString(), CanvasDataConfig.class);
+      this.params = params;
       super.run();
     } catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
       return "Error: " + e.getMessage();
@@ -45,15 +48,19 @@ public class CanvasPhase0Bootstrap extends Phase0Bootstrap {
     DumpInfo.init(canvasConfig.getDumpInfoDynamoTable());
     final ApiClient api = new ApiClient(canvasConfig.getCanvasDataHost(),
         canvasConfig.getCanvasApiKey(), canvasConfig.getCanvasApiSecret());
-    dump = null;
-    for (final DataDump candidate : api.getDumps()) {
-      if (needToSaveDump(candidate)) {
-        dump = candidate;
-        log.info("Saving dump " + dump);
-        return true;
+    if (params.getDumpSequence() != null) {
+      dumpId = "DUMP:" + api.getDump(params.getDumpSequence()).getDumpId();
+    } else if (params.getTable() != null) {
+      dumpId = "TABLE:" + params.getTable();
+    } else {
+      for (final DataDump candidate : api.getDumps()) {
+        if (needToSaveDump(candidate)) {
+          dumpId = "DUMP:" + candidate.getDumpId();
+        }
       }
     }
-    return false;
+    log.info("Saving dump " + dumpId);
+    return dumpId != null;
   }
 
   @Override
@@ -68,7 +75,7 @@ public class CanvasPhase0Bootstrap extends Phase0Bootstrap {
   @Override
   protected Map<String, String> getCustomEc2Environment() {
     final Map<String, String> env = new HashMap<String, String>();
-    env.put("DATA_SET_ID", dump.getDumpId());
+    env.put("DATA_SET_ID", dumpId);
     env.put("DATA_SCHEMA_VERSION", "1.10.3"); // XXX: Remove
     return env;
   }
@@ -101,6 +108,7 @@ public class CanvasPhase0Bootstrap extends Phase0Bootstrap {
     if (conservativeStart.before(candidate.getUpdatedAt())) {
       log.info(
           "Dump needs to be saved; previously downloaded less than an hour after it was last updated.");
+      info.resetDownloadAndVerify();
       return true;
     }
     log.info("Dump does not need to be saved; already exists at " + info.getBucket() + "/"

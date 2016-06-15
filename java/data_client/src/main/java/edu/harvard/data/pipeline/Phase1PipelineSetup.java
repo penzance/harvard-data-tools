@@ -2,6 +2,7 @@ package edu.harvard.data.pipeline;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.hadoop.mapreduce.Mapper;
 
@@ -21,12 +22,14 @@ public class Phase1PipelineSetup {
   private final PipelineFactory factory;
   private final DataConfig config;
   private final GeneratedCodeManager codeManager;
+  private final InputTableIndex dataIndex;
 
   public Phase1PipelineSetup(final Pipeline pipeline, final PipelineFactory factory,
-      final GeneratedCodeManager codeManager, final String runId) {
+      final GeneratedCodeManager codeManager, final String runId, final InputTableIndex dataIndex) {
     this.factory = factory;
     this.pipeline = pipeline;
     this.codeManager = codeManager;
+    this.dataIndex = dataIndex;
     this.config = pipeline.getConfig();
     this.workingDir = AwsUtils.key(config.getS3WorkingLocation(), runId);
     this.unloadIdentityS3 = AwsUtils.key(workingDir, "unloaded_tables", "identity_map");
@@ -94,13 +97,17 @@ public class Phase1PipelineSetup {
   private PipelineObjectBase hadoopIdentityScrub(final PipelineObjectBase previousStep) {
     final PipelineObjectBase barrier = factory.getSynchronizationBarrier("IdentityScrubBarrier",
         pipeline.getEmr());
-    for (final Class<? extends Mapper> cls : codeManager.getIdentityScrubberClasses()) {
-      final List<String> args = new ArrayList<String>();
-      args.add(config.getPaths());
-      final PipelineObjectBase step = factory.getEmrActivity(cls.getSimpleName(), pipeline.getEmr(),
-          cls, args);
-      step.addDependency(previousStep);
-      barrier.addDependency(step);
+    final Map<String, Class<? extends Mapper>> scrubbers = codeManager.getIdentityScrubberClasses();
+    for (final String table : scrubbers.keySet()) {
+      if (dataIndex.containsTable(table)) {
+        final Class<? extends Mapper> cls = scrubbers.get(table);
+        final List<String> args = new ArrayList<String>();
+        args.add(config.getPaths());
+        final PipelineObjectBase step = factory.getEmrActivity(cls.getSimpleName(), pipeline.getEmr(),
+            cls, args);
+        step.addDependency(previousStep);
+        barrier.addDependency(step);
+      }
     }
     return barrier;
   }

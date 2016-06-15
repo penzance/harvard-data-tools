@@ -8,8 +8,8 @@ import com.amazonaws.services.s3.model.S3ObjectId;
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.VerificationException;
-import edu.harvard.data.generator.GenerationSpec;
 import edu.harvard.data.pipeline.DataPipelineGenerator;
+import edu.harvard.data.pipeline.InputTableIndex;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class MatterhornPipelineSetup {
@@ -24,12 +24,11 @@ public class MatterhornPipelineSetup {
     final MatterhornDataConfig config = MatterhornDataConfig
         .parseInputFiles(MatterhornDataConfig.class, configPath, true);
     final S3ObjectId dumpLocation = AwsUtils.key(config.getS3IncomingLocation(), datasetId);
-    final MatterhornCodeGenerator generator = new MatterhornCodeGenerator("1.0", gitDir,
-        null, config, null);
-
-    final GenerationSpec spec = generator.createGenerationSpec();
-    final DataPipelineGenerator pipeline = new DataPipelineGenerator("Matterhorn", spec, config,
-        dumpLocation, new MatterhornCodeManager(), runId);
+    final AwsUtils aws = new AwsUtils();
+    final InputTableIndex dataIndex = aws.readJson(config.getIndexFileS3Location(runId),
+        InputTableIndex.class);
+    final DataPipelineGenerator pipeline = new DataPipelineGenerator(config,
+        dataIndex, new MatterhornCodeManager(), runId);
     pipeline.generate();
   }
 

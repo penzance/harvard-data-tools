@@ -30,8 +30,12 @@ public class HadoopUtilities {
   private static final Logger log = LogManager.getLogger();
 
   public void setPaths(final Job job, final URI hdfsService, final String in, final String out)
-      throws IOException {
-    for (final Path path : listFiles(hdfsService, in)) {
+      throws IOException, NoInputDataException {
+    final List<Path> files = listFiles(hdfsService, in);
+    if (files.isEmpty()) {
+      throw new NoInputDataException(job.getJobName(), in);
+    }
+    for (final Path path : files) {
       FileInputFormat.addInputPath(job, path);
       log.debug("Input path: " + path.toString());
     }

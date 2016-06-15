@@ -80,4 +80,9 @@ public class ApiClient {
     final List<CanvasDataSchemaSummary> schemas = rest.makeApiCall("/api/schema", 200, type);
     return schemas;
   }
+
+  public DataSchema getLatestSchema()
+      throws DataConfigurationException, UnexpectedApiResponseException, IOException {
+    return getSchema("latest");
+  }
 }

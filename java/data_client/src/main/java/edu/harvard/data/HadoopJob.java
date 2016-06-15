@@ -34,13 +34,22 @@ public abstract class HadoopJob {
       throw new DataConfigurationException(e);
     }
     this.hadoopConf = new Configuration();
-    final TableFormat format = new FormatLibrary().getFormat(Format.DecompressedCanvasDataFlatFiles);
+    final TableFormat format = new FormatLibrary()
+        .getFormat(Format.DecompressedCanvasDataFlatFiles);
     hadoopConf.set("format", format.getFormat().toString());
     hadoopConf.set("config", config.getPaths());
   }
 
   public void runJob() throws IOException, DataConfigurationException {
-    final Job job = getJob();
+    Job job;
+    try {
+      job = getJob();
+    } catch (final NoInputDataException e) {
+      // If there's no input data we don't run the job, but don't fail since we
+      // may be running against a subset of the data.
+      log.info(e.getMessage());
+      return;
+    }
     for (final URI file : cacheFiles) {
       job.addCacheFile(file);
     }
@@ -60,7 +69,6 @@ public abstract class HadoopJob {
     this.cacheFiles.add(file);
   }
 
-  public abstract Job getJob() throws IOException;
-
+  public abstract Job getJob() throws IOException, NoInputDataException;
 
 }

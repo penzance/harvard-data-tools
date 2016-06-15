@@ -20,6 +20,7 @@ import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopJob;
+import edu.harvard.data.NoInputDataException;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.canvas.CanvasDataConfig;
 import edu.harvard.data.canvas.bindings.phase1.Phase1Requests;
@@ -41,7 +42,7 @@ public class AdminRequestJob extends HadoopJob {
   }
 
   @Override
-  public Job getJob() throws IOException {
+  public Job getJob() throws IOException, NoInputDataException {
     final Job job = Job.getInstance(hadoopConf, "admin-requests");
     job.setMapperClass(AdminRequestMapper.class);
     job.setMapOutputKeyClass(Text.class);

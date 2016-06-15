@@ -75,6 +75,9 @@ public class TableInfo {
   }
 
   public static TableInfo find(final String name) {
+    if (tableName == null) {
+      throw new RuntimeException("TableInfo.find called before init(tableName) method called");
+    }
     log.debug("Finding table info for " + name + " from table " + tableName);
     return mapper.load(TableInfo.class, name, mapperConfig);
   }

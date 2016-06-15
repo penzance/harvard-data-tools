@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
-import edu.harvard.data.generator.GenerationSpec;
 
 public class Pipeline {
 
@@ -27,8 +26,9 @@ public class Pipeline {
   private final String schemaVersion;
   private final String runId;
 
-  public Pipeline(final String name, final GenerationSpec spec, final DataConfig config,
-      final String pipelineId, final PipelineFactory factory, final String schemaVersion, final String runId) throws JsonProcessingException {
+  public Pipeline(final String name, final DataConfig config, final String pipelineId,
+      final PipelineFactory factory, final String schemaVersion, final String runId)
+          throws JsonProcessingException {
     this.name = name;
     this.config = config;
     this.pipelineId = pipelineId;
@@ -49,14 +49,14 @@ public class Pipeline {
     return defineRequest;
   }
 
-  private PipelineObjectBase createDefaultObject()
-      throws JsonProcessingException {
+  private PipelineObjectBase createDefaultObject() throws JsonProcessingException {
     final PipelineObjectBase defaultObj = factory.getDefault(schedule);
     final PipelineCompletionMessage completion = new PipelineCompletionMessage(pipelineId,
         config.getReportBucket(), config.getFailureSnsArn(), config.getPipelineDynamoTable());
     final String failMsg = new ObjectMapper().writeValueAsString(completion);
     final String failSubj = "Pipeline " + name + " Failed";
-    defaultObj.set("onFail", factory.getSns("FailureSnsAlert", failSubj, failMsg, config.getCompletionSnsArn()));
+    defaultObj.set("onFail",
+        factory.getSns("FailureSnsAlert", failSubj, failMsg, config.getCompletionSnsArn()));
     return defaultObj;
   }
 
