@@ -133,7 +133,7 @@ public abstract class Phase0Bootstrap {
   }
 
   private String getRunId() {
-    final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH:mm");
+    final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd-HHmm");
     return config.getDatasetName() + "_" + format.format(new Date());
   }
 
