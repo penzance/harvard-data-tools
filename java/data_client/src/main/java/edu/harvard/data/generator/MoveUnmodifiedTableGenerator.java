@@ -41,7 +41,6 @@ public class MoveUnmodifiedTableGenerator {
       final SchemaPhase inputPhase, final SchemaPhase outputPhase, final String logFile) {
     out.println("if ! hadoop fs -test -e " + outputPhase.getHDFSDir() + "; then hadoop fs -mkdir "
         + outputPhase.getHDFSDir() + "; fi");
-    out.println("set -e"); // Exit on any failure
     out.println("sudo mkdir -p /var/log/hive/user/hadoop # Workaround for Hive logging bug");
     out.println("sudo chown hive:hive -R /var/log/hive");
     final Map<String, DataSchemaTable> schema = outputPhase.getSchema().getTables();
@@ -53,7 +52,11 @@ public class MoveUnmodifiedTableGenerator {
         if (!table.hasNewlyGeneratedElements()) {
           final String src = inputPhase.getHDFSDir() + "/" + table.getTableName();
           final String dest = outputPhase.getHDFSDir() + "/" + table.getTableName();
-          out.println("hadoop fs -test -e " + src + "; if [ $? -eq 0 ]; then hadoop fs -mv " + src + " " + dest + " &>> " + logFile + "; fi");
+          out.println("hadoop fs -test -e " + src);
+          out.println("if [ $? -eq 0 ]; then");
+          out.println("  hadoop fs -mv " + src + " " + dest + " &>> " + logFile);
+          out.println("  if [ $? -ne 0 ]; then exit $?; fi");
+          out.println("fi");
           out.println();
         }
       }
