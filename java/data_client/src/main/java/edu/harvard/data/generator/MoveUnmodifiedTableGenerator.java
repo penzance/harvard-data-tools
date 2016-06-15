@@ -53,9 +53,7 @@ public class MoveUnmodifiedTableGenerator {
         if (!table.hasNewlyGeneratedElements()) {
           final String src = inputPhase.getHDFSDir() + "/" + table.getTableName();
           final String dest = outputPhase.getHDFSDir() + "/" + table.getTableName();
-          out.println("if [ hadoop fs -test -e " + src + " ]");
-          out.println("    then hadoop fs -mv " + src + " " + dest + " &>> " + logFile);
-          out.println("fi");
+          out.println("hadoop fs -test -e " + src + "; if [ $? -eq 0 ]; then hadoop fs -mv " + src + " " + dest + " &>> " + logFile + "; fi");
           out.println();
         }
       }
