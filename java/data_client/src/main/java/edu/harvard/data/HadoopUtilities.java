@@ -53,9 +53,11 @@ public class HadoopUtilities {
     final List<Path> paths = new ArrayList<Path>();
     final Configuration conf = new Configuration();
     final FileSystem fs = FileSystem.get(hdfsService, conf);
-    for (final FileStatus status : fs.listStatus(new Path(dir))) {
-      if (!getFileName(status.getPath()).startsWith("_")) {
-        paths.add(status.getPath());
+    if (fs.exists(new Path(dir))) {
+      for (final FileStatus status : fs.listStatus(new Path(dir))) {
+        if (!getFileName(status.getPath()).startsWith("_")) {
+          paths.add(status.getPath());
+        }
       }
     }
     return paths;
