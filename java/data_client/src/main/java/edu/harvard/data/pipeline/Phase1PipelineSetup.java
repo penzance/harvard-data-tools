@@ -39,7 +39,7 @@ public class Phase1PipelineSetup {
 
   public PipelineObjectBase populate(final PipelineObjectBase previousPhase) {
     PipelineObjectBase previousStep = previousPhase;
-    if (!codeManager.getIdentityMapperClasses().isEmpty()) {
+    if (identityPhaseRequired()) {
       // Take out ID lease
       previousStep = unloadIdentity(previousStep);
       previousStep = copyIdentityToHdfs(previousStep);
@@ -49,10 +49,19 @@ public class Phase1PipelineSetup {
       previousStep = identityPostverify(previousStep);
       previousStep = copyIdentityToS3(previousStep);
       previousStep = loadIdentity(previousStep);
-      previousStep = moveUnmodifiedTables(previousStep);
       // Release ID lease
     }
+    previousStep = moveUnmodifiedTables(previousStep);
     return previousStep;
+  }
+
+  private boolean identityPhaseRequired() {
+    for (final String idTable : codeManager.getIdentityMapperClasses().keySet()) {
+      if (dataIndex.containsTable(idTable)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private PipelineObjectBase moveUnmodifiedTables(final PipelineObjectBase previousStep) {
