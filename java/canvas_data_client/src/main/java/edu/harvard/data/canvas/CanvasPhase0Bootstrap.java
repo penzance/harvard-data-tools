@@ -90,6 +90,10 @@ public class CanvasPhase0Bootstrap extends Phase0Bootstrap {
       log.info("Dump needs to be saved; previous download did not complete.");
       return true;
     }
+    if (info.getVerified() == null || !info.getVerified()) {
+      log.info("Dump needs to be saved; previous download did not properly verify.");
+      return true;
+    }
     final Date downloadStart = info.getDownloadStart();
     // Re-download any dump that was updated less than an hour before it was
     // downloaded before.

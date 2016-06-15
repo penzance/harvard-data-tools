@@ -55,10 +55,10 @@ public class CanvasPhase0 {
 
   private void run() throws DataConfigurationException, UnexpectedApiResponseException, IOException,
   VerificationException, ArgumentError {
-    //    setup();
-    //    downloadDump();
-    //    checkSchema();
-    //    verify();
+    setup();
+    downloadDump();
+    checkSchema();
+    verify();
   }
 
   private void setup()
