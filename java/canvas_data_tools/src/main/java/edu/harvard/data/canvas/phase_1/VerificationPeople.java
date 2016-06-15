@@ -147,10 +147,11 @@ public class VerificationPeople {
   }
 
   // TODO: Move this code into IdentityMap.
+  // TODO: Make identity map table name a config parameter.
   private void getIdMapsFromRedshift(final CanvasDataConfig config) throws SQLException {
     final Long start = System.currentTimeMillis();
     final String url = config.getRedshiftUrl();
-    String queryString = "SELECT * FROM identity_map WHERE identity_map.canvas_data_id IN (";
+    String queryString = "SELECT * FROM pii.identity_map WHERE pii.identity_map.canvas_data_id IN (";
     for (int i = 0; i < people.size(); i++) {
       queryString += "?, ";
     }
