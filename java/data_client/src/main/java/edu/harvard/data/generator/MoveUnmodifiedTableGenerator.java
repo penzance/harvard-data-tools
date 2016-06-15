@@ -31,15 +31,16 @@ public class MoveUnmodifiedTableGenerator {
       final File file = new File(dir, fileBase + ".sh");
       log.info("Generating move unmodified files for phase " + i + ". file: " + file);
       try (final PrintStream out = new PrintStream(new FileOutputStream(file))) {
-        moveUnmodifiedFiles(out, i + 1, schemaVersions.getPhase(i), schemaVersions.getPhase(i+1),
+        moveUnmodifiedFiles(out, i + 1, schemaVersions.getPhase(i), schemaVersions.getPhase(i + 1),
             "/home/hadoop/" + fileBase + ".out");
       }
     }
   }
 
-  private void moveUnmodifiedFiles(final PrintStream out, final int phase, final SchemaPhase inputPhase,
-      final SchemaPhase outputPhase, final String logFile) {
-    out.println("if ! hadoop fs -test -e " + outputPhase.getHDFSDir() + "; then hadoop fs -mkdir " + outputPhase.getHDFSDir() + "; fi");
+  private void moveUnmodifiedFiles(final PrintStream out, final int phase,
+      final SchemaPhase inputPhase, final SchemaPhase outputPhase, final String logFile) {
+    out.println("if ! hadoop fs -test -e " + outputPhase.getHDFSDir() + "; then hadoop fs -mkdir "
+        + outputPhase.getHDFSDir() + "; fi");
     out.println("set -e"); // Exit on any failure
     out.println("sudo mkdir -p /var/log/hive/user/hadoop # Workaround for Hive logging bug");
     out.println("sudo chown hive:hive -R /var/log/hive");
@@ -50,8 +51,12 @@ public class MoveUnmodifiedTableGenerator {
       final DataSchemaTable table = schema.get(name);
       if (!(table.isTemporary() && table.getExpirationPhase() < phase)) {
         if (!table.hasNewlyGeneratedElements()) {
-          out.println("hadoop fs -mv " + inputPhase.getHDFSDir() + "/" + table.getTableName() + " "
-              + outputPhase.getHDFSDir() + "/" + table.getTableName() + " &>> " + logFile);
+          final String src = inputPhase.getHDFSDir() + "/" + table.getTableName();
+          final String dest = outputPhase.getHDFSDir() + "/" + table.getTableName();
+          out.println("if [ hadoop fs -test -e " + src + " ]");
+          out.println("    then hadoop fs -mv " + src + " " + dest + " &>> " + logFile);
+          out.println("fi");
+          out.println();
         }
       }
     }

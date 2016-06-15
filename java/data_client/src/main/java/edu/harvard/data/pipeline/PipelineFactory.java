@@ -164,7 +164,7 @@ public class PipelineFactory {
     String cmd = "";
     for (final String table : dataIndex.getTableNames()) {
       for (final String dir : dataIndex.getDirectories(table)) {
-        cmd += "s3-dist-cp --src=" + AwsUtils.key(dir) + " --dest=hdfs://" + cleanHdfs(dest) + "/"
+        cmd += "s3-dist-cp --src=" + dir + " --dest=hdfs://" + cleanHdfs(dest) + "/"
             + table + " --outputCodec=none;\n";
       }
     }
