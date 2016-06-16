@@ -37,6 +37,7 @@ public abstract class Phase0Bootstrap {
   private Class<? extends DataConfig> configClass;
   protected String runId;
   private boolean downloadOnly;
+  private AwsUtils aws;
 
   protected abstract List<S3ObjectId> getInfrastructureConfigPaths();
   protected abstract Map<String, String> getCustomEc2Environment();
@@ -50,6 +51,7 @@ public abstract class Phase0Bootstrap {
     this.downloadOnly = downloadOnly;
     this.config = DataConfig.parseInputFiles(configClass, configPathString, false);
     this.runId = getRunId();
+    this.aws = new AwsUtils();
   }
 
   protected void run() throws IOException, DataConfigurationException, UnexpectedApiResponseException {
@@ -94,7 +96,6 @@ public abstract class Phase0Bootstrap {
   }
 
   private String getUserData(final DataConfig config) throws IOException {
-    final AwsUtils aws = new AwsUtils();
     final S3ObjectId bootstrapScript = config.getPhase0BootstrapScript();
 
     String userData = "#! /bin/bash\n";
@@ -125,7 +126,9 @@ public abstract class Phase0Bootstrap {
     env.put("PIPELINE_SETUP_CLASS", config.getPipelineSetupClass());
     env.put("SERVER_TIMEZONE", config.getServerTimezone());
     env.put("CREATE_PIPELINE", downloadOnly ? "0" : "1");
-    env.put("MAVEN_REPO_CACHE", AwsUtils.uri(config.getMavenRepoCacheS3Location()));
+    if(aws.isFile(config.getMavenRepoCacheS3Location())) {
+      env.put("MAVEN_REPO_CACHE", AwsUtils.uri(config.getMavenRepoCacheS3Location()));
+    }
     env.putAll(getCustomEc2Environment());
 
     String envString = "";

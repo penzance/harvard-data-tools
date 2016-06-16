@@ -2,6 +2,7 @@ package edu.harvard.data.canvas;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +71,9 @@ public class CanvasPhase0Bootstrap extends Phase0Bootstrap implements RequestHan
       final DataDump latest = api.getLatestDump();
       schemaVersion = latest.getSchemaVersion();
     } else {
-      for (final DataDump candidate : api.getDumps()) {
+      final List<DataDump> dumps = api.getDumps();
+      Collections.reverse(dumps);
+      for (final DataDump candidate : dumps) {
         if (needToSaveDump(candidate)) {
           dump = api.getDump(candidate.getDumpId());
           dumpId = "DUMP:" + dump.getDumpId();
@@ -111,10 +114,6 @@ public class CanvasPhase0Bootstrap extends Phase0Bootstrap implements RequestHan
 
   private boolean needToSaveDump(final DataDump candidate) throws IOException {
     final DumpInfo info = DumpInfo.find(candidate.getDumpId());
-    //    if (candidate.getSequence() < 189) {
-    //      log.warn("Dump downloader set to ignore dumps with sequence < 189");
-    //      return false;
-    //    }
     if (info == null) {
       log.info("Dump needs to be saved; no dump info record for " + candidate.getDumpId());
       return true;
