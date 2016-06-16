@@ -4,7 +4,7 @@ public class ArgumentError extends Exception {
 
   private static final long serialVersionUID = 1L;
 
-  ArgumentError(final String msg) {
+  public ArgumentError(final String msg) {
     super(msg);
   }
 }

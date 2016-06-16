@@ -149,10 +149,12 @@ public class DumpManager {
     final Map<String, List<S3ObjectId>> directories = new HashMap<String, List<S3ObjectId>>();
     final S3ObjectId dumpDir = getArchiveDumpObj(dumpSequence);
     for (final S3ObjectId tableDir : aws.listDirectories(dumpDir)) {
-      final String tableName = tableDir.getKey().substring(tableDir.getKey().lastIndexOf("/") + 1);
-      final List<S3ObjectId> tableDirs = new ArrayList<S3ObjectId>();
-      tableDirs.add(tableDir);
-      directories.put(tableName, tableDirs);
+      if (!aws.isFile(AwsUtils.key(tableDir, "empty_file"))) {
+        final String tableName = tableDir.getKey().substring(tableDir.getKey().lastIndexOf("/") + 1);
+        final List<S3ObjectId> tableDirs = new ArrayList<S3ObjectId>();
+        tableDirs.add(tableDir);
+        directories.put(tableName, tableDirs);
+      }
     }
     return directories;
   }

@@ -14,9 +14,11 @@ import edu.harvard.data.AwsUtils;
 public class InputTableIndex {
   private String schemaVersion;
   private final Map<String, List<String>> tables;
+  private final Map<String, Boolean> partial;
 
   public InputTableIndex() {
     this.tables = new HashMap<String, List<String>>();
+    this.partial = new HashMap<String, Boolean>();
   }
 
   public String getSchemaVersion() {
@@ -79,5 +81,22 @@ public class InputTableIndex {
   public static InputTableIndex read(final AwsUtils aws, final S3ObjectId location)
       throws IOException {
     return aws.readJson(location, InputTableIndex.class);
+  }
+
+  public void setPartial(final String table, final boolean isPartial) {
+    partial.put(table, isPartial);
+  }
+
+  public void setPartial(final Map<String, Boolean> data) {
+    this.partial.putAll(data);
+  }
+
+  public Map<String, Boolean> getPartial() {
+    return partial;
+  }
+
+  public boolean isPartial(final String tableName) {
+    System.out.println(partial);
+    return partial.get(tableName);
   }
 }

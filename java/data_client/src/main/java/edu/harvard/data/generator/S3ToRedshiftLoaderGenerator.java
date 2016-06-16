@@ -6,9 +6,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
 
@@ -66,14 +64,7 @@ public class S3ToRedshiftLoaderGenerator {
         final String columnList = getColumnList(table);
 
         if (!table.isTemporary()) {
-          final Set<String> partialTables = new HashSet<String>();
-          partialTables.add("requests");
-          partialTables.add("sessions");
-          partialTables.add("event");
-          partialTables.add("video");
-          partialTables.add("session");
-          // TODO: Make this dynamic for the dump being processed.
-          if (partialTables.contains(table.getTableName())) {
+          if (dataIndex.isPartial(tableName)) {
             outputPartialTableUpdate(out, table, config.getDatasetName(), columnList);
           } else {
             outputTableOverwrite(out, table, config.getDatasetName(), columnList);

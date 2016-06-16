@@ -2,7 +2,6 @@ package edu.harvard.data.canvas;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -18,6 +17,7 @@ import edu.harvard.data.TableInfo;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.canvas.data_api.ApiClient;
 import edu.harvard.data.canvas.data_api.CanvasDataSchema;
+import edu.harvard.data.canvas.data_api.DataArtifact;
 import edu.harvard.data.canvas.data_api.DataDump;
 import edu.harvard.data.canvas.phase_0.ArgumentError;
 import edu.harvard.data.canvas.phase_0.DumpManager;
@@ -47,7 +47,6 @@ public class CanvasPhase0 {
   private final AwsUtils aws;
   private final DumpManager manager;
   private final ApiClient api;
-  private DataDump dump;
   private CanvasDataSchema schema;
   private DumpInfo info;
   private final int threads;
@@ -74,52 +73,90 @@ public class CanvasPhase0 {
     }
   }
 
-  // XXX This method is too complicated...
   private void run() throws DataConfigurationException, UnexpectedApiResponseException, IOException,
   VerificationException, ArgumentError {
-    final Map<String, List<S3ObjectId>> tables = new HashMap<String, List<S3ObjectId>>();
-    if (dumpId != null) {
-      // Download and verify the dump
-      setupForDump();
-      // Bypass the download and verify step if it's already happened
-      if (!info.getVerified()) {
-        downloadDump();
-        checkSchema();
-        verifyDump();
-      }
-      // If we're not filtering on a specific table, add all tables in the dump
-      // to the index.
-      final Map<String, List<S3ObjectId>> dumpTables = manager.getDumpIndex(dump.getSequence());
-      if (tableName == null) {
-        tables.putAll(dumpTables);
-      } else {
-        List<S3ObjectId> directories = dumpTables.get(tableName);
-        if (directories == null) {
-          directories = new ArrayList<S3ObjectId>();
-        }
-        tables.put(tableName, directories);
-      }
-    }
-    if (tableName != null) {
-      // We handle the case where dumpId != null && tableName != null above.
-      if (dumpId == null) {
-        // Calculate the full data set for a single table
-        final List<S3ObjectId> directories = getDirectoriesForTable();
-        tables.put(tableName, directories);
-      }
+    final InputTableIndex index;
+    if (dumpId == null && tableName != null) {
+      // Build a data set containing the full history of one table
+      index = getTableHistory();
+
+    } else if (dumpId != null && tableName == null) {
+      // Build a data set containing one complete dump
+      index = getFullDump();
+
+    } else if (dumpId != null && tableName != null) {
+      // Build a data set containing the files for one table in one dump
+      index = getTableForDump();
+
+    } else {
+      // Error; we need either dump ID or a table name.
+      throw new ArgumentError("Either dump ID or table name must be set");
     }
 
-    final InputTableIndex index = new InputTableIndex();
-    if (dump == null) {
-      index.setSchemaVersion(api.getLatestSchema().getVersion());
-    } else {
-      index.setSchemaVersion(dump.getSchemaVersion());
-    }
-    index.addTables(tables);
-    System.out.println(index);
+    // Write the index
     final S3ObjectId indexFile = config.getIndexFileS3Location(runId);
     System.out.println("Saving index to " + AwsUtils.uri(indexFile));
     aws.writeJson(indexFile, index);
+  }
+
+  private InputTableIndex getTableHistory()
+      throws DataConfigurationException, UnexpectedApiResponseException, IOException {
+    // Calculate the full data set for a single table
+    final InputTableIndex index = new InputTableIndex();
+    final List<S3ObjectId> directories = getDirectoriesForTable();
+    index.addDirectories(tableName, directories);
+    index.setPartial(tableName, false);
+    index.setSchemaVersion(api.getLatestSchema().getVersion());
+    return index;
+  }
+
+  private InputTableIndex getFullDump() throws DataConfigurationException,
+  UnexpectedApiResponseException, IOException, VerificationException, ArgumentError {
+    final DataDump dump = downloadAndVerify();
+    final InputTableIndex index = new InputTableIndex();
+    index.addTables(manager.getDumpIndex(dump.getSequence()));
+    for (final String table : index.getTableNames()) {
+      index.setPartial(table, isPartial(table, dump));
+    }
+    index.setSchemaVersion(dump.getSchemaVersion());
+    return index;
+  }
+
+  private InputTableIndex getTableForDump() throws DataConfigurationException,
+  UnexpectedApiResponseException, IOException, VerificationException, ArgumentError {
+    final DataDump dump = downloadAndVerify();
+    final InputTableIndex index = new InputTableIndex();
+    final Map<String, List<S3ObjectId>> dumpTables = manager.getDumpIndex(dump.getSequence());
+    if (!dumpTables.containsKey(tableName)) {
+      throw new VerificationException(
+          "Dump " + dump.getSequence() + " does not contain table " + tableName);
+    }
+    index.addDirectories(tableName, dumpTables.get(tableName));
+    index.setPartial(tableName, isPartial(tableName, dump));
+    index.setSchemaVersion(dump.getSchemaVersion());
+    return index;
+  }
+
+  private DataDump downloadAndVerify() throws DataConfigurationException,
+  UnexpectedApiResponseException, IOException, VerificationException, ArgumentError {
+    // Download and verify the dump
+    final DataDump dump = setupForDump();
+    // Bypass the download and verify step if it's already happened
+    if (!info.getVerified()) {
+      downloadDump(dump);
+      checkSchema();
+      verifyDump();
+    }
+    return dump;
+  }
+
+  private boolean isPartial(final String table, final DataDump dump) throws VerificationException {
+    for (final DataArtifact artifact : dump.getArtifactsByTable().values()) {
+      if (artifact.getTableName().equals(table)) {
+        return artifact.isPartial();
+      }
+    }
+    throw new VerificationException("Can't determine whether " + table + " is partial");
   }
 
   private List<S3ObjectId> getDirectoriesForTable()
@@ -137,17 +174,18 @@ public class CanvasPhase0 {
     return directories;
   }
 
-  private void setupForDump()
+  private DataDump setupForDump()
       throws DataConfigurationException, UnexpectedApiResponseException, IOException {
-    this.dump = api.getDump(dumpId);
+    final DataDump dump = api.getDump(dumpId);
     this.schema = (CanvasDataSchema) api.getSchema(dump.getSchemaVersion());
     this.info = DumpInfo.find(dumpId);
     if (this.info == null) {
       this.info = new DumpInfo(dump.getDumpId(), dump.getSequence(), dump.getSchemaVersion());
     }
+    return dump;
   }
 
-  private void downloadDump() throws IOException, UnexpectedApiResponseException,
+  private void downloadDump(final DataDump dump) throws IOException, UnexpectedApiResponseException,
   DataConfigurationException, VerificationException, ArgumentError {
     manager.saveDump(api, dump, info);
     final S3ObjectId dumpLocation = manager.finalizeDump(dump, schema);
