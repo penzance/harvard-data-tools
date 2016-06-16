@@ -145,9 +145,19 @@ public class CanvasPhase0 {
     final DataDump dump = setupForDump();
     // Bypass the download and verify step if it's already happened
     if (!info.getVerified()) {
-      downloadDump(dump);
-      checkSchema();
-      verifyDump();
+      ExecutorService exec = null;
+      try {
+        exec = Executors.newFixedThreadPool(threads);
+        downloadDump(dump, exec);
+        checkSchema();
+        verifyDump(exec);
+      } finally {
+        if (exec != null) {
+          exec.shutdownNow();
+        }
+      }
+
+
     }
     return dump;
   }
@@ -187,9 +197,9 @@ public class CanvasPhase0 {
     return dump;
   }
 
-  private void downloadDump(final DataDump dump) throws IOException, UnexpectedApiResponseException,
+  private void downloadDump(final DataDump dump, final ExecutorService exec) throws IOException, UnexpectedApiResponseException,
   DataConfigurationException, VerificationException, ArgumentError {
-    manager.saveDump(api, dump, info);
+    manager.saveDump(api, dump, info, exec);
     final S3ObjectId dumpLocation = manager.finalizeDump(dump, schema);
     info.setBucket(dumpLocation.getBucket());
     info.setKey(dumpLocation.getKey());
@@ -209,16 +219,8 @@ public class CanvasPhase0 {
     }
   }
 
-  private void verifyDump() throws VerificationException, IOException {
-    ExecutorService exec = null;
-    try {
-      exec = Executors.newFixedThreadPool(threads);
-      final Phase0PostVerifier verifier = new Phase0PostVerifier(dumpId, aws, config, exec);
-      verifier.verify();
-    } finally {
-      if (exec != null) {
-        exec.shutdownNow();
-      }
-    }
+  private void verifyDump(final ExecutorService exec) throws VerificationException, IOException {
+    final Phase0PostVerifier verifier = new Phase0PostVerifier(dumpId, aws, config, exec);
+    verifier.verify();
   }
 }

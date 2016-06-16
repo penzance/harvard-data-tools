@@ -235,7 +235,7 @@ public class DataConfig {
   }
 
   public S3ObjectId getMavenRepoCacheS3Location() {
-    return AwsUtils.key(getCodeLocation(), "directoryList.json");
+    return AwsUtils.key(getCodeLocation(), "maven_cache.tgz");
   }
 
   public String getHdfsDir(final int phase) {

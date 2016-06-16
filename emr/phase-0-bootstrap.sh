@@ -13,8 +13,10 @@ sudo yum install -y apache-maven
 # Grab a cached version of the .m2 directory if available in order to speed up the build
 if [ -n "$MAVEN_REPO_CACHE" ]
 then
-    aws s3 cp $MAVEN_REPO_CACHE ./maven_cache.tgz
+    cd ~root
+    aws s3 cp $MAVEN_REPO_CACHE maven_cache.tgz
     tar -xzf maven_cache.tgz
+    cd -
 fi
 
 # clone our repo
