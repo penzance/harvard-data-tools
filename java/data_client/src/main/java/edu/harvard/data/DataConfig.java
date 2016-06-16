@@ -234,6 +234,10 @@ public class DataConfig {
     return AwsUtils.key(getS3WorkingLocation(runId), "directoryList.json");
   }
 
+  public S3ObjectId getMavenRepoCacheS3Location() {
+    return AwsUtils.key(getCodeLocation(), "directoryList.json");
+  }
+
   public String getHdfsDir(final int phase) {
     return hdfsBase + phase;
   }
@@ -477,6 +481,5 @@ public class DataConfig {
   public String getServerTimezone() {
     return serverTimezone;
   }
-
 
 }

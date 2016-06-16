@@ -125,6 +125,7 @@ public abstract class Phase0Bootstrap {
     env.put("PIPELINE_SETUP_CLASS", config.getPipelineSetupClass());
     env.put("SERVER_TIMEZONE", config.getServerTimezone());
     env.put("CREATE_PIPELINE", downloadOnly ? "0" : "1");
+    env.put("MAVEN_REPO_CACHE", AwsUtils.uri(config.getMavenRepoCacheS3Location()));
     env.putAll(getCustomEc2Environment());
 
     String envString = "";
