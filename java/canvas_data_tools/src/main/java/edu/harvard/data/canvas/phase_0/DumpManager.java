@@ -3,13 +3,14 @@ package edu.harvard.data.canvas.phase_0;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
@@ -18,8 +19,6 @@ import org.apache.logging.log4j.Logger;
 import com.amazonaws.services.s3.model.S3ObjectId;
 
 import edu.harvard.data.AwsUtils;
-import edu.harvard.data.DataConfigurationException;
-import edu.harvard.data.DumpInfo;
 import edu.harvard.data.TableInfo;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.canvas.CanvasDataConfig;
@@ -49,59 +48,52 @@ public class DumpManager {
   // when it runs. In addition, the file names that Instructure send are not
   // guaranteed to be unique, so we need to be smart in making sure that we
   // download the correct file.
-  public void saveDump(final ApiClient api, final DataDump dump, final DumpInfo info,
-      final ExecutorService exec) throws IOException, UnexpectedApiResponseException,
-  DataConfigurationException, VerificationException, ArgumentError {
-    info.setDownloadStart(new Date());
+  public void saveDump(final ApiClient api, final DataDump dump, final ExecutorService exec)
+      throws IOException, UnexpectedApiResponseException,
+      VerificationException, ArgumentError {
     final File directory = getScratchDumpDir(dump);
     final boolean created = directory.mkdirs();
-    log.debug("Creating directory " + directory + ": " + created);
+    if (!created) {
+      throw new IOException("Failed to create directory " + directory);
+    }
+    final List<Future<Void>> futures = new ArrayList<Future<Void>>();
     final Map<String, DataArtifact> artifactsByTable = dump.getArtifactsByTable();
-    final List<String> tables = new ArrayList<String>(artifactsByTable.keySet());
-    int downloadedFiles = 0;
-    for (final String table : tables) {
+    for (final String table : artifactsByTable.keySet()) {
       int fileIndex = 0;
-      final File tableDir = new File(directory, table);
-      final DataArtifact artifact = artifactsByTable.get(table);
-      log.info("Dumping " + table + " to " + tableDir);
-      final List<DataFile> files = artifact.getFiles();
-      for (int i = 0; i < files.size(); i++) {
-        final DataFile file = files.get(i);
-        final DataDump refreshedDump = api.getDump(dump.getDumpId());
-        final DataArtifact refreshedArtifact = refreshedDump.getArtifactsByTable().get(table);
-        final DataFile refreshedFile = refreshedArtifact.getFiles().get(i);
-        if (!refreshedFile.getFilename().equals(file.getFilename())) {
-          throw new ArgumentError("Mismatch in file name for refreshed dump. Expected"
-              + refreshedFile.getFilename() + ", got " + file.getFilename());
+      final File tempDir = new File(directory, table);
+      final DataFile file = artifactsByTable.get(table).getFiles().get(fileIndex);
+      final DownloadTask task = new DownloadTask(config, api, dump.getDumpId(), table,
+          file.getFilename(), tempDir, fileIndex);
+      fileIndex++;
+      futures.add(exec.submit(task));
+    }
+    int downloadedFiles = 0;
+    for (final Future<Void> future : futures) {
+      try {
+        future.get();
+      } catch (final InterruptedException e) {
+        log.fatal("Interrupted while waiting for future", e);
+        throw new RuntimeException(e);
+      } catch (final ExecutionException e) {
+        final Throwable t = e.getCause();
+        if (t instanceof IOException) {
+          throw (IOException)t;
         }
-        final String filename = getArtifactFileName(refreshedDump.getDumpId(), artifact,
-            fileIndex++);
-        final File downloadFile = new File(tableDir, filename);
-        refreshedFile.download(downloadFile);
-        archiveFile(dump, table, downloadFile);
-        downloadedFiles++;
+        if (t instanceof UnexpectedApiResponseException) {
+          throw (UnexpectedApiResponseException)t;
+        }
+        if (t instanceof ArgumentError) {
+          throw (ArgumentError)t;
+        }
+        log.fatal("Unexpected error.", e);
+        throw new RuntimeException(t);
       }
+      downloadedFiles++;
     }
     if (downloadedFiles != dump.countFilesToDownload()) {
       throw new VerificationException("Expected to download " + dump.getNumFiles()
       + " files. Actually downloaded " + downloadedFiles);
     }
-    info.setDownloadEnd(new Date());
-  }
-
-  private String getArtifactFileName(final String dumpId, final DataArtifact artifact,
-      final int fileIndex) {
-    return artifact.getTableName() + "-" + dumpId + "-" + String.format("%05d", fileIndex) + ".gz";
-  }
-
-  public void archiveFile(final DataDump dump, final String table, final File downloadFile) {
-    final S3ObjectId archiveObj = getArchiveDumpObj(dump.getSequence());
-    final S3ObjectId infoObj = AwsUtils.key(archiveObj, table, downloadFile.getName());
-
-    // Move the object to the archive bucket.
-    aws.getClient().putObject(infoObj.getBucket(), infoObj.getKey(), downloadFile);
-    log.info("Uploaded " + downloadFile + " to " + infoObj);
-    downloadFile.delete();
   }
 
   public S3ObjectId finalizeDump(final DataDump dump, final CanvasDataSchema schema)

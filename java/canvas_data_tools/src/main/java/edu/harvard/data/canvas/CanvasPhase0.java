@@ -2,6 +2,7 @@ package edu.harvard.data.canvas;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -156,8 +157,6 @@ public class CanvasPhase0 {
           exec.shutdownNow();
         }
       }
-
-
     }
     return dump;
   }
@@ -197,9 +196,12 @@ public class CanvasPhase0 {
     return dump;
   }
 
-  private void downloadDump(final DataDump dump, final ExecutorService exec) throws IOException, UnexpectedApiResponseException,
-  DataConfigurationException, VerificationException, ArgumentError {
-    manager.saveDump(api, dump, info, exec);
+  private void downloadDump(final DataDump dump, final ExecutorService exec)
+      throws IOException, UnexpectedApiResponseException, DataConfigurationException,
+      VerificationException, ArgumentError {
+    info.setDownloadStart(new Date());
+    manager.saveDump(api, dump, exec);
+    info.setDownloadEnd(new Date());
     final S3ObjectId dumpLocation = manager.finalizeDump(dump, schema);
     info.setBucket(dumpLocation.getBucket());
     info.setKey(dumpLocation.getKey());
