@@ -62,7 +62,7 @@ public class DownloadTask implements Callable<Void> {
 
   public void archiveFile(final DataDump dump, final String table, final File downloadFile) {
     final String dirName = String.format("%05d", dump.getSequence());
-    final S3ObjectId archiveObj = AwsUtils.key(config.getS3IncomingLocation(), dirName);
+    final S3ObjectId archiveObj = AwsUtils.key(config.getS3IncomingLocation(), dirName + "-parallel");
 
     final S3ObjectId infoObj = AwsUtils.key(archiveObj, table, downloadFile.getName());
 
