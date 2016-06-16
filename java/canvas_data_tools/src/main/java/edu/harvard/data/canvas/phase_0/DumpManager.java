@@ -59,13 +59,15 @@ public class DumpManager {
     final List<Future<Void>> futures = new ArrayList<Future<Void>>();
     final Map<String, DataArtifact> artifactsByTable = dump.getArtifactsByTable();
     for (final String table : artifactsByTable.keySet()) {
-      int fileIndex = 0;
-      final File tempDir = new File(directory, table);
-      final DataFile file = artifactsByTable.get(table).getFiles().get(fileIndex);
-      final DownloadTask task = new DownloadTask(config, api, dump.getDumpId(), table,
-          file.getFilename(), tempDir, fileIndex);
-      fileIndex++;
-      futures.add(exec.submit(task));
+      for (int i=0; i<artifactsByTable.get(table).getFiles().size(); i++) {
+        int fileIndex = 0;
+        final File tempDir = new File(directory, table);
+        final DataFile file = artifactsByTable.get(table).getFiles().get(fileIndex);
+        final DownloadTask task = new DownloadTask(config, api, dump.getDumpId(), table,
+            file.getFilename(), tempDir, fileIndex);
+        fileIndex++;
+        futures.add(exec.submit(task));
+      }
     }
     int downloadedFiles = 0;
     for (final Future<Void> future : futures) {
@@ -91,7 +93,7 @@ public class DumpManager {
       downloadedFiles++;
     }
     if (downloadedFiles != dump.countFilesToDownload()) {
-      throw new VerificationException("Expected to download " + dump.getNumFiles()
+      throw new VerificationException("Expected to download " + dump.countFilesToDownload()
       + " files. Actually downloaded " + downloadedFiles);
     }
   }
