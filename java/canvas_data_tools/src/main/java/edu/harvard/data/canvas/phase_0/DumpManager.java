@@ -59,8 +59,8 @@ public class DumpManager {
     final List<Future<Void>> futures = new ArrayList<Future<Void>>();
     final Map<String, DataArtifact> artifactsByTable = dump.getArtifactsByTable();
     for (final String table : artifactsByTable.keySet()) {
+      int fileIndex = 0;
       for (int i=0; i<artifactsByTable.get(table).getFiles().size(); i++) {
-        int fileIndex = 0;
         final File tempDir = new File(directory, table);
         final DataFile file = artifactsByTable.get(table).getFiles().get(fileIndex);
         final DownloadTask task = new DownloadTask(config, api, dump.getDumpId(), table,
