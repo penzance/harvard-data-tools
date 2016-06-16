@@ -59,6 +59,7 @@ public class DataConfig {
   private final String emrTaskInstanceType;
   private final String emrTaskBidPrice;
   private final String emrMaximumRetries;
+  private final String emrAvailabilityZoneGroup;
 
   private final String phase0InstanceType;
   private final String phase0BidPrice;
@@ -67,6 +68,7 @@ public class DataConfig {
   private final String phase0HeapSize;
   private final String phase0Ami;
   private final String phase0SecurityGroup;
+  private final String phase0AvailabilityZoneGroup;
 
   private final String ec2GitDir;
   private final String ec2CodeDir;
@@ -84,6 +86,7 @@ public class DataConfig {
   protected String pipelineSetupClass;
 
   private final Properties properties;
+
 
   public DataConfig(final List<? extends InputStream> streams, final boolean verify)
       throws IOException, DataConfigurationException {
@@ -132,6 +135,7 @@ public class DataConfig {
     this.completionSnsArn = getConfigParameter("completion_sns_arn", verify);
     this.pipelineDynamoTable = getConfigParameter("pipeline_dynamo_table", verify);
     this.mainIdentifier = IdentifierType.valueOf(getConfigParameter("main_identifier", verify));
+
     this.emrMaximumRetries = getConfigParameter("emr_maximum_retries", verify);
     this.emrReleaseLabel = getConfigParameter("emr_release_label", verify);
     this.emrTerminateAfter = getConfigParameter("emr_terminate_after", verify);
@@ -143,6 +147,7 @@ public class DataConfig {
     this.emrTaskBidPrice = getConfigParameter("emr_task_bid_price", false);
     this.emrCoreInstanceCount = getConfigParameter("emr_core_instance_count", verify);
     this.emrTaskInstanceCount = getConfigParameter("emr_task_instance_count", verify);
+    this.emrAvailabilityZoneGroup = getConfigParameter("emr_availability_zone_group", verify);
 
     this.phase0InstanceType = getConfigParameter("phase_0_instance_type", verify);
     this.phase0BidPrice = getConfigParameter("phase_0_bid_price", verify);
@@ -151,6 +156,7 @@ public class DataConfig {
     this.phase0HeapSize = getConfigParameter("phase_0_heap_size", verify);
     this.phase0Ami = getConfigParameter("phase_0_ami", verify);
     this.phase0SecurityGroup = getConfigParameter("phase_0_security_group", verify);
+    this.phase0AvailabilityZoneGroup = getConfigParameter("phase_0_availability_zone_group", verify);
   }
 
   public static <T extends DataConfig> T parseInputFiles(final Class<T> cls,
@@ -454,6 +460,10 @@ public class DataConfig {
     return phase0SecurityGroup;
   }
 
+  public String getPhase0AvailabilityZoneGroup() {
+    return phase0AvailabilityZoneGroup;
+  }
+
   public String getEc2GitDir() {
     return ec2GitDir;
   }
@@ -480,6 +490,10 @@ public class DataConfig {
 
   public String getServerTimezone() {
     return serverTimezone;
+  }
+
+  public String getEmrAvailabilityZoneGroup() {
+    return emrAvailabilityZoneGroup;
   }
 
 }
