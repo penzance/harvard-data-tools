@@ -38,7 +38,7 @@ public class CanvasPhase0Bootstrap extends Phase0Bootstrap implements RequestHan
   public static void main(final String[] args) throws JsonParseException, JsonMappingException, IOException {
     System.out.println(args[0]);
     final BootstrapParameters params = new ObjectMapper().readValue(args[0], BootstrapParameters.class);
-    new CanvasPhase0Bootstrap().handleRequest(params, null);
+    System.out.println(new CanvasPhase0Bootstrap().handleRequest(params, null));
   }
 
   @Override
@@ -87,7 +87,7 @@ public class CanvasPhase0Bootstrap extends Phase0Bootstrap implements RequestHan
     final S3ObjectId configPath = AwsUtils.key(config.getCodeBucket(), config.getGitTagOrBranch());
     boolean megadump = dumpId.equals("TABLE:requests");
     if (dump != null && dump.getArtifactsByTable().containsKey("requests")) {
-      megadump |= dump.getArtifactsByTable().get("requests").isPartial();
+      megadump |= !dump.getArtifactsByTable().get("requests").isPartial();
     }
     if (megadump) {
       paths.add(AwsUtils.key(configPath, "large_phase_0.properties"));
