@@ -20,8 +20,11 @@ python $HARVARD_DATA_TOOLS_BASE/python/$GENERATOR
 # run phase 0
 java -Duser.timezone=$SERVER_TIMEZONE -Xmx$PHASE_0_HEAP_SIZE -cp /home/ec2-user/code/data_tools.jar $PHASE_0_CLASS $CONFIG_PATHS $RUN_ID $DATA_SET_ID $PHASE_0_THREADS
 
-# Spin up the pipeline
-java -cp /home/ec2-user/code/data_tools.jar:$HARVARD_DATA_TOOLS_BASE/schema $PIPELINE_SETUP_CLASS $CONFIG_PATHS $HARVARD_DATA_TOOLS_BASE $RUN_ID $DATA_SET_ID
+if [ $CREATE_PIPELINE -eq 1 ]
+then
+    # Spin up the pipeline
+    java -cp /home/ec2-user/code/data_tools.jar:$HARVARD_DATA_TOOLS_BASE/schema $PIPELINE_SETUP_CLASS $CONFIG_PATHS $HARVARD_DATA_TOOLS_BASE $RUN_ID $DATA_SET_ID
+fi
 
 # Shut down; the pipeline will take over.
 sudo halt now

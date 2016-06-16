@@ -44,10 +44,11 @@ public class CanvasPhase0Bootstrap extends Phase0Bootstrap implements RequestHan
   @Override
   public String handleRequest(final BootstrapParameters params, final Context context) {
     try {
-      super.init(params.getConfigPathString(), CanvasDataConfig.class);
+      super.init(params.getConfigPathString(), CanvasDataConfig.class, params.getDownloadOnly());
       this.params = params;
       super.run();
     } catch (final Throwable e) {
+      e.printStackTrace();
       return "Error: " + e.getMessage();
     }
     return "";
@@ -71,9 +72,10 @@ public class CanvasPhase0Bootstrap extends Phase0Bootstrap implements RequestHan
     } else {
       for (final DataDump candidate : api.getDumps()) {
         if (needToSaveDump(candidate)) {
-          dump = candidate;
-          dumpId = "DUMP:" + candidate.getDumpId();
-          schemaVersion = candidate.getSchemaVersion();
+          dump = api.getDump(candidate.getDumpId());
+          dumpId = "DUMP:" + dump.getDumpId();
+          schemaVersion = dump.getSchemaVersion();
+          break;
         }
       }
     }

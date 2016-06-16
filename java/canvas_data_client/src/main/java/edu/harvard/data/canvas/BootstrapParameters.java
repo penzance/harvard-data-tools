@@ -4,6 +4,7 @@ public class BootstrapParameters {
   private String configPathString;
   private Integer dumpSequence;
   private String table;
+  private boolean downloadOnly;
 
   public String getConfigPathString() {
     return configPathString;
@@ -27,6 +28,14 @@ public class BootstrapParameters {
 
   public void setTable(final String table) {
     this.table = table;
+  }
+
+  public boolean getDownloadOnly() {
+    return downloadOnly;
+  }
+
+  public void setDownloadOnly(final boolean downloadOnly) {
+    this.downloadOnly = downloadOnly;
   }
 
 }
