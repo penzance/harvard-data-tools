@@ -2,8 +2,10 @@ package edu.harvard.data.canvas;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -197,8 +199,12 @@ public class CanvasPhase0 {
   }
 
   private void checkSchema() throws VerificationException {
+    final Set<String> validSchemas = new HashSet<String>();
+    validSchemas.add("1.10.3");
+    validSchemas.add("1.10.2");
+    validSchemas.add("1.10.1");
     // XXX: Create dynamo table to track valid schemas.
-    if (!schema.getVersion().equals("1.10.3")) {
+    if (!validSchemas.contains(schema.getVersion())) {
       throw new VerificationException("Unexpected schema version " + schema.getVersion());
     }
   }

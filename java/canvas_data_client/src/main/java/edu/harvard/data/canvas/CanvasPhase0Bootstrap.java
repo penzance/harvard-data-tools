@@ -13,6 +13,9 @@ import org.apache.logging.log4j.Logger;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.s3.model.S3ObjectId;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfigurationException;
@@ -24,10 +27,19 @@ import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class CanvasPhase0Bootstrap extends Phase0Bootstrap implements RequestHandler<BootstrapParameters, String> {
 
+  private DataDump dump;
   private String dumpId;
   private BootstrapParameters params;
+  private String schemaVersion;
 
   private static final Logger log = LogManager.getLogger();
+
+  // Main method for testing
+  public static void main(final String[] args) throws JsonParseException, JsonMappingException, IOException {
+    System.out.println(args[0]);
+    final BootstrapParameters params = new ObjectMapper().readValue(args[0], BootstrapParameters.class);
+    new CanvasPhase0Bootstrap().handleRequest(params, null);
+  }
 
   @Override
   public String handleRequest(final BootstrapParameters params, final Context context) {
@@ -35,7 +47,7 @@ public class CanvasPhase0Bootstrap extends Phase0Bootstrap implements RequestHan
       super.init(params.getConfigPathString(), CanvasDataConfig.class);
       this.params = params;
       super.run();
-    } catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
+    } catch (final Throwable e) {
       return "Error: " + e.getMessage();
     }
     return "";
@@ -49,13 +61,19 @@ public class CanvasPhase0Bootstrap extends Phase0Bootstrap implements RequestHan
     final ApiClient api = new ApiClient(canvasConfig.getCanvasDataHost(),
         canvasConfig.getCanvasApiKey(), canvasConfig.getCanvasApiSecret());
     if (params.getDumpSequence() != null) {
-      dumpId = "DUMP:" + api.getDump(params.getDumpSequence()).getDumpId();
+      dump = api.getDump(params.getDumpSequence());
+      dumpId = "DUMP:" + dump.getDumpId();
+      schemaVersion = dump.getSchemaVersion();
     } else if (params.getTable() != null) {
       dumpId = "TABLE:" + params.getTable();
+      final DataDump latest = api.getLatestDump();
+      schemaVersion = latest.getSchemaVersion();
     } else {
       for (final DataDump candidate : api.getDumps()) {
         if (needToSaveDump(candidate)) {
+          dump = candidate;
           dumpId = "DUMP:" + candidate.getDumpId();
+          schemaVersion = candidate.getSchemaVersion();
         }
       }
     }
@@ -67,8 +85,17 @@ public class CanvasPhase0Bootstrap extends Phase0Bootstrap implements RequestHan
   protected List<S3ObjectId> getInfrastructureConfigPaths() {
     final List<S3ObjectId> paths = new ArrayList<S3ObjectId>();
     final S3ObjectId configPath = AwsUtils.key(config.getCodeBucket(), config.getGitTagOrBranch());
-    paths.add(AwsUtils.key(configPath, "tiny_phase_0.properties"));
-    paths.add(AwsUtils.key(configPath, "tiny_emr.properties"));
+    boolean megadump = dumpId.equals("TABLE:requests");
+    if (dump != null && dump.getArtifactsByTable().containsKey("requests")) {
+      megadump |= dump.getArtifactsByTable().get("requests").isPartial();
+    }
+    if (megadump) {
+      paths.add(AwsUtils.key(configPath, "large_phase_0.properties"));
+      paths.add(AwsUtils.key(configPath, "large_emr.properties"));
+    } else {
+      paths.add(AwsUtils.key(configPath, "tiny_phase_0.properties"));
+      paths.add(AwsUtils.key(configPath, "tiny_emr.properties"));
+    }
     return paths;
   }
 
@@ -76,19 +103,16 @@ public class CanvasPhase0Bootstrap extends Phase0Bootstrap implements RequestHan
   protected Map<String, String> getCustomEc2Environment() {
     final Map<String, String> env = new HashMap<String, String>();
     env.put("DATA_SET_ID", dumpId);
-    env.put("DATA_SCHEMA_VERSION", "1.10.3"); // XXX: Remove
+    env.put("DATA_SCHEMA_VERSION", schemaVersion); // XXX: Remove
     return env;
   }
 
   private boolean needToSaveDump(final DataDump candidate) throws IOException {
-    if (!candidate.getSchemaVersion().equals("1.10.3")) {
-      return false;
-    }
     final DumpInfo info = DumpInfo.find(candidate.getDumpId());
-    if (candidate.getSequence() < 189) {
-      log.warn("Dump downloader set to ignore dumps with sequence < 189");
-      return false;
-    }
+    //    if (candidate.getSequence() < 189) {
+    //      log.warn("Dump downloader set to ignore dumps with sequence < 189");
+    //      return false;
+    //    }
     if (info == null) {
       log.info("Dump needs to be saved; no dump info record for " + candidate.getDumpId());
       return true;
