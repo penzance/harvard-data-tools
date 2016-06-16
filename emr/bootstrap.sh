@@ -27,6 +27,11 @@ sudo yum install -y java-devel git-core
 sudo wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
 sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
 sudo yum install -y apache-maven
+if [ -n "$MAVEN_REPO_CACHE" ]
+then
+    aws s3 cp $MAVEN_REPO_CACHE ./maven_cache.tgz
+    tar -xzf maven_cache.tgz
+fi
 
 # clone our repo
 git clone -b $GIT_BRANCH https://github.com/penzance/harvard-data-tools.git $HARVARD_DATA_TOOLS_BASE
