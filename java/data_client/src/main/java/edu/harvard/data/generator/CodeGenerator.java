@@ -16,6 +16,7 @@ import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.identity.IdentitySchemaTransformer;
+import edu.harvard.data.pipeline.InputTableIndex;
 import edu.harvard.data.schema.DataSchema;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 import edu.harvard.data.schema.existing.ExistingSchema;
@@ -41,6 +42,8 @@ public abstract class CodeGenerator {
   protected final File codeDir;
   private final S3ObjectId workingDir;
   private final DataConfig config;
+  private final S3ObjectId dataIndexLocation;
+  private final AwsUtils aws;
 
   /**
    * Initialize the CodeGenerator class with input and output file locations.
@@ -55,7 +58,9 @@ public abstract class CodeGenerator {
   public CodeGenerator(final DataConfig config, final File codeDir, final String runId) {
     this.config = config;
     this.codeDir = codeDir;
-    this.workingDir = AwsUtils.key(config.getS3WorkingLocation(), runId);
+    this.workingDir = AwsUtils.key(config.getS3WorkingLocation(runId));
+    this.dataIndexLocation = config.getIndexFileS3Location(runId);
+    this.aws = new AwsUtils();
   }
 
   /**
@@ -178,20 +183,29 @@ public abstract class CodeGenerator {
     new IdentityJobGenerator(spec, IdentitySchema.readIdentities(getIdentifierResource()))
     .generate();
 
-    log.info("Generating Hive table definitions in " + codeDir);
-    new CreateHiveTableGenerator(codeDir, spec).generate();
-
-    log.info("Generating Hive query manifests in " + codeDir);
-    new HiveQueryManifestGenerator(codeDir, spec).generate();
-
     log.info("Generating Redshift table definitions in " + codeDir);
     new CreateRedshiftTableGenerator(codeDir, spec, config).generate();
 
-    log.info("Generating Redshift copy from S3 script in " + codeDir);
-    new S3ToRedshiftLoaderGenerator(codeDir, spec, config, workingDir).generate();
+    // Generate pipeline utility code only if we have an index of the data to be
+    // processed.
+    if (aws.isFile(dataIndexLocation)) {
+      final InputTableIndex dataIndex = InputTableIndex.read(aws, dataIndexLocation);
 
-    log.info("Generating move unmodified files script in " + codeDir);
-    new MoveUnmodifiedTableGenerator(codeDir, spec).generate();
+      log.info("Generating Hive table definitions in " + codeDir);
+      new CreateHiveTableGenerator(codeDir, spec).generate();
+
+      log.info("Generating Hive query manifests in " + codeDir);
+      new HiveQueryManifestGenerator(codeDir, spec).generate();
+
+      log.info("Generating Redshift copy from S3 script in " + codeDir);
+      new S3ToRedshiftLoaderGenerator(codeDir, spec, config, workingDir, dataIndex).generate();
+
+      log.info("Generating move unmodified files script in " + codeDir);
+      new MoveUnmodifiedTableGenerator(codeDir, spec, dataIndex).generate();
+    } else {
+      log.info("No data index at " + AwsUtils.uri(dataIndexLocation)
+      + ". Skipping pipeline-specific files");
+    }
   }
 
   /**

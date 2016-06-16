@@ -21,7 +21,7 @@ public class Phase3PipelineSetup {
     this.pipeline = pipeline;
     this.codeManager = codeManager;
     this.config = pipeline.getConfig();
-    this.workingDir = AwsUtils.key(config.getS3WorkingLocation(), runId);
+    this.workingDir = AwsUtils.key(config.getS3WorkingLocation(runId));
     this.redshiftStagingS3 = AwsUtils.key(workingDir, config.getRedshiftStagingDir());
   }
 

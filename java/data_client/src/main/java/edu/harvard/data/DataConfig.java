@@ -214,8 +214,8 @@ public class DataConfig {
     return "jdbc:postgresql://" + redshiftServer + ":" + redshiftPort + "/" + redshiftDatabase;
   }
 
-  public S3ObjectId getS3WorkingLocation() {
-    return AwsUtils.key(workingBucket, dataSource);
+  public S3ObjectId getS3WorkingLocation(final String runId) {
+    return AwsUtils.key(workingBucket, dataSource, runId);
   }
 
   public S3ObjectId getS3IncomingLocation() {
@@ -231,7 +231,7 @@ public class DataConfig {
   }
 
   public S3ObjectId getIndexFileS3Location(final String runId) {
-    return AwsUtils.key(getS3WorkingLocation(), runId, "directoryList.json");
+    return AwsUtils.key(getS3WorkingLocation(runId), "directoryList.json");
   }
 
   public String getHdfsDir(final int phase) {
@@ -477,5 +477,6 @@ public class DataConfig {
   public String getServerTimezone() {
     return serverTimezone;
   }
+
 
 }

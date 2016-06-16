@@ -24,7 +24,7 @@ public class EmrStartupPipelineSetup {
     this.config = pipeline.getConfig();
     this.pipeline = pipeline;
     this.pipelineId = pipeline.getId();
-    this.workingDir = AwsUtils.key(config.getS3WorkingLocation(), runId);
+    this.workingDir = AwsUtils.key(config.getS3WorkingLocation(runId));
   }
 
   public PipelineObjectBase populate() {

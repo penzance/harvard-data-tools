@@ -7,11 +7,11 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import edu.harvard.data.pipeline.InputTableIndex;
 import edu.harvard.data.schema.DataSchemaTable;
 
 public class MoveUnmodifiedTableGenerator {
@@ -20,9 +20,13 @@ public class MoveUnmodifiedTableGenerator {
   private final File dir;
   private final GenerationSpec schemaVersions;
 
-  public MoveUnmodifiedTableGenerator(final File dir, final GenerationSpec schemaVersions) {
+  private final InputTableIndex dataIndex;
+
+  public MoveUnmodifiedTableGenerator(final File dir, final GenerationSpec schemaVersions,
+      final InputTableIndex dataIndex) {
     this.dir = dir;
     this.schemaVersions = schemaVersions;
+    this.dataIndex = dataIndex;
   }
 
   public void generate() throws IOException {
@@ -41,23 +45,23 @@ public class MoveUnmodifiedTableGenerator {
       final SchemaPhase inputPhase, final SchemaPhase outputPhase, final String logFile) {
     out.println("if ! hadoop fs -test -e " + outputPhase.getHDFSDir() + "; then hadoop fs -mkdir "
         + outputPhase.getHDFSDir() + "; fi");
+    out.println("set -e"); // Exit on any failure
     out.println("sudo mkdir -p /var/log/hive/user/hadoop # Workaround for Hive logging bug");
     out.println("sudo chown hive:hive -R /var/log/hive");
-    final Map<String, DataSchemaTable> schema = outputPhase.getSchema().getTables();
-    final List<String> names = new ArrayList<String>(schema.keySet());
-    Collections.sort(names);
-    for (final String name : names) {
-      final DataSchemaTable table = schema.get(name);
-      if (!(table.isTemporary() && table.getExpirationPhase() < phase)) {
-        if (!table.hasNewlyGeneratedElements()) {
-          final String src = inputPhase.getHDFSDir() + "/" + table.getTableName();
-          final String dest = outputPhase.getHDFSDir() + "/" + table.getTableName();
-          out.println("hadoop fs -test -e " + src);
-          out.println("if [ $? -eq 0 ]; then");
-          out.println("  hadoop fs -mv " + src + " " + dest + " &>> " + logFile);
-          out.println("  if [ $? -ne 0 ]; then exit $?; fi");
-          out.println("fi");
-          out.println();
+
+    final List<String> tableNames = new ArrayList<String>();
+    for (final DataSchemaTable table : outputPhase.getSchema().getTables().values()) {
+      tableNames.add(table.getTableName());
+    }
+    Collections.sort(tableNames);
+    for (final String tableName : tableNames) {
+      if (dataIndex.containsTable(tableName)) {
+        final DataSchemaTable table = outputPhase.getSchema().getTableByName(tableName);
+        if (!(table.isTemporary() && table.getExpirationPhase() < phase)) {
+          if (!table.hasNewlyGeneratedElements()) {
+            out.println("hadoop fs -mv " + inputPhase.getHDFSDir() + "/" + table.getTableName()
+            + " " + outputPhase.getHDFSDir() + "/" + table.getTableName() + " &>> " + logFile);
+          }
         }
       }
     }

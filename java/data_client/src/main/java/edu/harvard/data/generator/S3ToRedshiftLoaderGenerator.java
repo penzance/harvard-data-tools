@@ -14,6 +14,7 @@ import com.amazonaws.services.s3.model.S3ObjectId;
 
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.identity.IdentityMap;
+import edu.harvard.data.pipeline.InputTableIndex;
 import edu.harvard.data.schema.DataSchemaColumn;
 import edu.harvard.data.schema.DataSchemaTable;
 
@@ -23,13 +24,15 @@ public class S3ToRedshiftLoaderGenerator {
   private final GenerationSpec spec;
   private final S3ObjectId workingDir;
   private final DataConfig config;
+  private final InputTableIndex dataIndex;
 
   public S3ToRedshiftLoaderGenerator(final File dir, final GenerationSpec spec,
-      final DataConfig config, final S3ObjectId workingDir) {
+      final DataConfig config, final S3ObjectId workingDir, final InputTableIndex dataIndex) {
     this.config = config;
     this.dir = dir;
     this.spec = spec;
     this.workingDir = workingDir;
+    this.dataIndex = dataIndex;
   }
 
   public void generate() throws IOException {
@@ -58,21 +61,23 @@ public class S3ToRedshiftLoaderGenerator {
     }
     Collections.sort(tableNames);
     for (final String tableName : tableNames) {
-      final DataSchemaTable table = phase.getSchema().getTableByName(tableName);
-      final String columnList = getColumnList(table);
+      if (dataIndex.containsTable(tableName)) {
+        final DataSchemaTable table = phase.getSchema().getTableByName(tableName);
+        final String columnList = getColumnList(table);
 
-      if (!table.isTemporary()) {
-        final Set<String> partialTables = new HashSet<String>();
-        partialTables.add("requests");
-        partialTables.add("sessions");
-        partialTables.add("event");
-        partialTables.add("video");
-        partialTables.add("session");
-        // TODO: Make this dynamic for the dump being processed.
-        if (partialTables.contains(table.getTableName())) {
-          outputPartialTableUpdate(out, table, config.getDatasetName(), columnList);
-        } else {
-          outputTableOverwrite(out, table, config.getDatasetName(), columnList);
+        if (!table.isTemporary()) {
+          final Set<String> partialTables = new HashSet<String>();
+          partialTables.add("requests");
+          partialTables.add("sessions");
+          partialTables.add("event");
+          partialTables.add("video");
+          partialTables.add("session");
+          // TODO: Make this dynamic for the dump being processed.
+          if (partialTables.contains(table.getTableName())) {
+            outputPartialTableUpdate(out, table, config.getDatasetName(), columnList);
+          } else {
+            outputTableOverwrite(out, table, config.getDatasetName(), columnList);
+          }
         }
       }
     }

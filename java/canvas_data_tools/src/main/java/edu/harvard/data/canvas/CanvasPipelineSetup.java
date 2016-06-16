@@ -3,6 +3,8 @@ package edu.harvard.data.canvas;
 import java.io.File;
 import java.io.IOException;
 
+import com.amazonaws.services.s3.model.S3ObjectId;
+
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.VerificationException;
@@ -30,8 +32,9 @@ public class CanvasPipelineSetup {
       final String runId) throws DataConfigurationException, UnexpectedApiResponseException,
   IOException, VerificationException {
     final AwsUtils aws = new AwsUtils();
-    final InputTableIndex dataIndex = aws.readJson(config.getIndexFileS3Location(runId),
-        InputTableIndex.class);
+    final S3ObjectId indexLocation = config.getIndexFileS3Location(runId);
+    final InputTableIndex dataIndex = InputTableIndex.read(aws, indexLocation);
+
     final DataPipelineGenerator pipeline = new DataPipelineGenerator(config, dataIndex,
         new CanvasCodeManager(), runId);
     pipeline.generate();

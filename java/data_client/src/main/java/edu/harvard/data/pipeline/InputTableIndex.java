@@ -1,5 +1,6 @@
 package edu.harvard.data.pipeline;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -54,7 +55,7 @@ public class InputTableIndex {
   }
 
   public void addTables(final Map<String, List<S3ObjectId>> tableMap) {
-    for(final String table : tableMap.keySet()) {
+    for (final String table : tableMap.keySet()) {
       addDirectories(table, tableMap.get(table));
     }
   }
@@ -65,7 +66,7 @@ public class InputTableIndex {
     for (final String key : getTableNames()) {
       s += key + ":\n";
       for (final String dir : getDirectories(key)) {
-        s+= "  " + dir + "\n";
+        s += "  " + dir + "\n";
       }
     }
     return s;
@@ -73,5 +74,10 @@ public class InputTableIndex {
 
   public boolean containsTable(final String table) {
     return tables.containsKey(table);
+  }
+
+  public static InputTableIndex read(final AwsUtils aws, final S3ObjectId location)
+      throws IOException {
+    return aws.readJson(location, InputTableIndex.class);
   }
 }
