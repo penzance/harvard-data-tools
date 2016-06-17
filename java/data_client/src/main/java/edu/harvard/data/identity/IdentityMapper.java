@@ -8,8 +8,6 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.TableFormat;
@@ -36,7 +34,6 @@ import edu.harvard.data.generator.IdentityMapperGenerator;
  *          to {@code Text}, this parameter would be {@code Long}.
  */
 public class IdentityMapper<T> {
-  private static final Logger log = LogManager.getLogger();
   TableFormat format;
   private final HadoopUtilities hadoopUtils;
 

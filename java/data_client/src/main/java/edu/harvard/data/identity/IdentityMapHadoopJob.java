@@ -1,6 +1,7 @@
 package edu.harvard.data.identity;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
@@ -21,6 +22,7 @@ import edu.harvard.data.DataConfig;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.generator.GeneratedCodeManager;
+import edu.harvard.data.pipeline.InputTableIndex;
 
 public class IdentityMapHadoopJob {
   private static final Logger log = LogManager.getLogger();
@@ -30,13 +32,14 @@ public class IdentityMapHadoopJob {
   private final String outputDir;
   private final Configuration hadoopConfig;
   final HadoopUtilities hadoopUtils;
-
+  private final InputTableIndex dataIndex;
   private final GeneratedCodeManager codeManager;
 
-  public IdentityMapHadoopJob(final DataConfig config, final GeneratedCodeManager codeManager)
-      throws IOException {
+  public IdentityMapHadoopJob(final DataConfig config, final GeneratedCodeManager codeManager,
+      final InputTableIndex dataIndex) throws IOException {
     this.config = config;
     this.codeManager = codeManager;
+    this.dataIndex = dataIndex;
     this.inputDir = config.getHdfsDir(0);
     this.outputDir = config.getHdfsDir(1);
     this.hadoopConfig = new Configuration();
@@ -71,7 +74,14 @@ public class IdentityMapHadoopJob {
       job.addCacheFile(path.toUri());
     }
 
-    final Map<String, Class<? extends Mapper>> mapperClasses = codeManager.getIdentityMapperClasses();
+    final Map<String, Class<? extends Mapper>> allMapperClasses = codeManager
+        .getIdentityMapperClasses();
+    final Map<String, Class<? extends Mapper>> mapperClasses = new HashMap<String, Class<? extends Mapper>>();
+    for (final String table : allMapperClasses.keySet()) {
+      if (dataIndex.containsTable(table)) {
+        mapperClasses.put(table, allMapperClasses.get(table));
+      }
+    }
     for (final String table : mapperClasses.keySet()) {
       final Path path = new Path(inputDir + "/" + table + "/");
       MultipleInputs.addInputPath(job, path, TextInputFormat.class, mapperClasses.get(table));
