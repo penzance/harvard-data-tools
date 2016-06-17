@@ -54,7 +54,7 @@ public class DataPipelineGenerator {
 
     final ActivatePipelineRequest activate = new ActivatePipelineRequest();
     activate.setPipelineId(pipelineId);
-    //    client.activatePipeline(activate);
+    client.activatePipeline(activate);
     log.info(defineResult);
   }
 

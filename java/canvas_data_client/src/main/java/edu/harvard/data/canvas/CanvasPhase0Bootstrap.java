@@ -90,14 +90,21 @@ public class CanvasPhase0Bootstrap extends Phase0Bootstrap implements RequestHan
   protected List<S3ObjectId> getInfrastructureConfigPaths() {
     final List<S3ObjectId> paths = new ArrayList<S3ObjectId>();
     final S3ObjectId configPath = AwsUtils.key(config.getCodeBucket(), config.getGitTagOrBranch());
+
     boolean megadump = false;
     if (dump != null && dump.getArtifactsByTable().containsKey("requests")) {
       megadump |= !dump.getArtifactsByTable().get("requests").isPartial();
     }
-    if (megadump) {
+    if (dumpId.equals("TABLE:requests")) {
+      // Don't need to download data, but will have to process the full requests table
+      paths.add(AwsUtils.key(configPath, "tiny_phase_0.properties"));
+      paths.add(AwsUtils.key(configPath, "large_emr.properties"));
+    } else if (megadump) {
+      // Need to download a full requests table, then process it.
       paths.add(AwsUtils.key(configPath, "large_phase_0.properties"));
       paths.add(AwsUtils.key(configPath, "large_emr.properties"));
     } else {
+      // Regular dump; we're OK with minimal hardware.
       paths.add(AwsUtils.key(configPath, "tiny_phase_0.properties"));
       paths.add(AwsUtils.key(configPath, "tiny_emr.properties"));
     }
