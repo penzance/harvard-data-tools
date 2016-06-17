@@ -62,25 +62,32 @@ public class CanvasPhase0Bootstrap extends Phase0Bootstrap implements RequestHan
     DumpInfo.init(canvasConfig.getDumpInfoDynamoTable());
     final ApiClient api = new ApiClient(canvasConfig.getCanvasDataHost(),
         canvasConfig.getCanvasApiKey(), canvasConfig.getCanvasApiSecret());
+    final List<String> args = new ArrayList<String>();
     if (params.getDumpSequence() != null) {
       dump = api.getDump(params.getDumpSequence());
-      dumpId = "DUMP:" + dump.getDumpId();
+      args.add("DUMP:" + dump.getDumpId());
       schemaVersion = dump.getSchemaVersion();
-    } else if (params.getTable() != null) {
-      dumpId = "TABLE:" + params.getTable();
+    }
+    if (params.getTable() != null) {
+      args.add("TABLE:" + params.getTable());
       final DataDump latest = api.getLatestDump();
       schemaVersion = latest.getSchemaVersion();
-    } else {
+    }
+    if (params.getDumpSequence() == null && params.getTable() == null) {
       final List<DataDump> dumps = api.getDumps();
       Collections.reverse(dumps);
       for (final DataDump candidate : dumps) {
         if (needToSaveDump(candidate)) {
           dump = api.getDump(candidate.getDumpId());
-          dumpId = "DUMP:" + dump.getDumpId();
+          args.add("DUMP:" + dump.getDumpId());
           schemaVersion = dump.getSchemaVersion();
           break;
         }
       }
+    }
+    dumpId = args.get(0);
+    for (int i=1; i<args.size(); i++) {
+      dumpId += ":" + args.get(i);
     }
     log.info("Saving dump " + dumpId);
     return dumpId != null;

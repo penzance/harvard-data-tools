@@ -117,7 +117,7 @@ public class CanvasPhase0 {
   UnexpectedApiResponseException, IOException, VerificationException, ArgumentError {
     final DataDump dump = downloadAndVerify();
     final InputTableIndex index = new InputTableIndex();
-    index.addTables(manager.getDumpIndex(dump.getSequence()));
+    index.addTables(manager.getDumpIndex(info.getS3Location()));
     for (final String table : index.getTableNames()) {
       index.setPartial(table, isPartial(table, dump));
     }
@@ -129,7 +129,7 @@ public class CanvasPhase0 {
   UnexpectedApiResponseException, IOException, VerificationException, ArgumentError {
     final DataDump dump = downloadAndVerify();
     final InputTableIndex index = new InputTableIndex();
-    final Map<String, List<S3ObjectId>> dumpTables = manager.getDumpIndex(dump.getSequence());
+    final Map<String, List<S3ObjectId>> dumpTables = manager.getDumpIndex(info.getS3Location());
     if (!dumpTables.containsKey(tableName)) {
       throw new VerificationException(
           "Dump " + dump.getSequence() + " does not contain table " + tableName);

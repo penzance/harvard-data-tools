@@ -50,6 +50,7 @@ public class DataPipelineGenerator {
 
     final PutPipelineDefinitionRequest definition = pipeline.getDefineRequest(pipelineId);
     final PutPipelineDefinitionResult defineResult = client.putPipelineDefinition(definition);
+    log.info("Defining pipeline: " + defineResult);
     logPipelineToDynamo();
 
     final ActivatePipelineRequest activate = new ActivatePipelineRequest();

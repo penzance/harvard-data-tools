@@ -146,11 +146,6 @@ public class DumpManager {
     }
   }
 
-  public Map<String, List<S3ObjectId>> getDumpIndex(final long dumpSequence) {
-    final S3ObjectId dumpDir = getArchiveDumpObj(config.getS3IncomingLocation(), dumpSequence);
-    return getDumpIndex(dumpDir);
-  }
-
   public Map<String, List<S3ObjectId>> getDumpIndex(final S3ObjectId dumpDir) {
     final Map<String, List<S3ObjectId>> directories = new HashMap<String, List<S3ObjectId>>();
     log.info("Getting dump index for " + dumpDir);
