@@ -177,7 +177,8 @@ public class CanvasPhase0 {
     final long lastComplete = tableInfo.getLastCompleteDumpSequence();
     final List<DumpInfo> dumps = DumpInfo.getAllDumpsSince(lastComplete);
     for (final DumpInfo d : dumps) {
-      final Map<String, List<S3ObjectId>> tables = manager.getDumpIndex(d.getSequence());
+      final Map<String, List<S3ObjectId>> tables = manager.getDumpIndex(d.getS3Location());
+      System.out.println(d.getKey() + ": " + tables.get(tableName));
       if (tables.containsKey(tableName)) {
         directories.addAll(tables.get(tableName));
       }

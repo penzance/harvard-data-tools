@@ -90,7 +90,7 @@ public class CanvasPhase0Bootstrap extends Phase0Bootstrap implements RequestHan
   protected List<S3ObjectId> getInfrastructureConfigPaths() {
     final List<S3ObjectId> paths = new ArrayList<S3ObjectId>();
     final S3ObjectId configPath = AwsUtils.key(config.getCodeBucket(), config.getGitTagOrBranch());
-    boolean megadump = dumpId.equals("TABLE:requests");
+    boolean megadump = false;
     if (dump != null && dump.getArtifactsByTable().containsKey("requests")) {
       megadump |= !dump.getArtifactsByTable().get("requests").isPartial();
     }

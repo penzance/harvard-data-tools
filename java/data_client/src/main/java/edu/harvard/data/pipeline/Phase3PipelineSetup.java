@@ -14,12 +14,14 @@ public class Phase3PipelineSetup {
   private final S3ObjectId redshiftStagingS3;
   private final S3ObjectId workingDir;
   private final GeneratedCodeManager codeManager;
+  private final InputTableIndex dataIndex;
 
   public Phase3PipelineSetup(final Pipeline pipeline, final PipelineFactory factory,
-      final GeneratedCodeManager codeManager, final String runId) {
+      final GeneratedCodeManager codeManager, final String runId, final InputTableIndex dataIndex) {
     this.factory = factory;
     this.pipeline = pipeline;
     this.codeManager = codeManager;
+    this.dataIndex = dataIndex;
     this.config = pipeline.getConfig();
     this.workingDir = AwsUtils.key(config.getS3WorkingLocation(runId));
     this.redshiftStagingS3 = AwsUtils.key(workingDir, config.getRedshiftStagingDir());

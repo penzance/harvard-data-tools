@@ -84,7 +84,7 @@ public class DataPipelineGenerator {
         runId, dataIndex);
     final Phase2PipelineSetup phase2 = new Phase2PipelineSetup(pipeline, factory, codeManager);
     final Phase3PipelineSetup phase3 = new Phase3PipelineSetup(pipeline, factory, codeManager,
-        runId);
+        runId, dataIndex);
 
     PipelineObjectBase previousStep;
     previousStep = setup.populate();

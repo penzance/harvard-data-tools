@@ -49,8 +49,7 @@ public class DumpManager {
   // guaranteed to be unique, so we need to be smart in making sure that we
   // download the correct file.
   public void saveDump(final ApiClient api, final DataDump dump, final ExecutorService exec)
-      throws IOException, UnexpectedApiResponseException,
-      VerificationException, ArgumentError {
+      throws IOException, UnexpectedApiResponseException, VerificationException, ArgumentError {
     final File directory = getScratchDumpDir(dump);
     final boolean created = directory.mkdirs();
     if (!created) {
@@ -60,7 +59,7 @@ public class DumpManager {
     final Map<String, DataArtifact> artifactsByTable = dump.getArtifactsByTable();
     for (final String table : artifactsByTable.keySet()) {
       int fileIndex = 0;
-      for (int i=0; i<artifactsByTable.get(table).getFiles().size(); i++) {
+      for (int i = 0; i < artifactsByTable.get(table).getFiles().size(); i++) {
         final File tempDir = new File(directory, table);
         final DataFile file = artifactsByTable.get(table).getFiles().get(fileIndex);
         final DownloadTask task = new DownloadTask(config, api, dump.getDumpId(), table,
@@ -79,13 +78,13 @@ public class DumpManager {
       } catch (final ExecutionException e) {
         final Throwable t = e.getCause();
         if (t instanceof IOException) {
-          throw (IOException)t;
+          throw (IOException) t;
         }
         if (t instanceof UnexpectedApiResponseException) {
-          throw (UnexpectedApiResponseException)t;
+          throw (UnexpectedApiResponseException) t;
         }
         if (t instanceof ArgumentError) {
-          throw (ArgumentError)t;
+          throw (ArgumentError) t;
         }
         log.fatal("Unexpected error.", e);
         throw new RuntimeException(t);
@@ -100,7 +99,8 @@ public class DumpManager {
 
   public S3ObjectId finalizeDump(final DataDump dump, final CanvasDataSchema schema)
       throws IOException {
-    final S3ObjectId archiveObj = getArchiveDumpObj(dump.getSequence());
+    final S3ObjectId archiveObj = getArchiveDumpObj(config.getS3IncomingLocation(),
+        dump.getSequence());
     aws.writeJson(AwsUtils.key(archiveObj, "schema.json"), schema);
     aws.writeJson(AwsUtils.key(archiveObj, "dump_info.json"), dump);
     final Set<String> dirs = new HashSet<String>();
@@ -130,9 +130,9 @@ public class DumpManager {
     return new File(config.getScratchDir(), dirName);
   }
 
-  public S3ObjectId getArchiveDumpObj(final long dumpSequence) {
+  public S3ObjectId getArchiveDumpObj(final S3ObjectId baseDir, final long dumpSequence) {
     final String dirName = String.format("%05d", dumpSequence);
-    return AwsUtils.key(config.getS3IncomingLocation(), dirName);
+    return AwsUtils.key(baseDir, dirName);
   }
 
   public void updateTableInfoTable(final DataDump dump) {
@@ -147,8 +147,13 @@ public class DumpManager {
   }
 
   public Map<String, List<S3ObjectId>> getDumpIndex(final long dumpSequence) {
+    final S3ObjectId dumpDir = getArchiveDumpObj(config.getS3IncomingLocation(), dumpSequence);
+    return getDumpIndex(dumpDir);
+  }
+
+  public Map<String, List<S3ObjectId>> getDumpIndex(final S3ObjectId dumpDir) {
     final Map<String, List<S3ObjectId>> directories = new HashMap<String, List<S3ObjectId>>();
-    final S3ObjectId dumpDir = getArchiveDumpObj(dumpSequence);
+    log.info("Getting dump index for " + dumpDir);
     for (final S3ObjectId tableDir : aws.listDirectories(dumpDir)) {
       if (!aws.isFile(AwsUtils.key(tableDir, "empty_file"))) {
         final String tableName = tableDir.getKey()
