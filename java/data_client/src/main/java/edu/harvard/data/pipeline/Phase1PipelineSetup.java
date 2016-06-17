@@ -23,6 +23,7 @@ public class Phase1PipelineSetup {
   private final DataConfig config;
   private final GeneratedCodeManager codeManager;
   private final InputTableIndex dataIndex;
+  private final String runId;
 
   public Phase1PipelineSetup(final Pipeline pipeline, final PipelineFactory factory,
       final GeneratedCodeManager codeManager, final String runId, final InputTableIndex dataIndex) {
@@ -30,6 +31,7 @@ public class Phase1PipelineSetup {
     this.pipeline = pipeline;
     this.codeManager = codeManager;
     this.dataIndex = dataIndex;
+    this.runId = runId;
     this.config = pipeline.getConfig();
     this.workingDir = AwsUtils.key(config.getS3WorkingLocation(runId));
     this.unloadIdentityS3 = AwsUtils.key(workingDir, "unloaded_tables", "identity_map");
@@ -96,6 +98,7 @@ public class Phase1PipelineSetup {
     final Class<?> cls = codeManager.getIdentityMapHadoopJob();
     final List<String> args = new ArrayList<String>();
     args.add(config.getPaths());
+    args.add(runId);
     final PipelineObjectBase identity = factory.getEmrActivity("IdentityHadoop", pipeline.getEmr(),
         cls, args);
     identity.addDependency(previousStep);
