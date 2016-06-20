@@ -1,10 +1,5 @@
 # See bootstrap lambda function for the exports to set.
 
-# setup CloudWatch logging
-sudo yum install -y awslogs
-sudo cp /home/hadoop/harvard-data-tools/cloudwatch/awslogs-phase0.conf /etc/awslogs/awslogs.conf
-sudo service awslogs start
-
 # add github.com to known_hosts
 ssh-keyscan github.com >> /home/ec2-user/.ssh/known_hosts
 
@@ -26,6 +21,11 @@ fi
 
 # clone our repo
 git clone -b $GIT_BRANCH https://github.com/penzance/harvard-data-tools.git $HARVARD_DATA_TOOLS_BASE
+
+# setup CloudWatch logging
+sudo yum install -y awslogs
+sudo cp /home/ec2-user/harvard-data-tools/cloudwatch/awslogs-phase0.conf /etc/awslogs/awslogs.conf
+sudo service awslogs start
 
 # generate the tools
 python $HARVARD_DATA_TOOLS_BASE/python/$GENERATOR

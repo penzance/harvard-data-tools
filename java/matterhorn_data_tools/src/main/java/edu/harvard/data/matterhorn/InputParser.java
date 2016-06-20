@@ -29,7 +29,6 @@ public class InputParser {
   private final MatterhornDataConfig config;
   private final AwsUtils aws;
   private final S3ObjectId inputObj;
-  private final S3ObjectId outputLocation;
   private File originalFile;
   private File eventFile;
   private File videoFile;
@@ -37,13 +36,16 @@ public class InputParser {
   private S3ObjectId videoOutputObj;
   private final TableFormat inFormat;
   private final TableFormat outFormat;
+  private final S3ObjectId videoOutputDir;
+  private final S3ObjectId eventOutputDir;
 
   public InputParser(final MatterhornDataConfig config, final AwsUtils aws,
       final S3ObjectId inputObj, final S3ObjectId outputLocation) {
     this.config = config;
     this.aws = aws;
     this.inputObj = inputObj;
-    this.outputLocation = outputLocation;
+    this.eventOutputDir = AwsUtils.key(outputLocation, "event");
+    this.videoOutputDir = AwsUtils.key(outputLocation, "video");
     final FormatLibrary formatLibrary = new FormatLibrary();
     this.inFormat = formatLibrary.getFormat(Format.Matterhorn);
     this.outFormat = formatLibrary.getFormat(Format.CanvasDataFlatFiles);
@@ -58,8 +60,8 @@ public class InputParser {
       verify();
       aws.putFile(eventOutputObj, eventFile);
       aws.putFile(videoOutputObj, videoFile);
-      tables.put("event", eventOutputObj);
-      tables.put("video", videoOutputObj);
+      tables.put("event", eventOutputDir);
+      tables.put("video", videoOutputDir);
     } finally {
       cleanup();
     }
@@ -75,8 +77,8 @@ public class InputParser {
     final String videoFileName = "video-" + date + ".gz";
     eventFile = new File(config.getScratchDir(), eventFileName);
     videoFile = new File(config.getScratchDir(), videoFileName);
-    eventOutputObj = AwsUtils.key(outputLocation, "event", eventFileName);
-    videoOutputObj = AwsUtils.key(outputLocation, "video", videoFileName);
+    eventOutputObj = AwsUtils.key(eventOutputDir, eventFileName);
+    videoOutputObj = AwsUtils.key(videoOutputDir, videoFileName);
     log.info("Parsing " + filename + " to " + eventFile + ", " + videoFile);
     log.info("Event key: " + eventOutputObj);
     log.info("Video key: " + videoOutputObj);
