@@ -1,5 +1,10 @@
 # See bootstrap lambda function for the exports to set.
 
+# setup CloudWatch logging
+sudo yum install -y awslogs
+sudo cp /home/hadoop/harvard-data-tools/cloudwatch/awslogs-phase0.conf /etc/awslogs/awslogs.conf
+sudo service awslogs start
+
 # add github.com to known_hosts
 ssh-keyscan github.com >> /home/ec2-user/.ssh/known_hosts
 

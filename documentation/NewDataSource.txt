@@ -11,3 +11,12 @@ Create bootstrap class:
 
 Create a Phase 0 class:
  - Requires a main method taking arguments specified by phase-0-bootstrap.sh
+ - Produces a set of directories (one per table) in config.getS3WorkingLocation(runId)
+ - Saves an InputTableIndex object in config.getIndexFileS3Location(runId)
+
+Create a PipelineSetup class
+ - Requires a main method taking arguments specified by phase-0-bootstrap.sh
+ - Create a PipelineGenerator object and call generate()
+
+Create a CodeManager class
+ - Extends GeneratedCodeManager
