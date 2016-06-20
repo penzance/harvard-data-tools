@@ -84,7 +84,7 @@ public class Phase0PostVerifier implements Verifier {
       // along with the data from Canvas. Once the archives have been cleaned
       // out, and that code is no longer used, we can get rid of this
       // conditional.
-      if (tableName != "identity_map") {
+      if (!tableName.equals("identity_map")) {
         final Phase0CanvasTable table = Phase0CanvasTable.fromSourceName(tableName);
         for (final S3ObjectSummary file : aws.listKeys(dir)) {
           final S3ObjectId awsFile = AwsUtils.key(file.getBucketName(), file.getKey());
