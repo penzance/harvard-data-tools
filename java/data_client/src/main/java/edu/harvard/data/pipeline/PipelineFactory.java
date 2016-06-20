@@ -136,6 +136,15 @@ public class PipelineFactory {
     return obj;
   }
 
+  public PipelineObjectBase getS3CopyActivity(final String id, final S3ObjectId src,
+      final S3ObjectId dest, final PipelineObjectBase infrastructure) {
+    final PipelineObjectBase obj = new PipelineObjectBase(config, id, "ShellCommandActivity");
+    setupActivity(obj, infrastructure);
+    obj.set("command",
+        "aws s3 cp " + AwsUtils.uri(src) + " " + AwsUtils.uri(dest) + " --recursive");
+    return obj;
+  }
+
   public PipelineObjectBase getUnloadActivity(final String id, final String sql,
       final S3ObjectId dest, final PipelineObjectBase database,
       final PipelineObjectBase infrastructure) {
@@ -164,8 +173,8 @@ public class PipelineFactory {
     String cmd = "";
     for (final String table : dataIndex.getTableNames()) {
       for (final String dir : dataIndex.getDirectories(table)) {
-        cmd += "s3-dist-cp --src=" + dir + " --dest=hdfs://" + cleanHdfs(dest) + "/"
-            + table + " --outputCodec=none;\n";
+        cmd += "s3-dist-cp --src=" + dir + " --dest=hdfs://" + cleanHdfs(dest) + "/" + table
+            + " --outputCodec=none;\n";
       }
     }
     obj.set("command", cmd);

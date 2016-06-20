@@ -40,12 +40,14 @@ public abstract class Phase0Bootstrap {
   private AwsUtils aws;
 
   protected abstract List<S3ObjectId> getInfrastructureConfigPaths();
+
   protected abstract Map<String, String> getCustomEc2Environment();
+
   protected abstract boolean newDataAvailable()
       throws IOException, DataConfigurationException, UnexpectedApiResponseException;
 
-  protected void init(final String configPathString,
-      final Class<? extends DataConfig> configClass, final boolean downloadOnly) throws IOException, DataConfigurationException {
+  protected void init(final String configPathString, final Class<? extends DataConfig> configClass,
+      final boolean downloadOnly) throws IOException, DataConfigurationException {
     this.configPathString = configPathString;
     this.configClass = configClass;
     this.downloadOnly = downloadOnly;
@@ -54,7 +56,8 @@ public abstract class Phase0Bootstrap {
     this.aws = new AwsUtils();
   }
 
-  protected void run() throws IOException, DataConfigurationException, UnexpectedApiResponseException {
+  protected void run()
+      throws IOException, DataConfigurationException, UnexpectedApiResponseException {
     if (newDataAvailable()) {
       for (final S3ObjectId path : getInfrastructureConfigPaths()) {
         configPathString += "|" + AwsUtils.uri(path);
@@ -79,7 +82,7 @@ public abstract class Phase0Bootstrap {
 
     final RequestSpotInstancesRequest request = new RequestSpotInstancesRequest();
     request.setSpotPrice(config.getPhase0BidPrice());
-    //    request.setAvailabilityZoneGroup(config.getPhase0AvailabilityZoneGroup());
+    // request.setAvailabilityZoneGroup(config.getPhase0AvailabilityZoneGroup());
     request.setInstanceCount(1);
     request.setLaunchSpecification(spec);
 
@@ -93,7 +96,7 @@ public abstract class Phase0Bootstrap {
     final DescribeSpotInstanceRequestsResult description = ec2client
         .describeSpotInstanceRequests(describe);
     System.out.println(description);
-    //    TODO: final Check in case final the startup failed.
+    // TODO: final Check in case final the startup failed.
   }
 
   private String getUserData(final DataConfig config) throws IOException {
@@ -127,7 +130,7 @@ public abstract class Phase0Bootstrap {
     env.put("PIPELINE_SETUP_CLASS", config.getPipelineSetupClass());
     env.put("SERVER_TIMEZONE", config.getServerTimezone());
     env.put("CREATE_PIPELINE", downloadOnly ? "0" : "1");
-    if(aws.isFile(config.getMavenRepoCacheS3Location())) {
+    if (aws.isFile(config.getMavenRepoCacheS3Location())) {
       env.put("MAVEN_REPO_CACHE", AwsUtils.uri(config.getMavenRepoCacheS3Location()));
     }
     env.putAll(getCustomEc2Environment());

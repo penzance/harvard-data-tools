@@ -19,34 +19,40 @@ public class DataConfig {
 
   protected String paths;
 
+  private final String gitTagOrBranch;
   private final String datasetName;
   private final String dataSource;
+  private final IdentifierType mainIdentifier;
+  private final String serverTimezone;
+
   private final String dataPipelineRole;
   private final String dataPipelineResourceRoleArn;
   private final String dataPipelineCreatorRoleArn;
   private final String keypair;
   private final String subnetId;
-  private final String gitTagOrBranch;
+  private final String pipelineDynamoTable;
+
   private final String logBucket;
   private final String codeBucket;
-  private final String incomingBucket;
   private final String workingBucket;
   private final String reportBucket;
+  private final String archiveBucket;
+  private final String scratchDir;
+  private final String archivePath;
+
   private final String redshiftCluster;
   private final String redshiftServer;
   private final String redshiftDatabase;
   private final String redshiftPort;
   private final String redshiftUserName;
   private final String redshiftPassword;
+
+  private final String awsKeyId;
+  private final String awsSecretKey;
+
   private final String failureSnsArn;
   private final String successSnsArn;
   private final String completionSnsArn;
-  private final String scratchDir;
-  private final String awsKeyId;
-  private final String awsSecretKey;
-  private final IdentifierType mainIdentifier;
-  private final String pipelineDynamoTable;
-  private final String serverTimezone;
 
   private final String emrReleaseLabel;
   private final String emrTerminateAfter;
@@ -107,7 +113,6 @@ public class DataConfig {
 
     this.scratchDir = getConfigParameter("scratch_dir", verify);
     this.redshiftPort = getConfigParameter("redshift_port", verify);
-    this.incomingBucket = getConfigParameter("incoming_bucket", verify);
     this.awsKeyId = getConfigParameter("aws_key_id", verify);
     this.awsSecretKey = getConfigParameter("aws_secret_key", verify);
 
@@ -123,6 +128,8 @@ public class DataConfig {
     this.gitTagOrBranch = getConfigParameter("git_tag_or_branch", verify);
     this.logBucket = getConfigParameter("log_bucket", verify);
     this.codeBucket = getConfigParameter("code_bucket", verify);
+    this.archiveBucket = getConfigParameter("archive_bucket", verify);
+    this.archivePath = getConfigParameter("archive_path", verify);
     this.workingBucket = getConfigParameter("working_bucket", verify);
     this.reportBucket = getConfigParameter("report_bucket", verify);
     this.redshiftCluster = getConfigParameter("redshift_cluster", verify);
@@ -224,12 +231,12 @@ public class DataConfig {
     return AwsUtils.key(workingBucket, dataSource, runId);
   }
 
-  public S3ObjectId getS3IncomingLocation() {
-    return AwsUtils.key(incomingBucket, dataSource);
-  }
-
   public S3ObjectId getCodeLocation() {
     return AwsUtils.key(codeBucket, gitTagOrBranch);
+  }
+
+  public S3ObjectId getArchiveLocation() {
+    return AwsUtils.key(archiveBucket, archivePath);
   }
 
   public S3ObjectId getPhase0BootstrapScript() {
@@ -334,10 +341,6 @@ public class DataConfig {
 
   public String getCodeBucket() {
     return codeBucket;
-  }
-
-  public String getIncomingBucket() {
-    return incomingBucket;
   }
 
   public String getReportBucket() {

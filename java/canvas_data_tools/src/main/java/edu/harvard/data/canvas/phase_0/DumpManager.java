@@ -99,7 +99,7 @@ public class DumpManager {
 
   public S3ObjectId finalizeDump(final DataDump dump, final CanvasDataSchema schema)
       throws IOException {
-    final S3ObjectId archiveObj = getArchiveDumpObj(config.getS3IncomingLocation(),
+    final S3ObjectId archiveObj = getArchiveDumpObj(config.getArchiveLocation(),
         dump.getSequence());
     aws.writeJson(AwsUtils.key(archiveObj, "schema.json"), schema);
     aws.writeJson(AwsUtils.key(archiveObj, "dump_info.json"), dump);
