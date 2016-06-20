@@ -15,12 +15,13 @@ import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.pipeline.Phase0Bootstrap;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
-public class MatterhornPhase0Bootstrap extends Phase0Bootstrap implements RequestHandler<String, String> {
+public class MatterhornPhase0Bootstrap extends Phase0Bootstrap
+implements RequestHandler<String, String> {
 
   @Override
   public String handleRequest(final String configPathString, final Context context) {
     try {
-      super.init(configPathString, MatterhornDataConfig.class);
+      super.init(configPathString, MatterhornDataConfig.class, true);
       super.run();
     } catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
       return "Error: " + e.getMessage();
@@ -41,14 +42,14 @@ public class MatterhornPhase0Bootstrap extends Phase0Bootstrap implements Reques
   protected Map<String, String> getCustomEc2Environment() {
     final Map<String, String> env = new HashMap<String, String>();
     env.put("DATA_SET_ID", runId);
-    env.put("DATA_SCHEMA_VERSION", "1.0"); // XXX: Remove
+    env.put("DATA_SCHEMA_VERSION", "1.0");
     return env;
   }
 
   @Override
   protected boolean newDataAvailable()
       throws IOException, DataConfigurationException, UnexpectedApiResponseException {
-    return true;
+    return !aws.listKeys(((MatterhornDataConfig)config).getDropboxBucket()).isEmpty();
   }
 
 }

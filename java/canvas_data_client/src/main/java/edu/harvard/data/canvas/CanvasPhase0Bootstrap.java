@@ -26,7 +26,8 @@ import edu.harvard.data.canvas.data_api.DataDump;
 import edu.harvard.data.pipeline.Phase0Bootstrap;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
-public class CanvasPhase0Bootstrap extends Phase0Bootstrap implements RequestHandler<BootstrapParameters, String> {
+public class CanvasPhase0Bootstrap extends Phase0Bootstrap
+implements RequestHandler<BootstrapParameters, String> {
 
   private DataDump dump;
   private String dumpId;
@@ -36,16 +37,18 @@ public class CanvasPhase0Bootstrap extends Phase0Bootstrap implements RequestHan
   private static final Logger log = LogManager.getLogger();
 
   // Main method for testing
-  public static void main(final String[] args) throws JsonParseException, JsonMappingException, IOException {
+  public static void main(final String[] args)
+      throws JsonParseException, JsonMappingException, IOException {
     System.out.println(args[0]);
-    final BootstrapParameters params = new ObjectMapper().readValue(args[0], BootstrapParameters.class);
+    final BootstrapParameters params = new ObjectMapper().readValue(args[0],
+        BootstrapParameters.class);
     System.out.println(new CanvasPhase0Bootstrap().handleRequest(params, null));
   }
 
   @Override
   public String handleRequest(final BootstrapParameters params, final Context context) {
     try {
-      super.init(params.getConfigPathString(), CanvasDataConfig.class, params.getDownloadOnly());
+      super.init(params.getConfigPathString(), CanvasDataConfig.class, !params.getDownloadOnly());
       this.params = params;
       super.run();
     } catch (final Throwable e) {
@@ -86,7 +89,7 @@ public class CanvasPhase0Bootstrap extends Phase0Bootstrap implements RequestHan
       }
     }
     dumpId = args.get(0);
-    for (int i=1; i<args.size(); i++) {
+    for (int i = 1; i < args.size(); i++) {
       dumpId += ":" + args.get(i);
     }
     log.info("Saving dump " + dumpId);
@@ -103,7 +106,8 @@ public class CanvasPhase0Bootstrap extends Phase0Bootstrap implements RequestHan
       megadump |= !dump.getArtifactsByTable().get("requests").isPartial();
     }
     if (dumpId.equals("TABLE:requests")) {
-      // Don't need to download data, but will have to process the full requests table
+      // Don't need to download data, but will have to process the full requests
+      // table
       paths.add(AwsUtils.key(configPath, "tiny_phase_0.properties"));
       paths.add(AwsUtils.key(configPath, "large_emr.properties"));
     } else if (megadump) {

@@ -36,8 +36,8 @@ public abstract class Phase0Bootstrap {
   private String configPathString;
   private Class<? extends DataConfig> configClass;
   protected String runId;
-  private boolean downloadOnly;
-  private AwsUtils aws;
+  private boolean createPipeline;
+  protected AwsUtils aws;
 
   protected abstract List<S3ObjectId> getInfrastructureConfigPaths();
 
@@ -47,10 +47,10 @@ public abstract class Phase0Bootstrap {
       throws IOException, DataConfigurationException, UnexpectedApiResponseException;
 
   protected void init(final String configPathString, final Class<? extends DataConfig> configClass,
-      final boolean downloadOnly) throws IOException, DataConfigurationException {
+      final boolean createPipeline) throws IOException, DataConfigurationException {
     this.configPathString = configPathString;
     this.configClass = configClass;
-    this.downloadOnly = downloadOnly;
+    this.createPipeline = createPipeline;
     this.config = DataConfig.parseInputFiles(configClass, configPathString, false);
     this.runId = getRunId();
     this.aws = new AwsUtils();
@@ -129,7 +129,7 @@ public abstract class Phase0Bootstrap {
     env.put("RUN_ID", runId);
     env.put("PIPELINE_SETUP_CLASS", config.getPipelineSetupClass());
     env.put("SERVER_TIMEZONE", config.getServerTimezone());
-    env.put("CREATE_PIPELINE", downloadOnly ? "0" : "1");
+    env.put("CREATE_PIPELINE", createPipeline ? "1" : "0");
     if (aws.isFile(config.getMavenRepoCacheS3Location())) {
       env.put("MAVEN_REPO_CACHE", AwsUtils.uri(config.getMavenRepoCacheS3Location()));
     }

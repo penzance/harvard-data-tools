@@ -1,6 +1,7 @@
 package edu.harvard.data.matterhorn;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,6 +12,7 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
+import edu.harvard.data.pipeline.InputTableIndex;
 
 public class MatterhornPhase0 {
 
@@ -32,16 +34,26 @@ public class MatterhornPhase0 {
     this.config = config;
   }
 
-  private void run(final String datasetId, final String runId, final int threads) throws IOException {
+  private void run(final String datasetId, final String runId, final int threads)
+      throws IOException {
     log.info("Parsing files");
     final AwsUtils aws = new AwsUtils();
-    for (final S3ObjectSummary obj : aws.listKeys(config.dropboxBucket)) {
+    final InputTableIndex dataIndex = new InputTableIndex();
+    for (final S3ObjectSummary obj : aws.listKeys(config.getDropboxBucket())) {
       if (obj.getKey().endsWith(".gz")) {
-        final S3ObjectId outputLocation = AwsUtils.key(config.getS3IncomingLocation(), datasetId);
+        final S3ObjectId outputLocation = AwsUtils.key(config.getS3WorkingLocation(runId));
         log.info("Parsing file " + obj.getBucketName() + "/" + obj.getKey());
-        new InputParser(config, aws, AwsUtils.key(obj), outputLocation).parseFile();
+        final InputParser parser = new InputParser(config, aws, AwsUtils.key(obj), outputLocation);
+        final Map<String, S3ObjectId> parsedTables = parser.parseFile();
+        for (final String table : parsedTables.keySet()) {
+          dataIndex.addDirectory(table, parsedTables.get(table));
+        }
       }
     }
-    // XXX Produce directory index
+    dataIndex.setSchemaVersion("1.0");
+    for (final String table : dataIndex.getTableNames()) {
+      dataIndex.setPartial(table, true);
+    }
+    aws.writeJson(config.getIndexFileS3Location(runId), dataIndex);
   }
 }

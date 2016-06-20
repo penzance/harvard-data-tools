@@ -1,6 +1,5 @@
 package edu.harvard.data.canvas;
 
-import java.io.File;
 import java.io.IOException;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
@@ -19,7 +18,7 @@ public class CanvasPipelineSetup {
   UnexpectedApiResponseException, VerificationException {
     final CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class,
         args[0], true);
-    final File gitDir = new File(args[1]);
+    //    final File gitDir = new File(args[1]);
     final String runId = args[2];
     final String host = config.getCanvasDataHost();
     final String key = config.getCanvasApiKey();

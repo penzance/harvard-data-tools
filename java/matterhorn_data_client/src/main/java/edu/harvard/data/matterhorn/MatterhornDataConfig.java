@@ -11,7 +11,7 @@ import edu.harvard.data.DataConfigurationException;
 
 public class MatterhornDataConfig extends DataConfig {
 
-  public final String dropboxBucket;
+  private final String dropboxBucket;
 
   public MatterhornDataConfig(final List<? extends InputStream> streams, final boolean verify)
       throws IOException, DataConfigurationException {
@@ -36,5 +36,9 @@ public class MatterhornDataConfig extends DataConfig {
       in.close();
     }
     return config;
+  }
+
+  public String getDropboxBucket() {
+    return dropboxBucket;
   }
 }

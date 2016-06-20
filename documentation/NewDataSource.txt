@@ -1,0 +1,13 @@
+Adding a data source
+--------------------
+Create bootstrap class:
+ - Extend Phase0Bootstrap.
+ - Implement RequestHandler<?,?> from Lambda runtime.
+ - Call super.init() and super.run() from handler method.
+ - getInfrastructureConfigPaths() determines which config files to use, letting you determine infrastructure size.
+ - getCustomEc2Environment() adds any extra parameters to be passed to the build scripts
+    - Do we need DATA_SET_ID and DATA_SCHEMA_VERSION?
+ - newDataAvailable exits the bootstrap quickly if there's no data to process.
+
+Create a Phase 0 class:
+ - Requires a main method taking arguments specified by phase-0-bootstrap.sh

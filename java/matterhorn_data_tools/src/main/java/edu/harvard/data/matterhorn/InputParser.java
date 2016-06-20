@@ -2,6 +2,7 @@ package edu.harvard.data.matterhorn;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +19,6 @@ import edu.harvard.data.TableFormat;
 import edu.harvard.data.io.FileTableReader;
 import edu.harvard.data.io.JsonFileReader;
 import edu.harvard.data.io.TableWriter;
-import edu.harvard.data.matterhorn.MatterhornDataConfig;
 import edu.harvard.data.matterhorn.bindings.phase0.Phase0Event;
 import edu.harvard.data.matterhorn.bindings.phase0.Phase0Video;
 
@@ -49,7 +49,8 @@ public class InputParser {
     this.outFormat = formatLibrary.getFormat(Format.CanvasDataFlatFiles);
   }
 
-  public void parseFile() throws IOException {
+  public Map<String, S3ObjectId> parseFile() throws IOException {
+    final Map<String, S3ObjectId> tables = new HashMap<String, S3ObjectId>();
     try {
       getFileNames();
       aws.getFile(inputObj, originalFile);
@@ -57,9 +58,12 @@ public class InputParser {
       verify();
       aws.putFile(eventOutputObj, eventFile);
       aws.putFile(videoOutputObj, videoFile);
+      tables.put("event", eventOutputObj);
+      tables.put("video", videoOutputObj);
     } finally {
       cleanup();
     }
+    return tables;
   }
 
   private void getFileNames() {
