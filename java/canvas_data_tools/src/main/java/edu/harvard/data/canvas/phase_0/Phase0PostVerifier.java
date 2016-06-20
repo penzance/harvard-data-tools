@@ -80,15 +80,21 @@ public class Phase0PostVerifier implements Verifier {
     final Set<Future<Long>> futures = new HashSet<Future<Long>>();
     for (final S3ObjectId dir : aws.listDirectories(dumpObj)) {
       final String tableName = dir.getKey().substring(dir.getKey().lastIndexOf("/") + 1);
-      final Phase0CanvasTable table = Phase0CanvasTable.fromSourceName(tableName);
-      for (final S3ObjectSummary file : aws.listKeys(dir)) {
-        final S3ObjectId awsFile = AwsUtils.key(file.getBucketName(), file.getKey());
-        log.info("Verifying S3 file " + file.getBucketName() + "/" + file.getKey()
-        + " representing table " + table);
-        final Callable<Long> job = new CanvasPhase0VerifierJob2(aws, awsFile, format, table,
-            tmpDir);
-        final Future<Long> future = exec.submit(job);
-        futures.add(future);
+      // XXX Previous versions of the archiving code stored the identity map
+      // along with the data from Canvas. Once the archives have been cleaned
+      // out, and that code is no longer used, we can get rid of this
+      // conditional.
+      if (tableName != "identity_map") {
+        final Phase0CanvasTable table = Phase0CanvasTable.fromSourceName(tableName);
+        for (final S3ObjectSummary file : aws.listKeys(dir)) {
+          final S3ObjectId awsFile = AwsUtils.key(file.getBucketName(), file.getKey());
+          log.info("Verifying S3 file " + file.getBucketName() + "/" + file.getKey()
+          + " representing table " + table);
+          final Callable<Long> job = new CanvasPhase0VerifierJob2(aws, awsFile, format, table,
+              tmpDir);
+          final Future<Long> future = exec.submit(job);
+          futures.add(future);
+        }
       }
     }
     long errorCount = 0;
