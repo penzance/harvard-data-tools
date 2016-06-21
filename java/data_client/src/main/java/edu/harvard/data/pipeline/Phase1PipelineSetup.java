@@ -74,20 +74,26 @@ public class Phase1PipelineSetup {
   }
 
   private PipelineObjectBase releaseLease(final PipelineObjectBase previousStep, final String id) {
-    return factory.getReleaseLeaseActivity(id, config.getLeaseDynamoTable(),
+    final PipelineObjectBase release = factory.getReleaseLeaseActivity(id, config.getLeaseDynamoTable(),
         config.getIdentityLease(), runId, pipeline.getEmr());
+    release.addDependency(previousStep);
+    return release;
   }
 
   private PipelineObjectBase acquireLease(final PipelineObjectBase previousStep, final String id) {
-    return factory.getAcquireLeaseActivity(id, config.getLeaseDynamoTable(),
+    final PipelineObjectBase acquire = factory.getAcquireLeaseActivity(id, config.getLeaseDynamoTable(),
         config.getIdentityLease(), runId, config.getIdentityLeaseLengthSeconds(),
         pipeline.getEmr());
+    acquire.addDependency(previousStep);
+    return acquire;
   }
 
   private PipelineObjectBase refreshLease(final PipelineObjectBase previousStep, final String id) {
-    return factory.getRenewLeaseActivity(id, config.getLeaseDynamoTable(),
+    final PipelineObjectBase renew  = factory.getRenewLeaseActivity(id, config.getLeaseDynamoTable(),
         config.getIdentityLease(), runId, config.getIdentityLeaseLengthSeconds(),
         pipeline.getEmr());
+    renew.addDependency(previousStep);
+    return renew;
   }
 
   private boolean identityPhaseRequired() {

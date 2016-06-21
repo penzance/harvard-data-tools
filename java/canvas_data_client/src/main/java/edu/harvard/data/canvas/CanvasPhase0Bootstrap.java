@@ -88,12 +88,16 @@ implements RequestHandler<BootstrapParameters, String> {
         }
       }
     }
-    dumpId = args.get(0);
-    for (int i = 1; i < args.size(); i++) {
-      dumpId += ":" + args.get(i);
+    if (args.isEmpty()) {
+      return false;
+    } else {
+      dumpId = args.get(0);
+      for (int i = 1; i < args.size(); i++) {
+        dumpId += ":" + args.get(i);
+      }
+      log.info("Saving dump " + dumpId);
+      return true;
     }
-    log.info("Saving dump " + dumpId);
-    return dumpId != null;
   }
 
   @Override
