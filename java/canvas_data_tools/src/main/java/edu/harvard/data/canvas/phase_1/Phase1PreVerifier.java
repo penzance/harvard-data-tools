@@ -18,6 +18,8 @@ import edu.harvard.data.HadoopJob;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.canvas.CanvasDataConfig;
+import edu.harvard.data.leases.LeaseRenewalException;
+import edu.harvard.data.leases.LeaseRenewalThread;
 
 public class Phase1PreVerifier {
   private static final Logger log = LogManager.getLogger();
@@ -29,11 +31,15 @@ public class Phase1PreVerifier {
   private final URI hdfsService;
 
   public static void main(final String[] args)
-      throws IOException, DataConfigurationException, VerificationException {
+      throws IOException, DataConfigurationException, VerificationException, LeaseRenewalException {
     final String configPathString = args[0];
-    final CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, configPathString,
-        true);
+    final String runId = args[1];
+    final CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class,
+        configPathString, true);
+    final LeaseRenewalThread leaseThread = LeaseRenewalThread.setup(config.getLeaseDynamoTable(),
+        config.getIdentityLease(), runId, config.getIdentityLeaseLengthSeconds());
     new Phase1PreVerifier(config).verify();
+    leaseThread.checkLease();
   }
 
   public Phase1PreVerifier(final CanvasDataConfig config) throws DataConfigurationException {

@@ -42,7 +42,8 @@ public class Lease {
       return 0;
     }
     try {
-      return (int) (DATE_FORMAT.parse(expires).getTime() - new Date().getTime() / 1000L);
+      final long remaining = DATE_FORMAT.parse(expires).getTime() - new Date().getTime();
+      return (int) (remaining / 1000L);
     } catch (final ParseException e) {
       throw new RuntimeException(e);
     }
@@ -52,13 +53,6 @@ public class Lease {
     final long expiration = new Date().getTime() + (seconds * 1000);
     this.expires = DATE_FORMAT.format(new Date(expiration));
   }
-
-  //  public int renew(final int seconds) throws LeaseRenewalException {
-  //    final Lease lease = LeaseManager.acquire(name, owner, seconds);
-  //    if (lease == null) {
-  //      throw new LeaseRenewalException();
-  //    }
-  //  }
 
   public void setName(final String name) {
     this.name = name;

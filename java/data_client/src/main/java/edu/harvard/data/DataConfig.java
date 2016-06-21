@@ -30,7 +30,11 @@ public class DataConfig {
   private final String dataPipelineCreatorRoleArn;
   private final String keypair;
   private final String subnetId;
+
   private final String pipelineDynamoTable;
+  private final String leaseDynamoTable;
+  private final String identityLease;
+  private final int identityLeaseLengthSeconds;
 
   private final String logBucket;
   private final String codeBucket;
@@ -93,7 +97,6 @@ public class DataConfig {
 
   private final Properties properties;
 
-
   public DataConfig(final List<? extends InputStream> streams, final boolean verify)
       throws IOException, DataConfigurationException {
     properties = new Properties();
@@ -143,6 +146,11 @@ public class DataConfig {
     this.pipelineDynamoTable = getConfigParameter("pipeline_dynamo_table", verify);
     this.mainIdentifier = IdentifierType.valueOf(getConfigParameter("main_identifier", verify));
 
+    this.leaseDynamoTable = getConfigParameter("lease_dynamo_table", verify);
+    this.identityLease = getConfigParameter("identity_lease", verify);
+    this.identityLeaseLengthSeconds = Integer
+        .parseInt(getConfigParameter("identity_lease_length_seconds", verify));
+
     this.emrMaximumRetries = getConfigParameter("emr_maximum_retries", verify);
     this.emrReleaseLabel = getConfigParameter("emr_release_label", verify);
     this.emrTerminateAfter = getConfigParameter("emr_terminate_after", verify);
@@ -163,7 +171,8 @@ public class DataConfig {
     this.phase0HeapSize = getConfigParameter("phase_0_heap_size", verify);
     this.phase0Ami = getConfigParameter("phase_0_ami", verify);
     this.phase0SecurityGroup = getConfigParameter("phase_0_security_group", verify);
-    this.phase0AvailabilityZoneGroup = getConfigParameter("phase_0_availability_zone_group", verify);
+    this.phase0AvailabilityZoneGroup = getConfigParameter("phase_0_availability_zone_group",
+        verify);
   }
 
   public static <T extends DataConfig> T parseInputFiles(final Class<T> cls,
@@ -497,6 +506,18 @@ public class DataConfig {
 
   public String getEmrAvailabilityZoneGroup() {
     return emrAvailabilityZoneGroup;
+  }
+
+  public String getLeaseDynamoTable() {
+    return leaseDynamoTable;
+  }
+
+  public String getIdentityLease() {
+    return identityLease;
+  }
+
+  public int getIdentityLeaseLengthSeconds() {
+    return identityLeaseLengthSeconds;
   }
 
 }

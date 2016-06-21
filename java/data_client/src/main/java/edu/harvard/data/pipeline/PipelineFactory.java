@@ -10,6 +10,9 @@ import com.amazonaws.services.s3.model.S3ObjectId;
 
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
+import edu.harvard.data.leases.AcquireLeaseTask;
+import edu.harvard.data.leases.ReleaseLeaseTask;
+import edu.harvard.data.leases.RenewLeaseTask;
 
 public class PipelineFactory {
   private final DataConfig config;
@@ -103,13 +106,7 @@ public class PipelineFactory {
 
   public PipelineObjectBase getEmrActivity(final String id, final PipelineObjectBase infrastructure,
       final Class<?> cls, final List<String> args) {
-    final PipelineObjectBase obj = new PipelineObjectBase(config, id, "EmrActivity");
-    setupActivity(obj, infrastructure);
-    final String params = StringUtils.join(args, ",");
-    final String jar = config.getEmrCodeDir() + "/" + config.getDataToolsJar();
-    obj.set("step", jar + "," + cls.getCanonicalName() + "," + params);
-    obj.set("retryDelay", "2 Minutes");
-    return obj;
+    return getEmrActivity(id, infrastructure, cls.getCanonicalName(), args.toArray(new String[]{}));
   }
 
   public PipelineObjectBase getShellActivity(final String id, final String cmd,
@@ -201,6 +198,29 @@ public class PipelineFactory {
     return obj;
   }
 
+  public PipelineObjectBase getAcquireLeaseActivity(final String id, final String leaseTable,
+      final String leaseName, final String owner, final int seconds,
+      final PipelineObjectBase infrastructure) {
+    final String[] args = new String[] { leaseTable, leaseName, owner, "" + seconds };
+    final String cls = AcquireLeaseTask.class.getCanonicalName();
+    return getEmrActivity(id, infrastructure, cls, args);
+  }
+
+  public PipelineObjectBase getRenewLeaseActivity(final String id, final String leaseTable,
+      final String leaseName, final String owner, final int seconds,
+      final PipelineObjectBase infrastructure) {
+    final String[] args = new String[] { leaseTable, leaseName, owner, "" + seconds };
+    final String cls = RenewLeaseTask.class.getCanonicalName();
+    return getEmrActivity(id, infrastructure, cls, args);
+  }
+
+  public PipelineObjectBase getReleaseLeaseActivity(final String id, final String leaseTable,
+      final String leaseName, final String owner, final PipelineObjectBase infrastructure) {
+    final String[] args = new String[] { leaseTable, leaseName, owner };
+    final String cls = ReleaseLeaseTask.class.getCanonicalName();
+    return getEmrActivity(id, infrastructure, cls, args);
+  }
+
   ////////////////
 
   private void setupActivity(final PipelineObjectBase obj,
@@ -208,6 +228,18 @@ public class PipelineFactory {
     obj.set("runsOn", infrastructure);
     obj.set("maximumRetries", config.getEmrMaximumRetries());
     allObjects.add(obj);
+  }
+
+  private PipelineObjectBase getEmrActivity(final String id,
+      final PipelineObjectBase infrastructure, final String cls, final String[] args) {
+    final PipelineObjectBase obj = new PipelineObjectBase(config, id, "EmrActivity");
+    setupActivity(obj, infrastructure);
+    final String params = StringUtils.join(args, ",");
+    final String jar = config.getEmrCodeDir() + "/" + config.getDataToolsJar();
+    obj.set("step", jar + "," + cls + "," + params);
+    obj.set("retryDelay", "2 Minutes");
+    return obj;
+
   }
 
   private String cleanHdfs(final String path) {

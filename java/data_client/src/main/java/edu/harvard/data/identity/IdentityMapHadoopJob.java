@@ -22,6 +22,8 @@ import edu.harvard.data.DataConfig;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.generator.GeneratedCodeManager;
+import edu.harvard.data.leases.LeaseRenewalException;
+import edu.harvard.data.leases.LeaseRenewalThread;
 import edu.harvard.data.pipeline.InputTableIndex;
 
 public class IdentityMapHadoopJob {
@@ -30,16 +32,18 @@ public class IdentityMapHadoopJob {
   private final DataConfig config;
   private final String inputDir;
   private final String outputDir;
+  private final String runId;
   private final Configuration hadoopConfig;
   final HadoopUtilities hadoopUtils;
   private final InputTableIndex dataIndex;
   private final GeneratedCodeManager codeManager;
 
   public IdentityMapHadoopJob(final DataConfig config, final GeneratedCodeManager codeManager,
-      final InputTableIndex dataIndex) throws IOException {
+      final InputTableIndex dataIndex, final String runId) throws IOException {
     this.config = config;
     this.codeManager = codeManager;
     this.dataIndex = dataIndex;
+    this.runId = runId;
     this.inputDir = config.getHdfsDir(0);
     this.outputDir = config.getHdfsDir(1);
     this.hadoopConfig = new Configuration();
@@ -47,7 +51,9 @@ public class IdentityMapHadoopJob {
   }
 
   @SuppressWarnings("rawtypes")
-  protected void run() throws IOException {
+  protected void run() throws IOException, LeaseRenewalException {
+    final LeaseRenewalThread leaseThread = LeaseRenewalThread.setup(config.getLeaseDynamoTable(),
+        config.getIdentityLease(), runId, config.getIdentityLeaseLengthSeconds());
     final IdentifierType mainIdentifier = config.getMainIdentifier();
     hadoopConfig.set("format", Format.DecompressedCanvasDataFlatFiles.toString());
     hadoopConfig.set("mainIdentifier", mainIdentifier.toString());
@@ -93,5 +99,6 @@ public class IdentityMapHadoopJob {
     } catch (ClassNotFoundException | InterruptedException e) {
       throw new RuntimeException(e);
     }
+    leaseThread.checkLease();
   }
 }
