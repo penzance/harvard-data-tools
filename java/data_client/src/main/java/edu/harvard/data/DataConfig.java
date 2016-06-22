@@ -41,6 +41,7 @@ public class DataConfig {
   private final String workingBucket;
   private final String reportBucket;
   private final String archiveBucket;
+  private final String fullTextBucket;
   private final String scratchDir;
   private final String archivePath;
 
@@ -133,6 +134,7 @@ public class DataConfig {
     this.gitTagOrBranch = getConfigParameter("git_tag_or_branch", verify);
     this.logBucket = getConfigParameter("log_bucket", verify);
     this.codeBucket = getConfigParameter("code_bucket", verify);
+    this.fullTextBucket = getConfigParameter("full_text_bucket", verify);
     this.archiveBucket = getConfigParameter("archive_bucket", verify);
     this.archivePath = getConfigParameter("archive_path", verify);
     this.workingBucket = getConfigParameter("working_bucket", verify);
@@ -257,6 +259,10 @@ public class DataConfig {
 
   public S3ObjectId getArchiveLocation() {
     return AwsUtils.key(archiveBucket, archivePath);
+  }
+
+  public S3ObjectId getFullTextLocation() {
+    return AwsUtils.key(fullTextBucket, datasetName);
   }
 
   public S3ObjectId getPhase0BootstrapScript() {

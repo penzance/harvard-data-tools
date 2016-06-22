@@ -1,7 +1,6 @@
 package edu.harvard.data.matterhorn;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,10 +43,7 @@ public class MatterhornPhase0 {
         final S3ObjectId outputLocation = AwsUtils.key(config.getS3WorkingLocation(runId));
         log.info("Parsing file " + obj.getBucketName() + "/" + obj.getKey());
         final InputParser parser = new InputParser(config, aws, AwsUtils.key(obj), outputLocation);
-        final Map<String, S3ObjectId> parsedTables = parser.parseFile();
-        for (final String table : parsedTables.keySet()) {
-          dataIndex.addDirectory(table, parsedTables.get(table));
-        }
+        dataIndex.addAll(parser.parseFile());
       }
     }
     dataIndex.setSchemaVersion("1.0");

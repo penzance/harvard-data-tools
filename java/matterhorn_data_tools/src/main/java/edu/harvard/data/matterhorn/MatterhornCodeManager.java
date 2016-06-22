@@ -3,11 +3,15 @@ package edu.harvard.data.matterhorn;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
 import edu.harvard.data.HadoopJob;
 import edu.harvard.data.generator.GeneratedCodeManager;
+import edu.harvard.data.identity.HadoopIdentityKey;
 import edu.harvard.data.identity.IdentityMapHadoopJob;
+import edu.harvard.data.identity.IdentityScrubHadoopJob;
+import edu.harvard.data.identity.IdentityScrubber;
 import edu.harvard.data.matterhorn.identity.MatterhornIdentityHadoopManager;
 
 public class MatterhornCodeManager extends GeneratedCodeManager {
@@ -19,14 +23,12 @@ public class MatterhornCodeManager extends GeneratedCodeManager {
   }
 
   @Override
-  @SuppressWarnings("rawtypes")
-  public Map<String, Class<? extends Mapper>> getIdentityMapperClasses() {
+  public Map<String, Class<? extends Mapper<Object, Text, ?, HadoopIdentityKey>>> getIdentityMapperClasses() {
     return identity.getMapperClasses();
   }
 
   @Override
-  @SuppressWarnings("rawtypes")
-  public Map<String, Class<? extends Mapper>> getIdentityScrubberClasses() {
+  public Map<String, Class<? extends IdentityScrubber<?>>> getIdentityScrubberClasses() {
     return identity.getScrubberClasses();
   }
 
@@ -39,6 +41,12 @@ public class MatterhornCodeManager extends GeneratedCodeManager {
   public Class<? extends IdentityMapHadoopJob> getIdentityMapHadoopJob() {
     return MatterhornIdentityMapHadoopJob.class;
   }
+
+  @Override
+  public Class<? extends IdentityScrubHadoopJob> getIdentityScrubHadoopJob() {
+    return MatterhornIdentityScrubHadoopJob.class;
+  }
+
 
   @Override
   public Class<?> getIdentityPreverifyJob() {
@@ -56,5 +64,4 @@ public class MatterhornCodeManager extends GeneratedCodeManager {
     addJob(VideoJob.class, 2);
     return jobs;
   }
-
 }
