@@ -34,7 +34,7 @@ public class DataConfig {
   private final String pipelineDynamoTable;
   private final String leaseDynamoTable;
   private final String identityLease;
-  private final int identityLeaseLengthSeconds;
+  private final Integer identityLeaseLengthSeconds;
 
   private final String logBucket;
   private final String codeBucket;
@@ -86,6 +86,7 @@ public class DataConfig {
   private final String dataToolsJar;
   private final String identityRedshiftSchema;
   private final String identityRedshiftLoadScript;
+  private final String s3ToHdfsManifestFile;
   private final String redshiftLoadScript;
   private final String redshiftStagingDir;
   private final String hdfsBase;
@@ -106,6 +107,7 @@ public class DataConfig {
     this.dataToolsJar = "data_tools.jar";
     this.identityRedshiftLoadScript = "s3_to_redshift_identity_loader.sql";
     this.redshiftLoadScript = "s3_to_redshift_loader.sql";
+    this.s3ToHdfsManifestFile = "s3_to_hdfs_manifest.gz";
     this.redshiftStagingDir = "redshift_staging";
     this.identityRedshiftSchema = "pii";
     this.emrCodeDir = "/home/hadoop/code";
@@ -148,8 +150,8 @@ public class DataConfig {
 
     this.leaseDynamoTable = getConfigParameter("lease_dynamo_table", verify);
     this.identityLease = getConfigParameter("identity_lease", verify);
-    this.identityLeaseLengthSeconds = Integer
-        .parseInt(getConfigParameter("identity_lease_length_seconds", verify));
+    this.identityLeaseLengthSeconds = getIntConfigParameter("identity_lease_length_seconds",
+        verify);
 
     this.emrMaximumRetries = getConfigParameter("emr_maximum_retries", verify);
     this.emrReleaseLabel = getConfigParameter("emr_release_label", verify);
@@ -208,6 +210,15 @@ public class DataConfig {
         in.close();
       }
     }
+  }
+
+  protected Integer getIntConfigParameter(final String key, final boolean verify)
+      throws DataConfigurationException {
+    final String tmp = getConfigParameter(key, verify);
+    if (tmp == null) {
+      return null;
+    }
+    return Integer.parseInt(tmp);
   }
 
   protected String getConfigParameter(final String key, final boolean verify)
@@ -430,6 +441,10 @@ public class DataConfig {
 
   public String getRedshiftLoadScript() {
     return redshiftLoadScript;
+  }
+
+  public String getS3ToHdfsManifestFile() {
+    return s3ToHdfsManifestFile;
   }
 
   public String getRedshiftStagingDir() {

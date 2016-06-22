@@ -191,6 +191,9 @@ public abstract class CodeGenerator {
     if (aws.isFile(dataIndexLocation)) {
       final InputTableIndex dataIndex = InputTableIndex.read(aws, dataIndexLocation);
 
+      log.info("Generating S3 to HDFS copy manifest in " + codeDir);
+      new S3ToHdfsManifestGenerator(codeDir, config, dataIndex).generate();
+
       log.info("Generating Hive table definitions in " + codeDir);
       new CreateHiveTableGenerator(codeDir, spec).generate();
 

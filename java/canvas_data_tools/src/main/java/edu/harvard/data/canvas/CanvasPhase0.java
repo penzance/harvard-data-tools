@@ -1,11 +1,9 @@
 package edu.harvard.data.canvas;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -105,9 +103,7 @@ public class CanvasPhase0 {
   private InputTableIndex getTableHistory()
       throws DataConfigurationException, UnexpectedApiResponseException, IOException {
     // Calculate the full data set for a single table
-    final InputTableIndex index = new InputTableIndex();
-    final List<S3ObjectId> directories = getDirectoriesForTable();
-    index.addDirectories(tableName, directories);
+    final InputTableIndex index = getFilesForTable();
     index.setPartial(tableName, false);
     index.setSchemaVersion(api.getLatestSchema().getVersion());
     return index;
@@ -117,7 +113,7 @@ public class CanvasPhase0 {
   UnexpectedApiResponseException, IOException, VerificationException, ArgumentError {
     final DataDump dump = downloadAndVerify();
     final InputTableIndex index = new InputTableIndex();
-    index.addTables(manager.getDumpIndex(info.getS3Location()));
+    index.addAll(manager.getDumpIndex(info.getS3Location()));
     for (final String table : index.getTableNames()) {
       index.setPartial(table, isPartial(table, dump));
     }
@@ -129,12 +125,12 @@ public class CanvasPhase0 {
   UnexpectedApiResponseException, IOException, VerificationException, ArgumentError {
     final DataDump dump = downloadAndVerify();
     final InputTableIndex index = new InputTableIndex();
-    final Map<String, List<S3ObjectId>> dumpTables = manager.getDumpIndex(info.getS3Location());
-    if (!dumpTables.containsKey(tableName)) {
+    final InputTableIndex dataIndex = manager.getDumpIndex(info.getS3Location());
+    if (!dataIndex.containsTable(tableName)) {
       throw new VerificationException(
           "Dump " + dump.getSequence() + " does not contain table " + tableName);
     }
-    index.addDirectories(tableName, dumpTables.get(tableName));
+    index.addTable(tableName, dataIndex);
     index.setPartial(tableName, isPartial(tableName, dump));
     index.setSchemaVersion(dump.getSchemaVersion());
     return index;
@@ -170,20 +166,17 @@ public class CanvasPhase0 {
     throw new VerificationException("Can't determine whether " + table + " is partial");
   }
 
-  private List<S3ObjectId> getDirectoriesForTable()
+  private InputTableIndex getFilesForTable()
       throws DataConfigurationException, UnexpectedApiResponseException, IOException {
-    final List<S3ObjectId> directories = new ArrayList<S3ObjectId>();
+    final InputTableIndex files = new InputTableIndex();
     final TableInfo tableInfo = TableInfo.find(tableName);
     final long lastComplete = tableInfo.getLastCompleteDumpSequence();
     final List<DumpInfo> dumps = DumpInfo.getAllDumpsSince(lastComplete);
     for (final DumpInfo d : dumps) {
-      final Map<String, List<S3ObjectId>> tables = manager.getDumpIndex(d.getS3Location());
-      System.out.println(d.getKey() + ": " + tables.get(tableName));
-      if (tables.containsKey(tableName)) {
-        directories.addAll(tables.get(tableName));
-      }
+      final InputTableIndex dataIndex = manager.getDumpIndex(d.getS3Location());
+      files.addTable(tableName, dataIndex);
     }
-    return directories;
+    return files;
   }
 
   private DataDump setupForDump()

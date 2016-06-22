@@ -79,8 +79,7 @@ public class DataPipelineGenerator {
     final PipelineFactory factory = new PipelineFactory(config, pipelineId);
     final Pipeline pipeline = new Pipeline(runId, config, pipelineId, factory,
         dataIndex.getSchemaVersion(), runId);
-    final EmrStartupPipelineSetup setup = new EmrStartupPipelineSetup(pipeline, factory, dataIndex,
-        runId);
+    final EmrStartupPipelineSetup setup = new EmrStartupPipelineSetup(pipeline, factory, runId);
     final Phase1PipelineSetup phase1 = new Phase1PipelineSetup(pipeline, factory, codeManager,
         runId, dataIndex);
     final Phase2PipelineSetup phase2 = new Phase2PipelineSetup(pipeline, factory, codeManager);

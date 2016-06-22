@@ -106,7 +106,8 @@ public class PipelineFactory {
 
   public PipelineObjectBase getEmrActivity(final String id, final PipelineObjectBase infrastructure,
       final Class<?> cls, final List<String> args) {
-    return getEmrActivity(id, infrastructure, cls.getCanonicalName(), args.toArray(new String[]{}));
+    return getEmrActivity(id, infrastructure, cls.getCanonicalName(),
+        args.toArray(new String[] {}));
   }
 
   public PipelineObjectBase getShellActivity(final String id, final String cmd,
@@ -163,17 +164,13 @@ public class PipelineFactory {
     return obj;
   }
 
-  public PipelineObjectBase getS3DistCpActivity(final String id, final InputTableIndex dataIndex,
-      final String dest, final PipelineObjectBase infrastructure) {
+  public PipelineObjectBase getS3DistCpActivity(final String id, final String manifest,
+      final S3ObjectId src, final String dest, final PipelineObjectBase infrastructure) {
     final PipelineObjectBase obj = new PipelineObjectBase(config, id, "ShellCommandActivity");
     setupActivity(obj, infrastructure);
-    String cmd = "";
-    for (final String table : dataIndex.getTableNames()) {
-      for (final String dir : dataIndex.getDirectories(table)) {
-        cmd += "s3-dist-cp --src=" + dir + " --dest=hdfs://" + cleanHdfs(dest) + "/" + table
-            + " --outputCodec=none;\n";
-      }
-    }
+    final String cmd = "s3-dist-cp --copyFromManifest --previousManifest=file://" + manifest
+        + " --dest=hdfs://" + cleanHdfs(dest) + " --src=" + AwsUtils.uri(src)
+        + " --outputCodec=none";
     obj.set("command", cmd);
     return obj;
   }

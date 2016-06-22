@@ -14,11 +14,13 @@ import edu.harvard.data.AwsUtils;
 public class InputTableIndex {
   private String schemaVersion;
   private final Map<String, List<String>> tables;
+  private final Map<String, Long> fileSizes;
   private final Map<String, Boolean> partial;
 
   public InputTableIndex() {
     this.tables = new HashMap<String, List<String>>();
     this.partial = new HashMap<String, Boolean>();
+    this.fileSizes = new HashMap<String, Long>();
   }
 
   public String getSchemaVersion() {
@@ -29,17 +31,12 @@ public class InputTableIndex {
     this.schemaVersion = schemaVersion;
   }
 
-  public void addDirectory(final String table, final S3ObjectId directory) {
+  public void addFile(final String table, final S3ObjectId file, final long sizeBytes) {
     if (!tables.containsKey(table)) {
       tables.put(table, new ArrayList<String>());
     }
-    tables.get(table).add(AwsUtils.uri(directory));
-  }
-
-  public void addDirectories(final String table, final List<S3ObjectId> directories) {
-    for (final S3ObjectId dir : directories) {
-      addDirectory(table, dir);
-    }
+    tables.get(table).add(AwsUtils.uri(file));
+    fileSizes.put(AwsUtils.uri(file), sizeBytes);
   }
 
   public Map<String, List<String>> getTables() {
@@ -52,14 +49,40 @@ public class InputTableIndex {
     return names;
   }
 
-  public List<String> getDirectories(final String table) {
-    return tables.get(table);
+  public List<S3ObjectId> getFiles(final String table) {
+    final List<S3ObjectId> files = new ArrayList<S3ObjectId>();
+    for (final String file : tables.get(table)) {
+      files.add(AwsUtils.key(file));
+    }
+    return files;
   }
 
-  public void addTables(final Map<String, List<S3ObjectId>> tableMap) {
-    for (final String table : tableMap.keySet()) {
-      addDirectories(table, tableMap.get(table));
+  public void addAll(final InputTableIndex data) {
+    fileSizes.putAll(data.fileSizes);
+    for (final String table : data.tables.keySet()) {
+      if (!tables.containsKey(table)) {
+        tables.put(table, new ArrayList<String>());
+      }
+      tables.get(table).addAll(data.tables.get(table));
     }
+  }
+
+  public void addTable(final String table, final InputTableIndex data) {
+    if (!tables.containsKey(table)) {
+      tables.put(table, new ArrayList<String>());
+    }
+    tables.get(table).addAll(data.tables.get(table));
+    for (final String file : data.tables.get(table)) {
+      fileSizes.put(file, data.fileSizes.get(file));
+    }
+  }
+
+  public Map<String, Long> getFileSizes() {
+    return fileSizes;
+  }
+
+  public Long getFileSize(final S3ObjectId file) {
+    return fileSizes.get(AwsUtils.uri(file));
   }
 
   @Override
@@ -67,8 +90,8 @@ public class InputTableIndex {
     String s = "Schema: " + schemaVersion + "\n";
     for (final String key : getTableNames()) {
       s += key + ":\n";
-      for (final String dir : getDirectories(key)) {
-        s += "  " + dir + "\n";
+      for (final S3ObjectId file : getFiles(key)) {
+        s += "  " + AwsUtils.uri(file) + "\n";
       }
     }
     return s;
@@ -96,7 +119,6 @@ public class InputTableIndex {
   }
 
   public boolean isPartial(final String tableName) {
-    System.out.println(partial);
     return partial.get(tableName);
   }
 }

@@ -3,7 +3,6 @@ package edu.harvard.data.canvas.phase_0;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.TableInfo;
@@ -27,6 +27,7 @@ import edu.harvard.data.canvas.data_api.CanvasDataSchema;
 import edu.harvard.data.canvas.data_api.DataArtifact;
 import edu.harvard.data.canvas.data_api.DataDump;
 import edu.harvard.data.canvas.data_api.DataFile;
+import edu.harvard.data.pipeline.InputTableIndex;
 import edu.harvard.data.schema.DataSchemaTable;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
@@ -146,20 +147,22 @@ public class DumpManager {
     }
   }
 
-  public Map<String, List<S3ObjectId>> getDumpIndex(final S3ObjectId dumpDir) {
-    final Map<String, List<S3ObjectId>> directories = new HashMap<String, List<S3ObjectId>>();
+  public InputTableIndex getDumpIndex(final S3ObjectId dumpDir) {
+    final InputTableIndex dataIndex = new InputTableIndex();
     log.info("Getting dump index for " + dumpDir);
     for (final S3ObjectId tableDir : aws.listDirectories(dumpDir)) {
       if (!tableDir.getKey().endsWith("/identity_map")) {
         if (!aws.isFile(AwsUtils.key(tableDir, "empty_file"))) {
           final String tableName = tableDir.getKey()
               .substring(tableDir.getKey().lastIndexOf("/") + 1);
-          final List<S3ObjectId> tableDirs = new ArrayList<S3ObjectId>();
-          tableDirs.add(tableDir);
-          directories.put(tableName, tableDirs);
+          for (final S3ObjectSummary tableFile : aws.listKeys(tableDir)) {
+            if (tableFile.getKey().toLowerCase().endsWith(".gz")) {
+              dataIndex.addFile(tableName, AwsUtils.key(tableFile), tableFile.getSize());
+            }
+          }
         }
       }
     }
-    return directories;
+    return dataIndex;
   }
 }

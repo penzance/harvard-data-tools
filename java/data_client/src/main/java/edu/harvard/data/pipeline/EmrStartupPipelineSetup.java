@@ -15,12 +15,10 @@ public class EmrStartupPipelineSetup {
   private final Pipeline pipeline;
   private final PipelineFactory factory;
   private final String pipelineId;
-  private final InputTableIndex dataIndex;
 
   public EmrStartupPipelineSetup(final Pipeline pipeline, final PipelineFactory factory,
-      final InputTableIndex dataIndex, final String runId) {
+      final String runId) {
     this.factory = factory;
-    this.dataIndex = dataIndex;
     this.config = pipeline.getConfig();
     this.pipeline = pipeline;
     this.pipelineId = pipeline.getId();
@@ -54,7 +52,8 @@ public class EmrStartupPipelineSetup {
   }
 
   private PipelineObjectBase copyData() {
-    return factory.getS3DistCpActivity("CopyDataToHdfs", dataIndex, config.getHdfsDir(0),
+    final String manifest = config.getEmrCodeDir() + "/" + config.getS3ToHdfsManifestFile();
+    return factory.getS3DistCpActivity("CopyDataToHdfs", manifest, workingDir, config.getHdfsDir(0),
         pipeline.getEmr());
   }
 
