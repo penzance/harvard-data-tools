@@ -62,7 +62,30 @@ class DiscussionEntryDimPass1 extends HadoopJob {
   }
 }
 
+class DiscussionEntryDimPass2 extends HadoopJob {
 
+  public DiscussionEntryDimPass2(final DataConfig config, final int phase)
+      throws DataConfigurationException {
+    super(config, phase);
+  }
+
+  @Override
+  public Job getJob() throws IOException, NoInputDataException {
+    final Job job = Job.getInstance(hadoopConf, "discussion-dim-2-hadoop");
+    job.setMapperClass(DiscussionEntryDimPass2Mapper.class);
+    job.setMapOutputKeyClass(Text.class);
+    job.setMapOutputValueClass(NullWritable.class);
+    job.setNumReduceTasks(0);
+
+    job.setInputFormatClass(TextInputFormat.class);
+    job.setOutputFormatClass(TextOutputFormat.class);
+    final String inputDir = config.getHdfsDir(phase - 1);
+    final String outputDir = config.getHdfsDir(phase);
+    hadoopUtils.setPaths(job, hdfsService, inputDir + "/discussion_entry_dim",
+        outputDir + "/full_text/discussion_entry_dim");
+    return job;
+  }
+}
 
 class DiscussionEntryDimPass1Mapper extends Mapper<Object, Text, Text, NullWritable> {
 
@@ -112,30 +135,5 @@ class DiscussionEntryDimPass2Mapper extends Mapper<Object, Text, LongWritable, T
       final Phase1DiscussionEntryDim in = new Phase1DiscussionEntryDim(format, csvRecord);
       context.write(new LongWritable(in.getId()), new Text(in.getMessage()));
     }
-  }
-}
-
-class DiscussionEntryDimPass2 extends HadoopJob {
-
-  public DiscussionEntryDimPass2(final DataConfig config, final int phase)
-      throws DataConfigurationException {
-    super(config, phase);
-  }
-
-  @Override
-  public Job getJob() throws IOException, NoInputDataException {
-    final Job job = Job.getInstance(hadoopConf, "discussion-dim-2-hadoop");
-    job.setMapperClass(DiscussionEntryDimPass1Mapper.class);
-    job.setMapOutputKeyClass(Text.class);
-    job.setMapOutputValueClass(NullWritable.class);
-    job.setNumReduceTasks(0);
-
-    job.setInputFormatClass(TextInputFormat.class);
-    job.setOutputFormatClass(TextOutputFormat.class);
-    final String inputDir = config.getHdfsDir(phase - 1);
-    final String outputDir = config.getHdfsDir(phase);
-    hadoopUtils.setPaths(job, hdfsService, inputDir + "/discussion_entry_dim",
-        outputDir + "/full_text/discussion_entry_dim");
-    return job;
   }
 }
