@@ -1,17 +1,14 @@
 package edu.harvard.data.generator;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.csv.CSVRecord;
-import org.apache.hadoop.mapreduce.Job;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.DataTable;
-import edu.harvard.data.NoInputDataException;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.identity.IdentitySchemaTransformer;
@@ -62,38 +59,17 @@ public class IdentityScrubberGenerator {
     out.println();
     out.println("public class " + className + " extends IdentityScrubber<" + idType + "> {");
     out.println();
-    outputMainMethod(out);
-    out.println();
     outputPopulateRecord(out);
     out.println("}");
   }
 
   private void outputImportStatements(final PrintStream out, final String idType) {
-    out.println("import " + IOException.class.getCanonicalName() + ";");
     out.println("import " + CSVRecord.class.getCanonicalName() + ";");
     out.println("import " + IdentifierType.class.getCanonicalName() + ";");
     out.println("import " + DataTable.class.getCanonicalName() + ";");
     out.println("import " + IdentityScrubber.class.getCanonicalName() + ";");
-    out.println("import " + NoInputDataException.class.getCanonicalName() + ";");
-    out.println("import " + Job.class.getCanonicalName() + ";");
     out.println("import " + phase0ModelPackage + "." + phase0ModelClass + ";");
     out.println("import " + phase1ModelPackage + "." + phase1ModelClass + ";");
-  }
-
-  private void outputMainMethod(final PrintStream out) {
-    final String tableName = table.getTableName();
-    out.println("  public static void main(final String[] args)");
-    out.println("  throws " + IOException.class.getSimpleName() + ", "
-        + NoInputDataException.class.getSimpleName() + " {");
-    out.println("    final " + className + " instance = new " + className + "();");
-    out.println("    final Job job = instance.getJob(\"" + tableName + "\", " + className
-        + ".class, args[0]);");
-    out.println("    try {");
-    out.println("      job.waitForCompletion(true);");
-    out.println("    } catch (ClassNotFoundException | InterruptedException e) {");
-    out.println("      throw new RuntimeException(e);");
-    out.println("    }");
-    out.println("  }");
   }
 
   private void outputPopulateRecord(final PrintStream out) throws VerificationException {

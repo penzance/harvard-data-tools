@@ -3,6 +3,7 @@ package edu.harvard.data.canvas;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
 import edu.harvard.data.HadoopJob;
@@ -13,9 +14,11 @@ import edu.harvard.data.canvas.phase_2.AdminRequestJob;
 import edu.harvard.data.canvas.phase_2.RequestJob;
 import edu.harvard.data.canvas.phase_3.SessionsJob;
 import edu.harvard.data.generator.GeneratedCodeManager;
+import edu.harvard.data.identity.HadoopIdentityKey;
 import edu.harvard.data.identity.IdentityMapHadoopJob;
+import edu.harvard.data.identity.IdentityScrubHadoopJob;
+import edu.harvard.data.identity.IdentityScrubber;
 
-@SuppressWarnings("rawtypes")
 public class CanvasCodeManager extends GeneratedCodeManager {
 
   private final CanvasIdentityHadoopManager identity;
@@ -30,12 +33,17 @@ public class CanvasCodeManager extends GeneratedCodeManager {
   }
 
   @Override
-  public Map<String, Class<? extends Mapper>> getIdentityMapperClasses() {
+  public Class<? extends IdentityScrubHadoopJob> getIdentityScrubHadoopJob() {
+    return CanvasIdentityScrubHadoopJob.class;
+  }
+
+  @Override
+  public Map<String, Class<? extends Mapper<Object, Text, ?, HadoopIdentityKey>>> getIdentityMapperClasses() {
     return identity.getMapperClasses();
   }
 
   @Override
-  public Map<String, Class<? extends Mapper>> getIdentityScrubberClasses() {
+  public Map<String, Class<? extends IdentityScrubber<?>>> getIdentityScrubberClasses() {
     return identity.getScrubberClasses();
   }
 

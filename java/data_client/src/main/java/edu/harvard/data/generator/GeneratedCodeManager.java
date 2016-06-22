@@ -5,12 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
 import edu.harvard.data.HadoopJob;
+import edu.harvard.data.identity.HadoopIdentityKey;
 import edu.harvard.data.identity.IdentityMapHadoopJob;
+import edu.harvard.data.identity.IdentityScrubHadoopJob;
+import edu.harvard.data.identity.IdentityScrubber;
 
-@SuppressWarnings("rawtypes")
 public abstract class GeneratedCodeManager {
 
   protected final Map<Integer, List<Class<? extends HadoopJob>>> jobs;
@@ -27,13 +30,15 @@ public abstract class GeneratedCodeManager {
   }
 
   // Table name to class
-  public abstract Map<String, Class<? extends Mapper>> getIdentityMapperClasses();
+  public abstract Map<String, Class<? extends Mapper<Object, Text, ?, HadoopIdentityKey>>> getIdentityMapperClasses();
 
-  public abstract Map<String, Class<? extends Mapper>> getIdentityScrubberClasses();
+  public abstract Map<String, Class<? extends IdentityScrubber<?>>> getIdentityScrubberClasses();
 
   public abstract List<String> getIdentityTableNames();
 
   public abstract Class<? extends IdentityMapHadoopJob> getIdentityMapHadoopJob();
+
+  public abstract Class<? extends IdentityScrubHadoopJob> getIdentityScrubHadoopJob();
 
   public abstract Class<?> getIdentityPreverifyJob();
 

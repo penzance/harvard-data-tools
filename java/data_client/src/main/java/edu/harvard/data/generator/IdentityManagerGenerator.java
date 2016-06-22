@@ -6,7 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+
+import edu.harvard.data.identity.HadoopIdentityKey;
+import edu.harvard.data.identity.IdentityScrubber;
 
 public class IdentityManagerGenerator {
 
@@ -31,20 +35,20 @@ public class IdentityManagerGenerator {
     out.println();
     outputGetTableNames(out);
     out.println();
-    outputGetClasses(out, "getMapperClasses", mapperNames);
+    outputGetClasses(out, "getMapperClasses", mapperNames,
+        "Mapper<Object, Text, ?, HadoopIdentityKey>");
     out.println();
-    outputGetClasses(out, "getScrubberClasses", scrubberNames);
+    outputGetClasses(out, "getScrubberClasses", scrubberNames, "IdentityScrubber<?>");
     out.println("}");
   }
 
   private void outputGetClasses(final PrintStream out, final String mthdName,
-      final Map<String, String> classes) {
-    out.println("  @SuppressWarnings(\"rawtypes\")");
-    out.println("  public Map<String, Class<? extends Mapper>> " + mthdName + " () {");
-    out.println(
-        "    final Map<String, Class<? extends Mapper>> classes = new HashMap<String, Class<? extends Mapper>>();");
+      final Map<String, String> classes, final String superType) {
+    out.println("  public Map<String, Class<? extends " + superType + ">> " + mthdName + " () {");
+    out.println("    final Map<String, Class<? extends " + superType
+        + ">> classes = new HashMap<String, Class<? extends " + superType + ">>();");
     for (final String table : classes.keySet()) {
-      out.println("    classes.put(\""+ table + "\", " + classes.get(table) + ".class);");
+      out.println("    classes.put(\"" + table + "\", " + classes.get(table) + ".class);");
     }
     out.println("    return classes;");
     out.println("  }");
@@ -66,6 +70,9 @@ public class IdentityManagerGenerator {
     out.println("import " + List.class.getCanonicalName() + ";");
     out.println("import " + Map.class.getCanonicalName() + ";");
     out.println("import " + Mapper.class.getCanonicalName() + ";");
+    out.println("import " + IdentityScrubber.class.getCanonicalName() + ";");
+    out.println("import " + HadoopIdentityKey.class.getCanonicalName() + ";");
+    out.println("import " + Text.class.getCanonicalName() + ";");
     out.println();
     for (final String mapper : mapperNames.values()) {
       out.println("import " + hadoopPackage + "." + mapper + ";");

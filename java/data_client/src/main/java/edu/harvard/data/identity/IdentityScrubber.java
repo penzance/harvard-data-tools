@@ -1,30 +1,21 @@
 package edu.harvard.data.identity;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.DataTable;
-import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopUtilities;
-import edu.harvard.data.NoInputDataException;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.generator.IdentityScrubberGenerator;
 import edu.harvard.data.io.TableReader;
@@ -50,39 +41,6 @@ import edu.harvard.data.io.TableReader;
  */
 public abstract class IdentityScrubber<T> extends Mapper<Object, Text, Text, NullWritable> {
   private static final Logger log = LogManager.getLogger();
-
-  @SuppressWarnings("rawtypes")
-  protected Job getJob(final String tableName, final Class<? extends Mapper> cls,
-      final String configString) throws IOException, NoInputDataException {
-    try {
-      final HadoopUtilities hadoopUtils = new HadoopUtilities();
-      final DataConfig config = DataConfig.parseInputFiles(DataConfig.class, configString, true);
-      final Configuration hadoopConfig = new Configuration();
-
-      hadoopConfig.set("format", Format.DecompressedCanvasDataFlatFiles.toString());
-      hadoopConfig.set("config", configString);
-      final Job job = Job.getInstance(hadoopConfig, "canvas-" + tableName + "-scrubber");
-      job.setJarByClass(IdentityScrubber.class);
-      job.setMapperClass(cls);
-      job.setMapOutputKeyClass(Text.class);
-      job.setMapOutputValueClass(NullWritable.class);
-      job.setNumReduceTasks(0);
-
-      job.setInputFormatClass(TextInputFormat.class);
-      job.setOutputFormatClass(TextOutputFormat.class);
-      final URI hdfsService = new URI("hdfs///");
-      hadoopUtils.setPaths(job, hdfsService, config.getHdfsDir(0) + "/" + tableName,
-          config.getHdfsDir(1) + "/" + tableName);
-      for (final Path path : hadoopUtils.listHdfsFiles(hadoopConfig,
-          new Path(config.getHdfsDir(1) + "/identity_map"))) {
-        job.addCacheFile(path.toUri());
-      }
-
-      return job;
-    } catch (final URISyntaxException | DataConfigurationException e) {
-      throw new IOException(e);
-    }
-  }
 
   /**
    * Parse a {@link CSVRecord} object to create an instance of the

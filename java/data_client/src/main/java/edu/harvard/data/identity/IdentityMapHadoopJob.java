@@ -80,7 +80,7 @@ public class IdentityMapHadoopJob {
       job.addCacheFile(path.toUri());
     }
 
-    final Map<String, Class<? extends Mapper>> allMapperClasses = codeManager
+    final Map<String, Class<? extends Mapper<Object, Text, ?, HadoopIdentityKey>>> allMapperClasses = codeManager
         .getIdentityMapperClasses();
     final Map<String, Class<? extends Mapper>> mapperClasses = new HashMap<String, Class<? extends Mapper>>();
     for (final String table : allMapperClasses.keySet()) {

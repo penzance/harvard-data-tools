@@ -2,9 +2,6 @@ package edu.harvard.data.pipeline;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import org.apache.hadoop.mapreduce.Mapper;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
 
@@ -52,16 +49,9 @@ public class Phase1PipelineSetup {
       previousStep = refreshLease(previousStep, "AfterCopyToHDFSLeaseRefresh");
 
       previousStep = identityPreverify(previousStep);
-      previousStep = refreshLease(previousStep, "AfterPreverifyLeaseRefresh");
-
       previousStep = hadoopIdentityMap(previousStep);
-      previousStep = refreshLease(previousStep, "AfterIdentityMapLeaseRefresh");
-
       previousStep = hadoopIdentityScrub(previousStep);
-      previousStep = refreshLease(previousStep, "AfterIdentityScrubLeaseRefresh");
-
       previousStep = identityPostverify(previousStep);
-      previousStep = refreshLease(previousStep, "AfterPostVerifyLeaseRefresh");
 
       previousStep = copyIdentityToS3(previousStep);
       previousStep = refreshLease(previousStep, "AfterCopyToS3LeaseRefresh");
@@ -74,22 +64,22 @@ public class Phase1PipelineSetup {
   }
 
   private PipelineObjectBase releaseLease(final PipelineObjectBase previousStep, final String id) {
-    final PipelineObjectBase release = factory.getReleaseLeaseActivity(id, config.getLeaseDynamoTable(),
-        config.getIdentityLease(), runId, pipeline.getEmr());
+    final PipelineObjectBase release = factory.getReleaseLeaseActivity(id,
+        config.getLeaseDynamoTable(), config.getIdentityLease(), runId, pipeline.getEmr());
     release.addDependency(previousStep);
     return release;
   }
 
   private PipelineObjectBase acquireLease(final PipelineObjectBase previousStep, final String id) {
-    final PipelineObjectBase acquire = factory.getAcquireLeaseActivity(id, config.getLeaseDynamoTable(),
-        config.getIdentityLease(), runId, config.getIdentityLeaseLengthSeconds(),
-        pipeline.getEmr());
+    final PipelineObjectBase acquire = factory.getAcquireLeaseActivity(id,
+        config.getLeaseDynamoTable(), config.getIdentityLease(), runId,
+        config.getIdentityLeaseLengthSeconds(), pipeline.getEmr());
     acquire.addDependency(previousStep);
     return acquire;
   }
 
   private PipelineObjectBase refreshLease(final PipelineObjectBase previousStep, final String id) {
-    final PipelineObjectBase renew  = factory.getRenewLeaseActivity(id, config.getLeaseDynamoTable(),
+    final PipelineObjectBase renew = factory.getRenewLeaseActivity(id, config.getLeaseDynamoTable(),
         config.getIdentityLease(), runId, config.getIdentityLeaseLengthSeconds(),
         pipeline.getEmr());
     renew.addDependency(previousStep);
@@ -140,29 +130,21 @@ public class Phase1PipelineSetup {
     final List<String> args = new ArrayList<String>();
     args.add(config.getPaths());
     args.add(runId);
-    final PipelineObjectBase identity = factory.getEmrActivity("IdentityHadoop", pipeline.getEmr(),
-        cls, args);
+    final PipelineObjectBase identity = factory.getEmrActivity("IdentityMapHadoop",
+        pipeline.getEmr(), cls, args);
     identity.addDependency(previousStep);
     return identity;
   }
 
-  @SuppressWarnings("rawtypes")
   private PipelineObjectBase hadoopIdentityScrub(final PipelineObjectBase previousStep) {
-    final PipelineObjectBase barrier = factory.getSynchronizationBarrier("IdentityScrubBarrier",
-        pipeline.getEmr());
-    final Map<String, Class<? extends Mapper>> scrubbers = codeManager.getIdentityScrubberClasses();
-    for (final String table : scrubbers.keySet()) {
-      if (dataIndex.containsTable(table)) {
-        final Class<? extends Mapper> cls = scrubbers.get(table);
-        final List<String> args = new ArrayList<String>();
-        args.add(config.getPaths());
-        final PipelineObjectBase step = factory.getEmrActivity(cls.getSimpleName(),
-            pipeline.getEmr(), cls, args);
-        step.addDependency(previousStep);
-        barrier.addDependency(step);
-      }
-    }
-    return barrier;
+    final Class<?> cls = codeManager.getIdentityScrubHadoopJob();
+    final List<String> args = new ArrayList<String>();
+    args.add(config.getPaths());
+    args.add(runId);
+    final PipelineObjectBase identity = factory.getEmrActivity("IdentityScrubHadoop",
+        pipeline.getEmr(), cls, args);
+    identity.addDependency(previousStep);
+    return identity;
   }
 
   private PipelineObjectBase unloadIdentity(final PipelineObjectBase previousStep) {
