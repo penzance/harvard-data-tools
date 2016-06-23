@@ -361,4 +361,9 @@ class TestCodeGenerator extends CodeGenerator {
     return "code_generator_integration_tests/phase_3_additional_resources.json";
   }
 
+  @Override
+  protected String getFullTextResource() {
+    return "code_generator_integration_tests/full_text_tables.json";
+  }
+
 }
