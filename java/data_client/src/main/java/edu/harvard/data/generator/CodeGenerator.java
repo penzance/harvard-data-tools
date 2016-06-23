@@ -21,6 +21,7 @@ import edu.harvard.data.schema.DataSchema;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 import edu.harvard.data.schema.existing.ExistingSchema;
 import edu.harvard.data.schema.extension.ExtensionSchema;
+import edu.harvard.data.schema.fulltext.FullTextSchema;
 import edu.harvard.data.schema.identity.IdentitySchema;
 
 /**
@@ -124,6 +125,18 @@ public abstract class CodeGenerator {
 
   /**
    * Get the name of a resource on the class path that contains the definitions
+   * of all columns across the data set that contain unbounded text fields.
+   * These columns will be stored in S3, since their contents will be truncated
+   * in Redshift.
+   *
+   * @return a {@code String} containing the name of a classpath resource. A
+   *         resource by this name must be available to the classloader that
+   *         loaded this class.
+   */
+  protected abstract String getFullTextResource();
+
+  /**
+   * Get the name of a resource on the class path that contains the definitions
    * of any new or modified table that will be produced as a result of running
    * Phase 2. This resource will guide the generation of the Phase 2 models and
    * all later scripts. See {@link ExtensionSchema} for details on the format of
@@ -180,8 +193,7 @@ public abstract class CodeGenerator {
     new JavaBindingGenerator(spec).generate();
 
     log.info("Generating Java identity Hadoop jobs in " + codeDir);
-    new IdentityJobGenerator(spec, IdentitySchema.readIdentities(getIdentifierResource()))
-    .generate();
+    new IdentityJobGenerator(spec, IdentitySchema.read(getIdentifierResource())).generate();
 
     log.info("Generating Redshift table definitions in " + codeDir);
     new CreateRedshiftTableGenerator(codeDir, spec, config).generate();
@@ -205,6 +217,11 @@ public abstract class CodeGenerator {
 
       log.info("Generating move unmodified files script in " + codeDir);
       new MoveUnmodifiedTableGenerator(codeDir, spec, dataIndex).generate();
+
+      log.info("Generating copy full text script in " + codeDir);
+      new FullTextCopyScriptGenerator(codeDir, config, FullTextSchema.read(getFullTextResource()),
+          dataIndex).generate();
+
     } else {
       log.info("No data index at " + AwsUtils.uri(dataIndexLocation)
       + ". Skipping pipeline-specific files");
@@ -248,7 +265,7 @@ public abstract class CodeGenerator {
         .readExtensionSchema(getPhaseThreeAdditionsResource());
 
     // Transform the schema to remove identifers
-    final IdentitySchema identities = IdentitySchema.readIdentities(getIdentifierResource());
+    final IdentitySchema identities = IdentitySchema.read(getIdentifierResource());
     final IdentitySchemaTransformer idTrans = new IdentitySchemaTransformer(base, identities,
         getMainIdentifier());
     final DataSchema schema1 = idTrans.transform();

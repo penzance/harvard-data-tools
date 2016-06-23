@@ -84,9 +84,11 @@ public class DataConfig {
   private final String ec2GitDir;
   private final String ec2CodeDir;
   private final String emrCodeDir;
+  private final String fullTextDir;
   private final String dataToolsJar;
   private final String identityRedshiftSchema;
   private final String identityRedshiftLoadScript;
+  private final String fullTextScriptFile;
   private final String s3ToHdfsManifestFile;
   private final String redshiftLoadScript;
   private final String redshiftStagingDir;
@@ -109,9 +111,11 @@ public class DataConfig {
     this.identityRedshiftLoadScript = "s3_to_redshift_identity_loader.sql";
     this.redshiftLoadScript = "s3_to_redshift_loader.sql";
     this.s3ToHdfsManifestFile = "s3_to_hdfs_manifest.gz";
+    this.fullTextScriptFile = "full_text_copy.sh";
     this.redshiftStagingDir = "redshift_staging";
     this.identityRedshiftSchema = "pii";
     this.emrCodeDir = "/home/hadoop/code";
+    this.fullTextDir = "/home/hadoop/full_text";
     this.hdfsBase = "/phase_";
     this.hdfsVerifyBase = "/verify" + this.hdfsBase;
     this.ec2GitDir = "/home/ec2-user/harvard-data-tools";
@@ -285,6 +289,10 @@ public class DataConfig {
     return hdfsVerifyBase + phase;
   }
 
+  public String getFullTextDir() {
+    return fullTextDir;
+  }
+
   public String getMoveUnmodifiedScript(final int phase) {
     return "phase_" + phase + "_move_unmodified_files.sh";
   }
@@ -447,6 +455,10 @@ public class DataConfig {
 
   public String getRedshiftLoadScript() {
     return redshiftLoadScript;
+  }
+
+  public String getFullTextScriptFile() {
+    return fullTextScriptFile;
   }
 
   public String getS3ToHdfsManifestFile() {

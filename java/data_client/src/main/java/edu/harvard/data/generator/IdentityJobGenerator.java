@@ -26,8 +26,7 @@ public class IdentityJobGenerator {
   private final GenerationSpec spec;
   private final File javaSrcBase;
 
-  public IdentityJobGenerator(final GenerationSpec spec,
-      final IdentitySchema identities) {
+  public IdentityJobGenerator(final GenerationSpec spec, final IdentitySchema identities) {
     this.identities = identities;
     this.schema = spec.getPhase(0).getSchema();
     this.spec = spec;
@@ -75,22 +74,19 @@ public class IdentityJobGenerator {
     final String managerClass = spec.getHadoopIdentityManagerClass();
     final File managerFile = new File(javaSrcBase, managerClass + ".java");
     try (final PrintStream out = new PrintStream(new FileOutputStream(managerFile))) {
-      new IdentityManagerGenerator(hadoopPackage, managerClass, mapperNames,
-          scrubberNames).generate(out);
+      new IdentityManagerGenerator(hadoopPackage, managerClass, mapperNames, scrubberNames)
+      .generate(out);
     }
   }
 
   static List<String> getMainIdColumns(final Map<String, List<IdentifierType>> identities,
-      final DataSchemaTable table, final IdentifierType mainIdentifier) throws VerificationException {
+      final DataSchemaTable table, final IdentifierType mainIdentifier)
+          throws VerificationException {
     final List<String> ids = new ArrayList<String>();
     for (final String columnName : identities.keySet()) {
       if (identities.get(columnName).contains(mainIdentifier)) {
         ids.add(columnName);
       }
-    }
-    if (ids.size() == 0) {
-      throw new VerificationException(
-          "Table " + table.getTableName() + " does not have a field of type " + mainIdentifier);
     }
     return ids;
   }

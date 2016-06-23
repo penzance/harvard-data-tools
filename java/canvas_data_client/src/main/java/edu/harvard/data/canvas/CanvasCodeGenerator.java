@@ -29,6 +29,7 @@ public class CanvasCodeGenerator extends CodeGenerator {
   public static final String PHASE_ONE_IDENTIFIERS_JSON = "canvas/phase1_identifiers.json";
   public static final String PHASE_TWO_ADDITIONS_JSON = "canvas/phase2_schema_additions.json";
   public static final String PHASE_THREE_ADDITIONS_JSON = "canvas/phase3_schema_additions.json";
+  public static final String FULL_TEXT_TABLES = "canvas/full_text_tables.json";
 
   private final String schemaVersion;
   private final File gitDir;
@@ -114,6 +115,11 @@ public class CanvasCodeGenerator extends CodeGenerator {
   @Override
   protected String getExistingTableResource() {
     return PHASE_ZERO_TABLES_JSON;
+  }
+
+  @Override
+  protected String getFullTextResource() {
+    return FULL_TEXT_TABLES;
   }
 
 }

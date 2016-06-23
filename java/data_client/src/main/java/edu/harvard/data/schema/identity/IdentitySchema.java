@@ -166,7 +166,7 @@ public class IdentitySchema {
    *           if and error occurs when reading or parsing the JSON resource.
    */
   @SuppressWarnings("unchecked")
-  public static IdentitySchema readIdentities(final String jsonResource) throws IOException {
+  public static IdentitySchema read(final String jsonResource) throws IOException {
     log.info("Reading identifiers from file " + jsonResource);
     final ObjectMapper jsonMapper = new ObjectMapper();
     jsonMapper.setDateFormat(FormatLibrary.JSON_DATE_FORMAT);
