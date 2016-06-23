@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.amazonaws.services.datapipeline.DataPipelineClient;
+import com.amazonaws.services.datapipeline.model.ActivatePipelineRequest;
 import com.amazonaws.services.datapipeline.model.CreatePipelineRequest;
 import com.amazonaws.services.datapipeline.model.CreatePipelineResult;
 import com.amazonaws.services.datapipeline.model.PutPipelineDefinitionRequest;
@@ -52,9 +53,9 @@ public class DataPipelineGenerator {
     log.info("Defining pipeline: " + defineResult);
     logPipelineToDynamo();
 
-    //    final ActivatePipelineRequest activate = new ActivatePipelineRequest();
-    //    activate.setPipelineId(pipelineId);
-    //    client.activatePipeline(activate);
+    final ActivatePipelineRequest activate = new ActivatePipelineRequest();
+    activate.setPipelineId(pipelineId);
+    client.activatePipeline(activate);
   }
 
   private CreatePipelineRequest getCreateRequest() {
