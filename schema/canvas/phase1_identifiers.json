@@ -7,12 +7,6 @@
 	"communication_channel_dim": {
 		"user_id": ["CanvasDataID"]
 	},
-	"conversation_dim": {
-		"subject": ["Other"]
-	},
-	"conversation_message_dim": {
-		"body": ["Other"]
-	},
 	"conversation_message_dim": {
 		"author_id": ["CanvasDataID"]
 	},
