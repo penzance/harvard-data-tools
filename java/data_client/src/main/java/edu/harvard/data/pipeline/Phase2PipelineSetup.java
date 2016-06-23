@@ -26,6 +26,10 @@ public class Phase2PipelineSetup {
 
   public PipelineObjectBase populate(final PipelineObjectBase previousPhase) {
     PipelineObjectBase previousStep = previousPhase;
+
+    previousStep = createHiveTables(previousStep);
+    previousStep = copyFullText(previousStep);
+
     final Map<Integer, List<Class<? extends HadoopJob>>> jobsByPhase = codeManager
         .getHadoopProcessingJobs();
     final List<Integer> phases = new ArrayList<Integer>(jobsByPhase.keySet());
@@ -39,6 +43,20 @@ public class Phase2PipelineSetup {
     }
 
     return previousStep;
+  }
+
+  private PipelineObjectBase copyFullText(final PipelineObjectBase previousStep) {
+    final String cmd = "bash " + config.getEmrCodeDir() + "/" + config.getFullTextScriptFile();
+    final PipelineObjectBase copy = factory.getShellActivity("CopyFullText", cmd, pipeline.getEmr());
+    copy.addDependency(previousStep);
+    return copy;
+  }
+
+  private PipelineObjectBase createHiveTables(final PipelineObjectBase previousStep) {
+    final String cmd = "bash " + config.getEmrCodeDir() + "/" + config.getCreateHiveTables(2);
+    final PipelineObjectBase create = factory.getShellActivity("CreatePhase2HiveTables", cmd, pipeline.getEmr());
+    create.addDependency(previousStep);
+    return create;
   }
 
   private PipelineObjectBase populatePhase(final PipelineObjectBase previousStep, final int phase,

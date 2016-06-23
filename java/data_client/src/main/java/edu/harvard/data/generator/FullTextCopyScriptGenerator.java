@@ -35,9 +35,8 @@ public class FullTextCopyScriptGenerator {
           generateTable(out, table);
         }
       }
-      out.println("hadoop fs -put " + config.getFullTextDir() + " /full_text");
-      out.println("s3-dist-cp --src=hdfs:///full_text --dest="
-          + AwsUtils.uri(config.getFullTextLocation()) + " --outputCodec=gzip");
+
+      out.println("aws s3 cp --recursive " + config.getFullTextDir() + "/ " + AwsUtils.uri(config.getFullTextLocation()));
     }
   }
 
@@ -45,8 +44,10 @@ public class FullTextCopyScriptGenerator {
     final FullTextTable table = textSchema.get(tableName);
     out.println("mkdir -p /home/hadoop/full_text/" + tableName);
     for (final String column : table.getColumns()) {
+      final String filename = config.getFullTextDir() + "/" + tableName + "/" + column;
       out.println("sudo hive -S -e \"select " + table.getKey() + ", " + column + " from in_"
-          + tableName + ";\" > " + config.getFullTextDir() + "/" + tableName + "/" + column);
+          + tableName + ";\" > " + filename);
+      out.println("gzip " + filename);
     }
     out.println();
   }

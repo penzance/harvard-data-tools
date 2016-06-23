@@ -285,6 +285,10 @@ public class DataConfig {
     return hdfsBase + phase;
   }
 
+  public String getCreateHiveTables(final int phase) {
+    return "phase_" + phase + "_create_tables.sh";
+  }
+
   public String getVerifyHdfsDir(final int phase) {
     return hdfsVerifyBase + phase;
   }
