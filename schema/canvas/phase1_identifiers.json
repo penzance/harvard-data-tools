@@ -7,6 +7,12 @@
 	"communication_channel_dim": {
 		"user_id": ["CanvasDataID"]
 	},
+	"conversation_dim": {
+		"subject": ["Other"]
+	},
+	"conversation_message_dim": {
+		"body": ["Other"]
+	},
 	"conversation_message_dim": {
 		"author_id": ["CanvasDataID"]
 	},
@@ -72,7 +78,8 @@
 	"submission_comment_dim": {
 		"recipient_id": ["CanvasDataID"],
 		"author_id": ["CanvasDataID"],
-		"author_name": ["Other"]
+		"author_name": ["Other"],
+		"comment":  ["Other"]
 	},
 	"submission_comment_fact": {
 		"recipient_id": ["CanvasDataID"],
