@@ -22,21 +22,6 @@
         }
       ]
     },
-    "discussion_entry_dim": {
-      "owner": "java",
-      "columns" : [ 
-        {
-          "name" : "message_truncated",
-          "description" : "Flag indicating whether the message text has been truncated in order to fit into Redshift.",
-          "type" : "boolean"
-        },
-        {
-          "name" : "message_length",
-          "description" : "Size of the message body in Unicode code units.",
-          "type" : "integer"
-        }
-      ]
-    },
     "admin_requests": {
       "like": "requests"
     }
