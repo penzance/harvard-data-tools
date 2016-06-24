@@ -36,6 +36,11 @@ public class RedshiftColumn extends DataSchemaColumn {
   }
 
   @Override
+  public String getSourceName() {
+    return name;
+  }
+
+  @Override
   public String getDescription() {
     return "";
   }

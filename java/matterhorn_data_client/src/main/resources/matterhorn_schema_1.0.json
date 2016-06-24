@@ -26,7 +26,7 @@
         {
           "name" : "@timestamp",
           "description" : "",
-          "type" : "date"
+          "type" : "timestamp"
         },
         {
           "name" : "ip",

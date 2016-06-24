@@ -71,7 +71,7 @@ public class InputParser {
   private void getFileNames() {
     final String key = inputObj.getKey();
     final String filename = key.substring(key.lastIndexOf("/") + 1);
-    final String date = filename.substring(filename.indexOf(".") + 1, filename.indexOf(".jsonl"));
+    final String date = filename.substring(filename.indexOf(".") + 1, filename.indexOf(".json"));
     originalFile = new File(config.getScratchDir(), filename);
     final String eventFileName = "event-" + date + ".gz";
     final String videoFileName = "video-" + date + ".gz";

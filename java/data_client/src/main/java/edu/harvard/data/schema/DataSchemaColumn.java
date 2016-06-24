@@ -1,5 +1,8 @@
 package edu.harvard.data.schema;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public abstract class DataSchemaColumn {
@@ -8,6 +11,8 @@ public abstract class DataSchemaColumn {
   protected boolean newlyGenerated;
 
   public abstract String getName();
+
+  public abstract String getSourceName();
 
   public abstract String getDescription();
 
@@ -33,7 +38,12 @@ public abstract class DataSchemaColumn {
     if (name == null) {
       return null;
     }
-    final String clean = name;
+    final Set<String> badChars = new HashSet<String>();
+    badChars.add("@");
+    String clean = name;
+    while(badChars.contains(clean.substring(0, 1))) {
+      clean = clean.substring(1);
+    }
     switch(name) {
     case "default":
       return "is_default";

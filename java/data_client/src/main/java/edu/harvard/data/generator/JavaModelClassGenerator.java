@@ -210,16 +210,17 @@ public class JavaModelClassGenerator {
     }
     for (final DataSchemaColumn column : table.getColumns()) {
       final String columnName = column.getName();
+      final String originalName = column.getSourceName();
       final String key;
       final String getMethod;
       final String mapName;
       if (columnName.contains(".")) {
         mapName = JavaBindingGenerator
             .javaVariable(columnName.substring(0, columnName.lastIndexOf(".")));
-        key = columnName.substring(columnName.indexOf(".") + 1);
+        key = originalName.substring(columnName.indexOf(".") + 1);
       } else {
         mapName = "map";
-        key = columnName;
+        key = originalName;
       }
       getMethod = mapName + ".get(\"" + key + "\")";
       outputGetFromMap(out, column, getMethod);

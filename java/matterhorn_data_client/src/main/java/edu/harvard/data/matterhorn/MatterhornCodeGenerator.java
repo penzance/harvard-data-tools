@@ -136,4 +136,9 @@ public class MatterhornCodeGenerator extends CodeGenerator {
     return PHASE_ZERO_TABLES_JSON;
   }
 
+  @Override
+  protected String getFullTextResource() {
+    return null;
+  }
+
 }
