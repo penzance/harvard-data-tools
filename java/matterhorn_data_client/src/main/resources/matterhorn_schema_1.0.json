@@ -18,8 +18,37 @@
           "type" : "datetime"
         },
         {
+          "name" : "@version",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 16
+        },
+        {
+          "name" : "@timestamp",
+          "description" : "",
+          "type" : "date"
+        },
+        {
           "name" : "ip",
           "description" : "Originating IP address for this event.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "host",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "port",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 16
+        },
+        {
+          "name" : "hostname",
+          "description" : "",
           "type" : "varchar",
           "length" : 255
         },
@@ -113,6 +142,16 @@
           "length" : 255
         },
         {
+          "name" : "duration",
+          "description" : "",
+          "type" : "bigint"
+        },
+        {
+          "name" : "start",
+          "description" : "",
+          "type" : "Timestamp"
+        },
+        {
           "name" : "title",
           "description" : "Video title.",
           "type" : "varchar",
@@ -126,6 +165,12 @@
         },
         {
           "name" : "term",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "description",
           "description" : "",
           "type" : "varchar",
           "length" : 255
