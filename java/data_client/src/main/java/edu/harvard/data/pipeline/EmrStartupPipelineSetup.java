@@ -42,7 +42,7 @@ public class EmrStartupPipelineSetup {
     final List<String> args = new ArrayList<String>();
     args.add(pipelineId); // args[0] in main class
     args.add(config.getPipelineDynamoTable()); // args[1] in main class
-    final String jar = config.getEmrCodeDir() + config.getDataToolsJar();
+    final String jar = config.getEmrCodeDir() + "/" + config.getDataToolsJar();
     return factory.getJavaShellActivity("PipelineStartup", jar, cls, args, pipeline.getEmr());
   }
 

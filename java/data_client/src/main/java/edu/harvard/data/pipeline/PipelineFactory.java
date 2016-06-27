@@ -214,7 +214,7 @@ public class PipelineFactory {
     args.add(leaseName);
     args.add(owner);
     args.add("" + seconds);
-    final String jar = config.getEmrCodeDir() + config.getDataToolsJar();
+    final String jar = config.getEmrCodeDir() + "/" + config.getDataToolsJar();
     return getJavaShellActivity(id, jar, AcquireLeaseTask.class, args, infrastructure);
   }
 
@@ -226,7 +226,7 @@ public class PipelineFactory {
     args.add(leaseName);
     args.add(owner);
     args.add("" + seconds);
-    final String jar = config.getEmrCodeDir() + config.getDataToolsJar();
+    final String jar = config.getEmrCodeDir() + "/" + config.getDataToolsJar();
     return getJavaShellActivity(id, jar, RenewLeaseTask.class, args, infrastructure);
   }
 
@@ -236,7 +236,7 @@ public class PipelineFactory {
     args.add(leaseTable);
     args.add(leaseName);
     args.add(owner);
-    final String jar = config.getEmrCodeDir() + config.getDataToolsJar();
+    final String jar = config.getEmrCodeDir() + "/" + config.getDataToolsJar();
     return getJavaShellActivity(id, jar, ReleaseLeaseTask.class, args, infrastructure);
   }
 
