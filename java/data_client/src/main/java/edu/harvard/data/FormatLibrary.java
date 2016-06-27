@@ -72,7 +72,7 @@ public class FormatLibrary {
   public static final DateFormat JSON_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
   // XXX Define a standard internal format, rather than borrowing Canvas' format.
-  private static final CSVFormat CANVAS_CSV_FORMAT = CSVFormat.TDF
+  private static final CSVFormat CANVAS_CSV_FORMAT = CSVFormat.TDF.withQuote(null)
       .withNullString("\\N").withRecordSeparator("\n").withIgnoreSurroundingSpaces(false);
   //  private static final CSVFormat CANVAS_CSV_FORMAT = CSVFormat.TDF.withQuote('"') // XXX Works for Matterhorn, probably not for Canvas.
   //      .withNullString("\\N").withRecordSeparator("\n").withIgnoreSurroundingSpaces(false);
