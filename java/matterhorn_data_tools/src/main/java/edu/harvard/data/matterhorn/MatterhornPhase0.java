@@ -39,7 +39,7 @@ public class MatterhornPhase0 {
     final AwsUtils aws = new AwsUtils();
     final InputTableIndex dataIndex = new InputTableIndex();
     for (final S3ObjectSummary obj : aws.listKeys(config.getDropboxBucket())) {
-      if (obj.getKey().endsWith(".gz") && obj.getKey().contains("useractions")) {
+      if (obj.getKey().endsWith(".gz")) {
         final S3ObjectId outputLocation = AwsUtils.key(config.getS3WorkingLocation(runId));
         log.info("Parsing file " + obj.getBucketName() + "/" + obj.getKey());
         final InputParser parser = new InputParser(config, aws, AwsUtils.key(obj), outputLocation);

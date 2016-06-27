@@ -43,8 +43,7 @@
         {
           "name" : "port",
           "description" : "",
-          "type" : "varchar",
-          "length" : 16
+          "type" : "integer"
         },
         {
           "name" : "hostname",
@@ -182,6 +181,131 @@
           "length" : 255
         }
       ]
+    },
+    "geo_ip": {
+      "columns": [
+        {
+          "name" : "ip",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "country_code2",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "country_code3",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "country_name",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "continent_code",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "region_name",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "city_name",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "postal_code",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "latitude",
+          "type" : "double precision"
+        },
+        {
+          "name" : "longitude",
+          "type" : "double precision"
+        },
+        {
+          "name" : "dma_code",
+          "type" : "integer"
+        },
+        {
+          "name" : "area_code",
+          "type" : "integer"
+        },
+        {
+          "name" : "timezone",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "real_region_name",
+          "type" : "varchar",
+          "length" : 255
+        }
+        ]
+        },
+    "user_agent": {
+      "columns": [
+        {
+          "name" : "name",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "os",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "os_name",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "os_major",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "os_minor",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "device",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "major",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "minor",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "patch",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "build",
+          "type" : "varchar",
+          "length" : 255
+        }
+        ]
+      }
     }
   }
 }

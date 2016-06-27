@@ -111,12 +111,20 @@ public class TableFormat {
     if (time == null) {
       return null;
     }
-    String timestamp = time.toString();
-    if (timestamp.endsWith(".0")) {
-      timestamp = timestamp.substring(0, timestamp.lastIndexOf("."));
-    }
-    return timestamp;
+    final String timestamp = time.toString();
+    return cleanTimestampString(timestamp);
   }
+
+  public String cleanTimestampString(String ts) {
+    if (ts.endsWith(".000Z")) {
+      ts = ts.substring(0, ts.lastIndexOf(".")) + "Z";
+    }
+    if (ts.endsWith(".0")) {
+      ts = ts.substring(0, ts.lastIndexOf("."));
+    }
+    return ts;
+  }
+
 
   public Format getFormat() {
     return format;

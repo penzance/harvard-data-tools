@@ -16,6 +16,8 @@ import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.io.JsonDocumentParser;
 import edu.harvard.data.matterhorn.bindings.phase0.Phase0Event;
+import edu.harvard.data.matterhorn.bindings.phase0.Phase0GeoIp;
+import edu.harvard.data.matterhorn.bindings.phase0.Phase0UserAgent;
 import edu.harvard.data.matterhorn.bindings.phase0.Phase0Video;
 
 public class EventJsonDocumentParser implements JsonDocumentParser {
@@ -43,6 +45,21 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
       videos.add(video);
       tables.put("video", videos);
     }
+    if (values.containsKey("geoip") && ((Map<String, Object>) values.get("geoip")).size() > 0) {
+      final Map<String, Object> fields = (Map<String, Object>) values.get("geoip");
+      fields.remove("location"); // Location is redundant, and typed as a list
+      final Phase0GeoIp geoip = new Phase0GeoIp(format, fields);
+      final List<Phase0GeoIp> geoips = new ArrayList<Phase0GeoIp>();
+      geoips.add(geoip);
+      tables.put("geo_ip", geoips);
+    }
+    if (values.containsKey("ua") && ((Map<String, Object>) values.get("ua")).size() > 0) {
+      final Map<String, Object> fields = (Map<String, Object>) values.get("ua");
+      final Phase0UserAgent agent = new Phase0UserAgent(format, fields);
+      final List<Phase0UserAgent> agents = new ArrayList<Phase0UserAgent>();
+      agents.add(agent);
+      tables.put("user_agent", agents);
+    }
     final List<Phase0Event> events = new ArrayList<Phase0Event>();
     events.add(event);
     tables.put("event", events);
@@ -52,13 +69,22 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     return tables;
   }
 
-  public void verifyParser(final Map<String, Object> values, final Map<String, List<? extends DataTable>> tables)
-      throws VerificationException {
+  public void verifyParser(final Map<String, Object> values,
+      final Map<String, List<? extends DataTable>> tables) throws VerificationException {
+    values.remove("_meta");
     final List<? extends DataTable> events = tables.get("event");
     final List<? extends DataTable> videos = tables.get("video");
+    final List<? extends DataTable> geoips = tables.get("geo_ip");
+    final List<? extends DataTable> userAgents = tables.get("user_agent");
     final Map<String, Object> parsed = events.get(0).getFieldsAsMap();
     if (videos != null && !videos.isEmpty()) {
       parsed.put("episode", videos.get(0).getFieldsAsMap());
+    }
+    if (geoips != null && !geoips.isEmpty()) {
+      parsed.put("geoip", geoips.get(0).getFieldsAsMap());
+    }
+    if (userAgents != null && !userAgents.isEmpty()) {
+      parsed.put("ua", userAgents.get(0).getFieldsAsMap());
     }
     try {
       compareMaps(values, parsed);
@@ -74,23 +100,27 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
   private void compareMaps(final Map<String, Object> m1, final Map<String, Object> m2)
       throws VerificationException {
     for (final String key : m1.keySet()) {
-      if (!m2.containsKey(key)) {
-        throw new VerificationException("Missing key: " + key);
+      String m2Key = key;
+      if (key.startsWith("@")) {
+        m2Key = key.substring(1);
       }
-      if (m1.get(key) == null && m2.get(key) != null) {
-        throw new VerificationException("Key " + key + " should be null, not " + m2.get(key));
+      if (!m2.containsKey(m2Key)) {
+        throw new VerificationException("Missing key: " + m2Key);
+      }
+      if (m1.get(key) == null && m2.get(m2Key) != null) {
+        throw new VerificationException("Key " + key + " should be null, not " + m2.get(m2Key));
       } else if (m1.get(key) instanceof Map) {
-        if (!(m2.get(key) instanceof Map)) {
+        if (!(m2.get(m2Key) instanceof Map)) {
           throw new VerificationException("Incorrect type for key " + key);
         }
-        compareMaps((Map<String, Object>) m1.get(key), (Map<String, Object>) m2.get(key));
+        compareMaps((Map<String, Object>) m1.get(key), (Map<String, Object>) m2.get(m2Key));
       } else {
         final String v1 = m1.get(key).toString();
-        if (m2.get(key) == null) {
+        if (m2.get(m2Key) == null) {
           throw new VerificationException("Key " + key + " should not be null");
         }
-        if (m2.get(key) instanceof Boolean) {
-          if ((boolean) m2.get(key)) {
+        if (m2.get(m2Key) instanceof Boolean) {
+          if ((boolean) m2.get(m2Key)) {
             if (!(v1.equals("true") || v1.equals("1"))) {
               throw new VerificationException(
                   "Different values for key " + key + ". Original: " + v1 + ", new: true");
@@ -102,14 +132,48 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
             }
           }
         } else {
-          final String v2 = convertToString(m2.get(key));
-          if (!v1.equals(v2)) {
-            throw new VerificationException(
-                "Different values for key " + key + ". Original: " + v1 + ", new: " + v2);
+          final String v2 = convertToString(m2.get(m2Key));
+          if (m2.get(m2Key) instanceof Timestamp) {
+            compareTimestamps(v1, v2, key);
+          } else if (m2.get(m2Key) instanceof Double) {
+            compareDoubles(v1, v2, key);
+          } else {
+            if (!v1.equals(v2)) {
+              throw new VerificationException(
+                  "Different values for key " + key + ". Original: " + v1 + ", new: " + v2);
+            }
           }
         }
       }
     }
+  }
+
+  private void compareDoubles(String v1, String v2, final String key) throws VerificationException {
+    if (v1.endsWith(".0")) {
+      v1 = v1.substring(0, v1.lastIndexOf("."));
+    }
+    if (v2.endsWith(".0")) {
+      v2 = v2.substring(0, v2.lastIndexOf("."));
+    }
+    if (!v1.equals(v2)) {
+      throw new VerificationException(
+          "Different values for key " + key + ". Original: " + v1 + ", new: " + v2);
+    }
+  }
+
+  private void compareTimestamps(String v1, String v2, final String key)
+      throws VerificationException {
+    if (v1.endsWith(".000Z")) {
+      v1 = v1.substring(0, v1.lastIndexOf(".")) + "Z";
+    }
+    if (v2.endsWith(".000Z")) {
+      v2 = v2.substring(0, v2.lastIndexOf(".")) + "Z";
+    }
+    // XXX Enable for files after Jan 1 2016
+    //    if (!v1.equals(v2)) {
+    //      throw new VerificationException(
+    //          "Different values for key " + key + ". Original: " + v1 + ", new: " + v2);
+    //    }
   }
 
   private String convertToString(final Object object) {

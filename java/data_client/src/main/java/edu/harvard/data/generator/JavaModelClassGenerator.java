@@ -459,15 +459,20 @@ public class JavaModelClassGenerator {
       final String tmpName = "$" + variableName;
       out.println("    String " + tmpName + " = (String) " + getMethod + ";");
       out.println("    if (" + tmpName + " != null && " + tmpName + ".length() > 0) {");
-      out.println("    this." + variableName + " = new Timestamp(format.getTimstampFormat().parse("
-          + tmpName + ").getTime());");
+      out.println("      this." + variableName
+          + " = new Timestamp(format.getTimstampFormat().parse(format.cleanTimestampString("
+          + tmpName + ")).getTime());");
       out.println("    }");
       break;
     case Enum:
       outputParseFromString(out, column, "(String) " + getMethod);
       break;
     case DoublePrecision:
-      out.println("    this." + variableName + " = (Double) " + getMethod + ";");
+      out.println("    if (map.get(\"" + variableName + "\") instanceof Double) {");
+      out.println("      this." + variableName + " = (Double) " + getMethod + ";");
+      out.println("    } else {");
+      out.println("     this." + variableName + " = ((Integer) " + getMethod + ").doubleValue();");
+      out.println("    }");
       break;
     case Guid:
     case Text:

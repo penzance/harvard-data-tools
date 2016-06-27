@@ -9,12 +9,9 @@ import org.apache.commons.csv.CSVFormat;
 
 public class FormatLibrary {
   public enum Format {
-    DecompressedCanvasDataFlatFiles("decompressed_canvas"),
-    CanvasDataFlatFiles("canvas"),
-    DecompressedExcel("decompressed_excel"),
-    Excel("excel"),
-    Matterhorn("matterhorn"),
-    DecompressedMatterhorn("decompressed_matterhorn");
+    DecompressedCanvasDataFlatFiles("decompressed_canvas"), CanvasDataFlatFiles(
+        "canvas"), DecompressedExcel("decompressed_excel"), Excel(
+            "excel"), Matterhorn("matterhorn"), DecompressedMatterhorn("decompressed_matterhorn");
 
     private String label;
 
@@ -67,13 +64,15 @@ public class FormatLibrary {
       "yyyy-MM-dd HH:mm:ss");
   public static DateFormat CANVAS_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-  public static DateFormat MATTERHORN_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+  public static DateFormat MATTERHORN_DATE_FORMAT = new SimpleDateFormat(
+      "yyyy-MM-dd'T'HH:mm:ssXXX");
 
   public static final DateFormat LOCAL_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd Z");
 
   public static final DateFormat JSON_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
-  private static final CSVFormat CANVAS_CSV_FORMAT = CSVFormat.TDF.withQuote(null)
+  // XXX Define a standard internal format, rather than borrowing Canvas' format.
+  private static final CSVFormat CANVAS_CSV_FORMAT = CSVFormat.TDF.withQuote('"') // XXX Works for Matterhorn, probably not for Canvas.
       .withNullString("\\N").withRecordSeparator("\n").withIgnoreSurroundingSpaces(false);
 
   private static final String CANVAS_FILE_ENCODING = "UTF-8";
