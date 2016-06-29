@@ -26,6 +26,7 @@ public class CanvasCodeGenerator extends CodeGenerator {
   private static final String IDENTITY_HADOOP_PACKAGE = "edu.harvard.data.canvas.identity";
 
   public static final String PHASE_ZERO_TABLES_JSON = "canvas/phase0_redshift_tables.json";
+  public static final String PHASE_ZERO_OVERRIDES_JSON = "canvas/phase0_schema_overrides.json";
   public static final String PHASE_ONE_IDENTIFIERS_JSON = "canvas/phase1_identifiers.json";
   public static final String PHASE_TWO_ADDITIONS_JSON = "canvas/phase2_schema_additions.json";
   public static final String PHASE_THREE_ADDITIONS_JSON = "canvas/phase3_schema_additions.json";
@@ -87,6 +88,7 @@ public class CanvasCodeGenerator extends CodeGenerator {
     final ApiClient api = new ApiClient(host, key, secret);
 
     // Set the four schema versions in the spec.
+
     final List<DataSchema> schemas = transformSchema(api.getSchema(schemaVersion));
     spec.setSchemas(schemas.get(0), schemas.get(1), schemas.get(2), schemas.get(3));
     return spec;
@@ -120,6 +122,11 @@ public class CanvasCodeGenerator extends CodeGenerator {
   @Override
   protected String getFullTextResource() {
     return FULL_TEXT_TABLES;
+  }
+
+  @Override
+  protected String getPhaseZeroModificationResource() {
+    return PHASE_ZERO_OVERRIDES_JSON;
   }
 
 }

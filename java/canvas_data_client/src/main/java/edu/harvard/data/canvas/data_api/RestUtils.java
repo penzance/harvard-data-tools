@@ -66,7 +66,7 @@ public class RestUtils {
         throw new UnexpectedApiResponseException(expectedStatus, status, url);
       }
       final String responseValue = EntityUtils.toString(response.getEntity());
-      //      System.out.println(responseValue);
+      System.out.println(responseValue);
       return mapper.readValue(responseValue, type);
     }
   }

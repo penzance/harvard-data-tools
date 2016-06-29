@@ -366,4 +366,9 @@ class TestCodeGenerator extends CodeGenerator {
     return "code_generator_integration_tests/full_text_tables.json";
   }
 
+  @Override
+  protected String getPhaseZeroModificationResource() {
+    return null;
+  }
+
 }

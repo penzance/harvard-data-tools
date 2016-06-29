@@ -29,6 +29,9 @@ public class SchemaTransformer {
    * @param extension
    *          an {@link ExtensionSchema} containing new tables and columns to be
    *          added.
+   * @param override
+   *          whether to replace columns if the extension schema specifies a new
+   *          column with the same name.
    * @return a new {@code DataSchema} containing all tables and columns from
    *         both the base and extension schemas. This object is constructed
    *         from a deep copy of the base and extension schemas, so
@@ -37,8 +40,8 @@ public class SchemaTransformer {
    *           if the extension schema contains duplicate fields, or is
    *           specified to be 'like' a non-existent table.
    */
-  public DataSchema transform(final DataSchema base, final ExtensionSchema extension)
-      throws VerificationException {
+  public DataSchema transform(final DataSchema base, final ExtensionSchema extension,
+      final boolean override) throws VerificationException {
 
     // The new schema we're going to return will have all of the columns of the
     // original. We make a copy of the base schema so that we can edit it
@@ -58,7 +61,7 @@ public class SchemaTransformer {
     }
 
     // Add any new tables and columns from the extension schema.
-    extendTableSchema(schema, (ExtensionSchema) extension.copy());
+    extendTableSchema(schema, (ExtensionSchema) extension.copy(), override);
 
     return schema;
   }
@@ -69,8 +72,8 @@ public class SchemaTransformer {
    * exist, any fields specified in the extension schema are appended to the
    * field list for that table.
    */
-  private void extendTableSchema(final DataSchema schema, final ExtensionSchema extension)
-      throws VerificationException {
+  private void extendTableSchema(final DataSchema schema, final ExtensionSchema extension,
+      final boolean override) throws VerificationException {
     final Map<String, DataSchemaTable> updates = extension.getTables();
     if (updates != null) {
       // Track tables and columns that were added in this update
@@ -95,12 +98,18 @@ public class SchemaTransformer {
           final DataSchemaTable originalTable = schema.getTables().get(tableName);
           for (final DataSchemaColumn column : newTable.getColumns()) {
             if (originalTable.getColumn(column.getName()) != null) {
-              // The new column already exists in the table (could happen as a
-              // result of using the 'like' construct).
-              throw new VerificationException(
-                  "Redefining " + column.getName() + " in table " + tableName);
+              if (override) {
+                // We want to redefine the column, since the original version
+                // had an error in it.
+                originalTable.removeColumn(column.getName());
+              } else {
+                // The new column already exists in the table (could happen as a
+                // result of using the 'like' construct).
+                throw new VerificationException(
+                    "Redefining " + column.getName() + " in table " + tableName);
+              }
             }
-            originalTable.getColumns().add(column);
+            originalTable.addColumn(column);
           }
           // If the table is set as owned in the extension schema, we need to
           // reflect that in the new schema.
@@ -157,10 +166,9 @@ public class SchemaTransformer {
    *
    * We run throught the columns in reverse, and then prepend them to the list
    * of columns in the new table. That way we can ensure that columns are
-   * ordered as:
-   *  1) columns defined in the 'like' table in previous schemas
-   *  2) columns defined in the 'like' table in the updated schema
-   *  3) columns defined in the new table definition in the updated schema.
+   * ordered as: 1) columns defined in the 'like' table in previous schemas 2)
+   * columns defined in the 'like' table in the updated schema 3) columns
+   * defined in the new table definition in the updated schema.
    */
   private void addColumns(final DataSchemaTable table, final DataSchemaTable likeTable,
       final Map<String, DataSchemaType> seenColumns) throws VerificationException {

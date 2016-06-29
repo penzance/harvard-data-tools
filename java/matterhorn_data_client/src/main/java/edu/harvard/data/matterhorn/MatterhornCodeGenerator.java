@@ -141,4 +141,9 @@ public class MatterhornCodeGenerator extends CodeGenerator {
     return null;
   }
 
+  @Override
+  protected String getPhaseZeroModificationResource() {
+    return null;
+  }
+
 }

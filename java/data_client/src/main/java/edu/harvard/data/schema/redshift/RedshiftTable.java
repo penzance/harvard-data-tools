@@ -78,6 +78,19 @@ public class RedshiftTable extends DataSchemaTable {
   }
 
   @Override
+  public void removeColumn(final String name) {
+    final DataSchemaColumn column = columnsByName.get(name);
+    columns.remove(column);
+    columnsByName.remove(column);
+  }
+
+  @Override
+  public void addColumn(final DataSchemaColumn column) {
+    columns.add(column);
+    columnsByName.put(column.getName(), column);
+  }
+
+  @Override
   public Integer getExpirationPhase() {
     return expireAfterPhase;
   }

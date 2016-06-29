@@ -80,47 +80,50 @@ public class JavaModelClassGenerator {
   private void outputEnumTypes(final PrintStream out) {
     for (final DataSchemaColumn column : table.getColumns()) {
       if (column.getType() == DataSchemaType.Enum) {
-        final String enumName = JavaBindingGenerator.javaEnum(column);
-        out.println("  public enum " + enumName + " {");
         final String desc = column.getDescription();
-        final String[] split = desc.split("'");
-        for (int i = 1; i < split.length; i += 2) {
-          out.print(
-              "    " + JavaBindingGenerator.javaClass(split[i], "") + "(\"" + split[i] + "\")");
-          if (i + 2 < split.length) {
-            out.println(",");
-          } else {
-            out.println(";");
+        System.out.println("Enum Desc: " + desc);
+        final String[] enumValues = desc.split("'");
+        if (enumValues.length > 1) { // In case there are no enum values specified.
+          final String enumName = JavaBindingGenerator.javaEnum(column);
+          out.println("  public enum " + enumName + " {");
+          for (int i = 1; i < enumValues.length; i += 2) {
+            out.print(
+                "    " + JavaBindingGenerator.javaClass(enumValues[i], "") + "(\"" + enumValues[i] + "\")");
+            if (i + 2 < enumValues.length) {
+              out.println(",");
+            } else {
+              out.println(";");
+            }
           }
+          out.println();
+          out.println("    private static final Map<String, " + enumName + "> values;");
+          out.println("    static {");
+          out.println("      values = new HashMap<String, " + enumName + ">();");
+          out.println("      for (final " + enumName + " v : " + enumName + ".values()) {");
+          out.println("        values.put(v.value, v);");
+          out.println("      }");
+          out.println("    };");
+          out.println("    public static " + enumName + " parse(final String str) {");
+          out.println("      if (values.containsKey(str)) {");
+          out.println("        return values.get(str);");
+          out.println("      }");
+          out.println("      return valueOf(str);");
+          out.println("    }");
+          out.println();
+          out.println("    private final String value;");
+          out.println("    private " + enumName + "(final String value) {");
+          out.println("      this.value = value;");
+          out.println("    }");
+          out.println("    public String getValue() {");
+          out.println("      return value;");
+          out.println("    }");
+          out.println("    @Override");
+          out.println("    public String toString() {");
+          out.println("      return value;");
+          out.println("    }");
+          out.println("  }");
+          out.println();
         }
-        out.println();
-        out.println("    private static final Map<String, " + enumName + "> values;");
-        out.println("    static {");
-        out.println("      values = new HashMap<String, " + enumName + ">();");
-        out.println("      for (final " + enumName + " v : " + enumName + ".values()) {");
-        out.println("        values.put(v.value, v);");
-        out.println("      }");
-        out.println("    };");
-        out.println("    public static " + enumName + " parse(final String str) {");
-        out.println("      if (values.containsKey(str)) {");
-        out.println("        return values.get(str);");
-        out.println("      }");
-        out.println("      return valueOf(str);");
-        out.println("    }");
-        out.println();
-        out.println("    private final String value;");
-        out.println("    private " + enumName + "(final String value) {");
-        out.println("      this.value = value;");
-        out.println("    }");
-        out.println("    public String getValue() {");
-        out.println("      return value;");
-        out.println("    }");
-        out.println("    @Override");
-        out.println("    public String toString() {");
-        out.println("      return value;");
-        out.println("    }");
-        out.println("  }");
-        out.println();
       }
     }
   }

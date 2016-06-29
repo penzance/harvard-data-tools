@@ -111,6 +111,18 @@ public abstract class CodeGenerator {
   protected abstract IdentifierType getMainIdentifier();
 
   /**
+   * Get the name of a resource on the class path that contains definitions of
+   * any overridden fields in the original schema. This will normally be null,
+   * but is required in case a schema supplied by a third party is incorrect.
+   *
+   * @return a {@code String} containing the name of a classpath resource. A
+   *         resource by this name must be available to the classloader that
+   *         loaded this class. If there are no field overrides required for the
+   *         base schema, this method will return null.
+   */
+  protected abstract String getPhaseZeroModificationResource();
+
+  /**
    * Get the name of a resource on the class path that contains the definitions
    * of all user identifiers across the data set. These identifiers will be
    * removed from all models after Phase 1 of processing, and will be used to
@@ -264,15 +276,27 @@ public abstract class CodeGenerator {
     final ExtensionSchema phase3 = ExtensionSchema
         .readExtensionSchema(getPhaseThreeAdditionsResource());
 
+    final SchemaTransformer transformer = new SchemaTransformer();
+
+    // Update the schema with any overrides required due to errors in a third
+    // party schema document
+    final String overrides = getPhaseZeroModificationResource();
+    final DataSchema schema0;
+    if (overrides == null) {
+      schema0 = base;
+    } else {
+      final ExtensionSchema phase0 = ExtensionSchema.readExtensionSchema(overrides);
+      schema0 = transformer.transform(base, phase0, true);
+    }
+
     // Transform the schema to remove identifers
     final IdentitySchema identities = IdentitySchema.read(getIdentifierResource());
-    final IdentitySchemaTransformer idTrans = new IdentitySchemaTransformer(base, identities,
+    final IdentitySchemaTransformer idTrans = new IdentitySchemaTransformer(schema0, identities,
         getMainIdentifier());
     final DataSchema schema1 = idTrans.transform();
 
-    final SchemaTransformer transformer = new SchemaTransformer();
-    final DataSchema schema2 = transformer.transform(schema1, phase2);
-    final DataSchema schema3 = transformer.transform(schema2, phase3);
+    final DataSchema schema2 = transformer.transform(schema1, phase2, false);
+    final DataSchema schema3 = transformer.transform(schema2, phase3, false);
 
     // Add in any tables that are to be read from Redshift. This has to happen
     // last so that we have the correct schema for all existing tables; a table
@@ -280,10 +304,10 @@ public abstract class CodeGenerator {
     // previously written there.
     final ExistingTableSchemaTransformer existingTrans = new ExistingTableSchemaTransformer();
     final ExistingSchema existing = ExistingSchema.readExistingSchemas(getExistingTableResource());
-    final DataSchema schema0 = existingTrans.transform(base, existing, schema3);
+    final DataSchema updatedSchema0 = existingTrans.transform(schema0, existing, schema3);
 
     final List<DataSchema> schemas = new ArrayList<DataSchema>();
-    schemas.add(schema0);
+    schemas.add(updatedSchema0);
     schemas.add(schema1);
     schemas.add(schema2);
     schemas.add(schema3);

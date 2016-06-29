@@ -15,11 +15,16 @@ public abstract class DataSchemaTable {
 
   public abstract List<DataSchemaColumn> getColumns();
 
-  public abstract DataSchemaTable copy();
-
   public abstract DataSchemaColumn getColumn(final String name);
 
+  public abstract void addColumn(DataSchemaColumn column);
+
+  public abstract DataSchemaTable copy();
+
+
   public abstract String getLikeTable();
+
+  public abstract void removeColumn(final String name);
 
   protected DataSchemaTable(final boolean newlyGenerated, final TableOwner owner, final Integer expireAfterPhase) {
     this.newlyGenerated = newlyGenerated;

@@ -43,7 +43,7 @@ public class SchemaTransformerFailureTest {
       throws IOException, VerificationException {
     final ExtensionSchema base = read(resource1);
     final ExtensionSchema ext = read(resource2);
-    transformer.transform(base, ext);
+    transformer.transform(base, ext, false);
   }
 
 }
