@@ -18,6 +18,8 @@ import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.identity.IdentitySchemaTransformer;
 import edu.harvard.data.pipeline.InputTableIndex;
 import edu.harvard.data.schema.DataSchema;
+import edu.harvard.data.schema.DataSchemaColumn;
+import edu.harvard.data.schema.DataSchemaTable;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 import edu.harvard.data.schema.existing.ExistingSchema;
 import edu.harvard.data.schema.extension.ExtensionSchema;
@@ -287,6 +289,12 @@ public abstract class CodeGenerator {
     } else {
       final ExtensionSchema phase0 = ExtensionSchema.readExtensionSchema(overrides);
       schema0 = transformer.transform(base, phase0, true);
+      for (final DataSchemaTable table : schema0.getTables().values()) {
+        table.setNewlyGenerated(false);
+        for (final DataSchemaColumn column : table.getColumns()) {
+          column.setNewlyGenerated(false);
+        }
+      }
     }
 
     // Transform the schema to remove identifers
