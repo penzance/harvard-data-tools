@@ -4,7 +4,7 @@
 ssh-keyscan github.com >> /home/ec2-user/.ssh/known_hosts
 
 # install jdk and git
-sudo yum install -y java-devel git-core awslogs
+sudo yum install -y java-devel git-core
 
 #Install maven via instructions at https://gist.github.com/sebsto/19b99f1fa1f32cae5d00
 sudo wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
@@ -23,6 +23,7 @@ fi
 git clone -b $GIT_BRANCH https://github.com/penzance/harvard-data-tools.git $HARVARD_DATA_TOOLS_BASE
 
 # setup CloudWatch logging
+sudo yum install -y awslogs
 sudo cp /home/ec2-user/harvard-data-tools/cloudwatch/awslogs-phase0.conf /etc/awslogs/awslogs.conf
 sudo service awslogs start
 

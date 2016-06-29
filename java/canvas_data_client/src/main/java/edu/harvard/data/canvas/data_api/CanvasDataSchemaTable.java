@@ -228,6 +228,15 @@ public class CanvasDataSchemaTable extends DataSchemaTable {
   }
 
   @Override
+  public void updateColumn(final DataSchemaColumn column) {
+    final DataSchemaColumn oldColumn = columnsByName.get(column.getName());
+    final int idx = columns.indexOf(oldColumn);
+    columns.remove(oldColumn);
+    columns.add(idx, column);
+    columnsByName.put(column.getName(), column);
+  }
+
+  @Override
   public void addColumn(final DataSchemaColumn column) {
     columns.add(column);
     columnsByName.put(column.getName(), column);
@@ -241,4 +250,5 @@ public class CanvasDataSchemaTable extends DataSchemaTable {
     }
     return s;
   }
+
 }

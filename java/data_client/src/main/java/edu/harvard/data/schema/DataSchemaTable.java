@@ -26,6 +26,8 @@ public abstract class DataSchemaTable {
 
   public abstract void removeColumn(final String name);
 
+  public abstract void updateColumn(DataSchemaColumn column);
+
   protected DataSchemaTable(final boolean newlyGenerated, final TableOwner owner, final Integer expireAfterPhase) {
     this.newlyGenerated = newlyGenerated;
     this.owner = owner;

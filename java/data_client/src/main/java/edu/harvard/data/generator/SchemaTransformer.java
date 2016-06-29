@@ -101,15 +101,16 @@ public class SchemaTransformer {
               if (override) {
                 // We want to redefine the column, since the original version
                 // had an error in it.
-                originalTable.removeColumn(column.getName());
+                originalTable.updateColumn(column);
               } else {
                 // The new column already exists in the table (could happen as a
                 // result of using the 'like' construct).
                 throw new VerificationException(
                     "Redefining " + column.getName() + " in table " + tableName);
               }
+            } else {
+              originalTable.addColumn(column);
             }
-            originalTable.addColumn(column);
           }
           // If the table is set as owned in the extension schema, we need to
           // reflect that in the new schema.
