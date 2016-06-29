@@ -81,7 +81,6 @@ public class JavaModelClassGenerator {
     for (final DataSchemaColumn column : table.getColumns()) {
       if (column.getType() == DataSchemaType.Enum) {
         final String desc = column.getDescription();
-        System.out.println("Enum Desc: " + desc);
         final String[] enumValues = desc.split("'");
         if (enumValues.length > 1) { // In case there are no enum values specified.
           final String enumName = JavaBindingGenerator.javaEnum(column);
