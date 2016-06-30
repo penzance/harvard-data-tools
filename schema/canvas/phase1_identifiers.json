@@ -1,4 +1,10 @@
 {
+   "assignment_override_user_dim": {
+        "user_id": ["CanvasDataID"]
+   },
+   "assignment_override_user_fact": {
+        "user_id": ["CanvasDataID"]
+   },
    "communication_channel_dim": {
 		"canvas_id": ["CanvasID"],
 		"user_id": ["CanvasDataID"],
