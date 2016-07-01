@@ -60,7 +60,9 @@ public class MatterhornCodeManager extends GeneratedCodeManager {
 
   @Override
   public Map<Integer, List<Class<? extends HadoopJob>>> getHadoopProcessingJobs() {
+    addJob(GeoIpJob.class, 2);
     addJob(SessionJob.class, 2);
+    addJob(UserAgentJob.class, 2);
     addJob(VideoJob.class, 2);
     return jobs;
   }

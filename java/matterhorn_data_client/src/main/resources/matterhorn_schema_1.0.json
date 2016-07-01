@@ -255,6 +255,12 @@
     "user_agent": {
       "columns": [
         {
+          "name" : "useragent",
+          "description" : "Content of the user-agent header from the HTTP request.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
           "name" : "name",
           "type" : "varchar",
           "length" : 255

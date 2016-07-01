@@ -1,8 +1,13 @@
 { "tables": { 
-  	"video": {
+    "video": {
         "owner": "java"
     },
-    
+    "user_agent": {
+        "owner": "java"
+    },
+    "geo_ip": {
+        "owner": "java"
+    },    
     "session": {
         "owner": "java",
         "columns" : [ 
