@@ -38,7 +38,7 @@ public class IdentityMapperTests {
   @SuppressWarnings("unchecked")
   public void beforeTest() throws IOException {
     config = mock(Configuration.class);
-    when(config.get("format")).thenReturn(Format.DecompressedCanvasDataFlatFiles.toString());
+    when(config.get("format")).thenReturn(Format.DecompressedInternal.toString());
     context = mock(Mapper.Context.class);
     when(context.getConfiguration()).thenReturn(config);
   }
@@ -175,7 +175,7 @@ class TestIdentityMapper extends LongIdentityMapper {
     this.passedIds = new ArrayList<IdentityMap>();
     this.idValues = new ArrayList<IdentityMap>();
     this.mapper = new IdentityMapper<Long>();
-    this.mapper.format = new FormatLibrary().getFormat(Format.DecompressedCanvasDataFlatFiles);
+    this.mapper.format = new FormatLibrary().getFormat(Format.DecompressedInternal);
 
   }
 

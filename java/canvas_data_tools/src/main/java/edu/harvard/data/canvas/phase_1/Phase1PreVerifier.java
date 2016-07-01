@@ -13,7 +13,6 @@ import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
-import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopJob;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
@@ -47,7 +46,7 @@ public class Phase1PreVerifier {
     this.inputDir = config.getHdfsDir(0);
     this.outputDir = config.getVerifyHdfsDir(0);
     this.hadoopConfig = new Configuration();
-    this.format = new FormatLibrary().getFormat(Format.DecompressedCanvasDataFlatFiles);
+    this.format = new FormatLibrary().getFormat(config.getPipelineFormat());
     try {
       this.hdfsService = new URI("hdfs///");
     } catch (final URISyntaxException e) {

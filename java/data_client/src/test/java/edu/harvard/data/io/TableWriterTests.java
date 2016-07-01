@@ -36,7 +36,7 @@ public class TableWriterTests {
     final PipedInputStream in = new PipedInputStream();
     out = new PipedOutputStream(in);
     final FormatLibrary formatLibrary = new FormatLibrary();
-    format = formatLibrary.getFormat(Format.DecompressedCanvasDataFlatFiles);
+    format = formatLibrary.getFormat(Format.DecompressedInternal);
     reader = new BufferedReader(new InputStreamReader(in));
     file = mock(File.class);
     parentFile = mock(File.class);

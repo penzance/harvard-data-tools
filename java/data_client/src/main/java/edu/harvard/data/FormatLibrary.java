@@ -9,9 +9,14 @@ import org.apache.commons.csv.CSVFormat;
 
 public class FormatLibrary {
   public enum Format {
-    DecompressedCanvasDataFlatFiles("decompressed_canvas"), CanvasDataFlatFiles(
-        "canvas"), DecompressedExcel("decompressed_excel"), Excel(
-            "excel"), Matterhorn("matterhorn"), DecompressedMatterhorn("decompressed_matterhorn");
+    DecompressedCanvasDataFlatFiles("decompressed_canvas"),
+    CanvasDataFlatFiles("canvas"),
+    DecompressedExcel("decompressed_excel"),
+    Excel("excel"),
+    Matterhorn("matterhorn"),
+    DecompressedMatterhorn("decompressed_matterhorn"),
+    CompressedInternal("compressed_internal"),
+    DecompressedInternal("decompressed_internal");
 
     private String label;
 
@@ -37,6 +42,10 @@ public class FormatLibrary {
         return Matterhorn;
       case "decompressed_matterhorn":
         return DecompressedMatterhorn;
+      case "compressed_internal":
+        return CompressedInternal;
+      case "decompressed_internal":
+        return DecompressedInternal;
       default:
         return Format.valueOf(label);
       }
@@ -54,6 +63,8 @@ public class FormatLibrary {
     formatMap.put(Format.DecompressedExcel, createDecompressedExcelFormat());
     formatMap.put(Format.Matterhorn, createMatterhornFormat());
     formatMap.put(Format.DecompressedMatterhorn, createDecompressedMatterhornFormat());
+    formatMap.put(Format.CompressedInternal, createCompressedInternalFormat());
+    formatMap.put(Format.DecompressedInternal, createDecompressedInternalFormat());
   }
 
   public TableFormat getFormat(final Format format) {
@@ -71,11 +82,11 @@ public class FormatLibrary {
 
   public static final DateFormat JSON_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
-  // XXX Define a standard internal format, rather than borrowing Canvas' format.
   private static final CSVFormat CANVAS_CSV_FORMAT = CSVFormat.TDF.withQuote(null)
       .withNullString("\\N").withRecordSeparator("\n").withIgnoreSurroundingSpaces(false);
-  //  private static final CSVFormat CANVAS_CSV_FORMAT = CSVFormat.TDF.withQuote('"') // XXX Works for Matterhorn, probably not for Canvas.
-  //      .withNullString("\\N").withRecordSeparator("\n").withIgnoreSurroundingSpaces(false);
+
+  private static final CSVFormat INTERNAL_CSV_FORMAT = CSVFormat.TDF.withQuote('"')
+      .withNullString("\\N").withRecordSeparator("\n").withIgnoreSurroundingSpaces(false);
 
   private static final String CANVAS_FILE_ENCODING = "UTF-8";
   private static final String MATTERHORN_FILE_ENCODING = "UTF-8";
@@ -143,5 +154,28 @@ public class FormatLibrary {
     format.setCompression(TableFormat.Compression.Gzip);
     return format;
   }
+
+  private TableFormat createCompressedInternalFormat() {
+    final TableFormat canvasFormat = new TableFormat(Format.CompressedInternal);
+    canvasFormat.setTimestampFormat(CANVAS_TIMESTAMP_FORMAT);
+    canvasFormat.setDateFormat(CANVAS_DATE_FORMAT);
+    canvasFormat.setIncludeHeaders(false);
+    canvasFormat.setEncoding(CANVAS_FILE_ENCODING);
+    canvasFormat.setCsvFormat(INTERNAL_CSV_FORMAT);
+    canvasFormat.setCompression(TableFormat.Compression.Gzip);
+    return canvasFormat;
+  }
+
+  private TableFormat createDecompressedInternalFormat() {
+    final TableFormat canvasFormat = new TableFormat(Format.DecompressedInternal);
+    canvasFormat.setTimestampFormat(CANVAS_TIMESTAMP_FORMAT);
+    canvasFormat.setDateFormat(CANVAS_DATE_FORMAT);
+    canvasFormat.setIncludeHeaders(false);
+    canvasFormat.setEncoding(CANVAS_FILE_ENCODING);
+    canvasFormat.setCsvFormat(INTERNAL_CSV_FORMAT);
+    canvasFormat.setCompression(TableFormat.Compression.None);
+    return canvasFormat;
+  }
+
 
 }

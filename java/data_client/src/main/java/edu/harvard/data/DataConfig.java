@@ -13,6 +13,7 @@ import java.util.Properties;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
 
+import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.identity.IdentifierType;
 
 public class DataConfig {
@@ -24,6 +25,7 @@ public class DataConfig {
   private final String dataSource;
   private final IdentifierType mainIdentifier;
   private final String serverTimezone;
+  private final FormatLibrary.Format pipelineFormat;
 
   private final String dataPipelineRole;
   private final String dataPipelineResourceRoleArn;
@@ -128,6 +130,7 @@ public class DataConfig {
 
     this.dataSource = getConfigParameter("data_source", verify);
     this.datasetName = getConfigParameter("dataset_name", verify);
+    this.pipelineFormat = Format.fromLabel(getConfigParameter("pipeline_format", verify));
     this.dataPipelineRole = getConfigParameter("data_pipeline_role", verify);
     this.dataPipelineResourceRoleArn = getConfigParameter("data_pipeline_resource_role_arn",
         verify);
@@ -555,6 +558,10 @@ public class DataConfig {
 
   public int getIdentityLeaseLengthSeconds() {
     return identityLeaseLengthSeconds;
+  }
+
+  public FormatLibrary.Format getPipelineFormat() {
+    return pipelineFormat;
   }
 
 }

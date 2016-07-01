@@ -48,7 +48,7 @@ public class IdentityReducerSetupTests {
   @SuppressWarnings("unchecked")
   public void beforeTest() throws IOException {
     config = mock(Configuration.class);
-    when(config.get("format")).thenReturn(Format.DecompressedCanvasDataFlatFiles.toString());
+    when(config.get("format")).thenReturn(Format.DecompressedInternal.toString());
     when(config.get("mainIdentifier")).thenReturn(MAIN_IDENTIFIER.toString());
     context = mock(Reducer.Context.class);
     when(context.getConfiguration()).thenReturn(config);

@@ -38,7 +38,7 @@ public class IdentityReducerReduceTests {
     context = mock(Reducer.Context.class);
     when(context.getConfiguration()).thenReturn(config);
     identityReducer = new IdentityReducer<String>();
-    identityReducer.format = new FormatLibrary().getFormat(Format.DecompressedCanvasDataFlatFiles);
+    identityReducer.format = new FormatLibrary().getFormat(Format.DecompressedInternal);
     identityReducer.mainIdentifier = MAIN_IDENTIFIER;
     identityReducer.identities = new HashMap<String, IdentityMap>();
   }

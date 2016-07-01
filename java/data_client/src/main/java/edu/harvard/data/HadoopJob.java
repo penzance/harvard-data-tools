@@ -11,8 +11,6 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import edu.harvard.data.FormatLibrary.Format;
-
 public abstract class HadoopJob {
   private static final Logger log = LogManager.getLogger();
 
@@ -34,8 +32,7 @@ public abstract class HadoopJob {
       throw new DataConfigurationException(e);
     }
     this.hadoopConf = new Configuration();
-    final TableFormat format = new FormatLibrary()
-        .getFormat(Format.DecompressedCanvasDataFlatFiles);
+    final TableFormat format = new FormatLibrary().getFormat(config.getPipelineFormat());
     hadoopConf.set("format", format.getFormat().toString());
     hadoopConf.set("config", config.getPaths());
   }

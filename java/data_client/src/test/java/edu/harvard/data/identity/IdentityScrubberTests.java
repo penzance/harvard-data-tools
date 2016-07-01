@@ -51,7 +51,7 @@ public class IdentityScrubberTests {
   @SuppressWarnings("unchecked")
   public void beforeTest() throws IOException, DataConfigurationException {
     config = mock(Configuration.class);
-    when(config.get("format")).thenReturn(Format.DecompressedCanvasDataFlatFiles.toString());
+    when(config.get("format")).thenReturn(Format.DecompressedInternal.toString());
     when(config.get("mainIdentifier")).thenReturn(MAIN_IDENTIFIER.toString());
     context = mock(Mapper.Context.class);
     when(context.getConfiguration()).thenReturn(config);

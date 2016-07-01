@@ -19,7 +19,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.DataConfig;
-import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.generator.GeneratedCodeManager;
 import edu.harvard.data.leases.LeaseRenewalException;
@@ -55,7 +54,7 @@ public class IdentityMapHadoopJob {
     final LeaseRenewalThread leaseThread = LeaseRenewalThread.setup(config.getLeaseDynamoTable(),
         config.getIdentityLease(), runId, config.getIdentityLeaseLengthSeconds());
     final IdentifierType mainIdentifier = config.getMainIdentifier();
-    hadoopConfig.set("format", Format.DecompressedCanvasDataFlatFiles.toString());
+    hadoopConfig.set("format", config.getPipelineFormat().toString());
     hadoopConfig.set("mainIdentifier", mainIdentifier.toString());
     final Job job = Job.getInstance(hadoopConfig, "identity-map");
     job.setJarByClass(IdentityMapHadoopJob.class);

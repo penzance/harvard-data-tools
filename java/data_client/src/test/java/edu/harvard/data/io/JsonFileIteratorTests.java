@@ -43,7 +43,7 @@ public class JsonFileIteratorTests {
     in = new PipedInputStream(out);
     parser = new DataTableStubDocumentParser();
     formatLibrary = new FormatLibrary();
-    format = formatLibrary.getFormat(Format.DecompressedCanvasDataFlatFiles);
+    format = formatLibrary.getFormat(Format.DecompressedInternal);
     reader = new JsonFileReader(format, in, parser);
   }
 

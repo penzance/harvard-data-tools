@@ -20,7 +20,6 @@ import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
-import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopJob;
 import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.TableFormat;
@@ -62,7 +61,7 @@ public class Phase1PostVerifier {
     this.verifyDir = config.getVerifyHdfsDir(1);
     this.hadoopConfig = new Configuration();
     this.hadoopUtils = new HadoopUtilities();
-    this.format = new FormatLibrary().getFormat(Format.DecompressedCanvasDataFlatFiles);
+    this.format = new FormatLibrary().getFormat(config.getPipelineFormat());
     try {
       this.hdfsService = new URI("hdfs///");
     } catch (final URISyntaxException e) {

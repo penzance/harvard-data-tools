@@ -134,7 +134,7 @@ class TableReaderIteratorStub<T extends DataTable> implements Iterator<T> {
   public TableReaderIteratorStub(final int count, final String name) {
     this.items = new ArrayList<DataTableStub>();
     final TableFormat format = new FormatLibrary()
-        .getFormat(Format.DecompressedCanvasDataFlatFiles);
+        .getFormat(Format.DecompressedInternal);
     final DataTableStub base = new DataTableStub(format);
     for (int i = 0; i < count; i++) {
       items.add(new DataTableStub(format, i, name, "123", base.timestamp, base.date));

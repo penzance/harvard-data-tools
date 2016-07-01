@@ -16,7 +16,6 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 import edu.harvard.data.DataConfig;
-import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.NoInputDataException;
 import edu.harvard.data.generator.GeneratedCodeManager;
@@ -70,7 +69,7 @@ public class IdentityScrubHadoopJob {
   private Job getJob(final String tableName, final Class<? extends IdentityScrubber<?>> cls)
       throws IOException, NoInputDataException {
     final Configuration hadoopConfig = new Configuration();
-    hadoopConfig.set("format", Format.DecompressedCanvasDataFlatFiles.toString());
+    hadoopConfig.set("format", config.getPipelineFormat().toString());
     hadoopConfig.set("config", config.getPaths());
     final Job job = Job.getInstance(hadoopConfig, tableName + "-scrubber");
     job.setJarByClass(IdentityScrubHadoopJob.class);

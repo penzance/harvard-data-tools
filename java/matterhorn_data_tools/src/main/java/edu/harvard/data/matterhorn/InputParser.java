@@ -58,7 +58,7 @@ public class InputParser {
     this.userAgentOutputDir = AwsUtils.key(outputLocation, "user_agent");
     final FormatLibrary formatLibrary = new FormatLibrary();
     this.inFormat = formatLibrary.getFormat(Format.Matterhorn);
-    this.outFormat = formatLibrary.getFormat(Format.CanvasDataFlatFiles);
+    this.outFormat = formatLibrary.getFormat(config.getPipelineFormat());
   }
 
   public InputTableIndex parseFile() throws IOException {

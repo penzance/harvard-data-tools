@@ -41,7 +41,7 @@ public class DelimitedFileIteratorTests {
     in = new PipedInputStream((PipedOutputStream) out);
     writer = new PrintWriter(new OutputStreamWriter(out));
     final FormatLibrary formatLibrary = new FormatLibrary();
-    noHeaderFormat = formatLibrary.getFormat(Format.DecompressedCanvasDataFlatFiles);
+    noHeaderFormat = formatLibrary.getFormat(Format.DecompressedInternal);
 
     file = mock(File.class);
     when(file.exists()).thenReturn(true);
