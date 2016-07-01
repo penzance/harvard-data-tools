@@ -76,9 +76,8 @@ public class InputParser {
       dataIndex.addFile("video", videoOutputDir, videoFile.length());
       dataIndex.addFile("geo_ip", geoipOutputDir, geoipFile.length());
       dataIndex.addFile("user_agent", userAgentOutputDir, userAgentFile.length());
-      cleanup(); // XXX Move to finally block.
     } finally {
-      //      cleanup();
+      cleanup();
     }
     return dataIndex;
   }
