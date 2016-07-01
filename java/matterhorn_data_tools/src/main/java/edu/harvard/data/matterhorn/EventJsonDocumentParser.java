@@ -87,6 +87,15 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
       parsed.put("ua", userAgents.get(0).getFieldsAsMap());
     }
     try {
+      if (values.containsKey("geoip") && ((Map<?,?>)values.get("geoip")).isEmpty()) {
+        values.remove("geoip");
+      }
+      if (values.containsKey("ua") && ((Map<?,?>)values.get("ua")).isEmpty()) {
+        values.remove("ua");
+      }
+      if (values.containsKey("episode") && ((Map<?,?>)values.get("episode")).isEmpty()) {
+        values.remove("episode");
+      }
       compareMaps(values, parsed);
     } catch (final VerificationException e) {
       log.error("Failed to verify JSON document. " + e.getMessage());
