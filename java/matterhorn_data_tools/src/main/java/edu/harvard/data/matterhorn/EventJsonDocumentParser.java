@@ -169,11 +169,10 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     if (v2.endsWith(".000Z")) {
       v2 = v2.substring(0, v2.lastIndexOf(".")) + "Z";
     }
-    // XXX Enable for files after Jan 1 2016
-    //    if (!v1.equals(v2)) {
-    //      throw new VerificationException(
-    //          "Different values for key " + key + ". Original: " + v1 + ", new: " + v2);
-    //    }
+    if (!v1.equals(v2)) {
+      throw new VerificationException(
+          "Different values for key " + key + ". Original: " + v1 + ", new: " + v2);
+    }
   }
 
   private String convertToString(final Object object) {
