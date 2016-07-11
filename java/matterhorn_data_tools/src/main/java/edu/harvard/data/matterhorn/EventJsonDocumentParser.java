@@ -56,6 +56,7 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     if (values.containsKey("ua") && ((Map<String, Object>) values.get("ua")).size() > 0) {
       final Map<String, Object> fields = (Map<String, Object>) values.get("ua");
       final Phase0UserAgent agent = new Phase0UserAgent(format, fields);
+      agent.setUseragent((String) values.get("useragent"));
       final List<Phase0UserAgent> agents = new ArrayList<Phase0UserAgent>();
       agents.add(agent);
       tables.put("user_agent", agents);
