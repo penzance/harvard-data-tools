@@ -108,8 +108,9 @@ public class Phase1PipelineSetup {
     final List<String> args = new ArrayList<String>();
     args.add(config.getPaths());
     args.add(runId);
-    final PipelineObjectBase verify = factory.getEmrActivity("IdentityPreverify", pipeline.getEmr(),
-        cls, args);
+    final String jar = config.getEmrCodeDir() + "/" + config.getDataToolsJar();
+    final PipelineObjectBase verify = factory.getJavaShellActivity("IdentityPreverify", jar, cls,
+        args, pipeline.getEmr());
     verify.addDependency(previousStep);
     return verify;
   }
@@ -119,8 +120,9 @@ public class Phase1PipelineSetup {
     final List<String> args = new ArrayList<String>();
     args.add(config.getPaths());
     args.add(runId);
-    final PipelineObjectBase verify = factory.getEmrActivity("IdentityPostverify",
-        pipeline.getEmr(), cls, args);
+    final String jar = config.getEmrCodeDir() + "/" + config.getDataToolsJar();
+    final PipelineObjectBase verify = factory.getJavaShellActivity("IdentityPostverify", jar, cls,
+        args, pipeline.getEmr());
     verify.addDependency(previousStep);
     return verify;
   }

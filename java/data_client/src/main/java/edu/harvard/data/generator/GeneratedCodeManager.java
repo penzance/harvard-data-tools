@@ -45,4 +45,5 @@ public abstract class GeneratedCodeManager {
   public abstract Class<?> getIdentityPostverifyJob();
 
   public abstract Map<Integer, List<Class<? extends HadoopJob>>> getHadoopProcessingJobs();
+
 }

@@ -30,13 +30,17 @@ public class FullTextCopyScriptGenerator {
     final File scriptFile = new File(dir, config.getFullTextScriptFile());
 
     try (final PrintStream out = new PrintStream(new FileOutputStream(scriptFile))) {
+      boolean data = false;
       for (final String table : textSchema.tableNames()) {
         if (dataIndex.containsTable(table)) {
           generateTable(out, table);
+          data = true;
         }
       }
-
-      out.println("aws s3 cp --recursive " + config.getFullTextDir() + "/ " + AwsUtils.uri(config.getFullTextLocation()));
+      if (data) {
+        out.println("aws s3 cp --recursive " + config.getFullTextDir() + "/ "
+            + AwsUtils.uri(config.getFullTextLocation()));
+      }
     }
   }
 
