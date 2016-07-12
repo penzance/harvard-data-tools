@@ -106,7 +106,7 @@ public class Phase1PipelineSetup {
   private PipelineObjectBase identityPreverify(final PipelineObjectBase previousStep) {
     final Class<?> cls = codeManager.getIdentityPreverifyJob();
     final List<String> args = new ArrayList<String>();
-    args.add(config.getPaths());
+    args.add("\"" + config.getPaths() + "\"");
     args.add(runId);
     final String jar = config.getEmrCodeDir() + "/" + config.getDataToolsJar();
     final PipelineObjectBase verify = factory.getJavaShellActivity("IdentityPreverify", jar, cls,
@@ -118,7 +118,7 @@ public class Phase1PipelineSetup {
   private PipelineObjectBase identityPostverify(final PipelineObjectBase previousStep) {
     final Class<?> cls = codeManager.getIdentityPostverifyJob();
     final List<String> args = new ArrayList<String>();
-    args.add(config.getPaths());
+    args.add("\"" + config.getPaths() + "\"");
     args.add(runId);
     final String jar = config.getEmrCodeDir() + "/" + config.getDataToolsJar();
     final PipelineObjectBase verify = factory.getJavaShellActivity("IdentityPostverify", jar, cls,
