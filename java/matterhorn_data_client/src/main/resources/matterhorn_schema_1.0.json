@@ -107,8 +107,52 @@
           "type" : "boolean"
         },
         {
-          "name" : "useragent",
-          "description" : "Content of the user-agent header from the HTTP request.",
+          "name" : "ua.name",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "ua.os",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "ua.os_name",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "ua.os_major",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "ua.os_minor",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "ua.device",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "ua.major",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "ua.minor",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "ua.patch",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "ua.build",
           "type" : "varchar",
           "length" : 255
         }
@@ -247,66 +291,6 @@
         },
         {
           "name" : "real_region_name",
-          "type" : "varchar",
-          "length" : 255
-        }
-        ]
-        },
-    "user_agent": {
-      "columns": [
-        {
-          "name" : "useragent",
-          "description" : "Content of the user-agent header from the HTTP request.",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "name",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "os",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "os_name",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "os_major",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "os_minor",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "device",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "major",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "minor",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "patch",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "build",
           "type" : "varchar",
           "length" : 255
         }

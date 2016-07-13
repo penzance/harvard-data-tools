@@ -20,6 +20,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.amazonaws.util.StringUtils;
+
 import edu.harvard.data.schema.DataSchemaColumn;
 import edu.harvard.data.schema.DataSchemaTable;
 
@@ -240,7 +242,7 @@ public class JavaBindingGenerator {
   public static String javaGetter(final String fieldName) {
     String name = fieldName;
     if (name.contains(".")) {
-      name = name.substring(name.lastIndexOf(".") + 1);
+      name = StringUtils.join("_", name.split("\\."));
     }
     return javaClass(name, "get");
   }
@@ -248,7 +250,7 @@ public class JavaBindingGenerator {
   public static String javaSetter(final String fieldName) {
     String name = fieldName;
     if (name.contains(".")) {
-      name = name.substring(name.lastIndexOf(".") + 1);
+      name = StringUtils.join("_", name.split("\\."));
     }
     return javaClass(name, "set");
   }
@@ -258,7 +260,7 @@ public class JavaBindingGenerator {
     String fieldName = name;
     // Dots are used in the schema to indicate nested JSON values
     if (fieldName.contains(".")) {
-      fieldName = fieldName.substring(fieldName.lastIndexOf(".") + 1);
+      fieldName = StringUtils.join("_", fieldName.split("\\."));
     }
     final String[] parts = fieldName.split("_");
     String variableName = parts[0].substring(0, 1).toLowerCase() + parts[0].substring(1);

@@ -17,7 +17,6 @@ import edu.harvard.data.VerificationException;
 import edu.harvard.data.io.JsonDocumentParser;
 import edu.harvard.data.matterhorn.bindings.phase0.Phase0Event;
 import edu.harvard.data.matterhorn.bindings.phase0.Phase0GeoIp;
-import edu.harvard.data.matterhorn.bindings.phase0.Phase0UserAgent;
 import edu.harvard.data.matterhorn.bindings.phase0.Phase0Video;
 
 public class EventJsonDocumentParser implements JsonDocumentParser {
@@ -53,14 +52,6 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
       geoips.add(geoip);
       tables.put("geo_ip", geoips);
     }
-    if (values.containsKey("ua") && ((Map<String, Object>) values.get("ua")).size() > 0) {
-      final Map<String, Object> fields = (Map<String, Object>) values.get("ua");
-      final Phase0UserAgent agent = new Phase0UserAgent(format, fields);
-      agent.setUseragent((String) values.get("useragent"));
-      final List<Phase0UserAgent> agents = new ArrayList<Phase0UserAgent>();
-      agents.add(agent);
-      tables.put("user_agent", agents);
-    }
     final List<Phase0Event> events = new ArrayList<Phase0Event>();
     events.add(event);
     tables.put("event", events);
@@ -76,7 +67,6 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     final List<? extends DataTable> events = tables.get("event");
     final List<? extends DataTable> videos = tables.get("video");
     final List<? extends DataTable> geoips = tables.get("geo_ip");
-    final List<? extends DataTable> userAgents = tables.get("user_agent");
     final Map<String, Object> parsed = events.get(0).getFieldsAsMap();
     if (videos != null && !videos.isEmpty()) {
       parsed.put("episode", videos.get(0).getFieldsAsMap());
@@ -84,15 +74,9 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     if (geoips != null && !geoips.isEmpty()) {
       parsed.put("geoip", geoips.get(0).getFieldsAsMap());
     }
-    if (userAgents != null && !userAgents.isEmpty()) {
-      parsed.put("ua", userAgents.get(0).getFieldsAsMap());
-    }
     try {
       if (values.containsKey("geoip") && ((Map<?,?>)values.get("geoip")).isEmpty()) {
         values.remove("geoip");
-      }
-      if (values.containsKey("ua") && ((Map<?,?>)values.get("ua")).isEmpty()) {
-        values.remove("ua");
       }
       if (values.containsKey("episode") && ((Map<?,?>)values.get("episode")).isEmpty()) {
         values.remove("episode");

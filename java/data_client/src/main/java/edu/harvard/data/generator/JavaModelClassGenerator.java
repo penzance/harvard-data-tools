@@ -367,7 +367,7 @@ public class JavaModelClassGenerator {
         mapName = JavaBindingGenerator
             .javaVariable(columnName.substring(0, columnName.lastIndexOf(".")));
         key = columnName.substring(columnName.lastIndexOf(".") + 1);
-        variableName = JavaBindingGenerator.javaVariable(key);
+        variableName = JavaBindingGenerator.javaVariable(columnName);
       } else {
         mapName = "map";
         key = columnName;
