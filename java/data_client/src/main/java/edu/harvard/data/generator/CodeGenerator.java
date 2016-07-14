@@ -230,7 +230,7 @@ public abstract class CodeGenerator {
       new S3ToRedshiftLoaderGenerator(codeDir, spec, config, workingDir, dataIndex).generate();
 
       log.info("Generating move unmodified files script in " + codeDir);
-      new MoveUnmodifiedTableGenerator(codeDir, spec, dataIndex).generate();
+      new MoveUnmodifiedTableGenerator(codeDir, spec).generate();
 
       log.info("Generating copy full text script in " + codeDir);
       new FullTextCopyScriptGenerator(codeDir, config, FullTextSchema.read(getFullTextResource()),

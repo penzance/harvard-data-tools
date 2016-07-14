@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -99,7 +100,7 @@ public class MatterhornCodeGenerator extends CodeGenerator {
   private static DataSchema readSchema(final String version)
       throws JsonParseException, JsonMappingException, IOException {
     final ObjectMapper jsonMapper = new ObjectMapper();
-    jsonMapper.setDateFormat(FormatLibrary.JSON_DATE_FORMAT);
+    jsonMapper.setDateFormat(new SimpleDateFormat(FormatLibrary.JSON_DATE_FORMAT_STRING));
     final ClassLoader classLoader = MatterhornCodeGenerator.class.getClassLoader();
     try (final InputStream in = classLoader
         .getResourceAsStream("matterhorn_schema_" + version + ".json")) {

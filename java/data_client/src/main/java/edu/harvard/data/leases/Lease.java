@@ -2,6 +2,7 @@ package edu.harvard.data.leases;
 
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
@@ -25,7 +26,8 @@ public class Lease {
   @DynamoDBAttribute(attributeName = "version")
   private Long version;
 
-  private static final DateFormat DATE_FORMAT = FormatLibrary.JSON_DATE_FORMAT;
+  private static final DateFormat DATE_FORMAT = new SimpleDateFormat(
+      FormatLibrary.JSON_DATE_FORMAT_STRING);
 
   Lease(final String name, final String owner, final int seconds, final long version) {
     this.name = name;

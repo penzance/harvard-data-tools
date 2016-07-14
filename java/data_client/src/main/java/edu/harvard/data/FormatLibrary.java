@@ -1,24 +1,17 @@
 package edu.harvard.data;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.csv.CSVFormat;
 
 public class FormatLibrary {
   public enum Format {
-    DecompressedCanvasDataFlatFiles("decompressed_canvas"),
-    CanvasDataFlatFiles("canvas"),
-    DecompressedExcel("decompressed_excel"),
-    Excel("excel"),
-    Matterhorn("matterhorn"),
-    DecompressedMatterhorn("decompressed_matterhorn"),
-    CompressedInternal("compressed_internal"),
-    DecompressedInternal("decompressed_internal");
+    DecompressedCanvasDataFlatFiles("decompressed_canvas"), CanvasDataFlatFiles(
+        "canvas"), DecompressedExcel("decompressed_excel"), Excel("excel"), Matterhorn(
+            "matterhorn"), DecompressedMatterhorn("decompressed_matterhorn"), CompressedInternal(
+                "compressed_internal"), DecompressedInternal("decompressed_internal");
 
-    private String label;
+    private final String label;
 
     private Format(final String label) {
       this.label = label;
@@ -52,35 +45,26 @@ public class FormatLibrary {
     }
   };
 
-  private final Map<Format, TableFormat> formatMap;
-
-  public FormatLibrary() {
-    this.formatMap = new HashMap<Format, TableFormat>();
-    formatMap.put(Format.CanvasDataFlatFiles, createCanvasDataFlatFileFormat());
-    formatMap.put(Format.DecompressedCanvasDataFlatFiles,
-        createDecompressedCanvasDataFlatFileFormat());
-    formatMap.put(Format.Excel, createExcelFormat());
-    formatMap.put(Format.DecompressedExcel, createDecompressedExcelFormat());
-    formatMap.put(Format.Matterhorn, createMatterhornFormat());
-    formatMap.put(Format.DecompressedMatterhorn, createDecompressedMatterhornFormat());
-    formatMap.put(Format.CompressedInternal, createCompressedInternalFormat());
-    formatMap.put(Format.DecompressedInternal, createDecompressedInternalFormat());
-  }
-
   public TableFormat getFormat(final Format format) {
-    return formatMap.get(format);
+    switch(format) {
+    case CanvasDataFlatFiles: return createCanvasDataFlatFileFormat();
+    case DecompressedCanvasDataFlatFiles: return createDecompressedCanvasDataFlatFileFormat();
+    case Excel: return createExcelFormat();
+    case DecompressedExcel: return createDecompressedExcelFormat();
+    case Matterhorn: return createMatterhornFormat();
+    case DecompressedMatterhorn: return createDecompressedMatterhornFormat();
+    case CompressedInternal: return createCompressedInternalFormat();
+    case DecompressedInternal: return createDecompressedInternalFormat();
+    default:
+      throw new RuntimeException("Unknown format " + format);
+    }
   }
 
-  public static final DateFormat CANVAS_TIMESTAMP_FORMAT = new SimpleDateFormat(
-      "yyyy-MM-dd HH:mm:ss");
-  public static DateFormat CANVAS_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
-  public static DateFormat MATTERHORN_DATE_FORMAT = new SimpleDateFormat(
-      "yyyy-MM-dd'T'HH:mm:ssXXX");
-
-  public static final DateFormat LOCAL_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd Z");
-
-  public static final DateFormat JSON_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+  public static final String CANVAS_TIMESTAMP_FORMAT_STRING = "yyyy-MM-dd HH:mm:ss";
+  public static final String CANVAS_DATE_FORMAT_STRING = "yyyy-MM-dd";
+  public static final String MATTERHORN_DATE_FORMAT_STRING = "yyyy-MM-dd'T'HH:mm:ssXXX";
+  public static final String LOCAL_DATE_FORMAT_STRING = "yyyy-MM-dd Z";
+  public static final String JSON_DATE_FORMAT_STRING = "yyyy-MM-dd'T'HH:mm:ssZ";
 
   private static final CSVFormat CANVAS_CSV_FORMAT = CSVFormat.TDF.withQuote(null)
       .withNullString("\\N").withRecordSeparator("\n").withIgnoreSurroundingSpaces(false);
@@ -93,8 +77,8 @@ public class FormatLibrary {
 
   private TableFormat createCanvasDataFlatFileFormat() {
     final TableFormat canvasFormat = new TableFormat(Format.CanvasDataFlatFiles);
-    canvasFormat.setTimestampFormat(CANVAS_TIMESTAMP_FORMAT);
-    canvasFormat.setDateFormat(CANVAS_DATE_FORMAT);
+    canvasFormat.setTimestampFormat(new SimpleDateFormat(CANVAS_TIMESTAMP_FORMAT_STRING));
+    canvasFormat.setDateFormat(new SimpleDateFormat(CANVAS_DATE_FORMAT_STRING));
     canvasFormat.setIncludeHeaders(false);
     canvasFormat.setEncoding(CANVAS_FILE_ENCODING);
     canvasFormat.setCsvFormat(CANVAS_CSV_FORMAT);
@@ -104,8 +88,8 @@ public class FormatLibrary {
 
   private TableFormat createDecompressedCanvasDataFlatFileFormat() {
     final TableFormat canvasFormat = new TableFormat(Format.DecompressedCanvasDataFlatFiles);
-    canvasFormat.setTimestampFormat(CANVAS_TIMESTAMP_FORMAT);
-    canvasFormat.setDateFormat(CANVAS_DATE_FORMAT);
+    canvasFormat.setTimestampFormat(new SimpleDateFormat(CANVAS_TIMESTAMP_FORMAT_STRING));
+    canvasFormat.setDateFormat(new SimpleDateFormat(CANVAS_DATE_FORMAT_STRING));
     canvasFormat.setIncludeHeaders(false);
     canvasFormat.setEncoding(CANVAS_FILE_ENCODING);
     canvasFormat.setCsvFormat(CANVAS_CSV_FORMAT);
@@ -115,8 +99,8 @@ public class FormatLibrary {
 
   private TableFormat createExcelFormat() {
     final TableFormat canvasFormat = new TableFormat(Format.Excel);
-    canvasFormat.setTimestampFormat(CANVAS_TIMESTAMP_FORMAT);
-    canvasFormat.setDateFormat(CANVAS_DATE_FORMAT);
+    canvasFormat.setTimestampFormat(new SimpleDateFormat(CANVAS_TIMESTAMP_FORMAT_STRING));
+    canvasFormat.setDateFormat(new SimpleDateFormat(CANVAS_DATE_FORMAT_STRING));
     canvasFormat.setIncludeHeaders(true);
     canvasFormat.setEncoding(CANVAS_FILE_ENCODING);
     canvasFormat.setCsvFormat(CSVFormat.EXCEL);
@@ -126,8 +110,8 @@ public class FormatLibrary {
 
   private TableFormat createDecompressedExcelFormat() {
     final TableFormat canvasFormat = new TableFormat(Format.Excel);
-    canvasFormat.setTimestampFormat(CANVAS_TIMESTAMP_FORMAT);
-    canvasFormat.setDateFormat(CANVAS_DATE_FORMAT);
+    canvasFormat.setTimestampFormat(new SimpleDateFormat(CANVAS_TIMESTAMP_FORMAT_STRING));
+    canvasFormat.setDateFormat(new SimpleDateFormat(CANVAS_DATE_FORMAT_STRING));
     canvasFormat.setIncludeHeaders(true);
     canvasFormat.setEncoding(CANVAS_FILE_ENCODING);
     canvasFormat.setCsvFormat(CSVFormat.EXCEL);
@@ -137,8 +121,8 @@ public class FormatLibrary {
 
   private TableFormat createDecompressedMatterhornFormat() {
     final TableFormat format = new TableFormat(Format.Matterhorn);
-    format.setDateFormat(MATTERHORN_DATE_FORMAT);
-    format.setTimestampFormat(MATTERHORN_DATE_FORMAT);
+    format.setDateFormat(new SimpleDateFormat(MATTERHORN_DATE_FORMAT_STRING));
+    format.setTimestampFormat(new SimpleDateFormat(MATTERHORN_DATE_FORMAT_STRING));
     format.setIncludeHeaders(false);
     format.setEncoding(MATTERHORN_FILE_ENCODING);
     format.setCompression(TableFormat.Compression.None);
@@ -147,8 +131,8 @@ public class FormatLibrary {
 
   private TableFormat createMatterhornFormat() {
     final TableFormat format = new TableFormat(Format.Matterhorn);
-    format.setDateFormat(MATTERHORN_DATE_FORMAT);
-    format.setTimestampFormat(MATTERHORN_DATE_FORMAT);
+    format.setDateFormat(new SimpleDateFormat(MATTERHORN_DATE_FORMAT_STRING));
+    format.setTimestampFormat(new SimpleDateFormat(MATTERHORN_DATE_FORMAT_STRING));
     format.setIncludeHeaders(false);
     format.setEncoding(MATTERHORN_FILE_ENCODING);
     format.setCompression(TableFormat.Compression.Gzip);
@@ -157,8 +141,8 @@ public class FormatLibrary {
 
   private TableFormat createCompressedInternalFormat() {
     final TableFormat canvasFormat = new TableFormat(Format.CompressedInternal);
-    canvasFormat.setTimestampFormat(CANVAS_TIMESTAMP_FORMAT);
-    canvasFormat.setDateFormat(CANVAS_DATE_FORMAT);
+    canvasFormat.setTimestampFormat(new SimpleDateFormat(CANVAS_TIMESTAMP_FORMAT_STRING));
+    canvasFormat.setDateFormat(new SimpleDateFormat(CANVAS_DATE_FORMAT_STRING));
     canvasFormat.setIncludeHeaders(false);
     canvasFormat.setEncoding(CANVAS_FILE_ENCODING);
     canvasFormat.setCsvFormat(INTERNAL_CSV_FORMAT);
@@ -168,14 +152,13 @@ public class FormatLibrary {
 
   private TableFormat createDecompressedInternalFormat() {
     final TableFormat canvasFormat = new TableFormat(Format.DecompressedInternal);
-    canvasFormat.setTimestampFormat(CANVAS_TIMESTAMP_FORMAT);
-    canvasFormat.setDateFormat(CANVAS_DATE_FORMAT);
+    canvasFormat.setTimestampFormat(new SimpleDateFormat(CANVAS_TIMESTAMP_FORMAT_STRING));
+    canvasFormat.setDateFormat(new SimpleDateFormat(CANVAS_DATE_FORMAT_STRING));
     canvasFormat.setIncludeHeaders(false);
     canvasFormat.setEncoding(CANVAS_FILE_ENCODING);
     canvasFormat.setCsvFormat(INTERNAL_CSV_FORMAT);
     canvasFormat.setCompression(TableFormat.Compression.None);
     return canvasFormat;
   }
-
 
 }

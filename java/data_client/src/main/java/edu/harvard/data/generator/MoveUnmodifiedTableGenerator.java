@@ -11,7 +11,6 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import edu.harvard.data.pipeline.InputTableIndex;
 import edu.harvard.data.schema.DataSchemaTable;
 
 public class MoveUnmodifiedTableGenerator {
@@ -20,13 +19,9 @@ public class MoveUnmodifiedTableGenerator {
   private final File dir;
   private final GenerationSpec schemaVersions;
 
-  private final InputTableIndex dataIndex;
-
-  public MoveUnmodifiedTableGenerator(final File dir, final GenerationSpec schemaVersions,
-      final InputTableIndex dataIndex) {
+  public MoveUnmodifiedTableGenerator(final File dir, final GenerationSpec schemaVersions) {
     this.dir = dir;
     this.schemaVersions = schemaVersions;
-    this.dataIndex = dataIndex;
   }
 
   public void generate() throws IOException {
@@ -55,13 +50,14 @@ public class MoveUnmodifiedTableGenerator {
     }
     Collections.sort(tableNames);
     for (final String tableName : tableNames) {
-      if (dataIndex.containsTable(tableName)) {
-        final DataSchemaTable table = outputPhase.getSchema().getTableByName(tableName);
-        if (!(table.isTemporary() && table.getExpirationPhase() < phase)) {
-          if (!table.hasNewlyGeneratedElements()) {
-            out.println("hadoop fs -mv " + inputPhase.getHDFSDir() + "/" + table.getTableName()
-            + " " + outputPhase.getHDFSDir() + "/" + table.getTableName() + " &>> " + logFile);
-          }
+      final DataSchemaTable table = outputPhase.getSchema().getTableByName(tableName);
+      if (!(table.isTemporary() && table.getExpirationPhase() < phase)) {
+        if (!table.hasNewlyGeneratedElements()) {
+          final String hdfsDir = inputPhase.getHDFSDir() + "/" + table.getTableName();
+          final String test = "hadoop fs -test -d " + hdfsDir;
+          final String move = "hadoop fs -mv " + hdfsDir + " " + outputPhase.getHDFSDir() + "/"
+              + table.getTableName();
+          out.println(test + " && " + move + " &>> " + logFile);
         }
       }
     }

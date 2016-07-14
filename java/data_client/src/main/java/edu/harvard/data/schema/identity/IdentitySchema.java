@@ -2,6 +2,7 @@ package edu.harvard.data.schema.identity;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -169,7 +170,7 @@ public class IdentitySchema {
   public static IdentitySchema read(final String jsonResource) throws IOException {
     log.info("Reading identifiers from file " + jsonResource);
     final ObjectMapper jsonMapper = new ObjectMapper();
-    jsonMapper.setDateFormat(FormatLibrary.JSON_DATE_FORMAT);
+    jsonMapper.setDateFormat(new SimpleDateFormat(FormatLibrary.JSON_DATE_FORMAT_STRING));
     final ClassLoader classLoader = CodeGenerator.class.getClassLoader();
     final TypeReference<Map<String, Map<String, List<IdentifierType>>>> identiferTypeRef = new TypeReference<Map<String, Map<String, List<IdentifierType>>>>() {
     };

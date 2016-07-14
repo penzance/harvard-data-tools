@@ -2,6 +2,7 @@ package edu.harvard.data.schema.extension;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -89,7 +90,7 @@ public class ExtensionSchema implements DataSchema {
       throws IOException, VerificationException {
     log.info("Extending schema from file " + jsonResource);
     final ObjectMapper jsonMapper = new ObjectMapper();
-    jsonMapper.setDateFormat(FormatLibrary.JSON_DATE_FORMAT);
+    jsonMapper.setDateFormat(new SimpleDateFormat(FormatLibrary.JSON_DATE_FORMAT_STRING));
     final ClassLoader classLoader = CodeGenerator.class.getClassLoader();
     final ExtensionSchema schema;
     try (final InputStream in = classLoader.getResourceAsStream(jsonResource)) {

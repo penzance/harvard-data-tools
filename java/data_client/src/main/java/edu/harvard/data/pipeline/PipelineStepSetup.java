@@ -1,6 +1,7 @@
 package edu.harvard.data.pipeline;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -36,7 +37,7 @@ public class PipelineStepSetup {
   private static String getPreviousSteps(final PipelineExecutionRecord record)
       throws JsonParseException, JsonMappingException, IOException {
     final ObjectMapper jsonMapper = new ObjectMapper();
-    jsonMapper.setDateFormat(FormatLibrary.JSON_DATE_FORMAT);
+    jsonMapper.setDateFormat(new SimpleDateFormat(FormatLibrary.JSON_DATE_FORMAT_STRING));
     List<PreviousStepDescription> previous;
     if (record.getPreviousSteps() == null) {
       previous = new ArrayList<PreviousStepDescription>();
