@@ -225,7 +225,7 @@ public class JavaModelClassGenerator {
         key = originalName;
       }
       getMethod = mapName + ".get(\"" + key + "\")";
-      outputGetFromMap(out, column, getMethod);
+      outputGetFromMap(out, column, getMethod, mapName);
     }
     out.println("  }");
     out.println();
@@ -437,54 +437,56 @@ public class JavaModelClassGenerator {
   // Determine the code needed to correctly type a value extracted from an
   // untyped map.
   private void outputGetFromMap(final PrintStream out, final DataSchemaColumn column,
-      final String getMethod) {
+      final String getMethod, final String mapName) {
     final String variableName = JavaBindingGenerator.javaVariable(column.getName());
+    out.println("    if (" + mapName + " != null) {");
     switch (column.getType()) {
     case BigInt:
-      out.println("    if (" + getMethod + " instanceof Integer) {");
-      out.println("      this." + variableName + " = Long.parseLong(((Integer) " + getMethod
+      out.println("      if (" + getMethod + " instanceof Integer) {");
+      out.println("        this." + variableName + " = Long.parseLong(((Integer) " + getMethod
           + ").toString());");
-      out.println("    } else {");
-      out.println("      this." + variableName + " = (Long) " + getMethod + ";");
-      out.println("    }");
+      out.println("      } else {");
+      out.println("        this." + variableName + " = (Long) " + getMethod + ";");
+      out.println("      }");
       break;
     case Boolean:
-      out.println("    if (" + getMethod + " instanceof Integer) {");
-      out.println("      this." + variableName + " = ((Integer) " + getMethod + ") != 0;");
-      out.println("    } else {");
-      out.println("      this." + variableName + " = (Boolean) " + getMethod + ";");
-      out.println("    }");
+      out.println("      if (" + getMethod + " instanceof Integer) {");
+      out.println("        this." + variableName + " = ((Integer) " + getMethod + ") != 0;");
+      out.println("      } else {");
+      out.println("        this." + variableName + " = (Boolean) " + getMethod + ";");
+      out.println("      }");
       break;
     case Date:
     case DateTime:
     case Timestamp:
       final String tmpName = "$" + variableName;
-      out.println("    String " + tmpName + " = (String) " + getMethod + ";");
-      out.println("    if (" + tmpName + " != null && " + tmpName + ".length() > 0) {");
-      out.println("      this." + variableName
+      out.println("      String " + tmpName + " = (String) " + getMethod + ";");
+      out.println("      if (" + tmpName + " != null && " + tmpName + ".length() > 0) {");
+      out.println("        this." + variableName
           + " = new Timestamp(format.getTimstampFormat().parse(format.cleanTimestampString("
           + tmpName + ")).getTime());");
-      out.println("    }");
+      out.println("      }");
       break;
     case Enum:
       outputParseFromString(out, column, "(String) " + getMethod);
       break;
     case DoublePrecision:
-      out.println("    if (map.get(\"" + variableName + "\") instanceof Double) {");
-      out.println("      this." + variableName + " = (Double) " + getMethod + ";");
-      out.println("    } else {");
-      out.println("     this." + variableName + " = ((Integer) " + getMethod + ").doubleValue();");
-      out.println("    }");
+      out.println("      if (map.get(\"" + variableName + "\") instanceof Double) {");
+      out.println("        this." + variableName + " = (Double) " + getMethod + ";");
+      out.println("      } else {");
+      out.println("       this." + variableName + " = ((Integer) " + getMethod + ").doubleValue();");
+      out.println("      }");
       break;
     case Guid:
     case Text:
     case VarChar:
-      out.println("    this." + variableName + " = String.valueOf(" + getMethod + ");");
+      out.println("      this." + variableName + " = String.valueOf(" + getMethod + ");");
       break;
     case Integer:
-      out.println("    this." + variableName + " = (Integer) " + getMethod + ";");
+      out.println("      this." + variableName + " = (Integer) " + getMethod + ";");
       break;
     }
+    out.println("    }");
   }
 
   // Determine the code needed to parse a value from the CSV reader.
