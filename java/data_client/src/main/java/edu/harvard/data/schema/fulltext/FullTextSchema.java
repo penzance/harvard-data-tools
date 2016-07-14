@@ -29,8 +29,7 @@ public class FullTextSchema {
   }
 
   @JsonCreator
-  public FullTextSchema(
-      @JsonProperty("tables") final Map<String, FullTextTable> tableMap) {
+  public FullTextSchema(@JsonProperty("tables") final Map<String, FullTextTable> tableMap) {
     this();
     if (tableMap != null) {
       tables.putAll(tableMap);
@@ -76,11 +75,11 @@ public class FullTextSchema {
    *           if and error occurs when reading or parsing the JSON resource.
    */
   public static FullTextSchema read(final String jsonResource) throws IOException {
-    log.info("Reading identifiers from file " + jsonResource);
-    final ObjectMapper jsonMapper = new ObjectMapper();
-    jsonMapper.setDateFormat(new SimpleDateFormat(FormatLibrary.JSON_DATE_FORMAT_STRING));
-    final ClassLoader classLoader = CodeGenerator.class.getClassLoader();
-    if (classLoader.getResource(jsonResource) == null) {
+    if (jsonResource != null) {
+      log.info("Reading identifiers from file " + jsonResource);
+      final ObjectMapper jsonMapper = new ObjectMapper();
+      jsonMapper.setDateFormat(new SimpleDateFormat(FormatLibrary.JSON_DATE_FORMAT_STRING));
+      final ClassLoader classLoader = CodeGenerator.class.getClassLoader();
       try (final InputStream in = classLoader.getResourceAsStream(jsonResource)) {
         return jsonMapper.readValue(in, FullTextSchema.class);
       }
