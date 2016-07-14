@@ -216,6 +216,7 @@ public abstract class CodeGenerator {
     // processed.
     if (aws.isFile(dataIndexLocation)) {
       final InputTableIndex dataIndex = InputTableIndex.read(aws, dataIndexLocation);
+      dataIndex.addNewlyGeneratedTables(spec.getSchemaPhases());
 
       log.info("Generating S3 to HDFS copy manifest in " + codeDir);
       new S3ToHdfsManifestGenerator(codeDir, config, dataIndex).generate();

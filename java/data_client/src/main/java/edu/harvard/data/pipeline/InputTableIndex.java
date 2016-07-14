@@ -10,6 +10,8 @@ import java.util.Map;
 import com.amazonaws.services.s3.model.S3ObjectId;
 
 import edu.harvard.data.AwsUtils;
+import edu.harvard.data.generator.SchemaPhase;
+import edu.harvard.data.schema.DataSchemaTable;
 
 public class InputTableIndex {
   private String schemaVersion;
@@ -120,5 +122,17 @@ public class InputTableIndex {
 
   public boolean isPartial(final String tableName) {
     return partial.get(tableName);
+  }
+
+  public void addNewlyGeneratedTables(final List<SchemaPhase> schemaPhases) {
+    for (final SchemaPhase phase : schemaPhases) {
+      for (final DataSchemaTable table : phase.getSchema().getTables().values()) {
+        if (table.getNewlyGenerated()) {
+          this.tables.put(table.getTableName(), new ArrayList<String>());
+          this.partial.put(table.getTableName(), false); // XXX Need to figure this out per-table
+          this.fileSizes.put(table.getTableName(), 0L);
+        }
+      }
+    }
   }
 }

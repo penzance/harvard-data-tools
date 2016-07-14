@@ -39,6 +39,10 @@ public class GenerationSpec {
     return phases.get(i);
   }
 
+  public List<SchemaPhase> getSchemaPhases() {
+    return phases;
+  }
+
   public File getOutputBase() {
     return outputBase;
   }
