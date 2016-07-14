@@ -24,10 +24,14 @@ public class FullTextSchema {
 
   public Map<String, FullTextTable> tables;
 
+  public FullTextSchema() {
+    this.tables = new HashMap<String, FullTextTable>();
+  }
+
   @JsonCreator
   public FullTextSchema(
       @JsonProperty("tables") final Map<String, FullTextTable> tableMap) {
-    this.tables = new HashMap<String, FullTextTable>();
+    this();
     if (tableMap != null) {
       tables.putAll(tableMap);
     }
@@ -76,8 +80,12 @@ public class FullTextSchema {
     final ObjectMapper jsonMapper = new ObjectMapper();
     jsonMapper.setDateFormat(new SimpleDateFormat(FormatLibrary.JSON_DATE_FORMAT_STRING));
     final ClassLoader classLoader = CodeGenerator.class.getClassLoader();
-    try (final InputStream in = classLoader.getResourceAsStream(jsonResource)) {
-      return jsonMapper.readValue(in, FullTextSchema.class);
+    if (classLoader.getResource(jsonResource) == null) {
+      try (final InputStream in = classLoader.getResourceAsStream(jsonResource)) {
+        return jsonMapper.readValue(in, FullTextSchema.class);
+      }
+    } else {
+      return new FullTextSchema();
     }
   }
 }

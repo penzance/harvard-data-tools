@@ -40,4 +40,4 @@ then
 fi
 
 # Shut down; the pipeline will take over.
-# sudo halt now
+sudo halt now
