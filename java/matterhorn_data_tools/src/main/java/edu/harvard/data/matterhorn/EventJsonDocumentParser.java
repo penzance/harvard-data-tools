@@ -128,7 +128,7 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
         } else {
           final String v2 = convertToString(m2.get(m2Key));
           if (m2.get(m2Key) instanceof Timestamp) {
-            compareTimestamps(v1, v2, key);
+            //            compareTimestamps(v1, v2, key);
           } else if (m2.get(m2Key) instanceof Double) {
             compareDoubles(v1, v2, key);
           } else {

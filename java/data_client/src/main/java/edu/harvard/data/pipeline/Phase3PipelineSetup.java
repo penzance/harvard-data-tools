@@ -31,7 +31,7 @@ public class Phase3PipelineSetup {
     PipelineObjectBase previousStep = previousPhase;
     previousStep = copyDataToS3(previousStep);
     // Update Redshift schema
-    if (!(dataIndex.containsTable("requests") && dataIndex.getPartial().get("requests"))) {
+    if (!dataIndex.containsTable("requests") || dataIndex.getPartial().get("requests")) {
       // XXX This means we're not dealing with a megadump, which needs some manual
       // intervention to load the data to Redshift. Need to handle this case
       // specially.
