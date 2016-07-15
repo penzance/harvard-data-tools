@@ -64,6 +64,7 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
   public void verifyParser(final Map<String, Object> values,
       final Map<String, List<? extends DataTable>> tables) throws VerificationException {
     values.remove("_meta");
+    values.remove("useragent");
     final List<? extends DataTable> events = tables.get("event");
     final List<? extends DataTable> videos = tables.get("video");
     final List<? extends DataTable> geoips = tables.get("geo_ip");
