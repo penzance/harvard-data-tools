@@ -46,15 +46,23 @@ public class FormatLibrary {
   };
 
   public TableFormat getFormat(final Format format) {
-    switch(format) {
-    case CanvasDataFlatFiles: return createCanvasDataFlatFileFormat();
-    case DecompressedCanvasDataFlatFiles: return createDecompressedCanvasDataFlatFileFormat();
-    case Excel: return createExcelFormat();
-    case DecompressedExcel: return createDecompressedExcelFormat();
-    case Matterhorn: return createMatterhornFormat();
-    case DecompressedMatterhorn: return createDecompressedMatterhornFormat();
-    case CompressedInternal: return createCompressedInternalFormat();
-    case DecompressedInternal: return createDecompressedInternalFormat();
+    switch (format) {
+    case CanvasDataFlatFiles:
+      return createCanvasDataFlatFileFormat();
+    case DecompressedCanvasDataFlatFiles:
+      return createDecompressedCanvasDataFlatFileFormat();
+    case Excel:
+      return createExcelFormat();
+    case DecompressedExcel:
+      return createDecompressedExcelFormat();
+    case Matterhorn:
+      return createMatterhornFormat();
+    case DecompressedMatterhorn:
+      return createDecompressedMatterhornFormat();
+    case CompressedInternal:
+      return createCompressedInternalFormat();
+    case DecompressedInternal:
+      return createDecompressedInternalFormat();
     default:
       throw new RuntimeException("Unknown format " + format);
     }
@@ -69,7 +77,7 @@ public class FormatLibrary {
   private static final CSVFormat CANVAS_CSV_FORMAT = CSVFormat.TDF.withQuote(null)
       .withNullString("\\N").withRecordSeparator("\n").withIgnoreSurroundingSpaces(false);
 
-  private static final CSVFormat INTERNAL_CSV_FORMAT = CSVFormat.TDF.withQuote('"')
+  private static final CSVFormat INTERNAL_CSV_FORMAT = CSVFormat.TDF.withQuote(null).withEscape('/')
       .withNullString("\\N").withRecordSeparator("\n").withIgnoreSurroundingSpaces(false);
 
   private static final String CANVAS_FILE_ENCODING = "UTF-8";
@@ -140,25 +148,25 @@ public class FormatLibrary {
   }
 
   private TableFormat createCompressedInternalFormat() {
-    final TableFormat canvasFormat = new TableFormat(Format.CompressedInternal);
-    canvasFormat.setTimestampFormat(new SimpleDateFormat(CANVAS_TIMESTAMP_FORMAT_STRING));
-    canvasFormat.setDateFormat(new SimpleDateFormat(CANVAS_DATE_FORMAT_STRING));
-    canvasFormat.setIncludeHeaders(false);
-    canvasFormat.setEncoding(CANVAS_FILE_ENCODING);
-    canvasFormat.setCsvFormat(INTERNAL_CSV_FORMAT);
-    canvasFormat.setCompression(TableFormat.Compression.Gzip);
-    return canvasFormat;
+    final TableFormat format = new TableFormat(Format.CompressedInternal);
+    format.setTimestampFormat(new SimpleDateFormat(CANVAS_TIMESTAMP_FORMAT_STRING));
+    format.setDateFormat(new SimpleDateFormat(CANVAS_DATE_FORMAT_STRING));
+    format.setIncludeHeaders(false);
+    format.setEncoding(CANVAS_FILE_ENCODING);
+    format.setCsvFormat(INTERNAL_CSV_FORMAT);
+    format.setCompression(TableFormat.Compression.Gzip);
+    return format;
   }
 
   private TableFormat createDecompressedInternalFormat() {
-    final TableFormat canvasFormat = new TableFormat(Format.DecompressedInternal);
-    canvasFormat.setTimestampFormat(new SimpleDateFormat(CANVAS_TIMESTAMP_FORMAT_STRING));
-    canvasFormat.setDateFormat(new SimpleDateFormat(CANVAS_DATE_FORMAT_STRING));
-    canvasFormat.setIncludeHeaders(false);
-    canvasFormat.setEncoding(CANVAS_FILE_ENCODING);
-    canvasFormat.setCsvFormat(INTERNAL_CSV_FORMAT);
-    canvasFormat.setCompression(TableFormat.Compression.None);
-    return canvasFormat;
+    final TableFormat format = new TableFormat(Format.DecompressedInternal);
+    format.setTimestampFormat(new SimpleDateFormat(CANVAS_TIMESTAMP_FORMAT_STRING));
+    format.setDateFormat(new SimpleDateFormat(CANVAS_DATE_FORMAT_STRING));
+    format.setIncludeHeaders(false);
+    format.setEncoding(CANVAS_FILE_ENCODING);
+    format.setCsvFormat(INTERNAL_CSV_FORMAT);
+    format.setCompression(TableFormat.Compression.None);
+    return format;
   }
 
 }
