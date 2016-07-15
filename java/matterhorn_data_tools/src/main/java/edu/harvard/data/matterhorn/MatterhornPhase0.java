@@ -51,7 +51,7 @@ public class MatterhornPhase0 {
       exec = Executors.newFixedThreadPool(threads);
       final List<Future<InputTableIndex>> jobs = new ArrayList<Future<InputTableIndex>>();
       for (final S3ObjectSummary obj : aws.listKeys(config.getDropboxBucket())) {
-        if (obj.getKey().endsWith("actions.2015-09-30.jsonl.gz")) {
+        if (obj.getKey().endsWith(".gz")) {
           final S3ObjectId outputLocation = AwsUtils.key(config.getS3WorkingLocation(runId));
           final MatterhornSingleFileParser parser = new MatterhornSingleFileParser(obj, outputLocation, config);
           jobs.add(exec.submit(parser));
