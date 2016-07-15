@@ -32,7 +32,7 @@ implements RequestHandler<String, String> {
   @Override
   protected List<S3ObjectId> getInfrastructureConfigPaths() {
     final List<S3ObjectId> paths = new ArrayList<S3ObjectId>();
-    final S3ObjectId configPath = AwsUtils.key(config.getCodeBucket(), config.getGitTagOrBranch());
+    final S3ObjectId configPath = AwsUtils.key(config.getCodeBucket(), "infrastructure");
     paths.add(AwsUtils.key(configPath, "tiny_phase_0.properties"));
     paths.add(AwsUtils.key(configPath, "tiny_emr.properties"));
     return paths;

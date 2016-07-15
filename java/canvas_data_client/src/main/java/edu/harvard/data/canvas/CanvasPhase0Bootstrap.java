@@ -103,7 +103,7 @@ implements RequestHandler<BootstrapParameters, String> {
   @Override
   protected List<S3ObjectId> getInfrastructureConfigPaths() {
     final List<S3ObjectId> paths = new ArrayList<S3ObjectId>();
-    final S3ObjectId configPath = AwsUtils.key(config.getCodeBucket(), config.getGitTagOrBranch());
+    final S3ObjectId configPath = AwsUtils.key(config.getCodeBucket(), "infrastructure");
 
     boolean megadump = false;
     if (dump != null && dump.getArtifactsByTable().containsKey("requests")) {
