@@ -43,12 +43,6 @@ public class DumpManager {
     this.aws = aws;
   }
 
-  // XXX This currently runs sequentially. The difficulty with parallelizing it
-  // is that the URLs that we get through the dump expire (in ~15 minutes), so
-  // we need to refresh the dump between when we set up a concurrent task and
-  // when it runs. In addition, the file names that Instructure send are not
-  // guaranteed to be unique, so we need to be smart in making sure that we
-  // download the correct file.
   public void saveDump(final ApiClient api, final DataDump dump, final ExecutorService exec)
       throws IOException, UnexpectedApiResponseException, VerificationException, ArgumentError {
     final File directory = getScratchDumpDir(dump);
