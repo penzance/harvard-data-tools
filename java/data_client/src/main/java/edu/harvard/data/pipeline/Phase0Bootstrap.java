@@ -22,6 +22,8 @@ import com.amazonaws.services.ec2.model.RequestSpotInstancesRequest;
 import com.amazonaws.services.ec2.model.RequestSpotInstancesResult;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.s3.model.S3ObjectId;
+import com.amazonaws.services.sns.AmazonSNSClient;
+import com.amazonaws.services.sns.model.PublishRequest;
 import com.amazonaws.util.Base64;
 
 import edu.harvard.data.AwsUtils;
@@ -98,6 +100,7 @@ public abstract class Phase0Bootstrap {
     final String requestId = result.getSpotInstanceRequests().get(0).getSpotInstanceRequestId();
     System.out.println(result);
     executionRecord.setPhase0RequestId(requestId);
+    executionRecord.save();
 
     final List<String> instanceIds = new ArrayList<String>();
     instanceIds.add(requestId);
@@ -106,7 +109,12 @@ public abstract class Phase0Bootstrap {
     final DescribeSpotInstanceRequestsResult description = ec2client
         .describeSpotInstanceRequests(describe);
     System.out.println(description);
-    // TODO: final Check in case final the startup failed.
+
+    final AmazonSNSClient sns = new AmazonSNSClient();
+    final String subject = "Run " + runId + " started.";
+    final String msg = "Details at " + config.getHdtMonitorUrl() + "/data_dashboard/pipeline/" + runId;
+    final PublishRequest publishRequest = new PublishRequest(config.getSuccessSnsArn(), msg, subject);
+    sns.publish(publishRequest);
   }
 
   private String getUserData(final DataConfig config) throws IOException {

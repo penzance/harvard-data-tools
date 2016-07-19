@@ -46,6 +46,7 @@ public class DataConfig {
   private final String fullTextBucket;
   private final String scratchDir;
   private final String archivePath;
+  private final String hdtMonitorUrl;
 
   private final String redshiftCluster;
   private final String redshiftServer;
@@ -157,6 +158,7 @@ public class DataConfig {
     this.completionSnsArn = getConfigParameter("completion_sns_arn", verify);
     this.pipelineDynamoTable = getConfigParameter("pipeline_dynamo_table", verify);
     this.mainIdentifier = IdentifierType.valueOf(getConfigParameter("main_identifier", verify));
+    this.hdtMonitorUrl = getConfigParameter("hdt_monitor_url", verify);
 
     this.leaseDynamoTable = getConfigParameter("lease_dynamo_table", verify);
     this.identityLease = getConfigParameter("identity_lease", verify);
@@ -563,6 +565,10 @@ public class DataConfig {
 
   public FormatLibrary.Format getPipelineFormat() {
     return pipelineFormat;
+  }
+
+  public String getHdtMonitorUrl() {
+    return hdtMonitorUrl;
   }
 
 }

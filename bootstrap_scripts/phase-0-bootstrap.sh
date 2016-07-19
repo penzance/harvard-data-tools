@@ -28,7 +28,7 @@ sudo cp /home/ec2-user/harvard-data-tools/cloudwatch/awslogs-phase0.conf /etc/aw
 sudo service awslogs start
 
 # generate the tools
-python $HARVARD_DATA_TOOLS_BASE/python/$GENERATOR &> /root/generate-tools.out
+python $HARVARD_DATA_TOOLS_BASE/python/$GENERATOR &> /var/log/generate-tools.out
 
 # run phase 0
 java -Duser.timezone=$SERVER_TIMEZONE -Xmx$PHASE_0_HEAP_SIZE -cp /home/ec2-user/code/data_tools.jar $PHASE_0_CLASS $CONFIG_PATHS $RUN_ID $DATA_SET_ID $PHASE_0_THREADS $CODE_MANAGER_CLASS &> /var/log/phase0-output.log
@@ -36,8 +36,8 @@ java -Duser.timezone=$SERVER_TIMEZONE -Xmx$PHASE_0_HEAP_SIZE -cp /home/ec2-user/
 if [ $CREATE_PIPELINE -eq 1 ]
 then
     # Spin up the pipeline
-    java -cp /home/ec2-user/code/data_tools.jar:$HARVARD_DATA_TOOLS_BASE/schema edu.harvard.data.pipeline.DataPipelineSetup $CONFIG_PATHS $RUN_ID $CODE_MANAGER_CLASS &> /root/data-pipeline-init.out
+    java -cp /home/ec2-user/code/data_tools.jar:$HARVARD_DATA_TOOLS_BASE/schema edu.harvard.data.pipeline.DataPipelineSetup $CONFIG_PATHS $RUN_ID $CODE_MANAGER_CLASS &> /var/log/pipeline-init.out
 fi
 
 # Shut down; the pipeline will take over.
-sudo halt now
+#sudo halt now
