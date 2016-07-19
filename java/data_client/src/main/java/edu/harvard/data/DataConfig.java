@@ -99,7 +99,7 @@ public class DataConfig {
 
   protected String codeGeneratorScript;
   protected String phase0Class;
-  protected String pipelineSetupClass;
+  protected String codeManagerClass;
 
   private final Properties properties;
 
@@ -242,7 +242,7 @@ public class DataConfig {
   protected void checkParameters() throws DataConfigurationException {
     checkParameter("codeGeneratorScript", codeGeneratorScript);
     checkParameter("phase0Class", phase0Class);
-    checkParameter("pipelineSetupClass", pipelineSetupClass);
+    checkParameter("pipelineSetupClass", codeManagerClass);
   }
 
   private void checkParameter(final String key, final String value)
@@ -532,8 +532,8 @@ public class DataConfig {
     return phase0Class;
   }
 
-  public String getPipelineSetupClass() {
-    return pipelineSetupClass;
+  public String getCodeManagerClass() {
+    return codeManagerClass;
   }
 
   public String getDataPipelineCreatorRoleArn() {

@@ -129,7 +129,6 @@ implements RequestHandler<BootstrapParameters, String> {
   @Override
   protected Map<String, String> getCustomEc2Environment() {
     final Map<String, String> env = new HashMap<String, String>();
-    env.put("CODE_MANAGER_CLASS", "edu.harvard.data.canvas.CanvasCodeManager");
     env.put("DATA_SET_ID", dumpId);
     env.put("DATA_SCHEMA_VERSION", schemaVersion); // XXX: Remove
     return env;

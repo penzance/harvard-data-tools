@@ -127,9 +127,9 @@ public abstract class Phase0Bootstrap {
     env.put("PHASE_0_HEAP_SIZE", config.getPhase0HeapSize());
     env.put("PHASE_0_CLASS", config.getPhase0Class());
     env.put("RUN_ID", runId);
-    env.put("PIPELINE_SETUP_CLASS", config.getPipelineSetupClass());
     env.put("SERVER_TIMEZONE", config.getServerTimezone());
     env.put("CREATE_PIPELINE", createPipeline ? "1" : "0");
+    env.put("CODE_MANAGER_CLASS", config.getCodeManagerClass());
     if (aws.isFile(config.getMavenRepoCacheS3Location())) {
       env.put("MAVEN_REPO_CACHE", AwsUtils.uri(config.getMavenRepoCacheS3Location()));
     }
