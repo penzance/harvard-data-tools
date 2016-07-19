@@ -9,6 +9,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
+import edu.harvard.data.CodeManager;
 import edu.harvard.data.HadoopJob;
 import edu.harvard.data.canvas.identity.CanvasIdentityHadoopManager;
 import edu.harvard.data.canvas.phase_1.Phase1PostVerifier;
@@ -16,11 +17,10 @@ import edu.harvard.data.canvas.phase_1.Phase1PreVerifier;
 import edu.harvard.data.canvas.phase_2.AdminRequestJob;
 import edu.harvard.data.canvas.phase_2.RequestJob;
 import edu.harvard.data.canvas.phase_3.SessionsJob;
-import edu.harvard.data.generator.GeneratedCodeManager;
 import edu.harvard.data.identity.HadoopIdentityKey;
 import edu.harvard.data.identity.IdentityScrubber;
 
-public class CanvasCodeManager extends GeneratedCodeManager {
+public class CanvasCodeManager extends CodeManager {
 
   private final CanvasIdentityHadoopManager identity;
 

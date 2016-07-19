@@ -19,15 +19,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
+import edu.harvard.data.CodeManager;
 import edu.harvard.data.VerificationException;
-import edu.harvard.data.generator.GeneratedCodeManager;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class DataPipelineSetup {
   private static final Logger log = LogManager.getLogger();
 
   private final DataConfig config;
-  private final GeneratedCodeManager codeManager;
+  private final CodeManager codeManager;
   private final String runId;
   private final InputTableIndex dataIndex;
   private String pipelineId;
@@ -40,9 +40,9 @@ public class DataPipelineSetup {
     final String runId = args[1];
     final String codeManagerClassName = args[2];
 
-    final Class<? extends GeneratedCodeManager> codeManagerClass = (Class<? extends GeneratedCodeManager>) Class
+    final Class<? extends CodeManager> codeManagerClass = (Class<? extends CodeManager>) Class
         .forName(codeManagerClassName);
-    final GeneratedCodeManager codeManager = codeManagerClass.newInstance();
+    final CodeManager codeManager = codeManagerClass.newInstance();
 
     final DataConfig config = codeManager.getDataConfig(configPath, true);
     final AwsUtils aws = new AwsUtils();
@@ -53,7 +53,7 @@ public class DataPipelineSetup {
   }
 
   public DataPipelineSetup(final DataConfig config, final InputTableIndex dataIndex,
-      final GeneratedCodeManager codeManager, final String runId) {
+      final CodeManager codeManager, final String runId) {
     this.config = config;
     this.dataIndex = dataIndex;
     this.codeManager = codeManager;

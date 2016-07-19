@@ -7,7 +7,7 @@ import com.amazonaws.services.s3.model.S3ObjectId;
 
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
-import edu.harvard.data.generator.GeneratedCodeManager;
+import edu.harvard.data.CodeManager;
 import edu.harvard.data.identity.IdentityMapHadoopJob;
 import edu.harvard.data.identity.IdentityScrubHadoopJob;
 
@@ -20,12 +20,12 @@ public class Phase1PipelineSetup {
   private final Pipeline pipeline;
   private final PipelineFactory factory;
   private final DataConfig config;
-  private final GeneratedCodeManager codeManager;
+  private final CodeManager codeManager;
   private final InputTableIndex dataIndex;
   private final String runId;
 
   public Phase1PipelineSetup(final Pipeline pipeline, final PipelineFactory factory,
-      final GeneratedCodeManager codeManager, final String runId, final InputTableIndex dataIndex) {
+      final CodeManager codeManager, final String runId, final InputTableIndex dataIndex) {
     this.factory = factory;
     this.pipeline = pipeline;
     this.codeManager = codeManager;

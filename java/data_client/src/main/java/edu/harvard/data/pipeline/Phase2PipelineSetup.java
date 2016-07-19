@@ -6,18 +6,18 @@ import java.util.List;
 import java.util.Map;
 
 import edu.harvard.data.DataConfig;
+import edu.harvard.data.CodeManager;
 import edu.harvard.data.HadoopJob;
-import edu.harvard.data.generator.GeneratedCodeManager;
 
 public class Phase2PipelineSetup {
 
   private final PipelineFactory factory;
   private final Pipeline pipeline;
   private final DataConfig config;
-  private final GeneratedCodeManager codeManager;
+  private final CodeManager codeManager;
 
   public Phase2PipelineSetup(final Pipeline pipeline, final PipelineFactory factory,
-      final GeneratedCodeManager codeManager) {
+      final CodeManager codeManager) {
     this.factory = factory;
     this.pipeline = pipeline;
     this.codeManager = codeManager;

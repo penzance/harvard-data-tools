@@ -23,8 +23,8 @@ import com.amazonaws.services.s3.model.S3ObjectId;
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
+import edu.harvard.data.CodeManager;
 import edu.harvard.data.HadoopUtilities;
-import edu.harvard.data.generator.GeneratedCodeManager;
 import edu.harvard.data.leases.LeaseRenewalException;
 import edu.harvard.data.leases.LeaseRenewalThread;
 import edu.harvard.data.pipeline.InputTableIndex;
@@ -39,7 +39,7 @@ public class IdentityMapHadoopJob {
   private final Configuration hadoopConfig;
   final HadoopUtilities hadoopUtils;
   private final InputTableIndex dataIndex;
-  private final GeneratedCodeManager codeManager;
+  private final CodeManager codeManager;
 
   @SuppressWarnings("unchecked")
   public static void main(final String[] args)
@@ -49,9 +49,9 @@ public class IdentityMapHadoopJob {
     final String runId = args[1];
     final String codeManagerClassName = args[2];
 
-    final Class<? extends GeneratedCodeManager> codeManagerClass = (Class<? extends GeneratedCodeManager>) Class
+    final Class<? extends CodeManager> codeManagerClass = (Class<? extends CodeManager>) Class
         .forName(codeManagerClassName);
-    final GeneratedCodeManager codeManager = codeManagerClass.newInstance();
+    final CodeManager codeManager = codeManagerClass.newInstance();
 
     final AwsUtils aws = new AwsUtils();
     final DataConfig config = codeManager.getDataConfig(configPathString, true);
@@ -60,7 +60,7 @@ public class IdentityMapHadoopJob {
     new IdentityMapHadoopJob(config, codeManager, dataIndex, runId).run();
   }
 
-  public IdentityMapHadoopJob(final DataConfig config, final GeneratedCodeManager codeManager,
+  public IdentityMapHadoopJob(final DataConfig config, final CodeManager codeManager,
       final InputTableIndex dataIndex, final String runId) throws IOException {
     this.config = config;
     this.codeManager = codeManager;

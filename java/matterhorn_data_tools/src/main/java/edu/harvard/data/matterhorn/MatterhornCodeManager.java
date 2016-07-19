@@ -9,13 +9,13 @@ import org.apache.hadoop.mapreduce.Mapper;
 
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
+import edu.harvard.data.CodeManager;
 import edu.harvard.data.HadoopJob;
-import edu.harvard.data.generator.GeneratedCodeManager;
 import edu.harvard.data.identity.HadoopIdentityKey;
 import edu.harvard.data.identity.IdentityScrubber;
 import edu.harvard.data.matterhorn.identity.MatterhornIdentityHadoopManager;
 
-public class MatterhornCodeManager extends GeneratedCodeManager {
+public class MatterhornCodeManager extends CodeManager {
 
   private final MatterhornIdentityHadoopManager identity;
 
