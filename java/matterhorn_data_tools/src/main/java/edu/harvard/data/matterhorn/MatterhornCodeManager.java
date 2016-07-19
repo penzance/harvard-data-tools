@@ -1,16 +1,17 @@
 package edu.harvard.data.matterhorn;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
+import edu.harvard.data.DataConfig;
+import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.HadoopJob;
 import edu.harvard.data.generator.GeneratedCodeManager;
 import edu.harvard.data.identity.HadoopIdentityKey;
-import edu.harvard.data.identity.IdentityMapHadoopJob;
-import edu.harvard.data.identity.IdentityScrubHadoopJob;
 import edu.harvard.data.identity.IdentityScrubber;
 import edu.harvard.data.matterhorn.identity.MatterhornIdentityHadoopManager;
 
@@ -38,24 +39,13 @@ public class MatterhornCodeManager extends GeneratedCodeManager {
   }
 
   @Override
-  public Class<? extends IdentityMapHadoopJob> getIdentityMapHadoopJob() {
-    return MatterhornIdentityMapHadoopJob.class;
-  }
-
-  @Override
-  public Class<? extends IdentityScrubHadoopJob> getIdentityScrubHadoopJob() {
-    return MatterhornIdentityScrubHadoopJob.class;
-  }
-
-
-  @Override
   public Class<?> getIdentityPreverifyJob() {
-    return Phase1PreVerifier.class;
+    return null;
   }
 
   @Override
   public Class<?> getIdentityPostverifyJob() {
-    return Phase1PostVerifier.class;
+    return null;
   }
 
   @Override
@@ -63,5 +53,12 @@ public class MatterhornCodeManager extends GeneratedCodeManager {
     addJob(GeoIpJob.class, 2);
     addJob(VideoJob.class, 2);
     return jobs;
+  }
+
+  @Override
+  public DataConfig getDataConfig(final String configPathString, final boolean verify)
+      throws IOException, DataConfigurationException {
+    return MatterhornDataConfig.parseInputFiles(MatterhornDataConfig.class, configPathString,
+        verify);
   }
 }

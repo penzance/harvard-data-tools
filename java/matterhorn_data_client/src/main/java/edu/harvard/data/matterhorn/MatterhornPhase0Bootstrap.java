@@ -41,6 +41,7 @@ implements RequestHandler<String, String> {
   @Override
   protected Map<String, String> getCustomEc2Environment() {
     final Map<String, String> env = new HashMap<String, String>();
+    env.put("CODE_MANAGER_CLASS", "edu.harvard.data.matterhorn.MatterhornCodeManager");
     env.put("DATA_SET_ID", runId);
     env.put("DATA_SCHEMA_VERSION", "1.0");
     return env;

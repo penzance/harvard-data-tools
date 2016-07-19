@@ -1,5 +1,6 @@
 package edu.harvard.data.generator;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,10 +9,10 @@ import java.util.Map;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
+import edu.harvard.data.DataConfig;
+import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.HadoopJob;
 import edu.harvard.data.identity.HadoopIdentityKey;
-import edu.harvard.data.identity.IdentityMapHadoopJob;
-import edu.harvard.data.identity.IdentityScrubHadoopJob;
 import edu.harvard.data.identity.IdentityScrubber;
 
 public abstract class GeneratedCodeManager {
@@ -36,14 +37,17 @@ public abstract class GeneratedCodeManager {
 
   public abstract List<String> getIdentityTableNames();
 
-  public abstract Class<? extends IdentityMapHadoopJob> getIdentityMapHadoopJob();
+  //  public abstract Class<? extends IdentityMapHadoopJob> getIdentityMapHadoopJob();
 
-  public abstract Class<? extends IdentityScrubHadoopJob> getIdentityScrubHadoopJob();
+  //  public abstract Class<? extends IdentityScrubHadoopJob> getIdentityScrubHadoopJob();
 
   public abstract Class<?> getIdentityPreverifyJob();
 
   public abstract Class<?> getIdentityPostverifyJob();
 
   public abstract Map<Integer, List<Class<? extends HadoopJob>>> getHadoopProcessingJobs();
+
+  public abstract DataConfig getDataConfig(final String configPathString, final boolean verify) throws IOException, DataConfigurationException;
+
 
 }

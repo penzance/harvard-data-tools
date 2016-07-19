@@ -8,6 +8,8 @@ import com.amazonaws.services.s3.model.S3ObjectId;
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.generator.GeneratedCodeManager;
+import edu.harvard.data.identity.IdentityMapHadoopJob;
+import edu.harvard.data.identity.IdentityScrubHadoopJob;
 
 public class Phase1PipelineSetup {
 
@@ -105,31 +107,38 @@ public class Phase1PipelineSetup {
 
   private PipelineObjectBase identityPreverify(final PipelineObjectBase previousStep) {
     final Class<?> cls = codeManager.getIdentityPreverifyJob();
-    final List<String> args = new ArrayList<String>();
-    args.add(config.getPaths());
-    args.add(runId);
-    final PipelineObjectBase verify = factory.getEmrActivity("IdentityPreverify", pipeline.getEmr(),
-        cls, args);
-    verify.addDependency(previousStep);
-    return verify;
+    if (cls != null) {
+      final List<String> args = new ArrayList<String>();
+      args.add(config.getPaths());
+      args.add(runId);
+      final PipelineObjectBase verify = factory.getEmrActivity("IdentityPreverify",
+          pipeline.getEmr(), cls, args);
+      verify.addDependency(previousStep);
+      return verify;
+    }
+    return previousStep;
   }
 
   private PipelineObjectBase identityPostverify(final PipelineObjectBase previousStep) {
     final Class<?> cls = codeManager.getIdentityPostverifyJob();
-    final List<String> args = new ArrayList<String>();
-    args.add(config.getPaths());
-    args.add(runId);
-    final PipelineObjectBase verify = factory.getEmrActivity("IdentityPostverify",
-        pipeline.getEmr(), cls, args);
-    verify.addDependency(previousStep);
-    return verify;
+    if (cls != null) {
+      final List<String> args = new ArrayList<String>();
+      args.add(config.getPaths());
+      args.add(runId);
+      final PipelineObjectBase verify = factory.getEmrActivity("IdentityPostverify",
+          pipeline.getEmr(), cls, args);
+      verify.addDependency(previousStep);
+      return verify;
+    }
+    return previousStep;
   }
 
   private PipelineObjectBase hadoopIdentityMap(final PipelineObjectBase previousStep) {
-    final Class<?> cls = codeManager.getIdentityMapHadoopJob();
+    final Class<?> cls = IdentityMapHadoopJob.class;
     final List<String> args = new ArrayList<String>();
     args.add(config.getPaths());
     args.add(runId);
+    args.add(codeManager.getClass().getCanonicalName());
     final PipelineObjectBase identity = factory.getEmrActivity("IdentityMapHadoop",
         pipeline.getEmr(), cls, args);
     identity.addDependency(previousStep);
@@ -137,10 +146,11 @@ public class Phase1PipelineSetup {
   }
 
   private PipelineObjectBase hadoopIdentityScrub(final PipelineObjectBase previousStep) {
-    final Class<?> cls = codeManager.getIdentityScrubHadoopJob();
+    final Class<?> cls = IdentityScrubHadoopJob.class;
     final List<String> args = new ArrayList<String>();
     args.add(config.getPaths());
     args.add(runId);
+    args.add(codeManager.getClass().getCanonicalName());
     final PipelineObjectBase identity = factory.getEmrActivity("IdentityScrubHadoop",
         pipeline.getEmr(), cls, args);
     identity.addDependency(previousStep);

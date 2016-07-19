@@ -19,6 +19,7 @@ import edu.harvard.data.TableFormat.Compression;
 import edu.harvard.data.io.FileTableReader;
 import edu.harvard.data.io.JsonFileReader;
 import edu.harvard.data.io.TableWriter;
+import edu.harvard.data.matterhorn.MatterhornDataConfig;
 import edu.harvard.data.matterhorn.bindings.phase0.Phase0Event;
 import edu.harvard.data.matterhorn.bindings.phase0.Phase0GeoIp;
 import edu.harvard.data.matterhorn.bindings.phase0.Phase0Video;

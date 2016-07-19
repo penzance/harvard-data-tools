@@ -19,6 +19,7 @@ import edu.harvard.data.HadoopJob;
 import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.NoInputDataException;
 import edu.harvard.data.TableFormat;
+import edu.harvard.data.matterhorn.MatterhornDataConfig;
 import edu.harvard.data.matterhorn.bindings.phase1.Phase1Video;
 import edu.harvard.data.matterhorn.bindings.phase2.Phase2Video;
 

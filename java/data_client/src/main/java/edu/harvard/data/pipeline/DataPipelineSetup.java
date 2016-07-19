@@ -16,11 +16,14 @@ import com.amazonaws.services.datapipeline.model.PutPipelineDefinitionResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
+import edu.harvard.data.VerificationException;
 import edu.harvard.data.generator.GeneratedCodeManager;
+import edu.harvard.data.schema.UnexpectedApiResponseException;
 
-public class DataPipelineGenerator {
+public class DataPipelineSetup {
   private static final Logger log = LogManager.getLogger();
 
   private final DataConfig config;
@@ -29,7 +32,27 @@ public class DataPipelineGenerator {
   private final InputTableIndex dataIndex;
   private String pipelineId;
 
-  public DataPipelineGenerator(final DataConfig config, final InputTableIndex dataIndex,
+  @SuppressWarnings("unchecked")
+  public static void main(final String[] args) throws IOException, DataConfigurationException,
+  UnexpectedApiResponseException, VerificationException, ClassNotFoundException,
+  InstantiationException, IllegalAccessException {
+    final String configPath = args[0];
+    final String runId = args[1];
+    final String codeManagerClassName = args[2];
+
+    final Class<? extends GeneratedCodeManager> codeManagerClass = (Class<? extends GeneratedCodeManager>) Class
+        .forName(codeManagerClassName);
+    final GeneratedCodeManager codeManager = codeManagerClass.newInstance();
+
+    final DataConfig config = codeManager.getDataConfig(configPath, true);
+    final AwsUtils aws = new AwsUtils();
+    final InputTableIndex dataIndex = aws.readJson(config.getIndexFileS3Location(runId),
+        InputTableIndex.class);
+    final DataPipelineSetup pipeline = new DataPipelineSetup(config, dataIndex, codeManager, runId);
+    pipeline.generate();
+  }
+
+  public DataPipelineSetup(final DataConfig config, final InputTableIndex dataIndex,
       final GeneratedCodeManager codeManager, final String runId) {
     this.config = config;
     this.dataIndex = dataIndex;

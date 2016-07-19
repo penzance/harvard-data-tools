@@ -15,7 +15,11 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
+import com.amazonaws.services.s3.model.S3ObjectId;
+
+import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
+import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.NoInputDataException;
 import edu.harvard.data.generator.GeneratedCodeManager;
@@ -31,6 +35,26 @@ public class IdentityScrubHadoopJob {
   private final URI hdfsService;
   private final HadoopUtilities hadoopUtils;
   private final String runId;
+
+  @SuppressWarnings("unchecked")
+  public static void main(final String[] args) throws IOException, DataConfigurationException,
+  LeaseRenewalException, InstantiationException, IllegalAccessException, NoInputDataException,
+  URISyntaxException, ClassNotFoundException, InterruptedException {
+    final String configPathString = args[0];
+    final String runId = args[1];
+    final String codeManagerClassName = args[2];
+
+    final Class<? extends GeneratedCodeManager> codeManagerClass = (Class<? extends GeneratedCodeManager>) Class
+        .forName(codeManagerClassName);
+    final GeneratedCodeManager codeManager = codeManagerClass.newInstance();
+
+    final AwsUtils aws = new AwsUtils();
+    final DataConfig config = codeManager.getDataConfig(configPathString, true);
+    final S3ObjectId indexLocation = config.getIndexFileS3Location(runId);
+    final InputTableIndex dataIndex = InputTableIndex.read(aws, indexLocation);
+
+    new IdentityScrubHadoopJob(config, codeManager, dataIndex, runId).run();
+  }
 
   public IdentityScrubHadoopJob(final DataConfig config, final GeneratedCodeManager codeManager,
       final InputTableIndex dataIndex, final String runId) throws URISyntaxException {

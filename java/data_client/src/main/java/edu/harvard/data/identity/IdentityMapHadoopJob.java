@@ -18,7 +18,11 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.amazonaws.services.s3.model.S3ObjectId;
+
+import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
+import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.generator.GeneratedCodeManager;
 import edu.harvard.data.leases.LeaseRenewalException;
@@ -36,6 +40,25 @@ public class IdentityMapHadoopJob {
   final HadoopUtilities hadoopUtils;
   private final InputTableIndex dataIndex;
   private final GeneratedCodeManager codeManager;
+
+  @SuppressWarnings("unchecked")
+  public static void main(final String[] args)
+      throws IOException, DataConfigurationException, LeaseRenewalException, ClassNotFoundException,
+      InstantiationException, IllegalAccessException {
+    final String configPathString = args[0];
+    final String runId = args[1];
+    final String codeManagerClassName = args[2];
+
+    final Class<? extends GeneratedCodeManager> codeManagerClass = (Class<? extends GeneratedCodeManager>) Class
+        .forName(codeManagerClassName);
+    final GeneratedCodeManager codeManager = codeManagerClass.newInstance();
+
+    final AwsUtils aws = new AwsUtils();
+    final DataConfig config = codeManager.getDataConfig(configPathString, true);
+    final S3ObjectId indexLocation = config.getIndexFileS3Location(runId);
+    final InputTableIndex dataIndex = InputTableIndex.read(aws, indexLocation);
+    new IdentityMapHadoopJob(config, codeManager, dataIndex, runId).run();
+  }
 
   public IdentityMapHadoopJob(final DataConfig config, final GeneratedCodeManager codeManager,
       final InputTableIndex dataIndex, final String runId) throws IOException {
