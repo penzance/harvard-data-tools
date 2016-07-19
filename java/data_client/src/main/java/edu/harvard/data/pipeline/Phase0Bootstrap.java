@@ -20,6 +20,7 @@ import com.amazonaws.services.ec2.model.IamInstanceProfileSpecification;
 import com.amazonaws.services.ec2.model.LaunchSpecification;
 import com.amazonaws.services.ec2.model.RequestSpotInstancesRequest;
 import com.amazonaws.services.ec2.model.RequestSpotInstancesResult;
+import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.s3.model.S3ObjectId;
 import com.amazonaws.util.Base64;
 
@@ -38,6 +39,7 @@ public abstract class Phase0Bootstrap {
   protected String runId;
   private boolean createPipeline;
   protected AwsUtils aws;
+  private PipelineExecutionRecord executionRecord;
 
   protected abstract List<S3ObjectId> getInfrastructureConfigPaths();
 
@@ -56,13 +58,19 @@ public abstract class Phase0Bootstrap {
     this.aws = new AwsUtils();
   }
 
-  protected void run()
+  protected void run(final Context context)
       throws IOException, DataConfigurationException, UnexpectedApiResponseException {
     if (newDataAvailable()) {
       for (final S3ObjectId path : getInfrastructureConfigPaths()) {
         configPathString += "|" + AwsUtils.uri(path);
       }
       this.config = DataConfig.parseInputFiles(configClass, configPathString, false);
+      PipelineExecutionRecord.init(config.getPipelineDynamoTable());
+      executionRecord = new PipelineExecutionRecord(runId);
+      executionRecord.setBootstrapLogStream(context.getLogStreamName());
+      executionRecord.setBootstrapLogGroup(context.getLogGroupName());
+      executionRecord.setRunStart(new Date());
+      executionRecord.save();
       createPhase0();
     }
   }
@@ -87,10 +95,12 @@ public abstract class Phase0Bootstrap {
     request.setLaunchSpecification(spec);
 
     final RequestSpotInstancesResult result = ec2client.requestSpotInstances(request);
+    final String requestId = result.getSpotInstanceRequests().get(0).getSpotInstanceRequestId();
     System.out.println(result);
+    executionRecord.setPhase0RequestId(requestId);
 
     final List<String> instanceIds = new ArrayList<String>();
-    instanceIds.add(result.getSpotInstanceRequests().get(0).getSpotInstanceRequestId());
+    instanceIds.add(requestId);
     final DescribeSpotInstanceRequestsRequest describe = new DescribeSpotInstanceRequestsRequest();
     describe.setSpotInstanceRequestIds(instanceIds);
     final DescribeSpotInstanceRequestsResult description = ec2client

@@ -31,7 +31,7 @@ sudo service awslogs start
 python $HARVARD_DATA_TOOLS_BASE/python/$GENERATOR &> /root/generate-tools.out
 
 # run phase 0
-java -Duser.timezone=$SERVER_TIMEZONE -Xmx$PHASE_0_HEAP_SIZE -cp /home/ec2-user/code/data_tools.jar $PHASE_0_CLASS $CONFIG_PATHS $RUN_ID $DATA_SET_ID $PHASE_0_THREADS &> /var/log/phase0-output.log
+java -Duser.timezone=$SERVER_TIMEZONE -Xmx$PHASE_0_HEAP_SIZE -cp /home/ec2-user/code/data_tools.jar $PHASE_0_CLASS $CONFIG_PATHS $RUN_ID $DATA_SET_ID $PHASE_0_THREADS $CODE_MANAGER_CLASS &> /var/log/phase0-output.log
 
 if [ $CREATE_PIPELINE -eq 1 ]
 then

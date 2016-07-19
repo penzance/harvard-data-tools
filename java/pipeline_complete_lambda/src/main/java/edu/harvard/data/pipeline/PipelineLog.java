@@ -1,4 +1,4 @@
-package edu.harvard.data;
+package edu.harvard.data.pipeline;
 
 public class PipelineLog {
   private final String label;

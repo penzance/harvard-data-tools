@@ -1,4 +1,4 @@
-package edu.harvard.data.canvas.phase_0;
+package edu.harvard.data;
 
 public class ArgumentError extends Exception {
 

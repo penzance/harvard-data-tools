@@ -14,14 +14,14 @@ public class EmrStartupPipelineSetup {
   private final S3ObjectId workingDir;
   private final Pipeline pipeline;
   private final PipelineFactory factory;
-  private final String pipelineId;
+  private final String runId;
 
   public EmrStartupPipelineSetup(final Pipeline pipeline, final PipelineFactory factory,
       final String runId) {
     this.factory = factory;
     this.config = pipeline.getConfig();
     this.pipeline = pipeline;
-    this.pipelineId = pipeline.getId();
+    this.runId = runId;
     this.workingDir = AwsUtils.key(config.getS3WorkingLocation(runId));
   }
 
@@ -40,7 +40,7 @@ public class EmrStartupPipelineSetup {
   private PipelineObjectBase startupLogging() {
     final Class<?> cls = PipelineStartup.class;
     final List<String> args = new ArrayList<String>();
-    args.add(pipelineId); // args[0] in main class
+    args.add(runId); // args[0] in main class
     args.add(config.getPipelineDynamoTable()); // args[1] in main class
     final String jar = config.getEmrCodeDir() + "/" + config.getDataToolsJar();
     return factory.getJavaShellActivity("PipelineStartup", jar, cls, args, pipeline.getEmr());

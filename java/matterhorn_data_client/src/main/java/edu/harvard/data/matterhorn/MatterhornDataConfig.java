@@ -19,7 +19,6 @@ public class MatterhornDataConfig extends DataConfig {
     this.dropboxBucket = getConfigParameter("dropbox_bucket", verify);
     this.codeGeneratorScript = "matterhorn_generate_tools.py";
     this.codeManagerClass = "edu.harvard.data.matterhorn.MatterhornCodeManager";
-    this.phase0Class = "edu.harvard.data.matterhorn.MatterhornPhase0";
     if (verify) {
       checkParameters();
     }

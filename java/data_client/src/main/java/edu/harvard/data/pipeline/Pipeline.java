@@ -51,7 +51,7 @@ public class Pipeline {
 
   private PipelineObjectBase createDefaultObject() throws JsonProcessingException {
     final PipelineObjectBase defaultObj = factory.getDefault(schedule);
-    final PipelineCompletionMessage completion = new PipelineCompletionMessage(pipelineId,
+    final PipelineCompletionMessage completion = new PipelineCompletionMessage(pipelineId, runId,
         config.getReportBucket(), config.getFailureSnsArn(), config.getPipelineDynamoTable());
     final String failMsg = new ObjectMapper().writeValueAsString(completion);
     final String failSubj = "Pipeline " + name + " Failed";

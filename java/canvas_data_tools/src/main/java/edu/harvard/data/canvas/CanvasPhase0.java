@@ -6,41 +6,27 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
 
+import edu.harvard.data.ArgumentError;
 import edu.harvard.data.AwsUtils;
-import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.DumpInfo;
+import edu.harvard.data.Phase0;
+import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.TableInfo;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.canvas.data_api.ApiClient;
 import edu.harvard.data.canvas.data_api.CanvasDataSchema;
 import edu.harvard.data.canvas.data_api.DataArtifact;
 import edu.harvard.data.canvas.data_api.DataDump;
-import edu.harvard.data.canvas.phase_0.ArgumentError;
 import edu.harvard.data.canvas.phase_0.DumpManager;
 import edu.harvard.data.canvas.phase_0.Phase0PostVerifier;
 import edu.harvard.data.pipeline.InputTableIndex;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
-public class CanvasPhase0 {
-
-  public static void main(final String[] args) throws IOException, DataConfigurationException,
-  UnexpectedApiResponseException, VerificationException, ArgumentError {
-    final String configPathString = args[0];
-    final String runId = args[1];
-    final String datasetId = args[2];
-    final int threads = Integer.parseInt(args[3]);
-    final CanvasDataConfig config = DataConfig.parseInputFiles(CanvasDataConfig.class,
-        configPathString, false);
-    DumpInfo.init(config.getDumpInfoDynamoTable());
-    TableInfo.init(config.getTableInfoDynamoTable());
-    final CanvasPhase0 phase0 = new CanvasPhase0(config, runId, datasetId, threads);
-    phase0.run();
-  }
+public class CanvasPhase0 extends Phase0 {
 
   private final CanvasDataConfig config;
   private String dumpId;
@@ -50,14 +36,14 @@ public class CanvasPhase0 {
   private final ApiClient api;
   private CanvasDataSchema schema;
   private DumpInfo info;
-  private final int threads;
   private final String runId;
+  private final ExecutorService exec;
 
   public CanvasPhase0(final CanvasDataConfig config, final String runId, final String datasetId,
-      final int threads) throws DataConfigurationException {
+      final ExecutorService exec) throws DataConfigurationException {
     this.config = config;
     this.runId = runId;
-    this.threads = threads;
+    this.exec = exec;
     this.aws = new AwsUtils();
     this.manager = new DumpManager(config, aws);
     this.api = new ApiClient(config.getCanvasDataHost(), config.getCanvasApiKey(),
@@ -74,8 +60,9 @@ public class CanvasPhase0 {
     }
   }
 
-  private void run() throws DataConfigurationException, UnexpectedApiResponseException, IOException,
-  VerificationException, ArgumentError {
+  @Override
+  protected ReturnStatus run() throws DataConfigurationException, UnexpectedApiResponseException,
+  IOException, VerificationException, ArgumentError {
     final InputTableIndex index;
     if (dumpId == null && tableName != null) {
       // Build a data set containing the full history of one table
@@ -98,6 +85,7 @@ public class CanvasPhase0 {
     final S3ObjectId indexFile = config.getIndexFileS3Location(runId);
     System.out.println("Saving index to " + AwsUtils.uri(indexFile));
     aws.writeJson(indexFile, index);
+    return ReturnStatus.OK;
   }
 
   private InputTableIndex getTableHistory()
@@ -142,17 +130,9 @@ public class CanvasPhase0 {
     final DataDump dump = setupForDump();
     // Bypass the download and verify step if it's already happened
     if (!info.getVerified()) {
-      ExecutorService exec = null;
-      try {
-        exec = Executors.newFixedThreadPool(threads);
-        downloadDump(dump, exec);
-        checkSchema();
-        verifyDump(exec);
-      } finally {
-        if (exec != null) {
-          exec.shutdownNow();
-        }
-      }
+      downloadDump(dump, exec);
+      checkSchema();
+      verifyDump(exec);
     }
     return dump;
   }

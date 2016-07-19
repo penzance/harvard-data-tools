@@ -50,7 +50,7 @@ implements RequestHandler<BootstrapParameters, String> {
     try {
       super.init(params.getConfigPathString(), CanvasDataConfig.class, !params.getDownloadOnly());
       this.params = params;
-      super.run();
+      super.run(context);
     } catch (final Throwable e) {
       e.printStackTrace();
       return "Error: " + e.getMessage();

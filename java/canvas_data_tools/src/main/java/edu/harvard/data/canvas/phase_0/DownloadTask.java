@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
 
+import edu.harvard.data.ArgumentError;
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.canvas.data_api.ApiClient;

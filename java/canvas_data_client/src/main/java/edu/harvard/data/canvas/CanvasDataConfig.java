@@ -26,7 +26,6 @@ public class CanvasDataConfig extends DataConfig {
 
     this.codeGeneratorScript = "canvas_generate_tools.py";
     this.codeManagerClass = "edu.harvard.data.canvas.CanvasCodeManager";
-    this.phase0Class = "edu.harvard.data.canvas.CanvasPhase0";
     if (verify) {
       checkParameters();
     }

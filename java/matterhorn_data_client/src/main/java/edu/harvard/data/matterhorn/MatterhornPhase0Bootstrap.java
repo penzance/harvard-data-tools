@@ -22,7 +22,7 @@ implements RequestHandler<String, String> {
   public String handleRequest(final String configPathString, final Context context) {
     try {
       super.init(configPathString, MatterhornDataConfig.class, true);
-      super.run();
+      super.run(context);
     } catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
       return "Error: " + e.getMessage();
     }

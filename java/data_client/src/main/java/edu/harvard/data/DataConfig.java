@@ -122,6 +122,7 @@ public class DataConfig {
     this.hdfsVerifyBase = "/verify" + this.hdfsBase;
     this.ec2GitDir = "/home/ec2-user/harvard-data-tools";
     this.ec2CodeDir = "/home/ec2-user/code";
+    this.phase0Class = Phase0.class.getCanonicalName();
 
     this.scratchDir = getConfigParameter("scratch_dir", verify);
     this.redshiftPort = getConfigParameter("redshift_port", verify);
@@ -242,7 +243,7 @@ public class DataConfig {
   protected void checkParameters() throws DataConfigurationException {
     checkParameter("codeGeneratorScript", codeGeneratorScript);
     checkParameter("phase0Class", phase0Class);
-    checkParameter("pipelineSetupClass", codeManagerClass);
+    checkParameter("codeManagerClass", codeManagerClass);
   }
 
   private void checkParameter(final String key, final String value)

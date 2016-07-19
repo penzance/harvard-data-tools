@@ -1,4 +1,4 @@
-package edu.harvard.data;
+package edu.harvard.data.pipeline;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -36,7 +36,7 @@ import com.amazonaws.services.sns.model.PublishRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import edu.harvard.data.PipelineExecutionRecord.Status;
+import edu.harvard.data.pipeline.PipelineExecutionRecord.Status;
 
 public class PipelineComplete implements RequestHandler<SNSEvent, String> {
   private static final Logger log = LogManager.getLogger();
@@ -46,6 +46,7 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
   private final AmazonSNSClient snsClient;
   private S3ObjectId outputKey;
   private String pipelineId;
+  private String runId;
   private String emrInstanceName;
   private String emrName;
   private String emrAttempt;
@@ -55,15 +56,6 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
   private final PostMortemReport report;
   private DescribeObjectsResult objectDescriptions;
   private String snsArn;
-
-  public static void main(final String[] args) throws IOException {
-    final PipelineComplete p = new PipelineComplete();
-    p.pipelineId = "df-052812836GPN05A3P0AP";
-    p.outputKey = p.key("hdt-pipeline-reports", p.pipelineId + ".json");
-    p.snsArn = "arn:aws:sns:us-east-1:364469542718:hdtdevcanvas-FailureSNS-4W2G2I1H8I65";
-    PipelineExecutionRecord.init("hdt-pipeline");
-    p.process();
-  }
 
   public PipelineComplete() throws IOException {
     this.pipelineClient = new DataPipelineClient();
@@ -78,11 +70,13 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
     log.info("Handling request");
     final String json = input.getRecords().get(0).getSNS().getMessage();
     log.info("JSON: " + json);
+    log.info("Logs: " + context.getLogStreamName());
     final ObjectMapper mapper = new ObjectMapper();
     Map<String, String> data;
     try {
       data = mapper.readValue(json, Map.class);
       this.pipelineId = data.get("pipelineId");
+      this.runId = data.get("runId");
       this.outputKey = key(data.get("reportBucket"), this.pipelineId + ".json");
       this.snsArn = data.get("snsArn");
       PipelineExecutionRecord.init(data.get("pipelineDynamoTable"));
@@ -113,7 +107,7 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
   }
 
   private void updateDynamo() {
-    final PipelineExecutionRecord record = PipelineExecutionRecord.find(pipelineId);
+    final PipelineExecutionRecord record = PipelineExecutionRecord.find(runId);
     // TODO: Check if record doesn't exist.
     record.setPipelineEnd(new Date());
     if (report.getFailure() == null) {

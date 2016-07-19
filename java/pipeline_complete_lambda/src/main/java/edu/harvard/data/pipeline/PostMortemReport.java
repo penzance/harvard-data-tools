@@ -1,4 +1,4 @@
-package edu.harvard.data;
+package edu.harvard.data.pipeline;
 
 import java.util.ArrayList;
 import java.util.HashMap;

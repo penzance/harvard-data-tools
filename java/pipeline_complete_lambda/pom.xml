@@ -3,8 +3,8 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>edu.harvard</groupId>
-	<artifactId>pipeline_post_mortem</artifactId>
-	<name>pipeline_post_mortem</name>
+	<artifactId>pipeline_complete_lambda</artifactId>
+	<name>pipeline_complete_lambda</name>
 	<packaging>jar</packaging>
 	<version>1.0.0</version>
 	<dependencies>

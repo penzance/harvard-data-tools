@@ -1,4 +1,4 @@
-package edu.harvard.data;
+package edu.harvard.data.pipeline;
 
 import java.util.Date;
 
@@ -13,24 +13,18 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.TableNameOverride;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
-// TODO: This is a direct copy/paste from data-tools, and needs to be fixed.
-// The problem is that Lambda has a maximum Jar size of 50mb (250mb uncompressed), and
-// the complete data tools jar is already pushing that size. Introducing a dependency there
-// will push the size of the post mortem Jar very close to the limit, and it will probably
-// sneak over it at some point later causing a hard-to-debug failure at some later date.
-// Still - there's got to be a better solution than this.
 @DynamoDBTable(tableName = "DummyTableName")
 public class PipelineExecutionRecord {
   private static final Logger log = LogManager.getLogger();
 
-  public enum Status { Starting, Running, Failed, Success }
+  public enum Status { Created, Starting, Running, Failed, Success }
 
   private static DynamoDBMapper mapper;
   private static DynamoDBMapperConfig mapperConfig;
   private static String tableName;
 
-  public PipelineExecutionRecord(final String pipelineId) {
-    this.pipelineId = pipelineId;
+  public PipelineExecutionRecord(final String runId) {
+    this.runId = runId;
   }
 
   public PipelineExecutionRecord() {
@@ -42,8 +36,20 @@ public class PipelineExecutionRecord {
     mapperConfig = new DynamoDBMapperConfig(new TableNameOverride(tableName));
   }
 
-  @DynamoDBHashKey(attributeName = "pipeline_id")
-  private String pipelineId;
+  @DynamoDBHashKey(attributeName = "run_id")
+  private String runId;
+
+  @DynamoDBAttribute(attributeName = "run_start")
+  private Date runStart;
+
+  @DynamoDBAttribute(attributeName = "phase_0_request_id")
+  private String phase0RequestId;
+
+  @DynamoDBAttribute(attributeName = "phase_0_start")
+  private Date phase0Start;
+
+  @DynamoDBAttribute(attributeName = "phase_0_success")
+  private Boolean phase0Success;
 
   @DynamoDBAttribute(attributeName = "pipeline_created")
   private Date pipelineCreated;
@@ -56,6 +62,12 @@ public class PipelineExecutionRecord {
 
   @DynamoDBAttribute(attributeName = "pipeline_end")
   private Date pipelineEnd;
+
+  @DynamoDBAttribute(attributeName = "bootstrap_log_stream")
+  private String bootstrapLogStream;
+
+  @DynamoDBAttribute(attributeName = "bootstrap_log_group")
+  private String bootstrapLogGroup;
 
   @DynamoDBAttribute(attributeName = "config")
   private String configString;
@@ -72,28 +84,28 @@ public class PipelineExecutionRecord {
   @DynamoDBAttribute(attributeName = "status")
   private String status;
 
-  public static PipelineExecutionRecord find(final String pipelineId) {
+  public static PipelineExecutionRecord find(final String runId) {
     if (tableName == null) {
       throw new RuntimeException("PipelineExecutionRecord object saved before init(tableName) method called");
     }
-    log.debug("Finding pipeline ID " + pipelineId + " from table " + tableName);
-    return mapper.load(PipelineExecutionRecord.class, pipelineId, mapperConfig);
+    log.debug("Finding pipeline ID " + runId + " from table " + tableName);
+    return mapper.load(PipelineExecutionRecord.class, runId, mapperConfig);
   }
 
   public void save() {
     if (tableName == null) {
       throw new RuntimeException("PipelineExecutionRecord object saved before init(tableName) method called");
     }
-    log.info("Saving pipeline record ID " + pipelineId + " to table " + tableName);
+    log.info("Saving pipeline run ID " + runId + " to table " + tableName);
     mapper.save(this, mapperConfig);
   }
 
-  public String getPipelineId() {
-    return pipelineId;
+  public String getRunId() {
+    return runId;
   }
 
-  public void setPipelineId(final String pipelineId) {
-    this.pipelineId = pipelineId;
+  public void setRunId(final String runId) {
+    this.runId = runId;
   }
 
   public String getPipelineName() {
@@ -166,6 +178,54 @@ public class PipelineExecutionRecord {
 
   public void setPipelineEnd(final Date pipelineEnd) {
     this.pipelineEnd = pipelineEnd;
+  }
+
+  public String getBootstrapLogStream() {
+    return bootstrapLogStream;
+  }
+
+  public void setBootstrapLogStream(final String bootstrapLogStream) {
+    this.bootstrapLogStream = bootstrapLogStream;
+  }
+
+  public String getBootstrapLogGroup() {
+    return bootstrapLogGroup;
+  }
+
+  public void setBootstrapLogGroup(final String bootstrapLogGroup) {
+    this.bootstrapLogGroup = bootstrapLogGroup;
+  }
+
+  public Date getRunStart() {
+    return runStart;
+  }
+
+  public void setRunStart(final Date runStart) {
+    this.runStart = runStart;
+  }
+
+  public String getPhase0RequestId() {
+    return phase0RequestId;
+  }
+
+  public void setPhase0RequestId(final String phase0RequestId) {
+    this.phase0RequestId = phase0RequestId;
+  }
+
+  public Date getPhase0Start() {
+    return phase0Start;
+  }
+
+  public void setPhase0Start(final Date phase0Start) {
+    this.phase0Start = phase0Start;
+  }
+
+  public Boolean getPhase0Success() {
+    return phase0Success;
+  }
+
+  public void setPhase0Success(Boolean phase0Success) {
+    this.phase0Success = phase0Success;
   }
 
 }

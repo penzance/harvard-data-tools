@@ -3,14 +3,16 @@ package edu.harvard.data.matterhorn;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
+import edu.harvard.data.CodeManager;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
-import edu.harvard.data.CodeManager;
 import edu.harvard.data.HadoopJob;
+import edu.harvard.data.Phase0;
 import edu.harvard.data.identity.HadoopIdentityKey;
 import edu.harvard.data.identity.IdentityScrubber;
 import edu.harvard.data.matterhorn.identity.MatterhornIdentityHadoopManager;
@@ -61,4 +63,13 @@ public class MatterhornCodeManager extends CodeManager {
     return MatterhornDataConfig.parseInputFiles(MatterhornDataConfig.class, configPathString,
         verify);
   }
+
+  @Override
+  public Phase0 getPhase0(final String configPathString, final String datasetId, final String runId,
+      final ExecutorService exec) throws IOException, DataConfigurationException {
+    final MatterhornDataConfig config = MatterhornDataConfig
+        .parseInputFiles(MatterhornDataConfig.class, configPathString, false);
+    return new MatterhornPhase0(config, runId, exec);
+  }
+
 }

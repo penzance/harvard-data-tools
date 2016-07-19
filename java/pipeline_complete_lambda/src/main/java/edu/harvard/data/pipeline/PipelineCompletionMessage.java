@@ -5,10 +5,12 @@ public class PipelineCompletionMessage {
   private final String reportBucket;
   private final String snsArn;
   private final String pipelineDynamoTable;
+  private final String runId;
 
-  public PipelineCompletionMessage(final String pipelineId, final String reportBucket,
+  public PipelineCompletionMessage(final String pipelineId, final String runId, final String reportBucket,
       final String snsArn, final String pipelineDynamoTable) {
     this.pipelineId = pipelineId;
+    this.runId = runId;
     this.reportBucket = reportBucket;
     this.snsArn = snsArn;
     this.pipelineDynamoTable = pipelineDynamoTable;
@@ -16,6 +18,10 @@ public class PipelineCompletionMessage {
 
   public String getPipelineId() {
     return pipelineId;
+  }
+
+  public String getRunId() {
+    return runId;
   }
 
   public String getReportBucket() {

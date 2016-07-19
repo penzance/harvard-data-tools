@@ -17,9 +17,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.harvard.data.AwsUtils;
+import edu.harvard.data.CodeManager;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
-import edu.harvard.data.CodeManager;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
@@ -32,7 +32,6 @@ public class DataPipelineSetup {
   private final InputTableIndex dataIndex;
   private String pipelineId;
 
-  @SuppressWarnings("unchecked")
   public static void main(final String[] args) throws IOException, DataConfigurationException,
   UnexpectedApiResponseException, VerificationException, ClassNotFoundException,
   InstantiationException, IllegalAccessException {
@@ -40,10 +39,7 @@ public class DataPipelineSetup {
     final String runId = args[1];
     final String codeManagerClassName = args[2];
 
-    final Class<? extends CodeManager> codeManagerClass = (Class<? extends CodeManager>) Class
-        .forName(codeManagerClassName);
-    final CodeManager codeManager = codeManagerClass.newInstance();
-
+    final CodeManager codeManager = CodeManager.getCodeManager(codeManagerClassName);
     final DataConfig config = codeManager.getDataConfig(configPath, true);
     final AwsUtils aws = new AwsUtils();
     final InputTableIndex dataIndex = aws.readJson(config.getIndexFileS3Location(runId),
@@ -89,7 +85,7 @@ public class DataPipelineSetup {
   }
 
   private void logPipelineToDynamo() {
-    final PipelineExecutionRecord record = new PipelineExecutionRecord(pipelineId);
+    final PipelineExecutionRecord record = PipelineExecutionRecord.find(runId);
     record.setPipelineName(runId);
     record.setConfigString(config.getPaths());
     record.setPipelineCreated(new Date());
@@ -120,7 +116,7 @@ public class DataPipelineSetup {
   private PipelineObjectBase getSuccessAction(final PipelineFactory factory)
       throws JsonProcessingException {
     final String subject = "PipelineSuccess";
-    final PipelineCompletionMessage success = new PipelineCompletionMessage(pipelineId,
+    final PipelineCompletionMessage success = new PipelineCompletionMessage(pipelineId, runId,
         config.getReportBucket(), config.getSuccessSnsArn(), config.getPipelineDynamoTable());
     final String msg = new ObjectMapper().writeValueAsString(success);
     return factory.getSns("PipelineComplete", subject, msg, config.getCompletionSnsArn());

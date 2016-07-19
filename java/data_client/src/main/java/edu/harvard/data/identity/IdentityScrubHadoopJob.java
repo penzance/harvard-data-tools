@@ -18,9 +18,9 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import com.amazonaws.services.s3.model.S3ObjectId;
 
 import edu.harvard.data.AwsUtils;
+import edu.harvard.data.CodeManager;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
-import edu.harvard.data.CodeManager;
 import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.NoInputDataException;
 import edu.harvard.data.leases.LeaseRenewalException;
@@ -36,7 +36,6 @@ public class IdentityScrubHadoopJob {
   private final HadoopUtilities hadoopUtils;
   private final String runId;
 
-  @SuppressWarnings("unchecked")
   public static void main(final String[] args) throws IOException, DataConfigurationException,
   LeaseRenewalException, InstantiationException, IllegalAccessException, NoInputDataException,
   URISyntaxException, ClassNotFoundException, InterruptedException {
@@ -44,10 +43,7 @@ public class IdentityScrubHadoopJob {
     final String runId = args[1];
     final String codeManagerClassName = args[2];
 
-    final Class<? extends CodeManager> codeManagerClass = (Class<? extends CodeManager>) Class
-        .forName(codeManagerClassName);
-    final CodeManager codeManager = codeManagerClass.newInstance();
-
+    final CodeManager codeManager = CodeManager.getCodeManager(codeManagerClassName);
     final AwsUtils aws = new AwsUtils();
     final DataConfig config = codeManager.getDataConfig(configPathString, true);
     final S3ObjectId indexLocation = config.getIndexFileS3Location(runId);

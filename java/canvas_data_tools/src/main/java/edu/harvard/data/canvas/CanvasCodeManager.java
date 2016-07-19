@@ -3,14 +3,16 @@ package edu.harvard.data.canvas;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
+import edu.harvard.data.CodeManager;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
-import edu.harvard.data.CodeManager;
 import edu.harvard.data.HadoopJob;
+import edu.harvard.data.Phase0;
 import edu.harvard.data.canvas.identity.CanvasIdentityHadoopManager;
 import edu.harvard.data.canvas.phase_1.Phase1PostVerifier;
 import edu.harvard.data.canvas.phase_1.Phase1PreVerifier;
@@ -65,5 +67,13 @@ public class CanvasCodeManager extends CodeManager {
   public DataConfig getDataConfig(final String configPathString, final boolean verify)
       throws IOException, DataConfigurationException {
     return CanvasDataConfig.parseInputFiles(CanvasDataConfig.class, configPathString, verify);
+  }
+
+  @Override
+  public Phase0 getPhase0(final String configPathString, final String datasetId, final String runId,
+      final ExecutorService exec) throws IOException, DataConfigurationException {
+    final CanvasDataConfig config = DataConfig.parseInputFiles(CanvasDataConfig.class,
+        configPathString, false);
+    return new CanvasPhase0(config, runId, datasetId, exec);
   }
 }
