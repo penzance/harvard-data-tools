@@ -18,6 +18,7 @@ CURRENT_SCHEMA = os.environ['DATA_SCHEMA_VERSION']
 CONFIG_PATHS = os.environ['CONFIG_PATHS']
 RUN_ID = os.environ['RUN_ID']
 
+PIPELINE_COMPLETE_DIR = "{0}/java/pipeline_complete_lambda".format(GIT_BASE)
 DATA_CLIENT_DIR = "{0}/java/data_client".format(GIT_BASE)
 DATA_TOOLS_DIR = "{0}/java/matterhorn_data_tools".format(GIT_BASE)
 MATTERHORN_DATA_CLIENT_DIR = "{0}/java/matterhorn_data_client".format(GIT_BASE)
@@ -66,6 +67,7 @@ def run_generator():
     print "Return code: {0}".format(process.returncode)
     check_return_code(process.returncode)
 
+compile_java(PIPELINE_COMPLETE_DIR)
 compile_java(DATA_CLIENT_DIR)
 compile_java(MATTERHORN_DATA_CLIENT_DIR)
 run_generator()
