@@ -29,6 +29,7 @@ import com.amazonaws.util.Base64;
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
+import edu.harvard.data.pipeline.PipelineExecutionRecord.Status;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public abstract class Phase0Bootstrap {
@@ -72,6 +73,7 @@ public abstract class Phase0Bootstrap {
       executionRecord.setBootstrapLogStream(context.getLogStreamName());
       executionRecord.setBootstrapLogGroup(context.getLogGroupName());
       executionRecord.setRunStart(new Date());
+      executionRecord.setStatus(Status.ProvisioningPhase0.toString());
       executionRecord.save();
       createPhase0();
       sendSnsNotification();

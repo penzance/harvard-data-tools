@@ -8,8 +8,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.amazonaws.services.datapipeline.DataPipelineClient;
+import com.amazonaws.services.datapipeline.model.ActivatePipelineRequest;
 import com.amazonaws.services.datapipeline.model.CreatePipelineRequest;
 import com.amazonaws.services.datapipeline.model.CreatePipelineResult;
+import com.amazonaws.services.datapipeline.model.PutPipelineDefinitionRequest;
+import com.amazonaws.services.datapipeline.model.PutPipelineDefinitionResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -68,14 +71,14 @@ public class DataPipelineSetup {
 
     final Pipeline pipeline = populatePipeline();
 
-    //    final PutPipelineDefinitionRequest definition = pipeline.getDefineRequest(pipelineId);
-    //    final PutPipelineDefinitionResult defineResult = client.putPipelineDefinition(definition);
-    //    log.info("Defining pipeline: " + defineResult);
-    //    logPipelineToDynamo();
-    //
-    //    final ActivatePipelineRequest activate = new ActivatePipelineRequest();
-    //    activate.setPipelineId(pipelineId);
-    //    client.activatePipeline(activate);
+    final PutPipelineDefinitionRequest definition = pipeline.getDefineRequest(pipelineId);
+    final PutPipelineDefinitionResult defineResult = client.putPipelineDefinition(definition);
+    log.info("Defining pipeline: " + defineResult);
+    logPipelineToDynamo();
+
+    final ActivatePipelineRequest activate = new ActivatePipelineRequest();
+    activate.setPipelineId(pipelineId);
+    client.activatePipeline(activate);
   }
 
   private CreatePipelineRequest getCreateRequest() {
@@ -87,7 +90,6 @@ public class DataPipelineSetup {
 
   private void logPipelineToDynamo() {
     final PipelineExecutionRecord record = PipelineExecutionRecord.find(runId);
-    record.setPipelineName(runId);
     record.setConfigString(config.getPaths());
     record.setPipelineCreated(new Date());
     record.setStatus(PipelineExecutionRecord.Status.Created.toString());

@@ -17,7 +17,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 public class PipelineExecutionRecord {
   private static final Logger log = LogManager.getLogger();
 
-  public enum Status { Created, Starting, Running, Failed, Success }
+  public enum Status { ProvisioningPhase0, Created, Starting, Running, Failed, Success }
 
   private static DynamoDBMapper mapper;
   private static DynamoDBMapperConfig mapperConfig;
@@ -56,9 +56,6 @@ public class PipelineExecutionRecord {
 
   @DynamoDBAttribute(attributeName = "pipeline_created")
   private Date pipelineCreated;
-
-  @DynamoDBAttribute(attributeName = "pipeline_name")
-  private String pipelineName;
 
   @DynamoDBAttribute(attributeName = "pipeline_start")
   private Date pipelineStart;
@@ -115,14 +112,6 @@ public class PipelineExecutionRecord {
 
   public void setRunId(final String runId) {
     this.runId = runId;
-  }
-
-  public String getPipelineName() {
-    return pipelineName;
-  }
-
-  public void setPipelineName(final String pipelineName) {
-    this.pipelineName = pipelineName;
   }
 
   public Date getPipelineStart() {
