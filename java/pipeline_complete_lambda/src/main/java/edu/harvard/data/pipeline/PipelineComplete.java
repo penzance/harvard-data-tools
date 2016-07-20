@@ -83,7 +83,9 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
       this.snsArn = data.get("snsArn");
       PipelineExecutionRecord.init(data.get("pipelineDynamoTable"));
       this.record = PipelineExecutionRecord.find(runId);
-      // TODO: Check if record doesn't exist.
+      record.setCleanupLogGroup(context.getLogGroupName());
+      record.setCleanupLogStream(context.getLogStreamName());
+      record.save();
       this.process();
     } catch (final IOException e) {
       return e.toString();

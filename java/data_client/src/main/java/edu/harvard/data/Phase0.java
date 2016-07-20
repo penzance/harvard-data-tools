@@ -1,11 +1,16 @@
 package edu.harvard.data;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.amazonaws.services.ec2.AmazonEC2Client;
+import com.amazonaws.services.ec2.model.DescribeSpotInstanceRequestsRequest;
+import com.amazonaws.services.ec2.model.DescribeSpotInstanceRequestsResult;
 import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.PublishRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,6 +36,10 @@ public abstract class Phase0 {
     PipelineExecutionRecord.init(config.getPipelineDynamoTable());
     final PipelineExecutionRecord record = PipelineExecutionRecord.find(runId);
     record.setPhase0Start(new Date());
+    record.save();
+
+    final String instanceId = getPhase0InstanceId(record);
+    record.setPhase0InstanceId(instanceId);
     record.save();
 
     ReturnStatus status;
@@ -68,6 +77,18 @@ public abstract class Phase0 {
     }
     record.save();
     System.exit(status.getCode());
+  }
+
+  private static String getPhase0InstanceId(final PipelineExecutionRecord record) {
+    final AmazonEC2Client ec2client = new AmazonEC2Client();
+    final String requestId = record.getPhase0RequestId();
+    final List<String> requestIds = new ArrayList<String>();
+    requestIds.add(requestId);
+    final DescribeSpotInstanceRequestsRequest describe = new DescribeSpotInstanceRequestsRequest();
+    describe.setSpotInstanceRequestIds(requestIds);
+    final DescribeSpotInstanceRequestsResult description = ec2client
+        .describeSpotInstanceRequests(describe);
+    return description.getSpotInstanceRequests().get(0).getInstanceId();
   }
 
   private static void cleanup(final DataConfig config, final PipelineExecutionRecord record,

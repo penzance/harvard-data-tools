@@ -51,6 +51,9 @@ public class PipelineExecutionRecord {
   @DynamoDBAttribute(attributeName = "phase_0_success")
   private Boolean phase0Success;
 
+  @DynamoDBAttribute(attributeName = "phase_0_instance_id")
+  private String phase0InstanceId;
+
   @DynamoDBAttribute(attributeName = "pipeline_created")
   private Date pipelineCreated;
 
@@ -68,6 +71,12 @@ public class PipelineExecutionRecord {
 
   @DynamoDBAttribute(attributeName = "bootstrap_log_group")
   private String bootstrapLogGroup;
+
+  @DynamoDBAttribute(attributeName = "cleanup_log_stream")
+  private String cleanupLogStream;
+
+  @DynamoDBAttribute(attributeName = "cleanup_log_group")
+  private String cleanupLogGroup;
 
   @DynamoDBAttribute(attributeName = "config")
   private String configString;
@@ -224,8 +233,32 @@ public class PipelineExecutionRecord {
     return phase0Success;
   }
 
-  public void setPhase0Success(Boolean phase0Success) {
+  public void setPhase0Success(final Boolean phase0Success) {
     this.phase0Success = phase0Success;
+  }
+
+  public String getCleanupLogStream() {
+    return cleanupLogStream;
+  }
+
+  public void setCleanupLogStream(final String cleanupLogStream) {
+    this.cleanupLogStream = cleanupLogStream;
+  }
+
+  public String getCleanupLogGroup() {
+    return cleanupLogGroup;
+  }
+
+  public void setCleanupLogGroup(final String cleanupLogGroup) {
+    this.cleanupLogGroup = cleanupLogGroup;
+  }
+
+  public String getPhase0InstanceId() {
+    return phase0InstanceId;
+  }
+
+  public void setPhase0InstanceId(final String phase0InstanceId) {
+    this.phase0InstanceId = phase0InstanceId;
   }
 
 }
