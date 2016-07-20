@@ -87,6 +87,7 @@ public class DataConfig {
   private final String ec2GitDir;
   private final String ec2CodeDir;
   private final String emrCodeDir;
+  private final String emrLogDir;
   private final String fullTextDir;
   private final String dataToolsJar;
   private final String identityRedshiftSchema;
@@ -118,6 +119,7 @@ public class DataConfig {
     this.redshiftStagingDir = "redshift_staging";
     this.identityRedshiftSchema = "pii";
     this.emrCodeDir = "/home/hadoop/code";
+    this.emrLogDir = "/home/hadoop";
     this.fullTextDir = "/home/hadoop/full_text";
     this.hdfsBase = "/phase_";
     this.hdfsVerifyBase = "/verify" + this.hdfsBase;
@@ -305,6 +307,10 @@ public class DataConfig {
 
   public String getMoveUnmodifiedScript(final int phase) {
     return "phase_" + phase + "_move_unmodified_files.sh";
+  }
+
+  public String getEmrLogFile(final String stepId) {
+    return emrLogDir + "/" + stepId + ".out";
   }
 
   public String getDatasetName() {

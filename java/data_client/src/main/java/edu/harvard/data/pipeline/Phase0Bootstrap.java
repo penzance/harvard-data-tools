@@ -74,6 +74,7 @@ public abstract class Phase0Bootstrap {
       executionRecord.setRunStart(new Date());
       executionRecord.save();
       createPhase0();
+      sendSnsNotification();
     }
   }
 
@@ -109,7 +110,9 @@ public abstract class Phase0Bootstrap {
     final DescribeSpotInstanceRequestsResult description = ec2client
         .describeSpotInstanceRequests(describe);
     System.out.println(description);
+  }
 
+  private void sendSnsNotification() {
     final AmazonSNSClient sns = new AmazonSNSClient();
     final String subject = "Run " + runId + " started.";
     final String msg = "Details at " + config.getHdtMonitorUrl() + "/data_dashboard/pipeline/"

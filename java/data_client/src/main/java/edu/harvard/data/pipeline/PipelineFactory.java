@@ -114,16 +114,17 @@ public class PipelineFactory {
       final PipelineObjectBase infrastructure) {
     final PipelineObjectBase obj = new PipelineObjectBase(config, id, "ShellCommandActivity");
     setupActivity(obj, infrastructure);
-    obj.set("command", cmd);
+    obj.set("command", cmd + " &> " + config.getEmrLogFile(id));
     return obj;
   }
 
-  public PipelineObjectBase getJavaShellActivity(final String id, final String jar, final Class<?> cls, final List<String> args,
-      final PipelineObjectBase infrastructure) {
+  public PipelineObjectBase getJavaShellActivity(final String id, final String jar,
+      final Class<?> cls, final List<String> args, final PipelineObjectBase infrastructure) {
     final PipelineObjectBase obj = new PipelineObjectBase(config, id, "ShellCommandActivity");
     setupActivity(obj, infrastructure);
     final String params = StringUtils.join(args, " ");
-    final String cmd = "java -cp " + jar + " " + cls.getCanonicalName() + " " + params;
+    final String cmd = "java -cp " + jar + " " + cls.getCanonicalName() + " " + params + " &> "
+        + config.getEmrLogFile(id);
     obj.set("command", cmd);
     obj.set("retryDelay", "2 Minutes");
     return obj;
@@ -133,7 +134,8 @@ public class PipelineFactory {
       final String dest, final PipelineObjectBase infrastructure) {
     final PipelineObjectBase obj = new PipelineObjectBase(config, id, "ShellCommandActivity");
     setupActivity(obj, infrastructure);
-    obj.set("command", "aws s3 cp " + AwsUtils.uri(src) + " " + dest + " --recursive");
+    obj.set("command", "aws s3 cp " + AwsUtils.uri(src) + " " + dest + " --recursive &> "
+        + config.getEmrLogFile(id));
     return obj;
   }
 
@@ -149,8 +151,8 @@ public class PipelineFactory {
       final S3ObjectId dest, final PipelineObjectBase infrastructure) {
     final PipelineObjectBase obj = new PipelineObjectBase(config, id, "ShellCommandActivity");
     setupActivity(obj, infrastructure);
-    obj.set("command",
-        "aws s3 cp " + AwsUtils.uri(src) + " " + AwsUtils.uri(dest) + " --recursive");
+    obj.set("command", "aws s3 cp " + AwsUtils.uri(src) + " " + AwsUtils.uri(dest)
+    + " --recursive &> " + config.getEmrLogFile(id));
     return obj;
   }
 
@@ -181,7 +183,7 @@ public class PipelineFactory {
     setupActivity(obj, infrastructure);
     final String cmd = "s3-dist-cp --copyFromManifest --previousManifest=file://" + manifest
         + " --dest=hdfs://" + cleanHdfs(dest) + " --src=" + AwsUtils.uri(src)
-        + " --outputCodec=none";
+        + " --outputCodec=none &> " + config.getEmrLogFile(id);
     obj.set("command", cmd);
     return obj;
   }
@@ -191,7 +193,7 @@ public class PipelineFactory {
     final PipelineObjectBase obj = new PipelineObjectBase(config, id, "ShellCommandActivity");
     setupActivity(obj, infrastructure);
     final String cmd = "s3-dist-cp --src=" + AwsUtils.uri(src) + " --dest=hdfs://" + cleanHdfs(dest)
-    + " --outputCodec=none";
+    + " --outputCodec=none &> " + config.getEmrLogFile(id);
     obj.set("command", cmd);
     return obj;
   }
@@ -201,7 +203,7 @@ public class PipelineFactory {
     final PipelineObjectBase obj = new PipelineObjectBase(config, id, "ShellCommandActivity");
     setupActivity(obj, infrastructure);
     final String cmd = "s3-dist-cp --src=hdfs://" + cleanHdfs(src) + " --dest=" + AwsUtils.uri(dest)
-    + " --outputCodec=gzip";
+    + " --outputCodec=gzip &> " + config.getEmrLogFile(id);
     obj.set("command", cmd);
     return obj;
   }

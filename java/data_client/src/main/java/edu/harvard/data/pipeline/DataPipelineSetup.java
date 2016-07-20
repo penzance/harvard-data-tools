@@ -8,11 +8,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.amazonaws.services.datapipeline.DataPipelineClient;
-import com.amazonaws.services.datapipeline.model.ActivatePipelineRequest;
 import com.amazonaws.services.datapipeline.model.CreatePipelineRequest;
 import com.amazonaws.services.datapipeline.model.CreatePipelineResult;
-import com.amazonaws.services.datapipeline.model.PutPipelineDefinitionRequest;
-import com.amazonaws.services.datapipeline.model.PutPipelineDefinitionResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -38,6 +35,10 @@ public class DataPipelineSetup {
     final String configPath = args[0];
     final String runId = args[1];
     final String codeManagerClassName = args[2];
+
+    log.info("Config path: " + configPath);
+    log.info("Run ID: " + runId);
+    log.info("Code Manager class: " + codeManagerClassName);
 
     final CodeManager codeManager = CodeManager.getCodeManager(codeManagerClassName);
     final DataConfig config = codeManager.getDataConfig(configPath, true);
@@ -67,14 +68,14 @@ public class DataPipelineSetup {
 
     final Pipeline pipeline = populatePipeline();
 
-    final PutPipelineDefinitionRequest definition = pipeline.getDefineRequest(pipelineId);
-    final PutPipelineDefinitionResult defineResult = client.putPipelineDefinition(definition);
-    log.info("Defining pipeline: " + defineResult);
-    logPipelineToDynamo();
-
-    final ActivatePipelineRequest activate = new ActivatePipelineRequest();
-    activate.setPipelineId(pipelineId);
-    client.activatePipeline(activate);
+    //    final PutPipelineDefinitionRequest definition = pipeline.getDefineRequest(pipelineId);
+    //    final PutPipelineDefinitionResult defineResult = client.putPipelineDefinition(definition);
+    //    log.info("Defining pipeline: " + defineResult);
+    //    logPipelineToDynamo();
+    //
+    //    final ActivatePipelineRequest activate = new ActivatePipelineRequest();
+    //    activate.setPipelineId(pipelineId);
+    //    client.activatePipeline(activate);
   }
 
   private CreatePipelineRequest getCreateRequest() {

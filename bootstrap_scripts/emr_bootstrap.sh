@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# This script is called by the bootstrapAction attribute on the EMR cluster in a data pipeline.
+# See java/data_client/src/main/java/edu/harvard/data/pipeline/Pipeline.java
+
 export DATA_SCHEMA_VERSION=$1  # Used by code generator
 export GIT_BRANCH=$2
 export GENERATOR=$3
@@ -17,26 +20,28 @@ export HDFS_PHASE_0_DIR=hdfs:///phase_0
 export HDFS_PHASE_1_DIR=hdfs:///phase_1
 export HDFS_PHASE_2_DIR=hdfs:///phase_2
 
+# Dump the environment for the sake of the logs
+env
+
 # add github.com to known_hosts
 ssh-keyscan github.com >> /home/hadoop/.ssh/known_hosts
 
 # install jdk and git
 sudo yum install -y java-devel git-core
 
-#Install maven via instructions at https://gist.github.com/sebsto/19b99f1fa1f32cae5d00
-sudo wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
-sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
-sudo yum install -y apache-maven
-
 # clone our repo
 git clone -b $GIT_BRANCH https://github.com/penzance/harvard-data-tools.git $HARVARD_DATA_TOOLS_BASE
-
-# generate the tools
-python /home/hadoop/harvard-data-tools/python/$GENERATOR
-chmod 764 $HARVARD_DATA_GENERATED_OUTPUT/*.sh
 
 # setup CloudWatch logging
 sudo yum install -y awslogs
 sudo cp /home/hadoop/harvard-data-tools/cloudwatch/awslogs-emr.conf /etc/awslogs/awslogs.conf
 sudo service awslogs start
 
+#Install maven via instructions at https://gist.github.com/sebsto/19b99f1fa1f32cae5d00
+sudo wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
+sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
+sudo yum install -y apache-maven
+
+# generate the tools
+python /home/hadoop/harvard-data-tools/python/$GENERATOR &> /var/log/generate-tools.out
+chmod 764 $HARVARD_DATA_GENERATED_OUTPUT/*.sh

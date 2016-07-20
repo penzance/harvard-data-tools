@@ -1,5 +1,8 @@
 # See bootstrap lambda function for the exports to set.
 
+# Dump the environment for the sake of the logs
+env
+
 # add github.com to known_hosts
 ssh-keyscan github.com >> /home/ec2-user/.ssh/known_hosts
 
