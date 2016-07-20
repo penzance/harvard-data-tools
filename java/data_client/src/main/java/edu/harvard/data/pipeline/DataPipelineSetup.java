@@ -47,6 +47,7 @@ public class DataPipelineSetup {
     final CodeManager codeManager = CodeManager.getCodeManager(codeManagerClassName);
     final DataConfig config = codeManager.getDataConfig(configPath, true);
     final AwsUtils aws = new AwsUtils();
+    PipelineExecutionRecord.init(config.getPipelineDynamoTable());
     final InputTableIndex dataIndex = aws.readJson(config.getIndexFileS3Location(runId),
         InputTableIndex.class);
     final DataPipelineSetup pipeline = new DataPipelineSetup(config, dataIndex, codeManager, runId);
@@ -64,7 +65,6 @@ public class DataPipelineSetup {
   public void generate() throws DataConfigurationException, IOException {
     log.info("Data at " + dataIndex);
     final PipelineExecutionRecord record = PipelineExecutionRecord.find(runId);
-    PipelineExecutionRecord.init(config.getPipelineDynamoTable());
     final DataPipelineClient client = new DataPipelineClient();
     final CreatePipelineRequest create = getCreateRequest();
 
