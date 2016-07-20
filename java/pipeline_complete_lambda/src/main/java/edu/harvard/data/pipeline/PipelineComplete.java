@@ -57,6 +57,8 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
   private DescribeObjectsResult objectDescriptions;
   private String snsArn;
 
+  private PipelineExecutionRecord record;
+
   public PipelineComplete() throws IOException {
     this.pipelineClient = new DataPipelineClient();
     this.s3Client = new AmazonS3Client();
@@ -77,9 +79,11 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
       data = mapper.readValue(json, Map.class);
       this.pipelineId = data.get("pipelineId");
       this.runId = data.get("runId");
-      this.outputKey = key(data.get("reportBucket"), this.pipelineId + ".json");
+      this.outputKey = key(data.get("reportBucket"), this.runId + ".json");
       this.snsArn = data.get("snsArn");
       PipelineExecutionRecord.init(data.get("pipelineDynamoTable"));
+      this.record = PipelineExecutionRecord.find(runId);
+      // TODO: Check if record doesn't exist.
       this.process();
     } catch (final IOException e) {
       return e.toString();
@@ -107,8 +111,6 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
   }
 
   private void updateDynamo() {
-    final PipelineExecutionRecord record = PipelineExecutionRecord.find(runId);
-    // TODO: Check if record doesn't exist.
     record.setPipelineEnd(new Date());
     if (report.getFailure() == null) {
       record.setStatus(Status.Success.toString());
@@ -273,10 +275,6 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
         + "#cluster-details:" + emrResourceId;
   }
 
-  private String reportUrl() {
-    return "http://localhost:8000/data_dashboard/pipeline/" + pipelineId;
-  }
-
   public S3ObjectId key(final String bucket, final String... keys) {
     String key = "";
     for (final String k : keys) {
@@ -288,7 +286,7 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
   private void sendSnsMessage() {
     String subject = report.getPipelineDescription().getName() + " ";
     final String failure = report.getFailure();
-    String msg = "Report at " + reportUrl();
+    String msg = "";
     if (failure == null) {
       subject += "Succeeded";
     } else {

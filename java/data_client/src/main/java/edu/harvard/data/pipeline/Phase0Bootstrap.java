@@ -112,8 +112,10 @@ public abstract class Phase0Bootstrap {
 
     final AmazonSNSClient sns = new AmazonSNSClient();
     final String subject = "Run " + runId + " started.";
-    final String msg = "Details at " + config.getHdtMonitorUrl() + "/data_dashboard/pipeline/" + runId;
-    final PublishRequest publishRequest = new PublishRequest(config.getSuccessSnsArn(), msg, subject);
+    final String msg = "Details at " + config.getHdtMonitorUrl() + "/data_dashboard/pipeline/"
+        + config.getGitTagOrBranch() + "/" + runId;
+    final PublishRequest publishRequest = new PublishRequest(config.getSuccessSnsArn(), msg,
+        subject);
     sns.publish(publishRequest);
   }
 
