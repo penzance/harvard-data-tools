@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.harvard.data.pipeline.PipelineCompletionMessage;
 import edu.harvard.data.pipeline.PipelineExecutionRecord;
+import edu.harvard.data.pipeline.PipelineExecutionRecord.Status;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public abstract class Phase0 {
@@ -36,6 +37,7 @@ public abstract class Phase0 {
     PipelineExecutionRecord.init(config.getPipelineDynamoTable());
     final PipelineExecutionRecord record = PipelineExecutionRecord.find(runId);
     record.setPhase0Start(new Date());
+    record.setStatus(Status.Phase0Running.toString());
     record.save();
 
     final String instanceId = getPhase0InstanceId(record);
@@ -49,6 +51,7 @@ public abstract class Phase0 {
       final Phase0 phase0 = codeManager.getPhase0(configPathString, datasetId, runId, exec);
       status = phase0.run();
       record.setPhase0Success(true);
+      record.setStatus(Status.CreatingPipeline.toString());
     } catch (final IOException e) {
       cleanup(config, record, e);
       status = ReturnStatus.IO_ERROR;
@@ -95,6 +98,7 @@ public abstract class Phase0 {
       final Exception e) throws JsonProcessingException {
     e.printStackTrace();
     record.setPhase0Success(false);
+    record.setStatus(Status.Failed.toString());
 
     final PipelineCompletionMessage success = new PipelineCompletionMessage(null, record.getRunId(),
         config.getReportBucket(), config.getFailureSnsArn(), config.getPipelineDynamoTable());

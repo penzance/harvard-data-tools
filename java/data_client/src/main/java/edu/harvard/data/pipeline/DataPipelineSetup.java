@@ -21,6 +21,7 @@ import edu.harvard.data.CodeManager;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.VerificationException;
+import edu.harvard.data.pipeline.PipelineExecutionRecord.Status;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class DataPipelineSetup {
@@ -62,23 +63,39 @@ public class DataPipelineSetup {
 
   public void generate() throws DataConfigurationException, IOException {
     log.info("Data at " + dataIndex);
+    final PipelineExecutionRecord record = PipelineExecutionRecord.find(runId);
     PipelineExecutionRecord.init(config.getPipelineDynamoTable());
     final DataPipelineClient client = new DataPipelineClient();
     final CreatePipelineRequest create = getCreateRequest();
-    final CreatePipelineResult createResult = client.createPipeline(create);
-    pipelineId = createResult.getPipelineId();
-    log.info(createResult);
 
-    final Pipeline pipeline = populatePipeline();
+    try {
+      final CreatePipelineResult createResult = client.createPipeline(create);
+      pipelineId = createResult.getPipelineId();
+      log.info(createResult);
 
-    final PutPipelineDefinitionRequest definition = pipeline.getDefineRequest(pipelineId);
-    final PutPipelineDefinitionResult defineResult = client.putPipelineDefinition(definition);
-    log.info("Defining pipeline: " + defineResult);
-    logPipelineToDynamo();
+      record.setPipelineCreated(new Date());
+      record.save();
 
-    final ActivatePipelineRequest activate = new ActivatePipelineRequest();
-    activate.setPipelineId(pipelineId);
-    client.activatePipeline(activate);
+      final Pipeline pipeline = populatePipeline();
+
+      final PutPipelineDefinitionRequest definition = pipeline.getDefineRequest(pipelineId);
+      final PutPipelineDefinitionResult defineResult = client.putPipelineDefinition(definition);
+      log.info("Defining pipeline: " + defineResult);
+      if (defineResult.getErrored()) {
+        record.setStatus(PipelineExecutionRecord.Status.Failed.toString());
+      } else {
+        final ActivatePipelineRequest activate = new ActivatePipelineRequest();
+        activate.setPipelineId(pipelineId);
+        client.activatePipeline(activate);
+        record.setStatus(PipelineExecutionRecord.Status.ProvisioningPipeline.toString());
+      }
+      record.save();
+
+    } catch (final Throwable t) { // AWS documentation isn't great on what can
+      // go wrong here, so we can be general...
+      record.setStatus(Status.Failed.toString());
+      throw t;
+    }
   }
 
   private CreatePipelineRequest getCreateRequest() {
@@ -88,16 +105,8 @@ public class DataPipelineSetup {
     return createRequest;
   }
 
-  private void logPipelineToDynamo() {
-    final PipelineExecutionRecord record = PipelineExecutionRecord.find(runId);
-    record.setConfigString(config.getPaths());
-    record.setPipelineCreated(new Date());
-    record.setStatus(PipelineExecutionRecord.Status.Created.toString());
-    record.save();
-  }
-
   private Pipeline populatePipeline() throws DataConfigurationException, JsonProcessingException {
-    final PipelineFactory factory = new PipelineFactory(config, pipelineId);
+    final PipelineFactory factory = new PipelineFactory(config, pipelineId, runId);
     final Pipeline pipeline = new Pipeline(runId, config, pipelineId, factory,
         dataIndex.getSchemaVersion(), runId);
     final EmrStartupPipelineSetup setup = new EmrStartupPipelineSetup(pipeline, factory, runId);

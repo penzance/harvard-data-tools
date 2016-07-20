@@ -17,7 +17,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 public class PipelineExecutionRecord {
   private static final Logger log = LogManager.getLogger();
 
-  public enum Status { ProvisioningPhase0, Created, Starting, Running, Failed, Success }
+  public enum Status { ProvisioningPhase0, Phase0Running, CreatingPipeline, ProvisioningPipeline, PipelineRunning, Success, Failed }
 
   private static DynamoDBMapper mapper;
   private static DynamoDBMapperConfig mapperConfig;

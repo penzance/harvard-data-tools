@@ -74,6 +74,7 @@ public abstract class Phase0Bootstrap {
       executionRecord.setBootstrapLogGroup(context.getLogGroupName());
       executionRecord.setRunStart(new Date());
       executionRecord.setStatus(Status.ProvisioningPhase0.toString());
+      executionRecord.setConfigString(configPathString);
       executionRecord.save();
       createPhase0();
       sendSnsNotification();
