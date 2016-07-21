@@ -254,8 +254,10 @@ public class PipelineFactory {
   ////////////////
 
   private void setStdOut(final PipelineObjectBase obj, final String id) {
-    final S3ObjectId key = AwsUtils.key(config.getLogBucket(), runId, id + ".log");
-    obj.set("stdout", AwsUtils.uri(key));
+    final S3ObjectId out = AwsUtils.key(config.getLogBucket(), runId, id + ".out");
+    final S3ObjectId err = AwsUtils.key(config.getLogBucket(), runId, id + ".err");
+    obj.set("stdout", AwsUtils.uri(out));
+    obj.set("stderr", AwsUtils.uri(err));
   }
 
   private void setupActivity(final PipelineObjectBase obj,
