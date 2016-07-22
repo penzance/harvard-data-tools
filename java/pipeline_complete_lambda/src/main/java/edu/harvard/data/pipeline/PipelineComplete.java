@@ -44,7 +44,6 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
   private final DataPipelineClient pipelineClient;
   private final AmazonS3Client s3Client;
   private final AmazonSNSClient snsClient;
-  private S3ObjectId outputKey;
   private String pipelineId;
   private String runId;
   private String emrInstanceName;
@@ -56,7 +55,8 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
   private final PostMortemReport report;
   private DescribeObjectsResult objectDescriptions;
   private String snsArn;
-
+  private String logGroupName;
+  private String logStreamName;
   private PipelineExecutionRecord record;
 
   public PipelineComplete() throws IOException {
@@ -64,6 +64,18 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
     this.s3Client = new AmazonS3Client();
     this.snsClient = new AmazonSNSClient();
     this.report = new PostMortemReport();
+  }
+
+  public static void main(final String[] args) throws IOException {
+    final String pipelineId = "df-0839553BTYV3JX6PCZT";
+    final String runId = "dce_matterhorn_2016-07-22-1247";
+    final S3ObjectId outputKey = key("hdt-pipeline-reports", runId + ".json");
+    final String snsArn = "arn:aws:sns:us-east-1:364469542718:hdtdevcanvas-SuccessSNS-8HQ4921XICVD";
+    final String pipelineDynamoTable = "hdt-pipeline-dev";
+    final String logGroupName = "";
+    final String logStreamName = "";
+    new PipelineComplete().process(pipelineId, runId, outputKey, snsArn, pipelineDynamoTable,
+        logGroupName, logStreamName);
   }
 
   @Override
@@ -77,23 +89,35 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
     Map<String, String> data;
     try {
       data = mapper.readValue(json, Map.class);
-      this.pipelineId = data.get("pipelineId");
-      this.runId = data.get("runId");
-      this.outputKey = key(data.get("reportBucket"), this.runId + ".json");
-      this.snsArn = data.get("snsArn");
-      PipelineExecutionRecord.init(data.get("pipelineDynamoTable"));
-      this.record = PipelineExecutionRecord.find(runId);
-      record.setCleanupLogGroup(context.getLogGroupName());
-      record.setCleanupLogStream(context.getLogStreamName());
-      record.save();
-      this.process();
+      final String pipelineId = data.get("pipelineId");
+      final String runId = data.get("runId");
+      final S3ObjectId outputKey = key(data.get("reportBucket"), this.runId + ".json");
+      final String snsArn = data.get("snsArn");
+      final String pipelineDynamoTable = data.get("pipelineDynamoTable");
+      final String logGroupName = context.getLogGroupName();
+      final String logStreamName = context.getLogStreamName();
+
+      this.process(pipelineId, runId, outputKey, snsArn, pipelineDynamoTable, logGroupName,
+          logStreamName);
     } catch (final IOException e) {
       return e.toString();
     }
     return "";
   }
 
-  public void process() throws IOException {
+  public void process(final String pipelineId, final String runId, final S3ObjectId outputKey,
+      final String snsArn, final String pipelineDynamoTable, final String logGroupName,
+      final String logStreamName) throws IOException {
+    this.pipelineId = pipelineId;
+    this.runId = runId;
+    this.snsArn = snsArn;
+    this.logGroupName = logGroupName;
+    this.logStreamName = logStreamName;
+
+    PipelineExecutionRecord.init(pipelineDynamoTable);
+    this.record = PipelineExecutionRecord.find(runId);
+    saveInitialDynamoData();
+
     getPipelineDefinition();
     getPipelineObjects();
     populateLogs();
@@ -108,11 +132,17 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
     s3Client.putObject(outputKey.getBucket(), outputKey.getKey(), new ByteArrayInputStream(bytes),
         metadata);
     System.out.println("Wrote output to " + outputKey);
-    updateDynamo();
+    saveFinalDynamoData();
     sendSnsMessage();
   }
 
-  private void updateDynamo() {
+  private void saveInitialDynamoData() {
+    record.setCleanupLogGroup(logGroupName);
+    record.setCleanupLogStream(logStreamName);
+    record.save();
+  }
+
+  private void saveFinalDynamoData() {
     record.setPipelineEnd(new Date());
     if (report.getFailure() == null) {
       record.setStatus(Status.Success.toString());
@@ -129,10 +159,21 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
     objectDescriptions = pipelineClient.describeObjects(
         new DescribeObjectsRequest().withObjectIds(objects.getIds()).withPipelineId(pipelineId));
     for (final PipelineObject pipelineObj : objectDescriptions.getPipelineObjects()) {
+      // Get the parent object in order to find any static properties
+      final String parentId = getRefField(pipelineObj.getFields(), "parent");
+      final PipelineObject parentObj = pipelineClient
+          .describeObjects(new DescribeObjectsRequest()
+              .withObjectIds(Collections.singleton(parentId)).withPipelineId(pipelineId))
+          .getPipelineObjects().get(0);
+
       final PostMortemPipelineObject obj = new PostMortemPipelineObject(pipelineObj);
-      obj.setName(getRefField(pipelineObj.getFields(), "parent"));
+      obj.setName(parentObj.getName());
       obj.setId(pipelineObj.getId());
       obj.setStatus(getStringField(pipelineObj.getFields(), "@status"));
+      final String stdout = getStringField(parentObj.getFields(), "stdout");
+      if (stdout != null) {
+        obj.addLog(s3Url(key(stdout.substring(0, stdout.lastIndexOf("/"))), "stdout"));
+      }
 
       if (obj.getStatus().equals("FAILED")) {
         report.setFailure(obj.getId());
@@ -277,7 +318,9 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
         + "#cluster-details:" + emrResourceId;
   }
 
-  public S3ObjectId key(final String bucket, final String... keys) {
+  // Copied from AwsUtils.java; referencing that file would require depending on
+  // data_tools, which would push the JAR file size over Lambda's limits.
+  public static S3ObjectId key(final String bucket, final String... keys) {
     String key = "";
     for (final String k : keys) {
       key += "/" + k;
@@ -285,10 +328,17 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
     return new S3ObjectId(bucket, key.substring(1));
   }
 
+  public static S3ObjectId key(String str) {
+    if (str.toLowerCase().startsWith("s3://")) {
+      str = str.substring("s3://".length());
+    }
+    return key(str.substring(0, str.indexOf("/")), str.substring(str.indexOf("/") + 1));
+  }
+
   private void sendSnsMessage() {
     String subject = report.getPipelineDescription().getName() + " ";
     final String failure = report.getFailure();
-    String msg = "";
+    String msg = "Pipeline Complete";
     if (failure == null) {
       subject += "Succeeded";
     } else {

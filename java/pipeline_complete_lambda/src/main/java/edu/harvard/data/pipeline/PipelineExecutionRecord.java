@@ -57,6 +57,12 @@ public class PipelineExecutionRecord {
   @DynamoDBAttribute(attributeName = "pipeline_created")
   private Date pipelineCreated;
 
+  @DynamoDBAttribute(attributeName = "pipeline_id")
+  private String pipelineId;
+
+  @DynamoDBAttribute(attributeName = "emr_id")
+  private String emrId;
+
   @DynamoDBAttribute(attributeName = "pipeline_start")
   private Date pipelineStart;
 
@@ -248,6 +254,22 @@ public class PipelineExecutionRecord {
 
   public void setPhase0InstanceId(final String phase0InstanceId) {
     this.phase0InstanceId = phase0InstanceId;
+  }
+
+  public String getPipelineId() {
+    return pipelineId;
+  }
+
+  public void setPipelineId(final String pipelineId) {
+    this.pipelineId = pipelineId;
+  }
+
+  public String getEmrId() {
+    return emrId;
+  }
+
+  public void setEmrId(String emrId) {
+    this.emrId = emrId;
   }
 
 }

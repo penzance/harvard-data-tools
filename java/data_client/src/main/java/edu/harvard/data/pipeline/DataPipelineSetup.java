@@ -74,6 +74,7 @@ public class DataPipelineSetup {
       log.info(createResult);
 
       record.setPipelineCreated(new Date());
+      record.setPipelineId(pipelineId);
       record.save();
 
       final Pipeline pipeline = populatePipeline();
