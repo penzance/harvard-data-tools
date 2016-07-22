@@ -64,6 +64,7 @@ public abstract class Phase0Bootstrap {
 
   protected void run(final Context context)
       throws IOException, DataConfigurationException, UnexpectedApiResponseException {
+    sendSnsNotification();
     if (newDataAvailable()) {
       for (final S3ObjectId path : getInfrastructureConfigPaths()) {
         configPathString += "|" + AwsUtils.uri(path);
@@ -86,7 +87,6 @@ public abstract class Phase0Bootstrap {
       dataset.save();
 
       createPhase0();
-      sendSnsNotification();
     }
   }
 

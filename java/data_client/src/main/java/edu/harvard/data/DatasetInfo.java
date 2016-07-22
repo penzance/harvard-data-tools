@@ -40,7 +40,7 @@ public class DatasetInfo {
 
   public static DatasetInfo find(final String name) {
     if (tableName == null) {
-      throw new RuntimeException("DatasetInfo object saved before init(tableName) method called");
+      throw new RuntimeException("DatasetInfo object accessed before init(tableName) method called");
     }
     log.debug("Finding dataset info " + name + " from table " + tableName);
     return mapper.load(DatasetInfo.class, name, mapperConfig);
