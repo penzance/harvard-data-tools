@@ -33,6 +33,7 @@ public class DataConfig {
   private final String keypair;
   private final String subnetId;
 
+  private final String datasetsDynamoTable;
   private final String pipelineDynamoTable;
   private final String leaseDynamoTable;
   private final String identityLease;
@@ -162,6 +163,7 @@ public class DataConfig {
     this.mainIdentifier = IdentifierType.valueOf(getConfigParameter("main_identifier", verify));
     this.hdtMonitorUrl = getConfigParameter("hdt_monitor_url", verify);
 
+    this.datasetsDynamoTable = getConfigParameter("datasets_dynamo_table", verify);
     this.leaseDynamoTable = getConfigParameter("lease_dynamo_table", verify);
     this.identityLease = getConfigParameter("identity_lease", verify);
     this.identityLeaseLengthSeconds = getIntConfigParameter("identity_lease_length_seconds",
@@ -575,6 +577,10 @@ public class DataConfig {
 
   public String getHdtMonitorUrl() {
     return hdtMonitorUrl;
+  }
+
+  public String getDatasetsDynamoTable() {
+    return datasetsDynamoTable;
   }
 
 }

@@ -29,6 +29,7 @@ import com.amazonaws.util.Base64;
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
+import edu.harvard.data.DatasetInfo;
 import edu.harvard.data.pipeline.PipelineExecutionRecord.Status;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
@@ -68,7 +69,10 @@ public abstract class Phase0Bootstrap {
         configPathString += "|" + AwsUtils.uri(path);
       }
       this.config = DataConfig.parseInputFiles(configClass, configPathString, false);
+
       PipelineExecutionRecord.init(config.getPipelineDynamoTable());
+      DatasetInfo.init(config.getDatasetsDynamoTable());
+
       executionRecord = new PipelineExecutionRecord(runId);
       executionRecord.setBootstrapLogStream(context.getLogStreamName());
       executionRecord.setBootstrapLogGroup(context.getLogGroupName());
@@ -76,6 +80,11 @@ public abstract class Phase0Bootstrap {
       executionRecord.setStatus(Status.ProvisioningPhase0.toString());
       executionRecord.setConfigString(configPathString);
       executionRecord.save();
+
+      final DatasetInfo dataset = new DatasetInfo(config.getDatasetName());
+      dataset.setRunId(runId);
+      dataset.save();
+
       createPhase0();
       sendSnsNotification();
     }

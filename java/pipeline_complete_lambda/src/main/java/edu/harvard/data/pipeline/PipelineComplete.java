@@ -91,7 +91,7 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
       data = mapper.readValue(json, Map.class);
       final String pipelineId = data.get("pipelineId");
       final String runId = data.get("runId");
-      final S3ObjectId outputKey = key(data.get("reportBucket"), this.runId + ".json");
+      final S3ObjectId outputKey = key(data.get("reportBucket"), runId + ".json");
       final String snsArn = data.get("snsArn");
       final String pipelineDynamoTable = data.get("pipelineDynamoTable");
       final String logGroupName = context.getLogGroupName();
@@ -149,6 +149,8 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
     } else {
       record.setStatus(Status.Failed.toString());
     }
+    record.setEmrId(emrResourceId);
+    record.setPipelineId(pipelineId);
     record.save();
   }
 
