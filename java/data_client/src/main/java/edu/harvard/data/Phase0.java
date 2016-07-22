@@ -9,6 +9,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.amazonaws.services.ec2.AmazonEC2Client;
+import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
+import com.amazonaws.services.ec2.model.DescribeInstancesResult;
 import com.amazonaws.services.ec2.model.DescribeSpotInstanceRequestsRequest;
 import com.amazonaws.services.ec2.model.DescribeSpotInstanceRequestsResult;
 import com.amazonaws.services.sns.AmazonSNSClient;
@@ -41,7 +43,9 @@ public abstract class Phase0 {
     record.save();
 
     final String instanceId = getPhase0InstanceId(record);
+    final String instanceIp = getPhase0IpAddress(instanceId);
     record.setPhase0InstanceId(instanceId);
+    record.setPhase0Ip(instanceIp);
     record.save();
 
     ReturnStatus status;
@@ -92,6 +96,13 @@ public abstract class Phase0 {
     final DescribeSpotInstanceRequestsResult description = ec2client
         .describeSpotInstanceRequests(describe);
     return description.getSpotInstanceRequests().get(0).getInstanceId();
+  }
+
+  private static String getPhase0IpAddress(final String instanceId) {
+    final AmazonEC2Client ec2client = new AmazonEC2Client();
+    final DescribeInstancesRequest request = new DescribeInstancesRequest().withInstanceIds(instanceId);
+    final DescribeInstancesResult instances = ec2client.describeInstances(request);
+    return instances.getReservations().get(0).getInstances().get(0).getPrivateIpAddress();
   }
 
   private static void cleanup(final DataConfig config, final PipelineExecutionRecord record,

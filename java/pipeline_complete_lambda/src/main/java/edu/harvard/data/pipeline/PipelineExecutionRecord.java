@@ -54,6 +54,9 @@ public class PipelineExecutionRecord {
   @DynamoDBAttribute(attributeName = "phase_0_instance_id")
   private String phase0InstanceId;
 
+  @DynamoDBAttribute(attributeName = "phase_0_ip")
+  private String phase0Ip;
+
   @DynamoDBAttribute(attributeName = "pipeline_created")
   private Date pipelineCreated;
 
@@ -268,8 +271,16 @@ public class PipelineExecutionRecord {
     return emrId;
   }
 
-  public void setEmrId(String emrId) {
+  public void setEmrId(final String emrId) {
     this.emrId = emrId;
+  }
+
+  public String getPhase0Ip() {
+    return phase0Ip;
+  }
+
+  public void setPhase0Ip(String phase0Ip) {
+    this.phase0Ip = phase0Ip;
   }
 
 }

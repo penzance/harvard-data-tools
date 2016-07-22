@@ -65,27 +65,27 @@ public abstract class Phase0Bootstrap {
   protected void run(final Context context)
       throws IOException, DataConfigurationException, UnexpectedApiResponseException {
     sendSnsNotification();
+    for (final S3ObjectId path : getInfrastructureConfigPaths()) {
+      configPathString += "|" + AwsUtils.uri(path);
+    }
+    this.config = DataConfig.parseInputFiles(configClass, configPathString, false);
+
+    PipelineExecutionRecord.init(config.getPipelineDynamoTable());
+    DatasetInfo.init(config.getDatasetsDynamoTable());
+
+    executionRecord = new PipelineExecutionRecord(runId);
+    executionRecord.setBootstrapLogStream(context.getLogStreamName());
+    executionRecord.setBootstrapLogGroup(context.getLogGroupName());
+    executionRecord.setRunStart(new Date());
+    executionRecord.setStatus(Status.ProvisioningPhase0.toString());
+    executionRecord.setConfigString(configPathString);
+    executionRecord.save();
+
+    final DatasetInfo dataset = new DatasetInfo(config.getDatasetName());
+    dataset.setRunId(runId);
+    dataset.save();
+
     if (newDataAvailable()) {
-      for (final S3ObjectId path : getInfrastructureConfigPaths()) {
-        configPathString += "|" + AwsUtils.uri(path);
-      }
-      this.config = DataConfig.parseInputFiles(configClass, configPathString, false);
-
-      PipelineExecutionRecord.init(config.getPipelineDynamoTable());
-      DatasetInfo.init(config.getDatasetsDynamoTable());
-
-      executionRecord = new PipelineExecutionRecord(runId);
-      executionRecord.setBootstrapLogStream(context.getLogStreamName());
-      executionRecord.setBootstrapLogGroup(context.getLogGroupName());
-      executionRecord.setRunStart(new Date());
-      executionRecord.setStatus(Status.ProvisioningPhase0.toString());
-      executionRecord.setConfigString(configPathString);
-      executionRecord.save();
-
-      final DatasetInfo dataset = new DatasetInfo(config.getDatasetName());
-      dataset.setRunId(runId);
-      dataset.save();
-
       createPhase0();
     }
   }
