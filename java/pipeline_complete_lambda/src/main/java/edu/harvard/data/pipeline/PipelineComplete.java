@@ -45,7 +45,6 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
   private final AmazonS3Client s3Client;
   private final AmazonSNSClient snsClient;
   private String pipelineId;
-  private String runId;
   private String emrInstanceName;
   private String emrName;
   private String emrAttempt;
@@ -109,7 +108,6 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
       final String snsArn, final String pipelineDynamoTable, final String logGroupName,
       final String logStreamName) throws IOException {
     this.pipelineId = pipelineId;
-    this.runId = runId;
     this.snsArn = snsArn;
     this.logGroupName = logGroupName;
     this.logStreamName = logStreamName;
@@ -174,7 +172,7 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
       obj.setStatus(getStringField(pipelineObj.getFields(), "@status"));
       final String stdout = getStringField(parentObj.getFields(), "stdout");
       if (stdout != null) {
-        obj.addLog(s3Url(key(stdout.substring(0, stdout.lastIndexOf("/"))), "stdout"));
+        obj.addLog(s3Url(key(stdout.substring(0, stdout.lastIndexOf("/"))), "Output Streams"));
       }
 
       if (obj.getStatus().equals("FAILED")) {
