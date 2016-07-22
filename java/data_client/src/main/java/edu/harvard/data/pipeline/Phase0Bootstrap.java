@@ -45,9 +45,11 @@ public abstract class Phase0Bootstrap {
   protected AwsUtils aws;
   private PipelineExecutionRecord executionRecord;
 
-  protected abstract List<S3ObjectId> getInfrastructureConfigPaths();
+  protected abstract List<S3ObjectId> getInfrastructureConfigPaths()
+      throws IOException, DataConfigurationException, UnexpectedApiResponseException;
 
-  protected abstract Map<String, String> getCustomEc2Environment();
+  protected abstract Map<String, String> getCustomEc2Environment()
+      throws IOException, DataConfigurationException, UnexpectedApiResponseException;
 
   protected abstract boolean newDataAvailable()
       throws IOException, DataConfigurationException, UnexpectedApiResponseException;
@@ -90,7 +92,8 @@ public abstract class Phase0Bootstrap {
     }
   }
 
-  private void createPhase0() throws IOException {
+  private void createPhase0()
+      throws IOException, DataConfigurationException, UnexpectedApiResponseException {
     final AmazonEC2Client ec2client = new AmazonEC2Client();
 
     final LaunchSpecification spec = new LaunchSpecification();
@@ -134,7 +137,8 @@ public abstract class Phase0Bootstrap {
     sns.publish(publishRequest);
   }
 
-  private String getUserData(final DataConfig config) throws IOException {
+  private String getUserData(final DataConfig config)
+      throws IOException, DataConfigurationException, UnexpectedApiResponseException {
     final S3ObjectId bootstrapScript = config.getPhase0BootstrapScript();
 
     String userData = "#! /bin/bash\n";
@@ -151,7 +155,8 @@ public abstract class Phase0Bootstrap {
     return Base64.encodeAsString(userData.getBytes("UTF-8"));
   }
 
-  private String getBootstrapEnvironment(final DataConfig config) {
+  private String getBootstrapEnvironment(final DataConfig config)
+      throws IOException, DataConfigurationException, UnexpectedApiResponseException {
     final Map<String, String> env = new HashMap<String, String>();
     env.put("GIT_BRANCH", config.getGitTagOrBranch());
     env.put("HARVARD_DATA_TOOLS_BASE", config.getEc2GitDir());

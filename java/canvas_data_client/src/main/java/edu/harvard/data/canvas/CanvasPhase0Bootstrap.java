@@ -30,7 +30,6 @@ public class CanvasPhase0Bootstrap extends Phase0Bootstrap
 implements RequestHandler<BootstrapParameters, String> {
 
   private DataDump dump;
-  private String dumpId;
   private BootstrapParameters params;
   private String schemaVersion;
 
@@ -61,10 +60,16 @@ implements RequestHandler<BootstrapParameters, String> {
   @Override
   protected boolean newDataAvailable()
       throws IOException, DataConfigurationException, UnexpectedApiResponseException {
+    final String dumpId = getDumpId();
+    log.info("Saving dump " + dumpId);
+    return dumpId != null;
+  }
+
+  private String getDumpId()
+      throws IOException, DataConfigurationException, UnexpectedApiResponseException {
     final CanvasDataConfig canvasConfig = (CanvasDataConfig) config;
-    DumpInfo.init(canvasConfig.getDumpInfoDynamoTable());
-    final ApiClient api = new ApiClient(canvasConfig.getCanvasDataHost(),
-        canvasConfig.getCanvasApiKey(), canvasConfig.getCanvasApiSecret());
+    final ApiClient api = new ApiClient(canvasConfig.getCanvasDataHost(), canvasConfig.getCanvasApiKey(),
+        canvasConfig.getCanvasApiSecret());
     final List<String> args = new ArrayList<String>();
     if (params.getDumpSequence() != null) {
       dump = api.getDump(params.getDumpSequence());
@@ -89,19 +94,20 @@ implements RequestHandler<BootstrapParameters, String> {
       }
     }
     if (args.isEmpty()) {
-      return false;
+      return null;
     } else {
-      dumpId = args.get(0);
+      String dumpId = args.get(0);
       for (int i = 1; i < args.size(); i++) {
         dumpId += ":" + args.get(i);
       }
-      log.info("Saving dump " + dumpId);
-      return true;
+      return dumpId;
     }
+
   }
 
   @Override
-  protected List<S3ObjectId> getInfrastructureConfigPaths() {
+  protected List<S3ObjectId> getInfrastructureConfigPaths()
+      throws IOException, DataConfigurationException, UnexpectedApiResponseException {
     final List<S3ObjectId> paths = new ArrayList<S3ObjectId>();
     final S3ObjectId configPath = AwsUtils.key(config.getCodeBucket(), "infrastructure");
 
@@ -109,7 +115,8 @@ implements RequestHandler<BootstrapParameters, String> {
     if (dump != null && dump.getArtifactsByTable().containsKey("requests")) {
       megadump |= !dump.getArtifactsByTable().get("requests").isPartial();
     }
-    if (dumpId.equals("TABLE:requests")) {
+    final String dumpId = getDumpId();
+    if (dumpId == null || dumpId.equals("TABLE:requests")) {
       // Don't need to download data, but will have to process the full requests
       // table
       paths.add(AwsUtils.key(configPath, "tiny_phase_0.properties"));
@@ -127,14 +134,17 @@ implements RequestHandler<BootstrapParameters, String> {
   }
 
   @Override
-  protected Map<String, String> getCustomEc2Environment() {
+  protected Map<String, String> getCustomEc2Environment()
+      throws IOException, DataConfigurationException, UnexpectedApiResponseException {
     final Map<String, String> env = new HashMap<String, String>();
-    env.put("DATA_SET_ID", dumpId);
+    env.put("DATA_SET_ID", getDumpId());
     env.put("DATA_SCHEMA_VERSION", schemaVersion); // XXX: Remove
     return env;
   }
 
   private boolean needToSaveDump(final DataDump candidate) throws IOException {
+    final CanvasDataConfig canvasConfig = (CanvasDataConfig) config;
+    DumpInfo.init(canvasConfig.getDumpInfoDynamoTable());
     final DumpInfo info = DumpInfo.find(candidate.getDumpId());
     if (info == null) {
       log.info("Dump needs to be saved; no dump info record for " + candidate.getDumpId());

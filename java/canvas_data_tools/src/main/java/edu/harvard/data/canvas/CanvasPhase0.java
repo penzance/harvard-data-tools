@@ -58,6 +58,7 @@ public class CanvasPhase0 extends Phase0 {
         throw new DataConfigurationException("Unknown dataset parameter " + datasetParts[i]);
       }
     }
+    DumpInfo.init(config.getDumpInfoDynamoTable());
   }
 
   @Override
