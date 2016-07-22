@@ -66,13 +66,13 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
   }
 
   public static void main(final String[] args) throws IOException {
-    final String pipelineId = "df-0839553BTYV3JX6PCZT";
-    final String runId = "dce_matterhorn_2016-07-22-1247";
+    final String pipelineId = "df-07979201L7KJA2QMMV0A";
+    final String runId = "huit_canvas_2016-07-22-1838";
     final S3ObjectId outputKey = key("hdt-pipeline-reports", runId + ".json");
     final String snsArn = "arn:aws:sns:us-east-1:364469542718:hdtdevcanvas-SuccessSNS-8HQ4921XICVD";
     final String pipelineDynamoTable = "hdt-pipeline-dev";
-    final String logGroupName = "";
-    final String logStreamName = "";
+    final String logGroupName = "/aws/lambda/Data_Pipeline_Complete";
+    final String logStreamName = "TestLog";
     new PipelineComplete().process(pipelineId, runId, outputKey, snsArn, pipelineDynamoTable,
         logGroupName, logStreamName);
   }
@@ -82,6 +82,10 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
   public String handleRequest(final SNSEvent input, final Context context) {
     log.info("Handling request");
     final String json = input.getRecords().get(0).getSNS().getMessage();
+    System.out.println("Source: " + input.getRecords().get(0).getEventSource());
+    System.out.println("Subscription: " + input.getRecords().get(0).getEventSubscriptionArn());
+    System.out.println("Records: " + input.getRecords());
+    System.out.println("SNS: " + input.getRecords().get(0).getSNS());
     log.info("JSON: " + json);
     log.info("Logs: " + context.getLogStreamName());
     final ObjectMapper mapper = new ObjectMapper();
@@ -174,6 +178,13 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
       if (stdout != null) {
         obj.addLog(s3Url(key(stdout.substring(0, stdout.lastIndexOf("/"))), "Output Streams"));
       }
+
+      final String attempt = getRefField(pipelineObj.getFields(), "@headAttempt");
+      final PipelineObject attemptObj = pipelineClient
+          .describeObjects(new DescribeObjectsRequest()
+              .withObjectIds(Collections.singleton(attempt)).withPipelineId(pipelineId))
+          .getPipelineObjects().get(0);
+      obj.setErrorMessage(getStringField(attemptObj.getFields(), "errorMessage"));
 
       if (obj.getStatus().equals("FAILED")) {
         report.setFailure(obj.getId());

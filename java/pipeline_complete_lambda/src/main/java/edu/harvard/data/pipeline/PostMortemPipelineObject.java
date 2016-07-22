@@ -11,6 +11,7 @@ public class PostMortemPipelineObject {
   private String name;
   private final PipelineObject pipelineObj;
   private String status;
+  private String errorMessage;
   private final List<PipelineLog> logs;
 
   public PostMortemPipelineObject(final PipelineObject pipelineObj) {
@@ -38,6 +39,10 @@ public class PostMortemPipelineObject {
     return name;
   }
 
+  public String getErrorMessage() {
+    return errorMessage;
+  }
+
   public List<PipelineLog> getLogs() {
     return logs;
   }
@@ -52,6 +57,10 @@ public class PostMortemPipelineObject {
 
   public void setStatus(final String status) {
     this.status = status;
+  }
+
+  public void setErrorMessage(final String errorMessage) {
+    this.errorMessage = errorMessage;
   }
 
 }
