@@ -77,12 +77,16 @@ public abstract class Phase0 {
     } catch (final ArgumentError e) {
       cleanup(config, record, e);
       status = ReturnStatus.ARGUMENT_ERROR;
-    } finally {
+    } catch (final Throwable t) {
+      cleanup(config, record, t);
+      status = ReturnStatus.UNKNOWN_ERROR;
+    }
+    finally {
       if (exec != null) {
         exec.shutdownNow();
       }
+      record.save();
     }
-    record.save();
     System.exit(status.getCode());
   }
 
@@ -106,7 +110,7 @@ public abstract class Phase0 {
   }
 
   private static void cleanup(final DataConfig config, final PipelineExecutionRecord record,
-      final Exception e) throws JsonProcessingException {
+      final Throwable e) throws JsonProcessingException {
     e.printStackTrace();
     record.setPhase0Success(false);
     record.setStatus(Status.Failed.toString());
