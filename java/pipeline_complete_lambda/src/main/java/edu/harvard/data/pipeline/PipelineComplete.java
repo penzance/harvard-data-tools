@@ -180,11 +180,13 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
       }
 
       final String attempt = getRefField(pipelineObj.getFields(), "@headAttempt");
-      final PipelineObject attemptObj = pipelineClient
+      final DescribeObjectsResult headAttemptObjects = pipelineClient
           .describeObjects(new DescribeObjectsRequest()
-              .withObjectIds(Collections.singleton(attempt)).withPipelineId(pipelineId))
-          .getPipelineObjects().get(0);
-      obj.setErrorMessage(getStringField(attemptObj.getFields(), "errorMessage"));
+              .withObjectIds(Collections.singleton(attempt)).withPipelineId(pipelineId));
+      if (!headAttemptObjects.getPipelineObjects().isEmpty()) {
+        final PipelineObject attemptObj = headAttemptObjects.getPipelineObjects().get(0);
+        obj.setErrorMessage(getStringField(attemptObj.getFields(), "errorMessage"));
+      }
 
       if (obj.getStatus().equals("FAILED")) {
         report.setFailure(obj.getId());
