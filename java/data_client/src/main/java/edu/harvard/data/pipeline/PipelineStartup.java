@@ -11,6 +11,12 @@ import com.amazonaws.services.datapipeline.model.PipelineObject;
 import com.amazonaws.services.datapipeline.model.Query;
 import com.amazonaws.services.datapipeline.model.QueryObjectsRequest;
 import com.amazonaws.services.datapipeline.model.QueryObjectsResult;
+import com.amazonaws.services.elasticmapreduce.AmazonElasticMapReduceClient;
+import com.amazonaws.services.elasticmapreduce.model.DescribeClusterRequest;
+import com.amazonaws.services.elasticmapreduce.model.DescribeClusterResult;
+import com.amazonaws.services.elasticmapreduce.model.Instance;
+import com.amazonaws.services.elasticmapreduce.model.ListInstancesRequest;
+import com.amazonaws.services.elasticmapreduce.model.ListInstancesResult;
 
 // Run by the StartupActivity step
 public class PipelineStartup {
@@ -23,10 +29,12 @@ public class PipelineStartup {
 
     final PipelineExecutionRecord record = PipelineExecutionRecord.find(runId);
     final String emrId = getEmrId(record.getPipelineId());
+    final String emrMasterIp = getEmrMasterIp(emrId);
 
     record.setPipelineStart(new Date());
     record.setStatus(PipelineExecutionRecord.Status.PipelineRunning.toString());
     record.setEmrId(emrId);
+    record.setEmrMasterIp(emrMasterIp);
     record.save();
   }
 
@@ -39,6 +47,20 @@ public class PipelineStartup {
     for (final PipelineObject obj : descriptions.getPipelineObjects()) {
       if (getField(obj.getFields(), "type").equals("EmrCluster")) {
         return getField(obj.getFields(), "@resourceId");
+      }
+    }
+    return null;
+  }
+
+  private static String getEmrMasterIp(final String emrId) {
+    final AmazonElasticMapReduceClient client = new AmazonElasticMapReduceClient();
+    final DescribeClusterResult cluster = client.describeCluster(new DescribeClusterRequest().withClusterId(emrId));
+    final ListInstancesResult instances = client.listInstances(new ListInstancesRequest().withClusterId(emrId));
+
+    final String masterDns = cluster.getCluster().getMasterPublicDnsName();
+    for (final Instance instance : instances.getInstances()) {
+      if (instance.getPrivateDnsName().equals(masterDns)) {
+        return instance.getPrivateIpAddress();
       }
     }
     return null;

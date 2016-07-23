@@ -66,6 +66,9 @@ public class PipelineExecutionRecord {
   @DynamoDBAttribute(attributeName = "emr_id")
   private String emrId;
 
+  @DynamoDBAttribute(attributeName = "emr_master_ip")
+  private String emrMasterIp;
+
   @DynamoDBAttribute(attributeName = "pipeline_start")
   private Date pipelineStart;
 
@@ -279,8 +282,16 @@ public class PipelineExecutionRecord {
     return phase0Ip;
   }
 
-  public void setPhase0Ip(String phase0Ip) {
+  public void setPhase0Ip(final String phase0Ip) {
     this.phase0Ip = phase0Ip;
+  }
+
+  public String getEmrMasterIp() {
+    return emrMasterIp;
+  }
+
+  public void setEmrMasterIp(final String emrMasterIp) {
+    this.emrMasterIp = emrMasterIp;
   }
 
 }
