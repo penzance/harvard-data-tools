@@ -8,7 +8,6 @@ import org.apache.commons.lang.StringUtils;
 import com.amazonaws.services.datapipeline.model.PutPipelineDefinitionRequest;
 import com.amazonaws.services.s3.model.S3ObjectId;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
@@ -51,12 +50,6 @@ public class Pipeline {
 
   private PipelineObjectBase createDefaultObject() throws JsonProcessingException {
     final PipelineObjectBase defaultObj = factory.getDefault(schedule);
-    final PipelineCompletionMessage completion = new PipelineCompletionMessage(pipelineId, runId,
-        config.getReportBucket(), config.getFailureSnsArn(), config.getPipelineDynamoTable());
-    final String failMsg = new ObjectMapper().writeValueAsString(completion);
-    final String failSubj = "Pipeline " + name + " Failed";
-    defaultObj.set("onFail",
-        factory.getSns("FailureSnsAlert", failSubj, failMsg, config.getCompletionSnsArn()));
     return defaultObj;
   }
 

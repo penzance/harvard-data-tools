@@ -57,6 +57,7 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
   private String logGroupName;
   private String logStreamName;
   private PipelineExecutionRecord record;
+  private String source;
 
   public PipelineComplete() throws IOException {
     this.pipelineClient = new DataPipelineClient();
@@ -73,8 +74,9 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
     final String pipelineDynamoTable = "hdt-pipeline-dev";
     final String logGroupName = "/aws/lambda/Data_Pipeline_Complete";
     final String logStreamName = "TestLog";
+    final String source = null;
     new PipelineComplete().process(pipelineId, runId, outputKey, snsArn, pipelineDynamoTable,
-        logGroupName, logStreamName);
+        logGroupName, logStreamName, source);
   }
 
   @Override
@@ -82,10 +84,6 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
   public String handleRequest(final SNSEvent input, final Context context) {
     log.info("Handling request");
     final String json = input.getRecords().get(0).getSNS().getMessage();
-    System.out.println("Source: " + input.getRecords().get(0).getEventSource());
-    System.out.println("Subscription: " + input.getRecords().get(0).getEventSubscriptionArn());
-    System.out.println("Records: " + input.getRecords());
-    System.out.println("SNS: " + input.getRecords().get(0).getSNS());
     log.info("JSON: " + json);
     log.info("Logs: " + context.getLogStreamName());
     final ObjectMapper mapper = new ObjectMapper();
@@ -97,11 +95,12 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
       final S3ObjectId outputKey = key(data.get("reportBucket"), runId + ".json");
       final String snsArn = data.get("snsArn");
       final String pipelineDynamoTable = data.get("pipelineDynamoTable");
+      final String source = data.get("source");
       final String logGroupName = context.getLogGroupName();
       final String logStreamName = context.getLogStreamName();
 
       this.process(pipelineId, runId, outputKey, snsArn, pipelineDynamoTable, logGroupName,
-          logStreamName);
+          logStreamName, source);
     } catch (final IOException e) {
       return e.toString();
     }
@@ -110,11 +109,12 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
 
   public void process(final String pipelineId, final String runId, final S3ObjectId outputKey,
       final String snsArn, final String pipelineDynamoTable, final String logGroupName,
-      final String logStreamName) throws IOException {
+      final String logStreamName, final String source) throws IOException {
     this.pipelineId = pipelineId;
     this.snsArn = snsArn;
     this.logGroupName = logGroupName;
     this.logStreamName = logStreamName;
+    this.source = source;
 
     PipelineExecutionRecord.init(pipelineDynamoTable);
     this.record = PipelineExecutionRecord.find(runId);
@@ -347,20 +347,22 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
   }
 
   private void sendSnsMessage() {
-    String subject = report.getPipelineDescription().getName() + " ";
     final String failure = report.getFailure();
-    String msg = "Pipeline Complete";
-    if (failure == null) {
-      subject += "Succeeded";
-    } else {
-      subject += "Failed at Step " + failure;
-      msg += "\n\nInteresting logs:";
-      for (final PipelineLog log : report.getPipelineObjects().get(failure).getLogs()) {
-        msg += "\n\n" + log;
+    if (source == null || source.equals(failure)) {
+      String subject = report.getPipelineDescription().getName() + " ";
+      String msg = "Pipeline Complete";
+      if (failure == null) {
+        subject += "Succeeded";
+      } else {
+        subject += "Failed at Step " + failure;
+        msg += "\n\nInteresting logs:";
+        for (final PipelineLog log : report.getPipelineObjects().get(failure).getLogs()) {
+          msg += "\n\n" + log;
+        }
       }
+      final PublishRequest publishRequest = new PublishRequest(snsArn, msg, subject);
+      snsClient.publish(publishRequest);
     }
-    final PublishRequest publishRequest = new PublishRequest(snsArn, msg, subject);
-    snsClient.publish(publishRequest);
   }
 
 }

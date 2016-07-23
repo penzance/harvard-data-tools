@@ -6,14 +6,16 @@ public class PipelineCompletionMessage {
   private final String snsArn;
   private final String pipelineDynamoTable;
   private final String runId;
+  private final String source;
 
   public PipelineCompletionMessage(final String pipelineId, final String runId, final String reportBucket,
-      final String snsArn, final String pipelineDynamoTable) {
+      final String snsArn, final String pipelineDynamoTable, final String source) {
     this.pipelineId = pipelineId;
     this.runId = runId;
     this.reportBucket = reportBucket;
     this.snsArn = snsArn;
     this.pipelineDynamoTable = pipelineDynamoTable;
+    this.source = source;
   }
 
   public String getPipelineId() {
@@ -34,5 +36,9 @@ public class PipelineCompletionMessage {
 
   public String getPipelineDynamoTable() {
     return pipelineDynamoTable;
+  }
+
+  public String getSource() {
+    return source;
   }
 }

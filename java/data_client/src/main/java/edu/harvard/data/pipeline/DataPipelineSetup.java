@@ -130,7 +130,7 @@ public class DataPipelineSetup {
       throws JsonProcessingException {
     final String subject = "PipelineSuccess";
     final PipelineCompletionMessage success = new PipelineCompletionMessage(pipelineId, runId,
-        config.getReportBucket(), config.getSuccessSnsArn(), config.getPipelineDynamoTable());
+        config.getReportBucket(), config.getSuccessSnsArn(), config.getPipelineDynamoTable(), null);
     final String msg = new ObjectMapper().writeValueAsString(success);
     return factory.getSns("PipelineComplete", subject, msg, config.getCompletionSnsArn());
   }

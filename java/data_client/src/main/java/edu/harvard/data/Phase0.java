@@ -115,9 +115,9 @@ public abstract class Phase0 {
     record.setPhase0Success(false);
     record.setStatus(Status.Failed.toString());
 
-    final PipelineCompletionMessage success = new PipelineCompletionMessage(null, record.getRunId(),
-        config.getReportBucket(), config.getFailureSnsArn(), config.getPipelineDynamoTable());
-    final String msg = new ObjectMapper().writeValueAsString(success);
+    final PipelineCompletionMessage failure = new PipelineCompletionMessage(null, record.getRunId(),
+        config.getReportBucket(), config.getFailureSnsArn(), config.getPipelineDynamoTable(), null);
+    final String msg = new ObjectMapper().writeValueAsString(failure);
     final AmazonSNSClient sns = new AmazonSNSClient();
     final String topicArn = config.getCompletionSnsArn();
     final PublishRequest publishRequest = new PublishRequest(topicArn, msg);
