@@ -277,7 +277,7 @@ public class PipelineFactory {
       throw new RuntimeException(e);
     }
     final String failSubj = "Pipeline " + runId + " Failed";
-    obj.set("onFail", getSns("FailureSnsAlert", failSubj, failMsg, config.getCompletionSnsArn()));
+    obj.set("onFail", getSns(id + "FailureSnsAlert", failSubj, failMsg, config.getCompletionSnsArn()));
 
     allObjects.add(obj);
   }
