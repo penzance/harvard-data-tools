@@ -58,6 +58,7 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
   private String logStreamName;
   private PipelineExecutionRecord record;
   private String source;
+  private String runId;
 
   public PipelineComplete() throws IOException {
     this.pipelineClient = new DataPipelineClient();
@@ -111,6 +112,7 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
       final String snsArn, final String pipelineDynamoTable, final String logGroupName,
       final String logStreamName, final String source) throws IOException {
     this.pipelineId = pipelineId;
+    this.runId = runId;
     this.snsArn = snsArn;
     this.logGroupName = logGroupName;
     this.logStreamName = logStreamName;
@@ -120,20 +122,22 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
     this.record = PipelineExecutionRecord.find(runId);
     saveInitialDynamoData();
 
-    getPipelineDefinition();
-    getPipelineObjects();
-    populateLogs();
-    getStepOrder();
-    report.setEmrUrl(emrUrl());
-    final ObjectMapper mapper = new ObjectMapper();
-    mapper.enable(SerializationFeature.INDENT_OUTPUT);
-    final String json = mapper.writeValueAsString(report);
-    final byte[] bytes = json.getBytes();
-    final ObjectMetadata metadata = new ObjectMetadata();
-    metadata.setContentLength(bytes.length);
-    s3Client.putObject(outputKey.getBucket(), outputKey.getKey(), new ByteArrayInputStream(bytes),
-        metadata);
-    System.out.println("Wrote output to " + outputKey);
+    if (pipelineId != null) {
+      getPipelineDefinition();
+      getPipelineObjects();
+      populateLogs();
+      getStepOrder();
+      report.setEmrUrl(emrUrl());
+      final ObjectMapper mapper = new ObjectMapper();
+      mapper.enable(SerializationFeature.INDENT_OUTPUT);
+      final String json = mapper.writeValueAsString(report);
+      final byte[] bytes = json.getBytes();
+      final ObjectMetadata metadata = new ObjectMetadata();
+      metadata.setContentLength(bytes.length);
+      s3Client.putObject(outputKey.getBucket(), outputKey.getKey(), new ByteArrayInputStream(bytes),
+          metadata);
+      System.out.println("Wrote output to " + outputKey);
+    }
     saveFinalDynamoData();
     sendSnsMessage();
   }
@@ -354,15 +358,15 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
   private void sendSnsMessage() {
     final String failure = report.getFailure();
     if (source == null || source.equals(failure)) {
-      String subject = report.getPipelineDescription().getName() + " ";
-      String msg = "Pipeline Complete";
-      if (failure == null) {
-        subject += "Succeeded";
+      final String msg = "Pipeline Complete";
+      String subject = runId + " ";
+      if (pipelineId == null) {
+        subject += "Failed during Phase 0";
       } else {
-        subject += "Failed at Step " + failure;
-        msg += "\n\nInteresting logs:";
-        for (final PipelineLog log : report.getPipelineObjects().get(failure).getLogs()) {
-          msg += "\n\n" + log;
+        if (failure == null) {
+          subject += "Succeeded";
+        } else {
+          subject += "Failed at Step " + failure;
         }
       }
       final PublishRequest publishRequest = new PublishRequest(snsArn, msg, subject);

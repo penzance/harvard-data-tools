@@ -53,11 +53,13 @@ public class MoveUnmodifiedTableGenerator {
       final DataSchemaTable table = outputPhase.getSchema().getTableByName(tableName);
       if (!(table.isTemporary() && table.getExpirationPhase() < phase)) {
         if (!table.hasNewlyGeneratedElements()) {
-          final String hdfsDir = inputPhase.getHDFSDir() + "/" + table.getTableName();
-          final String test = "hadoop fs -test -d " + hdfsDir;
-          final String move = "hadoop fs -mv " + hdfsDir + " " + outputPhase.getHDFSDir() + "/"
-              + table.getTableName();
-          out.println(test + " && " + move + " &>> " + logFile);
+          if (table.getOwner() == null) {
+            final String hdfsDir = inputPhase.getHDFSDir() + "/" + table.getTableName();
+            final String test = "hadoop fs -test -d " + hdfsDir;
+            final String move = "hadoop fs -mv " + hdfsDir + " " + outputPhase.getHDFSDir() + "/"
+                + table.getTableName();
+            out.println(test + " && " + move + " &>> " + logFile);
+          }
         }
       }
     }
