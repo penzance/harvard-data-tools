@@ -56,6 +56,7 @@ public abstract class Phase0Bootstrap {
 
   protected void init(final String configPathString, final Class<? extends DataConfig> configClass,
       final boolean createPipeline) throws IOException, DataConfigurationException {
+    log.info("Configuration path: " + configPathString);
     this.configPathString = configPathString;
     this.configClass = configClass;
     this.createPipeline = createPipeline;
