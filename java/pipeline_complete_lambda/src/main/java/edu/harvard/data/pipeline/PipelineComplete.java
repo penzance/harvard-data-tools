@@ -67,8 +67,8 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
   }
 
   public static void main(final String[] args) throws IOException {
-    final String pipelineId = "df-07979201L7KJA2QMMV0A";
-    final String runId = "huit_canvas_2016-07-22-1838";
+    final String pipelineId = "df-0565271324DPTX3EA1GW";
+    final String runId = "dce_matterhorn_2016-07-23-0211";
     final S3ObjectId outputKey = key("hdt-pipeline-reports", runId + ".json");
     final String snsArn = "arn:aws:sns:us-east-1:364469542718:hdtdevcanvas-SuccessSNS-8HQ4921XICVD";
     final String pipelineDynamoTable = "hdt-pipeline-dev";
@@ -189,7 +189,10 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
       }
 
       if (obj.getStatus().equals("FAILED")) {
+        log.info("Operation " + obj.getId() + " failed");
         report.setFailure(obj.getId());
+      } else {
+        log.info("Operation " + obj.getId() + " succeeded");
       }
       if (getStringField(pipelineObj.getFields(), "type").equals("EmrCluster")) {
         emrInstanceName = obj.getId();
