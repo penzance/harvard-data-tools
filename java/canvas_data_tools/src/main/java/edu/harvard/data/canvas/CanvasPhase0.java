@@ -64,6 +64,7 @@ public class CanvasPhase0 extends Phase0 {
   protected ReturnStatus run() throws DataConfigurationException, UnexpectedApiResponseException,
   IOException, VerificationException, ArgumentError {
     DumpInfo.init(config.getDumpInfoDynamoTable());
+    TableInfo.init(config.getTableInfoDynamoTable());
     final InputTableIndex index;
     if (dumpId == null && tableName != null) {
       // Build a data set containing the full history of one table
