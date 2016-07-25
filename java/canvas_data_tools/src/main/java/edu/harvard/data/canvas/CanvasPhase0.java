@@ -58,12 +58,12 @@ public class CanvasPhase0 extends Phase0 {
         throw new DataConfigurationException("Unknown dataset parameter " + datasetParts[i]);
       }
     }
-    DumpInfo.init(config.getDumpInfoDynamoTable());
   }
 
   @Override
   protected ReturnStatus run() throws DataConfigurationException, UnexpectedApiResponseException,
   IOException, VerificationException, ArgumentError {
+    DumpInfo.init(config.getDumpInfoDynamoTable());
     final InputTableIndex index;
     if (dumpId == null && tableName != null) {
       // Build a data set containing the full history of one table
