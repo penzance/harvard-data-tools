@@ -30,8 +30,11 @@ public class DumpInfo {
   private static String tableName;
   private static DynamoDBMapperConfig mapperConfig;
 
-  public static void init(final String table) {
+  public static void init(final String table) throws DataConfigurationException {
     mapper = new DynamoDBMapper(new AmazonDynamoDBClient());
+    if (table == null) {
+      throw new DataConfigurationException("Dump Info table name can't be null");
+    }
     tableName = table;
     mapperConfig = new DynamoDBMapperConfig(new TableNameOverride(tableName));
   }

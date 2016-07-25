@@ -34,7 +34,7 @@ public abstract class Phase0 {
     final String codeManagerClassName = args[4];
 
     final CodeManager codeManager = CodeManager.getCodeManager(codeManagerClassName);
-    final DataConfig config = codeManager.getDataConfig(configPathString, false);
+    final DataConfig config = codeManager.getDataConfig(configPathString, true);
 
     PipelineExecutionRecord.init(config.getPipelineDynamoTable());
     final PipelineExecutionRecord record = PipelineExecutionRecord.find(runId);

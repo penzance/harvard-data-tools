@@ -142,7 +142,7 @@ implements RequestHandler<BootstrapParameters, String> {
     return env;
   }
 
-  private boolean needToSaveDump(final DataDump candidate) throws IOException {
+  private boolean needToSaveDump(final DataDump candidate) throws IOException, DataConfigurationException {
     final CanvasDataConfig canvasConfig = (CanvasDataConfig) config;
     DumpInfo.init(canvasConfig.getDumpInfoDynamoTable());
     final DumpInfo info = DumpInfo.find(candidate.getDumpId());
