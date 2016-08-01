@@ -82,6 +82,7 @@ public abstract class Phase0Bootstrap {
     executionRecord.setRunStart(new Date());
     executionRecord.setStatus(Status.ProvisioningPhase0.toString());
     executionRecord.setConfigString(configPathString);
+    executionRecord.setWorkingDirectory(AwsUtils.uri(config.getS3WorkingLocation(runId)));
     executionRecord.save();
 
     final DatasetInfo dataset = new DatasetInfo(config.getDatasetName());

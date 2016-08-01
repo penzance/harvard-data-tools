@@ -42,5 +42,8 @@ then
     java -cp /home/ec2-user/code/data_tools.jar:$HARVARD_DATA_TOOLS_BASE/schema edu.harvard.data.pipeline.DataPipelineSetup $CONFIG_PATHS $RUN_ID $CODE_MANAGER_CLASS &> /var/log/pipeline-init.out
 fi
 
+# Pause before shutting down to make sure that logs are all flushed
+sleep 60
+
 # Shut down; the pipeline will take over.
-# sudo halt now
+sudo halt now

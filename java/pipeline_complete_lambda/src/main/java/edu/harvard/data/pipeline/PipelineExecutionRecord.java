@@ -69,6 +69,9 @@ public class PipelineExecutionRecord {
   @DynamoDBAttribute(attributeName = "emr_master_ip")
   private String emrMasterIp;
 
+  @DynamoDBAttribute(attributeName = "working_directory")
+  private String workingDirectory;
+
   @DynamoDBAttribute(attributeName = "pipeline_start")
   private Date pipelineStart;
 
@@ -292,6 +295,14 @@ public class PipelineExecutionRecord {
 
   public void setEmrMasterIp(final String emrMasterIp) {
     this.emrMasterIp = emrMasterIp;
+  }
+
+  public String getWorkingDirectory() {
+    return workingDirectory;
+  }
+
+  public void setWorkingDirectory(final String workingDirectory) {
+    this.workingDirectory = workingDirectory;
   }
 
 }
