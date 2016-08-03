@@ -40,6 +40,10 @@ public enum IdentifierType {
 
   CanvasDataID("canvas_data_id", "", Long.class),
 
+  EPPN("eppn", "", String.class),
+
+  ActiveDirectoryID("active_directory_id", "", String.class),
+
   EmailAddress("email",
       "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$",
       String.class),

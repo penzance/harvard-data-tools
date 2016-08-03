@@ -98,6 +98,8 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     columns.add(new ExtensionSchemaColumn("xid", "", "varchar", 255));
     columns.add(new ExtensionSchemaColumn("canvas_id", "", "bigint", 0));
     columns.add(new ExtensionSchemaColumn("canvas_data_id", "", "bigint", 0));
+    columns.add(new ExtensionSchemaColumn("eppn", "", "varchar", 255));
+    columns.add(new ExtensionSchemaColumn("active_directory_id", "", "varchar", 255));
     tables.put("identity_map", new ExtensionSchemaTable("identity_map", columns));
 
     columns = new ArrayList<DataSchemaColumn>();
@@ -151,6 +153,12 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     if ($canvasDataId != null && $canvasDataId.length() > 0) {
       identities.put(IdentifierType.CanvasDataID, Long.valueOf($canvasDataId));
     }
+    if (record.get(5) != null) {
+      identities.put(IdentifierType.EPPN, record.get(5));
+    }
+    if (record.get(6) != null) {
+      identities.put(IdentifierType.ActiveDirectoryID, record.get(6));
+    }
   }
 
   /**
@@ -170,13 +178,13 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
   public IdentityMap(final ResultSet resultSet) throws SQLException {
     this();
     if (resultSet.getString("research_id") != null) {
-      identities.put(IdentifierType.ResearchUUID, "research_id");
+      identities.put(IdentifierType.ResearchUUID, resultSet.getString("research_id"));
     }
     if (resultSet.getString("huid") != null) {
-      identities.put(IdentifierType.HUID, "huid");
+      identities.put(IdentifierType.HUID, resultSet.getString("huid"));
     }
     if (resultSet.getString("xid") != null) {
-      identities.put(IdentifierType.XID, "xid");
+      identities.put(IdentifierType.XID, resultSet.getString("xid"));
     }
     final long canvasId = resultSet.getLong("canvas_id");
     if (!resultSet.wasNull()) {
@@ -186,6 +194,13 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     if (!resultSet.wasNull()) {
       identities.put(IdentifierType.CanvasDataID, canvasDataId);
     }
+    if (resultSet.getString("eppn") != null) {
+      identities.put(IdentifierType.EPPN, resultSet.getString("eppn"));
+    }
+    if (resultSet.getString("eppn") != null) {
+      identities.put(IdentifierType.ActiveDirectoryID, resultSet.getString("active_directory_id"));
+    }
+
   }
 
   @Override
@@ -196,6 +211,8 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     fields.add(identities.get(IdentifierType.XID));
     fields.add(identities.get(IdentifierType.CanvasID));
     fields.add(identities.get(IdentifierType.CanvasDataID));
+    fields.add(identities.get(IdentifierType.EPPN));
+    fields.add(identities.get(IdentifierType.ActiveDirectoryID));
     return fields;
   }
 
@@ -207,6 +224,8 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     fields.add(IdentifierType.XID.getFieldName());
     fields.add(IdentifierType.CanvasID.getFieldName());
     fields.add(IdentifierType.CanvasDataID.getFieldName());
+    fields.add(IdentifierType.EPPN.getFieldName());
+    fields.add(IdentifierType.ActiveDirectoryID.getFieldName());
     return fields;
   }
 
