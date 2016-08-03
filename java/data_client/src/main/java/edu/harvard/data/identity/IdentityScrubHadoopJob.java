@@ -103,7 +103,7 @@ public class IdentityScrubHadoopJob {
     hadoopUtils.setPaths(job, hdfsService, config.getHdfsDir(0) + "/" + tableName,
         config.getHdfsDir(1) + "/" + tableName);
     for (final Path path : hadoopUtils.listHdfsFiles(hadoopConfig,
-        new Path(config.getHdfsDir(1) + "/identity_map"))) {
+        new Path(config.getHdfsDir(1) + "/identity_map/identitymap"))) {
       job.addCacheFile(path.toUri());
     }
 
