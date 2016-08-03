@@ -34,7 +34,7 @@ public class HuidEppnLookup {
     for (int i = start; i < end; i++) {
       queryString += "?, ";
     }
-    queryString = queryString.substring(0, queryString.length() - 2) + ");";
+    queryString = queryString.substring(0, queryString.length() - 2) + ")";
 
     final String connectionString = config.getIdentityOracleUrl();
     try {
@@ -48,14 +48,15 @@ public class HuidEppnLookup {
             config.getIdentityOracleUserName(), config.getIdentityOraclePassword());
         PreparedStatement statement = connection.prepareStatement(queryString);) {
       for (int i = start; i < end; i++) {
-        System.out.println("Setting string to " + (String) identities.get(i).get(IdentifierType.HUID));
         statement.setString(i - start + 1, (String) identities.get(i).get(IdentifierType.HUID));
       }
       try (final ResultSet rs = statement.executeQuery();) {
-        while (rs.next()) {
-          System.out.println(rs.getString("huid"));
-          System.out.println(rs.getString("eppn"));
-          System.out.println(rs.getString("adid"));
+        for (int i = start; i < end; i++) {
+          rs.next();
+          final IdentityMap id = identities.get(i);
+          id.set(IdentifierType.HUID, rs.getString("huid"));
+          id.set(IdentifierType.HUID, rs.getString("eppn"));
+          id.set(IdentifierType.HUID, rs.getString("adid"));
         }
       }
     }
