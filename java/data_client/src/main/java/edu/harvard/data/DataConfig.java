@@ -56,6 +56,14 @@ public class DataConfig {
   private final String redshiftUserName;
   private final String redshiftPassword;
 
+  private final String identityOraclePassword;
+  private final String identityOraclePort;
+  private final String identityOracleSchema;
+  private final String identityOracleServer;
+  private final String identityOracleSid;
+  private final String identityOracleUserName;
+  private final String identityOracleView;
+
   private final String awsKeyId;
   private final String awsSecretKey;
 
@@ -162,6 +170,14 @@ public class DataConfig {
     this.pipelineDynamoTable = getConfigParameter("pipeline_dynamo_table", verify);
     this.mainIdentifier = IdentifierType.valueOf(getConfigParameter("main_identifier", verify));
     this.hdtMonitorUrl = getConfigParameter("hdt_monitor_url", verify);
+
+    this.identityOraclePassword = getConfigParameter("identity_oracle_password", verify);
+    this.identityOraclePort = getConfigParameter("identity_oracle_port", verify);
+    this.identityOracleSchema = getConfigParameter("identity_oracle_schema", verify);
+    this.identityOracleServer = getConfigParameter("identity_oracle_server", verify);
+    this.identityOracleSid = getConfigParameter("identity_oracle_sid", verify);
+    this.identityOracleUserName = getConfigParameter("identity_oracle_user_name", verify);
+    this.identityOracleView = getConfigParameter("identity_oracle_view", verify);
 
     this.datasetsDynamoTable = getConfigParameter("datasets_dynamo_table", verify);
     this.leaseDynamoTable = getConfigParameter("lease_dynamo_table", verify);
@@ -582,5 +598,38 @@ public class DataConfig {
   public String getDatasetsDynamoTable() {
     return datasetsDynamoTable;
   }
+
+  public String getIdentityOracleServer() {
+    return identityOracleServer;
+  }
+
+  public String getIdentityOraclePort() {
+    return identityOraclePort;
+  }
+
+  public String getIdentityOracleSid() {
+    return identityOracleSid;
+  }
+
+  public String getIdentityOracleUserName() {
+    return identityOracleUserName;
+  }
+
+  public String getIdentityOraclePassword() {
+    return identityOraclePassword;
+  }
+
+  public String getIdentityOracleUrl() {
+    return "jdbc:oracle:thin:@"+ identityOracleServer + ":" + identityOraclePort + ":" + identityOracleSid;
+  }
+
+  public String getIdentityOracleSchema() {
+    return identityOracleSchema;
+  }
+
+  public String getIdentityOracleView() {
+    return identityOracleView;
+  }
+
 
 }
