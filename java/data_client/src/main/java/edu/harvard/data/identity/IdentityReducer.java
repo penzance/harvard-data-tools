@@ -109,7 +109,7 @@ public class IdentityReducer<T> {
    *          a MultipleOutputs instance that is configured to allow writing
    *          values to the identity map file, as well as any other identity
    *          outputs such as names or e-mail addresses. The names out of the
-   *          output streams (other than identity_map) will match the result of
+   *          output streams (other than identitymap) will match the result of
    *          {@link IdentifierType#getFieldName}.
    *
    * @throws IOException
@@ -148,7 +148,7 @@ public class IdentityReducer<T> {
         names.add(name);
       }
     }
-    outputResult("identity_map", outputs, id.getFieldsAsList(format).toArray());
+    outputResult("identitymap", outputs, id.getFieldsAsList(format).toArray());
     for (final String email : emails) {
       outputResult(IdentifierType.EmailAddress.getFieldName(), outputs, id.get(mainIdentifier), email);
     }

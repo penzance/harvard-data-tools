@@ -93,7 +93,7 @@ public class IdentityMapHadoopJob {
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
 
-    MultipleOutputs.addNamedOutput(job, "identity_map", TextOutputFormat.class, Text.class,
+    MultipleOutputs.addNamedOutput(job, "identitymap", TextOutputFormat.class, Text.class,
         NullWritable.class);
     MultipleOutputs.addNamedOutput(job, IdentifierType.EmailAddress.getFieldName(),
         TextOutputFormat.class, Text.class, NullWritable.class);
