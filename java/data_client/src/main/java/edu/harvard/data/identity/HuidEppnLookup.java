@@ -48,6 +48,7 @@ public class HuidEppnLookup {
             config.getIdentityOracleUserName(), config.getIdentityOraclePassword());
         PreparedStatement statement = connection.prepareStatement(queryString);) {
       for (int i = start; i < end; i++) {
+        System.out.println("Setting string to " + (String) identities.get(i).get(IdentifierType.HUID));
         statement.setString(i - start + 1, (String) identities.get(i).get(IdentifierType.HUID));
       }
       try (final ResultSet rs = statement.executeQuery();) {
