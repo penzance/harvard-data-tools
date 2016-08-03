@@ -24,6 +24,17 @@ import edu.harvard.data.schema.extension.ExtensionSchemaTable;
 //     canvas_id BIGINT,
 //     canvas_data_id BIGINT
 // );
+//
+// CREATE TABLE pii.name (
+//     research_id VARCHAR(255),
+//     name VARCHAR(255)
+//  );
+//
+// CREATE TABLE pii.email (
+//     research_id VARCHAR(255),
+//     email VARCHAR(255)
+// );
+
 /**
  * This class represents an entry in the environment-scoped
  * <code>identity_map</code> table. It contains the cumulative information that
@@ -79,14 +90,47 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     populate(record);
   }
 
-  public static DataSchemaTable getIdentityMapTable() {
-    final List<DataSchemaColumn> columns = new ArrayList<DataSchemaColumn>();
+  public static Map<String, DataSchemaTable> getIdentityMapTables() {
+    final Map<String, DataSchemaTable> tables = new HashMap<String, DataSchemaTable>();
+    List<DataSchemaColumn> columns = new ArrayList<DataSchemaColumn>();
     columns.add(new ExtensionSchemaColumn("research_id", "", "varchar", 255));
     columns.add(new ExtensionSchemaColumn("huid", "", "varchar", 255));
     columns.add(new ExtensionSchemaColumn("xid", "", "varchar", 255));
     columns.add(new ExtensionSchemaColumn("canvas_id", "", "bigint", 0));
     columns.add(new ExtensionSchemaColumn("canvas_data_id", "", "bigint", 0));
-    return new ExtensionSchemaTable("identity_map", columns);
+    tables.put("identity_map", new ExtensionSchemaTable("identity_map", columns));
+
+    columns = new ArrayList<DataSchemaColumn>();
+    columns.add(new ExtensionSchemaColumn("research_id", "", "varchar", 255));
+    columns.add(new ExtensionSchemaColumn("name", "", "varchar", 255));
+    tables.put("name", new ExtensionSchemaTable("name", columns));
+
+    columns = new ArrayList<DataSchemaColumn>();
+    columns.add(new ExtensionSchemaColumn("research_id", "", "varchar", 255));
+    columns.add(new ExtensionSchemaColumn("email", "", "varchar", 255));
+    tables.put("email", new ExtensionSchemaTable("email", columns));
+
+    return tables;
+  }
+
+  public static List<String> getPrimaryKeyFields(final String tableName) {
+    final List<String> keys = new ArrayList<String>();
+    switch(tableName) {
+    case "identity_map":
+      keys.add("research_id");
+      break;
+    case "name":
+      keys.add("research_id");
+      keys.add("name");
+      break;
+    case "email":
+      keys.add("research_id");
+      keys.add("email");
+      break;
+    default:
+      throw new RuntimeException("Unknown identity table " + tableName);
+    }
+    return keys;
   }
 
   private void populate(final CSVRecord record) {
@@ -231,4 +275,5 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
   public void set(final IdentifierType idType, final Object value) {
     identities.put(idType, value);
   }
+
 }
