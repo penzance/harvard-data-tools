@@ -131,12 +131,14 @@ public class IdentityMapperGenerator {
     out.println("    if (phase0." + getter + "() != null) {");
     out.println("      " + fieldType + " " + fieldName + " = phase0." + getter + "();");
     for (final IdentifierType identifierType : identities.get(columnName)) {
-      out.println("      if (IdentifierType." + identifierType + ".getPattern().matcher("
-          + fieldName + ").matches()) {");
-      out.println("        $id.set(IdentifierType." + identifierType.toString() + ", phase0."
-          + getter + "());");
-      out.println("        populated = true;");
-      out.println("      }");
+      if (identifierType != IdentifierType.Other) {
+        out.println("      if (IdentifierType." + identifierType + ".getPattern().matcher("
+            + fieldName + ").matches()) {");
+        out.println("        $id.set(IdentifierType." + identifierType.toString() + ", phase0."
+            + getter + "());");
+        out.println("        populated = true;");
+        out.println("      }");
+      }
     }
     out.println("    }");
   }
