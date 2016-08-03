@@ -104,7 +104,7 @@
 		"canvas_id": ["CanvasID"],
 		"gender": ["Other"],
 		"birthdate": ["Other"],
-		"name": ["Other"],
+		"name": ["Name"],
 		"sortable_name": ["Other"]
 	},
 	"wiki_page_fact": {

@@ -15,6 +15,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -30,6 +31,7 @@ public class IdentityReducerReduceTests {
   private Configuration config;
   private Reducer<Text, HadoopIdentityKey, Text, NullWritable>.Context context;
   private IdentityReducer<String> identityReducer;
+  private MultipleOutputs<Text, NullWritable> outputs;
 
   @Before
   @SuppressWarnings("unchecked")
@@ -37,6 +39,7 @@ public class IdentityReducerReduceTests {
     config = mock(Configuration.class);
     context = mock(Reducer.Context.class);
     when(context.getConfiguration()).thenReturn(config);
+    outputs = mock(MultipleOutputs.class);
     identityReducer = new IdentityReducer<String>();
     identityReducer.format = new FormatLibrary().getFormat(Format.DecompressedInternal);
     identityReducer.mainIdentifier = MAIN_IDENTIFIER;
@@ -86,7 +89,7 @@ public class IdentityReducerReduceTests {
   public void existingUUID() throws IOException, InterruptedException {
     final IdentityMap id = makeId();
     identityReducer.identities.put(XID, id);
-    identityReducer.reduce(XID, getIterable(makeId(XID)), context);
+    identityReducer.reduce(XID, getIterable(makeId(XID)), outputs);
     final IdentityMap written = getWrittenMap();
     assertEquals(id.get(IdentifierType.ResearchUUID), written.get(IdentifierType.ResearchUUID));
   }
@@ -97,7 +100,7 @@ public class IdentityReducerReduceTests {
     final IdentityMap id = makeId();
     id.set(IdentifierType.XID, "some_other_xid");
     identityReducer.identities.put((String) id.get(IdentifierType.XID), id);
-    identityReducer.reduce(XID, getIterable(makeId(XID)), context);
+    identityReducer.reduce(XID, getIterable(makeId(XID)), outputs);
     final IdentityMap written = getWrittenMap();
     assertNotEquals(id.get(IdentifierType.ResearchUUID), written.get(IdentifierType.ResearchUUID));
   }
@@ -106,7 +109,7 @@ public class IdentityReducerReduceTests {
   // Check that new identity data is properly added
   public void identityPopulation() throws IOException, InterruptedException {
     final IdentityMap original = makeId();
-    identityReducer.reduce(XID, getIterable(original), context);
+    identityReducer.reduce(XID, getIterable(original), outputs);
     final IdentityMap written = getWrittenMap();
     assertEquals(original.get(IdentifierType.HUID), written.get(IdentifierType.HUID));
     assertEquals(original.get(IdentifierType.XID), written.get(IdentifierType.XID));
@@ -122,7 +125,7 @@ public class IdentityReducerReduceTests {
     id1.set(IdentifierType.HUID, "huid");
     id1.set(IdentifierType.CanvasID, 123L);
     id2.set(IdentifierType.CanvasDataID, 456L);
-    identityReducer.reduce(XID, getIterable(id1, id2), context);
+    identityReducer.reduce(XID, getIterable(id1, id2), outputs);
     final IdentityMap written = getWrittenMap();
     assertEquals("huid", written.get(IdentifierType.HUID));
     assertEquals(XID, written.get(IdentifierType.XID));

@@ -40,6 +40,12 @@ public enum IdentifierType {
 
   CanvasDataID("canvas_data_id", "", Long.class),
 
+  EmailAddress("email",
+      "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$",
+      String.class),
+
+  Name("name", "", String.class),
+
   Other("other", "", Void.class);
 
   private String fieldName;

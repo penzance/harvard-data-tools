@@ -14,6 +14,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -91,6 +92,13 @@ public class IdentityMapHadoopJob {
     job.setMapOutputValueClass(HadoopIdentityKey.class);
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
+
+    MultipleOutputs.addNamedOutput(job, "identity_map", TextOutputFormat.class, Text.class,
+        NullWritable.class);
+    MultipleOutputs.addNamedOutput(job, IdentifierType.EmailAddress.getFieldName(),
+        TextOutputFormat.class, Text.class, NullWritable.class);
+    MultipleOutputs.addNamedOutput(job, IdentifierType.Name.getFieldName(), TextOutputFormat.class,
+        Text.class, NullWritable.class);
 
     for (final Path path : hadoopUtils.listHdfsFiles(hadoopConfig,
         new Path(inputDir + "/identity_map"))) {

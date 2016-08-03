@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 
 /**
  * Definition of the general (i.e. not table-specific) reducer job for a dataset
@@ -18,6 +19,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 public class StringIdentityReducer extends Reducer<Text, HadoopIdentityKey, Text, NullWritable> {
 
   private final IdentityReducer<String> identityReducer;
+  private MultipleOutputs<Text, NullWritable> outputs;
 
   public StringIdentityReducer() {
     this.identityReducer = new IdentityReducer<String>();
@@ -31,6 +33,7 @@ public class StringIdentityReducer extends Reducer<Text, HadoopIdentityKey, Text
   protected void setup(final Context context) throws IOException, InterruptedException {
     super.setup(context);
     identityReducer.setup(context);
+    outputs = new MultipleOutputs<Text, NullWritable>(context);
   }
 
   /**
@@ -41,6 +44,6 @@ public class StringIdentityReducer extends Reducer<Text, HadoopIdentityKey, Text
   public void reduce(final Text key, final Iterable<HadoopIdentityKey> values,
       final Context context) throws IOException, InterruptedException {
     final String mainIdValue = key.toString();
-    identityReducer.reduce(mainIdValue, values, context);
+    identityReducer.reduce(mainIdValue, values, outputs);
   }
 }
