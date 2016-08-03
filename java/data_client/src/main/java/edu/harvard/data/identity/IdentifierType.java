@@ -44,9 +44,9 @@ public enum IdentifierType {
       "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$",
       String.class),
 
-  Name("name", "", String.class),
+  Name("name", ".*", String.class),
 
-  Other("other", "", Void.class);
+  Other("other", ".*", Void.class);
 
   private String fieldName;
   private Pattern pattern;
