@@ -76,6 +76,16 @@ public enum IdentifierType {
     return fieldName;
   }
 
+  public static IdentifierType fromFieldName(final String fieldName) {
+    for (final IdentifierType id : values()) {
+      if (id.getFieldName().equals(fieldName)) {
+        return id;
+      }
+    }
+    return valueOf(fieldName);
+  }
+
+
   /**
    * Get a regular expression pattern by which this String-typed enumeration
    * value can be identified.

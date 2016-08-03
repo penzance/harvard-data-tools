@@ -210,22 +210,18 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
   @Override
   public Map<String, Object> getFieldsAsMap() {
     final Map<String, Object> fields = new HashMap<String, Object>();
-    if (identities.containsKey(IdentifierType.ResearchUUID)) {
-      fields.put("research_id", identities.get(IdentifierType.ResearchUUID));
-    }
-    if (identities.containsKey(IdentifierType.HUID)) {
-      fields.put("huid", identities.get(IdentifierType.HUID));
-    }
-    if (identities.containsKey(IdentifierType.XID)) {
-      fields.put("xid", identities.get(IdentifierType.XID));
-    }
-    if (identities.containsKey(IdentifierType.CanvasID)) {
-      fields.put("canvas_id", identities.get(IdentifierType.CanvasID));
-    }
-    if (identities.containsKey(IdentifierType.CanvasDataID)) {
-      fields.put("canvas_data_id", identities.get(IdentifierType.CanvasDataID));
+    for (final IdentifierType id : IdentifierType.values()) {
+      if (identities.containsKey(id)) {
+        fields.put(id.getFieldName(), identities.get(id));
+      }
     }
     return fields;
+  }
+
+  public void setFieldsAsMap(final Map<String, Object> map) {
+    for (final String key : map.keySet()) {
+      identities.put(IdentifierType.fromFieldName(key), map.get(key));
+    }
   }
 
   public Object get(final IdentifierType idType) {
