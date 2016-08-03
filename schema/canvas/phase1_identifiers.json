@@ -11,10 +11,7 @@
    "communication_channel_dim": {
 		"canvas_id": ["CanvasID"],
 		"user_id": ["CanvasDataID"],
-		"address": ["Other"]
-	},
-	"communication_channel_dim": {
-		"user_id": ["CanvasDataID"]
+		"address": ["EmailAddress"]
 	},
 	"conversation_message_dim": {
 		"author_id": ["CanvasDataID"]
