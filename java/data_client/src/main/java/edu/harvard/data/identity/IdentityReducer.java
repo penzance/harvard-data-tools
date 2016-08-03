@@ -150,10 +150,12 @@ public class IdentityReducer<T> {
     }
     outputResult("identitymap", outputs, id.getFieldsAsList(format).toArray());
     for (final String email : emails) {
-      outputResult(IdentifierType.EmailAddress.getFieldName(), outputs, id.get(IdentifierType.ResearchUUID), email);
+      outputResult(IdentifierType.EmailAddress.getFieldName(), outputs,
+          id.get(IdentifierType.ResearchUUID), email);
     }
     for (final String name : names) {
-      outputResult(IdentifierType.Name.getFieldName(), outputs, id.get(IdentifierType.ResearchUUID), name);
+      outputResult(IdentifierType.Name.getFieldName(), outputs, id.get(IdentifierType.ResearchUUID),
+          name);
     }
   }
 
@@ -165,6 +167,6 @@ public class IdentityReducer<T> {
       printer.printRecord(fields);
     }
     final Text csvText = new Text(writer.toString().trim());
-    outputs.write(outputName, csvText, NullWritable.get());
+    outputs.write(outputName, csvText, NullWritable.get(), outputName + "/");
   }
 }
