@@ -150,10 +150,10 @@ public class IdentityReducer<T> {
     }
     outputResult("identitymap", outputs, id.getFieldsAsList(format).toArray());
     for (final String email : emails) {
-      outputResult(IdentifierType.EmailAddress.getFieldName(), outputs, id.get(mainIdentifier), email);
+      outputResult(IdentifierType.EmailAddress.getFieldName(), outputs, id.get(IdentifierType.ResearchUUID), email);
     }
     for (final String name : names) {
-      outputResult(IdentifierType.Name.getFieldName(), outputs, id.get(mainIdentifier), name);
+      outputResult(IdentifierType.Name.getFieldName(), outputs, id.get(IdentifierType.ResearchUUID), name);
     }
   }
 
