@@ -42,6 +42,10 @@ sudo wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-mav
 sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
 sudo yum install -y apache-maven
 
+# Install the Oracle JDBC drivers
+aws s3 cp s3://hdt-code/ojdbc7.jar /home/hadoop/ojdbc7.jar
+mvn install:install-file -DgroupId=com.oracle -DartifactId=ojdbc7 -Dversion=12.1.0.1 -Dpackaging=jar -Dfile=/home/hadoop/ojdbc7.jar -DgeneratePom=true
+
 # generate the tools
 python /home/hadoop/harvard-data-tools/python/$GENERATOR &> /var/log/generate-tools.out
 chmod 764 $HARVARD_DATA_GENERATED_OUTPUT/*.sh

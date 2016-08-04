@@ -22,7 +22,9 @@ import edu.harvard.data.schema.extension.ExtensionSchemaTable;
 //     huid VARCHAR(255),
 //     xid VARCHAR(255),
 //     canvas_id BIGINT,
-//     canvas_data_id BIGINT
+//     canvas_data_id BIGINT,
+//     eppn VARCHAR(255),
+//     active_directory_id VARCHAR(255)
 // );
 //
 // CREATE TABLE pii.name (
