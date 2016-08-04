@@ -284,8 +284,8 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
   }
 
   public void setFieldsAsMap(final Map<String, Object> map) {
-    for (final String key : map.keySet()) {
-      identities.put(IdentifierType.fromFieldName(key), map.get(key));
+    for (final IdentifierType id : IdentifierType.values()) {
+      identities.put(id, map.get(id.getFieldName()));
     }
   }
 
