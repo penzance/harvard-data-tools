@@ -81,7 +81,8 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
    * Create an identity map, reading is initial values from a CSV record.
    *
    * @param format
-   *          this parameter is ignored by this {@code DataTable} implementation.
+   *          this parameter is ignored by this {@code DataTable}
+   *          implementation.
    * @param record
    *          a properly-formatted {@link CSVRecord} that contains String values
    *          for each identifier (any of which may be null, apart from the
@@ -119,7 +120,7 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
 
   public static List<String> getPrimaryKeyFields(final String tableName) {
     final List<String> keys = new ArrayList<String>();
-    switch(tableName) {
+    switch (tableName) {
     case "identity_map":
       keys.add("research_id");
       break;
@@ -208,13 +209,21 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
   @Override
   public List<Object> getFieldsAsList(final TableFormat formatter) {
     final List<Object> fields = new ArrayList<Object>();
-    fields.add(identities.get(IdentifierType.ResearchUUID));
-    fields.add(identities.get(IdentifierType.HUID));
-    fields.add(identities.get(IdentifierType.XID));
-    fields.add(identities.get(IdentifierType.CanvasID));
-    fields.add(identities.get(IdentifierType.CanvasDataID));
-    fields.add(identities.get(IdentifierType.EPPN));
-    fields.add(identities.get(IdentifierType.ActiveDirectoryID));
+    fields.add(identities.containsKey(IdentifierType.ResearchUUID)
+        ? identities.get(IdentifierType.ResearchUUID) : formatter.getCsvFormat().getNullString());
+    fields.add(identities.containsKey(IdentifierType.HUID) ? identities.get(IdentifierType.HUID)
+        : formatter.getCsvFormat().getNullString());
+    fields.add(identities.containsKey(IdentifierType.XID) ? identities.get(IdentifierType.XID)
+        : formatter.getCsvFormat().getNullString());
+    fields.add(identities.containsKey(IdentifierType.CanvasID)
+        ? identities.get(IdentifierType.CanvasID) : formatter.getCsvFormat().getNullString());
+    fields.add(identities.containsKey(IdentifierType.CanvasDataID)
+        ? identities.get(IdentifierType.CanvasDataID) : formatter.getCsvFormat().getNullString());
+    fields.add(identities.containsKey(IdentifierType.EPPN) ? identities.get(IdentifierType.EPPN)
+        : formatter.getCsvFormat().getNullString());
+    fields.add(identities.containsKey(IdentifierType.ActiveDirectoryID)
+        ? identities.get(IdentifierType.ActiveDirectoryID)
+            : formatter.getCsvFormat().getNullString());
     return fields;
   }
 
