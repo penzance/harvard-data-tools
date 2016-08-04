@@ -172,7 +172,7 @@ public class PipelineFactory {
     final PipelineObjectBase obj = new PipelineObjectBase(config, id, "SqlActivity");
     setupActivity(id, obj, infrastructure);
     final String query = "UNLOAD ('" + sql + "') TO '" + AwsUtils.uri(dest)
-    + "/' WITH CREDENTIALS AS " + getCredentials() + " delimiter '\\t' GZIP;";
+    + "/' WITH CREDENTIALS AS " + getCredentials() + " delimiter '\\t' null as '\\\\N' GZIP;";
     obj.set("script", query);
     obj.set("database", database);
     return obj;
