@@ -6,15 +6,16 @@ import java.util.List;
 import com.amazonaws.services.s3.model.S3ObjectId;
 
 import edu.harvard.data.AwsUtils;
-import edu.harvard.data.DataConfig;
 import edu.harvard.data.CodeManager;
+import edu.harvard.data.DataConfig;
 import edu.harvard.data.identity.IdentityMapHadoopJob;
 import edu.harvard.data.identity.IdentityScrubHadoopJob;
 
 public class Phase1PipelineSetup {
 
   private final S3ObjectId unloadIdentityS3;
-  private final String identityHdfs;
+  private final String phase0IdentityHdfs;
+  private final String phase1IdentityHdfs;
   private final S3ObjectId redshiftStagingS3;
   private final S3ObjectId workingDir;
   private final Pipeline pipeline;
@@ -36,7 +37,8 @@ public class Phase1PipelineSetup {
     this.unloadIdentityS3 = AwsUtils.key(workingDir, "unloaded_tables", "identity_map");
     this.redshiftStagingS3 = AwsUtils.key(workingDir, config.getRedshiftStagingDir(),
         "identity_map");
-    this.identityHdfs = config.getHdfsDir(0) + "/identity_map";
+    this.phase0IdentityHdfs = config.getHdfsDir(0) + "/identity_map";
+    this.phase1IdentityHdfs = config.getHdfsDir(1) + "/identity_map";
   }
 
   public PipelineObjectBase populate(final PipelineObjectBase previousPhase) {
@@ -167,14 +169,14 @@ public class Phase1PipelineSetup {
 
   private PipelineObjectBase copyIdentityToHdfs(final PipelineObjectBase previousStep) {
     final PipelineObjectBase copy = factory.getS3DistCpActivity("CopyIdentityToHdfs",
-        unloadIdentityS3, identityHdfs, pipeline.getEmr());
+        unloadIdentityS3, phase0IdentityHdfs, pipeline.getEmr());
     copy.addDependency(previousStep);
     return copy;
   }
 
   private PipelineObjectBase copyIdentityToS3(final PipelineObjectBase previousStep) {
-    final PipelineObjectBase copy = factory.getS3DistCpActivity("CopyIdentityToS3", identityHdfs,
-        redshiftStagingS3, pipeline.getEmr());
+    final PipelineObjectBase copy = factory.getS3DistCpActivity("CopyIdentityToS3",
+        phase1IdentityHdfs, redshiftStagingS3, pipeline.getEmr());
     copy.addDependency(previousStep);
     return copy;
   }
