@@ -171,9 +171,10 @@ public class PipelineFactory {
       final PipelineObjectBase infrastructure) {
     final PipelineObjectBase obj = new PipelineObjectBase(config, id, "SqlActivity");
     setupActivity(id, obj, infrastructure);
-    final String query = "UNLOAD ('" + sql + "') TO '" + AwsUtils.uri(dest)
-    + "/' WITH CREDENTIALS AS " + getCredentials() + " delimiter '\\t' null as '\\\\N' GZIP;";
-    obj.set("script", query);
+    //    final String query = "UNLOAD ('" + sql + "') TO '" + AwsUtils.uri(dest)
+    //    + "/' WITH CREDENTIALS AS " + getCredentials() + " DELIMITER '\\t' NULL '\\\\\\\\N' GZIP;";
+    //    obj.set("script", query);
+    obj.set("scriptUri", "s3://hdt-code/unload_identity.sql");
     obj.set("database", database);
     return obj;
   }

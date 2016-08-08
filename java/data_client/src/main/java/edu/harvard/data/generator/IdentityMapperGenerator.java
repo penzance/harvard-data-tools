@@ -149,7 +149,11 @@ public class IdentityMapperGenerator {
     // values.
     if (identifierType != IdentifierType.Other) {
       final String getter = JavaBindingGenerator.javaGetter(columnName);
-      out.println("    if (phase0." + getter + "() != null) {");
+      String condition = "phase0." + getter + "() != null";
+      if (identifierType.getType().equals(String.class)) {
+        condition += " && phase0." + getter + "().length() > 0";
+      }
+      out.println("    if ("+ condition + ") {");
       out.println("      $id.set(IdentifierType." + identifierType.toString() + ", phase0." + getter
           + "());");
       out.println("      populated = true;");
