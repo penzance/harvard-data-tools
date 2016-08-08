@@ -160,9 +160,9 @@ public class Phase1PipelineSetup {
   }
 
   private PipelineObjectBase unloadIdentity(final PipelineObjectBase previousStep) {
-    final String sql = "SELECT * FROM pii.identity_map";
-    final PipelineObjectBase unloadId = factory.getUnloadActivity("UnloadIdentity", sql,
-        unloadIdentityS3, pipeline.getRedshift(), pipeline.getEmr());
+    final S3ObjectId script = AwsUtils.key(workingDir, "code", config.getRedshiftUnloadScript());
+    final PipelineObjectBase unloadId = factory.getUnloadActivity("UnloadIdentity", script,
+        pipeline.getRedshift(), pipeline.getEmr());
     unloadId.addDependency(previousStep);
     return unloadId;
   }

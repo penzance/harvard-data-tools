@@ -101,6 +101,7 @@ public class DataConfig {
   private final String dataToolsJar;
   private final String identityRedshiftSchema;
   private final String identityRedshiftLoadScript;
+  private final String redshiftUnloadScript;
   private final String fullTextScriptFile;
   private final String s3ToHdfsManifestFile;
   private final String redshiftLoadScript;
@@ -122,6 +123,7 @@ public class DataConfig {
     }
     this.dataToolsJar = "data_tools.jar";
     this.identityRedshiftLoadScript = "s3_to_redshift_identity_loader.sql";
+    this.redshiftUnloadScript = "redshift_unload.sql";
     this.redshiftLoadScript = "s3_to_redshift_loader.sql";
     this.s3ToHdfsManifestFile = "s3_to_hdfs_manifest.gz";
     this.fullTextScriptFile = "full_text_copy.sh";
@@ -631,5 +633,8 @@ public class DataConfig {
     return identityOracleView;
   }
 
+  public String getRedshiftUnloadScript() {
+    return redshiftUnloadScript;
+  }
 
 }
