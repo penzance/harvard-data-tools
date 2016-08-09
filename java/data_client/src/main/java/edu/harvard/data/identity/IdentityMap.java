@@ -22,8 +22,21 @@ import edu.harvard.data.schema.extension.ExtensionSchemaTable;
 //     huid VARCHAR(255),
 //     xid VARCHAR(255),
 //     canvas_id BIGINT,
-//     canvas_data_id BIGINT
+//     canvas_data_id BIGINT,
+//     eppn VARCHAR(255),
+//     active_directory_id VARCHAR(255)
 // );
+//
+// CREATE TABLE pii.name (
+//     research_id VARCHAR(255),
+//     name VARCHAR(255)
+//  );
+//
+// CREATE TABLE pii.email (
+//     research_id VARCHAR(255),
+//     email VARCHAR(255)
+// );
+
 /**
  * This class represents an entry in the environment-scoped
  * <code>identity_map</code> table. It contains the cumulative information that
@@ -68,7 +81,8 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
    * Create an identity map, reading is initial values from a CSV record.
    *
    * @param format
-   *          this parameter is ignored by this {@code DataTable} implementation.
+   *          this parameter is ignored by this {@code DataTable}
+   *          implementation.
    * @param record
    *          a properly-formatted {@link CSVRecord} that contains String values
    *          for each identifier (any of which may be null, apart from the
@@ -79,14 +93,49 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     populate(record);
   }
 
-  public static DataSchemaTable getIdentityMapTable() {
-    final List<DataSchemaColumn> columns = new ArrayList<DataSchemaColumn>();
+  public static Map<String, DataSchemaTable> getIdentityMapTables() {
+    final Map<String, DataSchemaTable> tables = new HashMap<String, DataSchemaTable>();
+    List<DataSchemaColumn> columns = new ArrayList<DataSchemaColumn>();
     columns.add(new ExtensionSchemaColumn("research_id", "", "varchar", 255));
     columns.add(new ExtensionSchemaColumn("huid", "", "varchar", 255));
     columns.add(new ExtensionSchemaColumn("xid", "", "varchar", 255));
     columns.add(new ExtensionSchemaColumn("canvas_id", "", "bigint", 0));
     columns.add(new ExtensionSchemaColumn("canvas_data_id", "", "bigint", 0));
-    return new ExtensionSchemaTable("identity_map", columns);
+    columns.add(new ExtensionSchemaColumn("eppn", "", "varchar", 255));
+    columns.add(new ExtensionSchemaColumn("active_directory_id", "", "varchar", 255));
+    tables.put("identity_map", new ExtensionSchemaTable("identity_map", columns));
+
+    columns = new ArrayList<DataSchemaColumn>();
+    columns.add(new ExtensionSchemaColumn("research_id", "", "varchar", 255));
+    columns.add(new ExtensionSchemaColumn("name", "", "varchar", 255));
+    tables.put("name", new ExtensionSchemaTable("name", columns));
+
+    columns = new ArrayList<DataSchemaColumn>();
+    columns.add(new ExtensionSchemaColumn("research_id", "", "varchar", 255));
+    columns.add(new ExtensionSchemaColumn("email", "", "varchar", 255));
+    tables.put("email", new ExtensionSchemaTable("email", columns));
+
+    return tables;
+  }
+
+  public static List<String> getPrimaryKeyFields(final String tableName) {
+    final List<String> keys = new ArrayList<String>();
+    switch (tableName) {
+    case "identity_map":
+      keys.add("research_id");
+      break;
+    case "name":
+      keys.add("research_id");
+      keys.add("name");
+      break;
+    case "email":
+      keys.add("research_id");
+      keys.add("email");
+      break;
+    default:
+      throw new RuntimeException("Unknown identity table " + tableName);
+    }
+    return keys;
   }
 
   private void populate(final CSVRecord record) {
@@ -107,6 +156,12 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     if ($canvasDataId != null && $canvasDataId.length() > 0) {
       identities.put(IdentifierType.CanvasDataID, Long.valueOf($canvasDataId));
     }
+    if (record.get(5) != null) {
+      identities.put(IdentifierType.EPPN, record.get(5));
+    }
+    if (record.get(6) != null) {
+      identities.put(IdentifierType.ActiveDirectoryID, record.get(6));
+    }
   }
 
   /**
@@ -126,13 +181,13 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
   public IdentityMap(final ResultSet resultSet) throws SQLException {
     this();
     if (resultSet.getString("research_id") != null) {
-      identities.put(IdentifierType.ResearchUUID, "research_id");
+      identities.put(IdentifierType.ResearchUUID, resultSet.getString("research_id"));
     }
     if (resultSet.getString("huid") != null) {
-      identities.put(IdentifierType.HUID, "huid");
+      identities.put(IdentifierType.HUID, resultSet.getString("huid"));
     }
     if (resultSet.getString("xid") != null) {
-      identities.put(IdentifierType.XID, "xid");
+      identities.put(IdentifierType.XID, resultSet.getString("xid"));
     }
     final long canvasId = resultSet.getLong("canvas_id");
     if (!resultSet.wasNull()) {
@@ -142,16 +197,33 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     if (!resultSet.wasNull()) {
       identities.put(IdentifierType.CanvasDataID, canvasDataId);
     }
+    if (resultSet.getString("eppn") != null) {
+      identities.put(IdentifierType.EPPN, resultSet.getString("eppn"));
+    }
+    if (resultSet.getString("eppn") != null) {
+      identities.put(IdentifierType.ActiveDirectoryID, resultSet.getString("active_directory_id"));
+    }
+
   }
 
   @Override
   public List<Object> getFieldsAsList(final TableFormat formatter) {
     final List<Object> fields = new ArrayList<Object>();
-    fields.add(identities.get(IdentifierType.ResearchUUID));
-    fields.add(identities.get(IdentifierType.HUID));
-    fields.add(identities.get(IdentifierType.XID));
-    fields.add(identities.get(IdentifierType.CanvasID));
-    fields.add(identities.get(IdentifierType.CanvasDataID));
+    fields.add(identities.containsKey(IdentifierType.ResearchUUID)
+        ? identities.get(IdentifierType.ResearchUUID) : formatter.getCsvFormat().getNullString());
+    fields.add(identities.containsKey(IdentifierType.HUID) ? identities.get(IdentifierType.HUID)
+        : formatter.getCsvFormat().getNullString());
+    fields.add(identities.containsKey(IdentifierType.XID) ? identities.get(IdentifierType.XID)
+        : formatter.getCsvFormat().getNullString());
+    fields.add(identities.containsKey(IdentifierType.CanvasID)
+        ? identities.get(IdentifierType.CanvasID) : formatter.getCsvFormat().getNullString());
+    fields.add(identities.containsKey(IdentifierType.CanvasDataID)
+        ? identities.get(IdentifierType.CanvasDataID) : formatter.getCsvFormat().getNullString());
+    fields.add(identities.containsKey(IdentifierType.EPPN) ? identities.get(IdentifierType.EPPN)
+        : formatter.getCsvFormat().getNullString());
+    fields.add(identities.containsKey(IdentifierType.ActiveDirectoryID)
+        ? identities.get(IdentifierType.ActiveDirectoryID)
+            : formatter.getCsvFormat().getNullString());
     return fields;
   }
 
@@ -163,6 +235,8 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     fields.add(IdentifierType.XID.getFieldName());
     fields.add(IdentifierType.CanvasID.getFieldName());
     fields.add(IdentifierType.CanvasDataID.getFieldName());
+    fields.add(IdentifierType.EPPN.getFieldName());
+    fields.add(IdentifierType.ActiveDirectoryID.getFieldName());
     return fields;
   }
 
@@ -210,22 +284,20 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
   @Override
   public Map<String, Object> getFieldsAsMap() {
     final Map<String, Object> fields = new HashMap<String, Object>();
-    if (identities.containsKey(IdentifierType.ResearchUUID)) {
-      fields.put("research_id", identities.get(IdentifierType.ResearchUUID));
-    }
-    if (identities.containsKey(IdentifierType.HUID)) {
-      fields.put("huid", identities.get(IdentifierType.HUID));
-    }
-    if (identities.containsKey(IdentifierType.XID)) {
-      fields.put("xid", identities.get(IdentifierType.XID));
-    }
-    if (identities.containsKey(IdentifierType.CanvasID)) {
-      fields.put("canvas_id", identities.get(IdentifierType.CanvasID));
-    }
-    if (identities.containsKey(IdentifierType.CanvasDataID)) {
-      fields.put("canvas_data_id", identities.get(IdentifierType.CanvasDataID));
+    for (final IdentifierType id : IdentifierType.values()) {
+      if (identities.containsKey(id)) {
+        fields.put(id.getFieldName(), identities.get(id));
+      }
     }
     return fields;
+  }
+
+  public void setFieldsAsMap(final Map<String, Object> map) {
+    for (final IdentifierType id : IdentifierType.values()) {
+      if (id != IdentifierType.Other) {
+        identities.put(id, map.get(id.getFieldName()));
+      }
+    }
   }
 
   public Object get(final IdentifierType idType) {
@@ -235,4 +307,5 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
   public void set(final IdentifierType idType, final Object value) {
     identities.put(idType, value);
   }
+
 }

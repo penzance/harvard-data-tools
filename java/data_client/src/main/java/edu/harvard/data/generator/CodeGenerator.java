@@ -218,6 +218,9 @@ public abstract class CodeGenerator {
       final InputTableIndex dataIndex = InputTableIndex.read(aws, dataIndexLocation);
       dataIndex.addNewlyGeneratedTables(spec.getSchemaPhases());
 
+      log.info("Generating Redshift unload script in " + codeDir);
+      new RedshiftUnloadGenerator(codeDir, config, workingDir).generate();
+
       log.info("Generating S3 to HDFS copy manifest in " + codeDir);
       new S3ToHdfsManifestGenerator(codeDir, config, dataIndex).generate();
 

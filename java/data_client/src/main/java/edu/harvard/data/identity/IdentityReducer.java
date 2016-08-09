@@ -3,13 +3,16 @@ package edu.harvard.data.identity;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopUtilities;
@@ -102,9 +105,12 @@ public class IdentityReducer<T> {
    *          all identity values calculated by the various identity mapper
    *          jobs. The {@code IdentityMap} objects are wrapped in
    *          Hadoop-friendly {@link HadoopIdentityKey} objects.
-   * @param context
-   *          the Hadoop context for this job to which the resulting identity
-   *          object will be written.
+   * @param outputs
+   *          a MultipleOutputs instance that is configured to allow writing
+   *          values to the identity map file, as well as any other identity
+   *          outputs such as names or e-mail addresses. The names out of the
+   *          output streams (other than identitymap) will match the result of
+   *          {@link IdentifierType#getFieldName}.
    *
    * @throws IOException
    *           if an error occurs while outputting the identity object to the
@@ -113,9 +119,10 @@ public class IdentityReducer<T> {
    *           if interrupted while writing to the context.
    */
   public void reduce(final T mainIdValue, final Iterable<HadoopIdentityKey> values,
-      final Reducer<?, ?, Text, NullWritable>.Context context)
-          throws IOException, InterruptedException {
+      final MultipleOutputs<Text, NullWritable> outputs) throws IOException, InterruptedException {
     final IdentityMap id;
+    final Set<String> emails = new HashSet<String>();
+    final Set<String> names = new HashSet<String>();
     if (identities.containsKey(mainIdValue)) {
       id = identities.get(mainIdValue);
     } else {
@@ -132,12 +139,34 @@ public class IdentityReducer<T> {
           }
         }
       }
+      final String email = (String) value.getIdentityMap().get(IdentifierType.EmailAddress);
+      if (email != null) {
+        emails.add(email);
+      }
+      final String name = (String) value.getIdentityMap().get(IdentifierType.Name);
+      if (name != null) {
+        names.add(name);
+      }
     }
+    outputResult("identitymap", outputs, id.getFieldsAsList(format).toArray());
+    for (final String email : emails) {
+      outputResult(IdentifierType.EmailAddress.getFieldName(), outputs,
+          id.get(IdentifierType.ResearchUUID), email);
+    }
+    for (final String name : names) {
+      outputResult(IdentifierType.Name.getFieldName(), outputs, id.get(IdentifierType.ResearchUUID),
+          name);
+    }
+  }
+
+  private void outputResult(final String outputName,
+      final MultipleOutputs<Text, NullWritable> outputs, final Object... fields)
+          throws IOException, InterruptedException {
     final StringWriter writer = new StringWriter();
     try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
-      printer.printRecord(id.getFieldsAsList(format));
+      printer.printRecord(fields);
     }
     final Text csvText = new Text(writer.toString().trim());
-    context.write(csvText, NullWritable.get());
+    outputs.write(outputName, csvText, NullWritable.get(), outputName + "/" + outputName);
   }
 }

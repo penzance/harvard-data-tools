@@ -146,7 +146,7 @@ public class DumpManager {
     final InputTableIndex dataIndex = new InputTableIndex();
     log.info("Getting dump index for " + dumpDir);
     for (final S3ObjectId tableDir : aws.listDirectories(dumpDir)) {
-      if (!tableDir.getKey().endsWith("/identity_map")) {
+      if (!tableDir.getKey().contains("/identity_map")) {
         if (!aws.isFile(AwsUtils.key(tableDir, "empty_file"))) {
           final String tableName = tableDir.getKey()
               .substring(tableDir.getKey().lastIndexOf("/") + 1);

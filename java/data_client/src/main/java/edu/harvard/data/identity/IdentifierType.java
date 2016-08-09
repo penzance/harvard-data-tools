@@ -40,7 +40,17 @@ public enum IdentifierType {
 
   CanvasDataID("canvas_data_id", "", Long.class),
 
-  Other("other", "", Void.class);
+  EPPN("eppn", "", String.class),
+
+  ActiveDirectoryID("active_directory_id", "", String.class),
+
+  EmailAddress("email",
+      "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$",
+      String.class),
+
+  Name("name", ".*", String.class),
+
+  Other("other", ".*", Void.class);
 
   private String fieldName;
   private Pattern pattern;
@@ -69,6 +79,16 @@ public enum IdentifierType {
     }
     return fieldName;
   }
+
+  public static IdentifierType fromFieldName(final String fieldName) {
+    for (final IdentifierType id : values()) {
+      if (id.getFieldName().equals(fieldName)) {
+        return id;
+      }
+    }
+    return valueOf(fieldName);
+  }
+
 
   /**
    * Get a regular expression pattern by which this String-typed enumeration

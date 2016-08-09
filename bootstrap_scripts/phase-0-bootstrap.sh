@@ -22,6 +22,10 @@ then
     cd -
 fi
 
+# Install the Oracle JDBC drivers
+aws s3 cp s3://hdt-code/ojdbc7.jar /home/ec2-user/ojdbc7.jar
+mvn install:install-file -DgroupId=com.oracle -DartifactId=ojdbc7 -Dversion=12.1.0.1 -Dpackaging=jar -Dfile=/home/ec2-user/ojdbc7.jar -DgeneratePom=true
+
 # clone our repo
 git clone -b $GIT_BRANCH https://github.com/penzance/harvard-data-tools.git $HARVARD_DATA_TOOLS_BASE
 

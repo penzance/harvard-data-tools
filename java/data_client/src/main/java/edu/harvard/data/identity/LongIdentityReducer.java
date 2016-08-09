@@ -6,6 +6,7 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 
 /**
  * Definition of the general (i.e. not table-specific) reducer job for a dataset
@@ -20,6 +21,7 @@ public class LongIdentityReducer
 extends Reducer<LongWritable, HadoopIdentityKey, Text, NullWritable> {
 
   private final IdentityReducer<Long> identityReducer;
+  private MultipleOutputs<Text, NullWritable> outputs;
 
   public LongIdentityReducer() {
     this.identityReducer = new IdentityReducer<Long>();
@@ -33,6 +35,7 @@ extends Reducer<LongWritable, HadoopIdentityKey, Text, NullWritable> {
   protected void setup(final Context context) throws IOException, InterruptedException {
     super.setup(context);
     identityReducer.setup(context);
+    outputs = new MultipleOutputs<Text, NullWritable>(context);
   }
 
   /**
@@ -43,6 +46,6 @@ extends Reducer<LongWritable, HadoopIdentityKey, Text, NullWritable> {
   public void reduce(final LongWritable key, final Iterable<HadoopIdentityKey> values,
       final Context context) throws IOException, InterruptedException {
     final Long mainIdValue = key.get();
-    identityReducer.reduce(mainIdValue, values, context);
+    identityReducer.reduce(mainIdValue, values, outputs);
   }
 }

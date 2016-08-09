@@ -76,7 +76,7 @@ public class Phase1PostVerifier {
     log.info("Verify directory: " + verifyDir);
 
     new PostVerifyIdentityMap(hadoopConfig, hdfsService, inputDir + "/identity_map",
-        outputDir + "/identity_map", format).verify();
+        outputDir + "/identity_map/identitymap", format).verify();
     updateInterestingTables();
 
     for (final HadoopJob job : setupJobs()) {
@@ -93,7 +93,7 @@ public class Phase1PostVerifier {
   private void updateInterestingTables() throws IOException {
     final FileSystem fs = FileSystem.get(hdfsService, hadoopConfig);
     final Map<Long, IdentityMap> identities = new HashMap<Long, IdentityMap>();
-    for (final Path path : hadoopUtils.listFiles(hdfsService, outputDir + "/identity_map")) {
+    for (final Path path : hadoopUtils.listFiles(hdfsService, outputDir + "/identity_map/identitymap")) {
       try (HdfsTableReader<IdentityMap> in = new HdfsTableReader<IdentityMap>(IdentityMap.class,
           format, fs, path)) {
         for (final IdentityMap id : in) {

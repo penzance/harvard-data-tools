@@ -166,14 +166,11 @@ public class PipelineFactory {
     return obj;
   }
 
-  public PipelineObjectBase getUnloadActivity(final String id, final String sql,
-      final S3ObjectId dest, final PipelineObjectBase database,
-      final PipelineObjectBase infrastructure) {
+  public PipelineObjectBase getUnloadActivity(final String id, final S3ObjectId scriptLocation,
+      final PipelineObjectBase database, final PipelineObjectBase infrastructure) {
     final PipelineObjectBase obj = new PipelineObjectBase(config, id, "SqlActivity");
     setupActivity(id, obj, infrastructure);
-    final String query = "UNLOAD ('" + sql + "') TO '" + AwsUtils.uri(dest)
-    + "/' WITH CREDENTIALS AS " + getCredentials() + " delimiter '\\t' GZIP;";
-    obj.set("script", query);
+    obj.set("scriptUri", AwsUtils.uri(scriptLocation));
     obj.set("database", database);
     return obj;
   }
@@ -277,7 +274,8 @@ public class PipelineFactory {
       throw new RuntimeException(e);
     }
     final String failSubj = "Pipeline " + runId + " Failed";
-    obj.set("onFail", getSns(id + "FailureSnsAlert", failSubj, failMsg, config.getCompletionSnsArn()));
+    obj.set("onFail",
+        getSns(id + "FailureSnsAlert", failSubj, failMsg, config.getCompletionSnsArn()));
 
     allObjects.add(obj);
   }
@@ -298,11 +296,6 @@ public class PipelineFactory {
       return path.substring("hdfs://".length());
     }
     return path;
-  }
-
-  private String getCredentials() {
-    return "'aws_access_key_id=" + config.getAwsKeyId() + ";aws_secret_access_key="
-        + config.getAwsSecretKey() + "'";
   }
 
   public List<PipelineObject> getAllObjects() {

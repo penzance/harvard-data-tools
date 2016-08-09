@@ -7,6 +7,9 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
 
@@ -46,9 +49,14 @@ public class S3ToRedshiftLoaderGenerator {
   }
 
   private void generateIdentityRedshiftLoaderFile(final PrintStream out, final SchemaPhase phase) {
-    final DataSchemaTable table = IdentityMap.getIdentityMapTable();
-    final String columnList = getColumnList(table);
-    outputPartialTableUpdate(out, table, config.getIdentityRedshiftSchema(), columnList);
+    final Map<String, DataSchemaTable> tables = IdentityMap.getIdentityMapTables();
+    for (final String tableName : tables.keySet()) {
+      final DataSchemaTable table = tables.get(tableName);
+      final String columnList = getColumnList(table);
+      final List<String> joinFields = IdentityMap.getPrimaryKeyFields(tableName);
+      outputPartialTableUpdate(out, table, config.getIdentityRedshiftSchema(), columnList,
+          getLocation("identity_map/" + table.getTableName().replaceAll("_", "")), joinFields);
+    }
   }
 
   private void generateRedshiftLoaderFile(final PrintStream out, final SchemaPhase phase) {
@@ -65,7 +73,9 @@ public class S3ToRedshiftLoaderGenerator {
 
         if (!table.isTemporary()) {
           if (dataIndex.isPartial(tableName)) {
-            outputPartialTableUpdate(out, table, config.getDatasetName(), columnList);
+            final String joinField = table.getColumns().get(0).getName();
+            outputPartialTableUpdate(out, table, config.getDatasetName(), columnList,
+                getLocation(table.getTableName()), Collections.singletonList(joinField));
           } else {
             outputTableOverwrite(out, table, config.getDatasetName(), columnList);
           }
@@ -92,10 +102,10 @@ public class S3ToRedshiftLoaderGenerator {
   }
 
   private void outputPartialTableUpdate(final PrintStream out, final DataSchemaTable table,
-      final String redshiftSchema, final String columnList) {
+      final String redshiftSchema, final String columnList, final String s3Location,
+      final List<String> joinFields) {
     final String tableName = redshiftSchema + "." + table.getTableName();
-    final String stageTableName = table.getTableName() + "_stage";
-    final String joinField = table.getColumns().get(0).getName();
+    final String stageTableName = redshiftSchema + "_" + table.getTableName() + "_stage";
 
     out.println("------- Table " + tableName + "-------");
     // Create a stage table based on the structure of the real table"
@@ -103,17 +113,23 @@ public class S3ToRedshiftLoaderGenerator {
     out.println("CREATE TEMPORARY TABLE " + stageTableName + " (LIKE " + tableName + ");");
 
     // Copy the final incoming data into final the stage table
-    out.println(
-        "COPY " + stageTableName + " " + columnList + " FROM " + getLocation(table.getTableName())
+    out.println("COPY " + stageTableName + " " + columnList + " FROM " + s3Location
         + " CREDENTIALS " + getCredentials() + " DELIMITER '\\t' TRUNCATECOLUMNS GZIP;");
 
     // Use an inner join with the staging table to delete the rows from the
     // target table that are being updated.
     // Put the delete and insert operations in a single transaction block so
     // that if there is a problem, everything will be rolled back.
+
+    final List<String> joinConditions = new ArrayList<String>();
+    for (final String joinField : joinFields) {
+      joinConditions.add(tableName + "." + joinField + " = " + stageTableName + "." + joinField);
+    }
+    final String joinCondition = StringUtils.join(joinConditions, " AND ");
+
     out.println("BEGIN TRANSACTION;");
-    out.println("DELETE FROM " + tableName + " USING " + stageTableName + " WHERE " + tableName
-        + "." + joinField + " = " + stageTableName + "." + joinField + ";");
+    out.println(
+        "DELETE FROM " + tableName + " USING " + stageTableName + " WHERE " + joinCondition + ";");
 
     // Insert all of the rows from the staging table.
     out.println("INSERT INTO " + tableName + " SELECT * FROM " + stageTableName + ";");

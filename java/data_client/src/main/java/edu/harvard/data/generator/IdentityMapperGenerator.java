@@ -131,19 +131,14 @@ public class IdentityMapperGenerator {
     out.println("    if (phase0." + getter + "() != null) {");
     out.println("      " + fieldType + " " + fieldName + " = phase0." + getter + "();");
     for (final IdentifierType identifierType : identities.get(columnName)) {
-      if (identifierType == IdentifierType.Other) {
-        // We only strip out "Other" fields; it doesn't make sense to specify a
-        // column as ["Other", "HUID"], for example.
-        throw new VerificationException(
-            "Table: " + table.getTableName() + " column: " + columnName + ". Can't use "
-                + IdentifierType.Other + " type in combination with any other identifier");
+      if (identifierType != IdentifierType.Other) {
+        out.println("      if (IdentifierType." + identifierType + ".getPattern().matcher("
+            + fieldName + ").matches()) {");
+        out.println("        $id.set(IdentifierType." + identifierType.toString() + ", phase0."
+            + getter + "());");
+        out.println("        populated = true;");
+        out.println("      }");
       }
-      out.println("      if (IdentifierType." + identifierType + ".getPattern().matcher("
-          + fieldName + ").matches()) {");
-      out.println("        $id.set(IdentifierType." + identifierType.toString() + ", phase0."
-          + getter + "());");
-      out.println("        populated = true;");
-      out.println("      }");
     }
     out.println("    }");
   }
@@ -154,7 +149,11 @@ public class IdentityMapperGenerator {
     // values.
     if (identifierType != IdentifierType.Other) {
       final String getter = JavaBindingGenerator.javaGetter(columnName);
-      out.println("    if (phase0." + getter + "() != null) {");
+      String condition = "phase0." + getter + "() != null";
+      if (identifierType.getType().equals(String.class)) {
+        condition += " && phase0." + getter + "().length() > 0";
+      }
+      out.println("    if ("+ condition + ") {");
       out.println("      $id.set(IdentifierType." + identifierType.toString() + ", phase0." + getter
           + "());");
       out.println("      populated = true;");
