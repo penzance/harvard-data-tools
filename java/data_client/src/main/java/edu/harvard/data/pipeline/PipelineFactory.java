@@ -298,11 +298,6 @@ public class PipelineFactory {
     return path;
   }
 
-  private String getCredentials() {
-    return "'aws_access_key_id=" + config.getAwsKeyId() + ";aws_secret_access_key="
-        + config.getAwsSecretKey() + "'";
-  }
-
   public List<PipelineObject> getAllObjects() {
     final List<PipelineObject> objects = new ArrayList<PipelineObject>();
     for (final PipelineObjectBase obj : allObjects) {
