@@ -138,6 +138,7 @@ public class HuidEppnLookup {
               throw new RuntimeException("Query returned unexpected key " + knownValue);
             }
             final IdentityMap id = unknownIdentities.get(knownValue);
+            log.info("Updating ID with known value: " + knownValue + ". ID map: " + id);
             id.set(unknownField, unknownValue);
             id.set(IdentifierType.ActiveDirectoryID, rs.getString("adid"));
           }
