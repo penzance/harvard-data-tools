@@ -81,9 +81,11 @@ public class HuidEppnLookup {
         final String huid = (String) id.get(IdentifierType.HUID);
         final String eppn = (String) id.get(IdentifierType.EPPN);
         if (huid != null && eppn == null) {
+          log.info("Unknown EPPN for HUID " + huid);
           unknownEppn.put(huid, id);
         }
         if (eppn != null && huid == null) {
+          log.info("Unknown HUID for EPPN " + huid);
           unknownHuid.put(eppn, id);
         }
       }
