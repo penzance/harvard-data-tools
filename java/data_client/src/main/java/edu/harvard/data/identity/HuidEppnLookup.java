@@ -129,8 +129,8 @@ public class HuidEppnLookup {
 
     try (PreparedStatement statement = connection.prepareStatement(queryString)) {
       for (int i = start; i < end; i++) {
-        log.info("Adding query parameter " + identities.get(i).get(knownField));
-        statement.setString(i - start + 1, (String) identities.get(i).get(knownField));
+        log.info("Adding query parameter " + idMaps.get(i).get(knownField));
+        statement.setString(i - start + 1, (String) idMaps.get(i).get(knownField));
       }
       try (final ResultSet rs = statement.executeQuery();) {
         for (int i = start; i < end; i++) {
