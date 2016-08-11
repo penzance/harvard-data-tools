@@ -110,7 +110,6 @@ public class HuidEppnLookup {
       final int end = Math.min(start + LOOKUP_CHUNK_SIZE, idMaps.size());
       populateUnknownIdentities(idMaps, unknownIdentities, start, end, knownField, unknownField,
           connection);
-      return;
     }
   }
 
@@ -119,6 +118,8 @@ public class HuidEppnLookup {
       final IdentifierType knownField, final IdentifierType unknownField,
       final Connection connection) throws DataConfigurationException, SQLException {
     log.info("Known: " + knownField + ", unknown: " + unknownField);
+    log.info("Fetching indices " + start + " to " + (end - 1));
+    log.info("unknownIdentities: " + unknownIdentities);
     final String view = config.getIdentityOracleSchema() + "." + config.getIdentityOracleView();
     String queryString = "SELECT huid,eppn,adid FROM " + view + " WHERE "
         + knownField.getFieldName() + " IN (";
@@ -129,7 +130,6 @@ public class HuidEppnLookup {
 
     try (PreparedStatement statement = connection.prepareStatement(queryString)) {
       for (int i = start; i < end; i++) {
-        log.info("Adding query parameter " + idMaps.get(i).get(knownField));
         statement.setString(i - start + 1, (String) idMaps.get(i).get(knownField));
       }
       try (final ResultSet rs = statement.executeQuery();) {
@@ -137,12 +137,10 @@ public class HuidEppnLookup {
           while (rs.next()) {
             final String knownValue = rs.getString(knownField.getFieldName());
             final String unknownValue = rs.getString(unknownField.getFieldName());
-            log.info("Known value: " + knownValue + ", unknownValue: " + unknownValue);
             if (knownValue == null) {
               throw new RuntimeException("Query returned unexpected key " + knownValue);
             }
             final IdentityMap id = unknownIdentities.get(knownValue);
-            log.info("Updating ID with known value: " + knownValue + ". ID map: " + id);
             id.set(unknownField, unknownValue);
             id.set(IdentifierType.ActiveDirectoryID, rs.getString("adid"));
           }
