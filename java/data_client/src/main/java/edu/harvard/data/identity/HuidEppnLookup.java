@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
@@ -22,7 +24,10 @@ import edu.harvard.data.io.TableReader;
 import edu.harvard.data.io.TableWriter;
 
 public class HuidEppnLookup {
-  private static final int LOOKUP_CHUNK_SIZE = 2;
+
+  private static final Logger log = LogManager.getLogger();
+
+  private static final int LOOKUP_CHUNK_SIZE = 100;
   private final DataConfig config;
   private final ArrayList<IdentityMap> identities;
   private final HashMap<String, IdentityMap> unknownEppn;
@@ -44,6 +49,8 @@ public class HuidEppnLookup {
   public void expandIdentities(final URI[] inputPaths, final URI outputPath)
       throws SQLException, DataConfigurationException, IOException {
     readIdentities(inputPaths);
+    log.info("Found " + unknownEppn.size() + " unknown EPPNs and " + unknownHuid.size()
+    + " unknown HUIDs");
     try (Connection connection = establishConnection()) {
       if (!unknownEppn.isEmpty()) {
         expand(unknownEppn, IdentifierType.HUID, IdentifierType.EPPN, connection);

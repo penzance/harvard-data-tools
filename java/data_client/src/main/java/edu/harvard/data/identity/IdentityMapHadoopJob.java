@@ -95,6 +95,7 @@ public class IdentityMapHadoopJob {
   }
 
   private void lookupEppnAndHuid(final DataConfig config2) throws SQLException, DataConfigurationException, IOException {
+    log.info("Looking up any unknown EPPNs or HUIDs");
     final TableFormat format = new FormatLibrary().getFormat(config.getPipelineFormat());
     final HuidEppnLookup lookup = new HuidEppnLookup(config, format);
 
