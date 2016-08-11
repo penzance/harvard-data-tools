@@ -110,6 +110,7 @@ public class HuidEppnLookup {
       final int end = Math.min(start + LOOKUP_CHUNK_SIZE, idMaps.size());
       populateUnknownIdentities(idMaps, unknownIdentities, start, end, knownField, unknownField,
           connection);
+      return;
     }
   }
 
