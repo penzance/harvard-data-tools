@@ -76,19 +76,19 @@ public class IdentityMapHadoopJob {
   protected void run() throws IOException, LeaseRenewalException, SQLException, DataConfigurationException {
     final LeaseRenewalThread leaseThread = LeaseRenewalThread.setup(config.getLeaseDynamoTable(),
         config.getIdentityLease(), runId, config.getIdentityLeaseLengthSeconds());
-    //    final IdentifierType mainIdentifier = config.getMainIdentifier();
-    //    hadoopConfig.set("format", config.getPipelineFormat().toString());
-    //    hadoopConfig.set("mainIdentifier", mainIdentifier.toString());
-    //
-    //    final Job job = getIdentityMapJob(config);
-    //    addInitialIdentityMapPaths(config, job);
-    //    configureMapperClasses(job);
-    //
-    //    try {
-    //      job.waitForCompletion(true);
-    //    } catch (ClassNotFoundException | InterruptedException e) {
-    //      throw new RuntimeException(e);
-    //    }
+    final IdentifierType mainIdentifier = config.getMainIdentifier();
+    hadoopConfig.set("format", config.getPipelineFormat().toString());
+    hadoopConfig.set("mainIdentifier", mainIdentifier.toString());
+
+    final Job job = getIdentityMapJob(config);
+    addInitialIdentityMapPaths(config, job);
+    configureMapperClasses(job);
+
+    try {
+      job.waitForCompletion(true);
+    } catch (ClassNotFoundException | InterruptedException e) {
+      throw new RuntimeException(e);
+    }
 
     lookupEppnAndHuid(config);
     leaseThread.checkLease();
