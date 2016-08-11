@@ -118,6 +118,7 @@ public class HuidEppnLookup {
       final Map<String, IdentityMap> unknownIdentities, final int start, final int end,
       final IdentifierType knownField, final IdentifierType unknownField,
       final Connection connection) throws DataConfigurationException, SQLException {
+    log.info("Known: " + knownField + ", unknown: " + unknownField);
     final String view = config.getIdentityOracleSchema() + "." + config.getIdentityOracleView();
     String queryString = "SELECT huid,eppn,adid FROM " + view + " WHERE "
         + knownField.getFieldName() + " IN (";
@@ -128,6 +129,7 @@ public class HuidEppnLookup {
 
     try (PreparedStatement statement = connection.prepareStatement(queryString)) {
       for (int i = start; i < end; i++) {
+        log.info("Adding query parameter " + identities.get(i).get(knownField));
         statement.setString(i - start + 1, (String) identities.get(i).get(knownField));
       }
       try (final ResultSet rs = statement.executeQuery();) {
@@ -135,10 +137,10 @@ public class HuidEppnLookup {
           while (rs.next()) {
             final String knownValue = rs.getString(knownField.getFieldName());
             final String unknownValue = rs.getString(unknownField.getFieldName());
+            log.info("Known value: " + knownValue + ", unknownValue: " + unknownValue);
             if (knownValue == null) {
               throw new RuntimeException("Query returned unexpected key " + knownValue);
             }
-            log.info("Unknown identities: " + unknownIdentities);
             final IdentityMap id = unknownIdentities.get(knownValue);
             log.info("Updating ID with known value: " + knownValue + ". ID map: " + id);
             id.set(unknownField, unknownValue);
