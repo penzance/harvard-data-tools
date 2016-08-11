@@ -313,6 +313,30 @@ public class DataConfig {
     return hdfsBase + phase;
   }
 
+  public String getPhase0IdMapPath() {
+    return getHdfsDir(0) + "/identity_map";
+  }
+
+  public String getPhase1IdMapPath() {
+    return getHdfsDir(1) + "/identity_map";
+  }
+
+  public String getPhase1TempIdMapOutput() {
+    return "tempidentitymap";
+  }
+
+  public String getPhase1IdMapOutput() {
+    return "identitymap";
+  }
+
+  public String getPhase1EmailOutput() {
+    return IdentifierType.EmailAddress.getFieldName();
+  }
+
+  public String getPhase1NameOutput() {
+    return IdentifierType.Name.getFieldName();
+  }
+
   public String getCreateHiveTables(final int phase) {
     return "phase_" + phase + "_create_tables.sh";
   }

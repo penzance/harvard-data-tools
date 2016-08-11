@@ -25,6 +25,7 @@ import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.io.CombinedTableReader;
 import edu.harvard.data.io.HdfsTableReader;
 import edu.harvard.data.io.TableReader;
+import edu.harvard.data.io.TableWriter;
 
 public class HadoopUtilities {
   private static final Logger log = LogManager.getLogger();
@@ -177,6 +178,13 @@ public class HadoopUtilities {
       readers.add(new HdfsTableReader<T>(tableType, format, fs, path));
     }
     return new CombinedTableReader<T>(readers);
+  }
+
+  public <T extends DataTable> TableWriter<T> getHdfsTableWriter(final Configuration config,
+      final URI outputPath, final TableFormat format, final Class<T> tableType) throws IOException {
+    final FileSystem fs = FileSystem.get(config);
+    final Path path = new Path(outputPath.toString());
+    return new TableWriter<T>(tableType, format, fs.create(path));
   }
 
   public List<Path> listHdfsFiles(final Configuration hadoopConfig, final Path path)

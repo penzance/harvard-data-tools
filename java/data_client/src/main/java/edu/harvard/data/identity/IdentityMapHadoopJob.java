@@ -1,7 +1,11 @@
 package edu.harvard.data.identity;
 
 import java.io.IOException;
+import java.net.URI;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
@@ -25,7 +29,9 @@ import edu.harvard.data.AwsUtils;
 import edu.harvard.data.CodeManager;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
+import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.HadoopUtilities;
+import edu.harvard.data.TableFormat;
 import edu.harvard.data.leases.LeaseRenewalException;
 import edu.harvard.data.leases.LeaseRenewalThread;
 import edu.harvard.data.pipeline.InputTableIndex;
@@ -35,7 +41,6 @@ public class IdentityMapHadoopJob {
 
   private final DataConfig config;
   private final String inputDir;
-  private final String outputDir;
   private final String runId;
   private final Configuration hadoopConfig;
   final HadoopUtilities hadoopUtils;
@@ -44,7 +49,7 @@ public class IdentityMapHadoopJob {
 
   public static void main(final String[] args)
       throws IOException, DataConfigurationException, LeaseRenewalException, ClassNotFoundException,
-      InstantiationException, IllegalAccessException {
+      InstantiationException, IllegalAccessException, SQLException {
     final String configPathString = args[0];
     final String runId = args[1];
     final String codeManagerClassName = args[2];
@@ -64,18 +69,77 @@ public class IdentityMapHadoopJob {
     this.dataIndex = dataIndex;
     this.runId = runId;
     this.inputDir = config.getHdfsDir(0);
-    this.outputDir = config.getHdfsDir(1);
     this.hadoopConfig = new Configuration();
     this.hadoopUtils = new HadoopUtilities();
   }
 
-  @SuppressWarnings("rawtypes")
-  protected void run() throws IOException, LeaseRenewalException {
+  protected void run() throws IOException, LeaseRenewalException, SQLException, DataConfigurationException {
     final LeaseRenewalThread leaseThread = LeaseRenewalThread.setup(config.getLeaseDynamoTable(),
         config.getIdentityLease(), runId, config.getIdentityLeaseLengthSeconds());
     final IdentifierType mainIdentifier = config.getMainIdentifier();
     hadoopConfig.set("format", config.getPipelineFormat().toString());
     hadoopConfig.set("mainIdentifier", mainIdentifier.toString());
+
+    final Job job = getIdentityMapJob(config);
+    addInitialIdentityMapPaths(config, job);
+    configureMapperClasses(job);
+
+    try {
+      job.waitForCompletion(true);
+    } catch (ClassNotFoundException | InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+
+    lookupEppnAndHuid(config);
+    leaseThread.checkLease();
+  }
+
+  private void lookupEppnAndHuid(final DataConfig config2) throws SQLException, DataConfigurationException, IOException {
+    final TableFormat format = new FormatLibrary().getFormat(config.getPipelineFormat());
+    final HuidEppnLookup lookup = new HuidEppnLookup(config, format);
+
+    final String idMapDir = config.getPhase1IdMapPath() + "/";
+
+    final Path inputDirPath = new Path(idMapDir + config.getPhase1TempIdMapOutput());
+    final List<URI> inputUris = new ArrayList<URI>();
+    for (final Path inputPath : hadoopUtils.listHdfsFiles(hadoopConfig, inputDirPath)) {
+      inputUris.add(inputPath.toUri());
+    }
+
+    final Path outputPath = new Path(idMapDir + config.getPhase1IdMapOutput());
+
+    lookup.expandIdentities(inputUris.toArray(new URI[] {}), outputPath.toUri());
+  }
+
+  @SuppressWarnings("rawtypes")
+  private void configureMapperClasses(final Job job) {
+    final Map<String, Class<? extends Mapper<Object, Text, ?, HadoopIdentityKey>>> allMapperClasses = codeManager
+        .getIdentityMapperClasses();
+    final Map<String, Class<? extends Mapper>> mapperClasses = new HashMap<String, Class<? extends Mapper>>();
+    for (final String table : allMapperClasses.keySet()) {
+      if (dataIndex.containsTable(table)) {
+        mapperClasses.put(table, allMapperClasses.get(table));
+      }
+    }
+    for (final String table : mapperClasses.keySet()) {
+      final Path path = new Path(inputDir + "/" + table + "/");
+      MultipleInputs.addInputPath(job, path, TextInputFormat.class, mapperClasses.get(table));
+      log.info("Adding mapper for path " + path);
+    }
+    FileOutputFormat.setOutputPath(job, new Path(config.getPhase1IdMapPath()));
+  }
+
+  private void addInitialIdentityMapPaths(final DataConfig config2, final Job job)
+      throws IllegalArgumentException, IOException {
+    for (final Path path : hadoopUtils.listHdfsFiles(hadoopConfig,
+        new Path(config.getPhase0IdMapPath()))) {
+      log.info("Adding identity file " + path + " to map job cache");
+      job.addCacheFile(path.toUri());
+    }
+  }
+
+  private Job getIdentityMapJob(final DataConfig config) throws IOException {
+    final IdentifierType mainIdentifier = config.getMainIdentifier();
     final Job job = Job.getInstance(hadoopConfig, "identity-map");
     job.setJarByClass(IdentityMapHadoopJob.class);
     job.setOutputKeyClass(Text.class);
@@ -93,38 +157,13 @@ public class IdentityMapHadoopJob {
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
 
-    MultipleOutputs.addNamedOutput(job, "identitymap", TextOutputFormat.class, Text.class,
-        NullWritable.class);
-    MultipleOutputs.addNamedOutput(job, IdentifierType.EmailAddress.getFieldName(),
-        TextOutputFormat.class, Text.class, NullWritable.class);
-    MultipleOutputs.addNamedOutput(job, IdentifierType.Name.getFieldName(), TextOutputFormat.class,
+    MultipleOutputs.addNamedOutput(job, config.getPhase1IdMapOutput(), TextOutputFormat.class,
+        Text.class, NullWritable.class);
+    MultipleOutputs.addNamedOutput(job, config.getPhase1EmailOutput(), TextOutputFormat.class,
+        Text.class, NullWritable.class);
+    MultipleOutputs.addNamedOutput(job, config.getPhase1NameOutput(), TextOutputFormat.class,
         Text.class, NullWritable.class);
 
-    for (final Path path : hadoopUtils.listHdfsFiles(hadoopConfig,
-        new Path(inputDir + "/identity_map"))) {
-      log.info("Adding identity file " + path + " to map job cache");
-      job.addCacheFile(path.toUri());
-    }
-
-    final Map<String, Class<? extends Mapper<Object, Text, ?, HadoopIdentityKey>>> allMapperClasses = codeManager
-        .getIdentityMapperClasses();
-    final Map<String, Class<? extends Mapper>> mapperClasses = new HashMap<String, Class<? extends Mapper>>();
-    for (final String table : allMapperClasses.keySet()) {
-      if (dataIndex.containsTable(table)) {
-        mapperClasses.put(table, allMapperClasses.get(table));
-      }
-    }
-    for (final String table : mapperClasses.keySet()) {
-      final Path path = new Path(inputDir + "/" + table + "/");
-      MultipleInputs.addInputPath(job, path, TextInputFormat.class, mapperClasses.get(table));
-      log.info("Adding mapper for path " + path);
-    }
-    FileOutputFormat.setOutputPath(job, new Path(outputDir + "/identity_map"));
-    try {
-      job.waitForCompletion(true);
-    } catch (ClassNotFoundException | InterruptedException e) {
-      throw new RuntimeException(e);
-    }
-    leaseThread.checkLease();
+    return job;
   }
 }
