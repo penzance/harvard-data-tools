@@ -90,7 +90,7 @@ public class IdentityMapHadoopJob {
       throw new RuntimeException(e);
     }
 
-    lookupEppnAndHuid(config);
+    //    lookupEppnAndHuid(config);
     leaseThread.checkLease();
   }
 
