@@ -90,26 +90,31 @@ public class IdentityMapHadoopJob {
       throw new RuntimeException(e);
     }
 
-    //    lookupEppnAndHuid(config);
+    lookupEppnAndHuid(mainIdentifier);
     leaseThread.checkLease();
   }
 
-  private void lookupEppnAndHuid(final DataConfig config2) throws SQLException, DataConfigurationException, IOException {
+  private void lookupEppnAndHuid(final IdentifierType mainIdentifier) throws SQLException, DataConfigurationException, IOException {
     log.info("Looking up any unknown EPPNs or HUIDs");
     final TableFormat format = new FormatLibrary().getFormat(config.getPipelineFormat());
-    final HuidEppnLookup lookup = new HuidEppnLookup(config, format);
+    final HuidEppnLookup lookup = new HuidEppnLookup(config, format, mainIdentifier);
 
     final String idMapDir = config.getPhase1IdMapPath() + "/";
 
-    final Path inputDirPath = new Path(idMapDir + config.getPhase1TempIdMapOutput());
+    final URI[] latest = getInputUris(idMapDir + config.getPhase1TempIdMapOutput());
+    final URI[] original = getInputUris(config.getPhase0IdMapPath());
+    final Path outputPath = new Path(idMapDir + config.getPhase1IdMapOutput());
+
+    lookup.expandIdentities(latest, original, outputPath.toUri(), mainIdentifier.getType());
+  }
+
+  private URI[] getInputUris(final String path) throws IOException {
+    final Path inputDirPath = new Path(path);
     final List<URI> inputUris = new ArrayList<URI>();
     for (final Path inputPath : hadoopUtils.listHdfsFiles(hadoopConfig, inputDirPath)) {
       inputUris.add(inputPath.toUri());
     }
-
-    final Path outputPath = new Path(idMapDir + config.getPhase1IdMapOutput());
-
-    lookup.expandIdentities(inputUris.toArray(new URI[] {}), outputPath.toUri());
+    return inputUris.toArray(new URI[] {});
   }
 
   @SuppressWarnings("rawtypes")
@@ -158,7 +163,7 @@ public class IdentityMapHadoopJob {
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
 
-    MultipleOutputs.addNamedOutput(job, config.getPhase1IdMapOutput(), TextOutputFormat.class,
+    MultipleOutputs.addNamedOutput(job, config.getPhase1TempIdMapOutput(), TextOutputFormat.class,
         Text.class, NullWritable.class);
     MultipleOutputs.addNamedOutput(job, config.getPhase1EmailOutput(), TextOutputFormat.class,
         Text.class, NullWritable.class);

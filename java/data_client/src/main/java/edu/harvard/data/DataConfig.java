@@ -326,7 +326,7 @@ public class DataConfig {
   }
 
   public String getPhase1IdMapOutput() {
-    return "identitymap";
+    return "identitymap/identitymap";
   }
 
   public String getPhase1EmailOutput() {
