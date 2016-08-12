@@ -9,8 +9,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.logging.log4j.LogManager;
@@ -35,9 +37,11 @@ public class HuidEppnLookup {
   private final HadoopUtilities hadoopUtils;
   private final Configuration hadoopConfig;
   private final TableFormat format;
+  private final IdentifierType mainIdentifier;
 
-  public HuidEppnLookup(final DataConfig config, final TableFormat format) {
+  public HuidEppnLookup(final DataConfig config, final TableFormat format, final IdentifierType mainIdentifier) {
     this.config = config;
+    this.mainIdentifier = mainIdentifier;
     this.identities = new ArrayList<IdentityMap>();
     this.unknownEppn = new HashMap<String, IdentityMap>();
     this.unknownHuid = new HashMap<String, IdentityMap>();
@@ -46,9 +50,13 @@ public class HuidEppnLookup {
     this.format = format;
   }
 
-  public void expandIdentities(final URI[] inputPaths, final URI outputPath)
+  // We need both the original and the updated paths, in case there are unknown
+  // HUIDs or EPPNs in records that didn't come from this data set.
+  public <T> void expandIdentities(final URI[] latestPaths,final URI[] originalPaths, final URI outputPath, final Class<T> cls)
       throws SQLException, DataConfigurationException, IOException {
-    readIdentities(inputPaths);
+    final Set<T> seenIds = new HashSet<T>();
+    readIdentities(latestPaths, seenIds);
+    readIdentities(originalPaths, seenIds);
     log.info("Found " + unknownEppn.size() + " unknown EPPNs and " + unknownHuid.size()
     + " unknown HUIDs");
     try (Connection connection = establishConnection()) {
@@ -73,20 +81,24 @@ public class HuidEppnLookup {
         config.getIdentityOraclePassword());
   }
 
-  private void readIdentities(final URI[] paths) throws IOException {
+  @SuppressWarnings("unchecked")
+  private <T> void readIdentities(final URI[] paths, final Set<T> seenIdentities) throws IOException {
     try (TableReader<IdentityMap> in = hadoopUtils.getHdfsTableReader(hadoopConfig, paths, format,
         IdentityMap.class)) {
       for (final IdentityMap id : in) {
-        identities.add(id);
-        final String huid = (String) id.get(IdentifierType.HUID);
-        final String eppn = (String) id.get(IdentifierType.EPPN);
-        if (huid != null && eppn == null) {
-          log.info("Unknown EPPN for HUID " + huid);
-          unknownEppn.put(huid, id);
-        }
-        if (eppn != null && huid == null) {
-          log.info("Unknown HUID for EPPN " + huid);
-          unknownHuid.put(eppn, id);
+        if (!seenIdentities.contains(id.get(mainIdentifier))) {
+          identities.add(id);
+          seenIdentities.add((T) id.get(mainIdentifier));
+          final String huid = (String) id.get(IdentifierType.HUID);
+          final String eppn = (String) id.get(IdentifierType.EPPN);
+          if (huid != null && eppn == null) {
+            log.info("Unknown EPPN for HUID " + huid);
+            unknownEppn.put(huid, id);
+          }
+          if (eppn != null && huid == null) {
+            log.info("Unknown HUID for EPPN " + huid);
+            unknownHuid.put(eppn, id);
+          }
         }
       }
     }
