@@ -54,6 +54,8 @@ public abstract class Phase0Bootstrap {
   protected abstract boolean newDataAvailable()
       throws IOException, DataConfigurationException, UnexpectedApiResponseException;
 
+  protected abstract void setup() throws IOException, DataConfigurationException, UnexpectedApiResponseException;
+
   protected void init(final String configPathString, final Class<? extends DataConfig> configClass,
       final boolean createPipeline) throws IOException, DataConfigurationException {
     log.info("Configuration path: " + configPathString);
@@ -68,6 +70,7 @@ public abstract class Phase0Bootstrap {
   protected void run(final Context context)
       throws IOException, DataConfigurationException, UnexpectedApiResponseException {
     sendSnsNotification();
+    setup();
     for (final S3ObjectId path : getInfrastructureConfigPaths()) {
       configPathString += "|" + AwsUtils.uri(path);
     }

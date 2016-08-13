@@ -32,6 +32,7 @@ implements RequestHandler<BootstrapParameters, String> {
   private DataDump dump;
   private BootstrapParameters params;
   private String schemaVersion;
+  private String dumpId;
 
   private static final Logger log = LogManager.getLogger();
 
@@ -58,15 +59,7 @@ implements RequestHandler<BootstrapParameters, String> {
   }
 
   @Override
-  protected boolean newDataAvailable()
-      throws IOException, DataConfigurationException, UnexpectedApiResponseException {
-    final String dumpId = getDumpId();
-    log.info("Saving dump " + dumpId);
-    return dumpId != null;
-  }
-
-  private String getDumpId()
-      throws IOException, DataConfigurationException, UnexpectedApiResponseException {
+  protected void setup() throws IOException, DataConfigurationException, UnexpectedApiResponseException {
     final CanvasDataConfig canvasConfig = (CanvasDataConfig) config;
     final ApiClient api = new ApiClient(canvasConfig.getCanvasDataHost(), canvasConfig.getCanvasApiKey(),
         canvasConfig.getCanvasApiSecret());
@@ -94,15 +87,21 @@ implements RequestHandler<BootstrapParameters, String> {
       }
     }
     if (args.isEmpty()) {
-      return null;
+      dumpId = null;
     } else {
-      String dumpId = args.get(0);
+      String id = args.get(0);
       for (int i = 1; i < args.size(); i++) {
-        dumpId += ":" + args.get(i);
+        id += ":" + args.get(i);
       }
-      return dumpId;
+      dumpId = id;
     }
+  }
 
+  @Override
+  protected boolean newDataAvailable()
+      throws IOException, DataConfigurationException, UnexpectedApiResponseException {
+    log.info("Saving dump " + dumpId);
+    return dumpId != null;
   }
 
   @Override
@@ -113,9 +112,8 @@ implements RequestHandler<BootstrapParameters, String> {
 
     boolean megadump = false;
     if (dump != null && dump.getArtifactsByTable().containsKey("requests")) {
-      megadump |= !dump.getArtifactsByTable().get("requests").isPartial();
+      megadump = !dump.getArtifactsByTable().get("requests").isPartial();
     }
-    final String dumpId = getDumpId();
     if (dumpId == null || dumpId.equals("TABLE:requests")) {
       // Don't need to download data, but will have to process the full requests
       // table
@@ -137,7 +135,7 @@ implements RequestHandler<BootstrapParameters, String> {
   protected Map<String, String> getCustomEc2Environment()
       throws IOException, DataConfigurationException, UnexpectedApiResponseException {
     final Map<String, String> env = new HashMap<String, String>();
-    env.put("DATA_SET_ID", getDumpId());
+    env.put("DATA_SET_ID", dumpId);
     env.put("DATA_SCHEMA_VERSION", schemaVersion); // XXX: Remove
     return env;
   }

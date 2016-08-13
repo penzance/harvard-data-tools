@@ -52,4 +52,9 @@ implements RequestHandler<String, String> {
     return !aws.listKeys(((MatterhornDataConfig)config).getDropboxBucket()).isEmpty();
   }
 
+  @Override
+  protected void setup()
+      throws IOException, DataConfigurationException, UnexpectedApiResponseException {
+  }
+
 }
