@@ -63,5 +63,6 @@ public class MoveUnmodifiedTableGenerator {
         }
       }
     }
+    out.println("exit 0");
   }
 }
