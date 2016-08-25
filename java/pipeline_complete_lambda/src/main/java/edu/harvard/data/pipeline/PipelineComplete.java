@@ -192,7 +192,7 @@ public class PipelineComplete implements RequestHandler<SNSEvent, String> {
         obj.setErrorMessage(getStringField(attemptObj.getFields(), "errorMessage"));
       }
 
-      if (obj.getStatus().equals("FAILED")) {
+      if (obj.getStatus().equals("FAILED") || obj.getStatus().equals("CANCELED")) {
         log.info("Operation " + obj.getId() + " failed");
         report.setFailure(obj.getId());
       } else {

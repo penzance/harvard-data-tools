@@ -59,10 +59,11 @@ implements RequestHandler<BootstrapParameters, String> {
   }
 
   @Override
-  protected void setup() throws IOException, DataConfigurationException, UnexpectedApiResponseException {
+  protected void setup()
+      throws IOException, DataConfigurationException, UnexpectedApiResponseException {
     final CanvasDataConfig canvasConfig = (CanvasDataConfig) config;
-    final ApiClient api = new ApiClient(canvasConfig.getCanvasDataHost(), canvasConfig.getCanvasApiKey(),
-        canvasConfig.getCanvasApiSecret());
+    final ApiClient api = new ApiClient(canvasConfig.getCanvasDataHost(),
+        canvasConfig.getCanvasApiKey(), canvasConfig.getCanvasApiSecret());
     final List<String> args = new ArrayList<String>();
     if (params.getDumpSequence() != null) {
       dump = api.getDump(params.getDumpSequence());
@@ -128,6 +129,14 @@ implements RequestHandler<BootstrapParameters, String> {
       paths.add(AwsUtils.key(configPath, "tiny_phase_0.properties"));
       paths.add(AwsUtils.key(configPath, "tiny_emr.properties"));
     }
+
+    if (megadump) {
+      final String subject = "*** WARNING: Dump " + dump.getSequence() + " is a megadump. ***";
+      final String msg = "Redshift must be resized prior to update. Dump information at "
+          + config.getHdtMonitorUrl() + "/data_dashboard/canvas/dump/" + dumpId;
+      sendSnsNotification(subject, msg, config.getSuccessSnsArn());
+    }
+
     return paths;
   }
 
@@ -140,7 +149,8 @@ implements RequestHandler<BootstrapParameters, String> {
     return env;
   }
 
-  private boolean needToSaveDump(final DataDump candidate) throws IOException, DataConfigurationException {
+  private boolean needToSaveDump(final DataDump candidate)
+      throws IOException, DataConfigurationException {
     final CanvasDataConfig canvasConfig = (CanvasDataConfig) config;
     DumpInfo.init(canvasConfig.getDumpInfoDynamoTable());
     final DumpInfo info = DumpInfo.find(candidate.getDumpId());

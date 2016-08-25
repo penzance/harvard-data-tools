@@ -54,7 +54,8 @@ public abstract class Phase0Bootstrap {
   protected abstract boolean newDataAvailable()
       throws IOException, DataConfigurationException, UnexpectedApiResponseException;
 
-  protected abstract void setup() throws IOException, DataConfigurationException, UnexpectedApiResponseException;
+  protected abstract void setup()
+      throws IOException, DataConfigurationException, UnexpectedApiResponseException;
 
   protected void init(final String configPathString, final Class<? extends DataConfig> configClass,
       final boolean createPipeline) throws IOException, DataConfigurationException {
@@ -69,7 +70,10 @@ public abstract class Phase0Bootstrap {
 
   protected void run(final Context context)
       throws IOException, DataConfigurationException, UnexpectedApiResponseException {
-    sendSnsNotification();
+    final String msg = "Details at " + config.getHdtMonitorUrl() + "/data_dashboard/pipeline/"
+        + config.getGitTagOrBranch() + "/" + runId;
+    sendSnsNotification("Run " + runId + " started.", msg, config.getSuccessSnsArn());
+
     setup();
     for (final S3ObjectId path : getInfrastructureConfigPaths()) {
       configPathString += "|" + AwsUtils.uri(path);
@@ -132,13 +136,9 @@ public abstract class Phase0Bootstrap {
     System.out.println(description);
   }
 
-  private void sendSnsNotification() {
+  protected void sendSnsNotification(final String subject, final String msg, final String arn) {
     final AmazonSNSClient sns = new AmazonSNSClient();
-    final String subject = "Run " + runId + " started.";
-    final String msg = "Details at " + config.getHdtMonitorUrl() + "/data_dashboard/pipeline/"
-        + config.getGitTagOrBranch() + "/" + runId;
-    final PublishRequest publishRequest = new PublishRequest(config.getSuccessSnsArn(), msg,
-        subject);
+    final PublishRequest publishRequest = new PublishRequest(arn, msg, subject);
     sns.publish(publishRequest);
   }
 
