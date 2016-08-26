@@ -1,4 +1,5 @@
 test-data
+bin
 
 *~
 
@@ -17,3 +18,5 @@ myparameters
 test-output
 
 Scratch.java
+
+apidocs
