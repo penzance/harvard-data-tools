@@ -14,13 +14,18 @@ primary_path = '{0}/java/data_client'.format(GIT_BASE)
 
 paths = [
     '{0}/java/pipeline_complete_lambda'.format(GIT_BASE),
+
     '{0}/java/canvas_data_client'.format(GIT_BASE),
     '{0}/java/canvas_data_tools'.format(GIT_BASE),
+    CANVAS_GENERATED_CODE,
+
+    '{0}/java/matterhorn_data_client'.format(GIT_BASE),
+    '{0}/java/matterhorn_data_tools'.format(GIT_BASE),
+    MATTERHORN_GENERATED_CODE,
+
     # '{0}/java/edx_data_client'.format(GIT_BASE),
     # '{0}/java/edx_data_tools'.format(GIT_BASE),
-    CANVAS_GENERATED_CODE,
     # EDX_GENERATED_CODE,
-    MATTERHORN_GENERATED_CODE,
     ]
 
 def check_return_code(return_code, cmd):
