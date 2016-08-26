@@ -1,20 +1,20 @@
 package edu.harvard.data.edx;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import edu.harvard.data.CodeManager;
-import edu.harvard.data.DataConfig;
+import com.amazonaws.services.s3.model.S3ObjectId;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
+
+import edu.harvard.data.AwsUtils;
 import edu.harvard.data.Phase0;
 import edu.harvard.data.ReturnStatus;
 import edu.harvard.data.pipeline.InputTableIndex;
@@ -26,32 +26,6 @@ public class EdxPhase0 extends Phase0 {
   private final String runId;
   private final ExecutorService exec;
 
-  // Main class for testing only.
-  public static void main(final String[] args) throws Exception {
-    final String configPathString = args[0];
-    final String runId = args[1];
-    final String datasetId = args[2];
-    final int threads = Integer.parseInt(args[3]);
-    final String codeManagerClassName = args[4];
-
-    final CodeManager codeManager = CodeManager.getCodeManager(codeManagerClassName);
-    final DataConfig config = codeManager.getDataConfig(configPathString, true);
-
-    ReturnStatus status;
-    ExecutorService exec = null;
-    try {
-      exec = Executors.newFixedThreadPool(threads);
-      final EdxPhase0 phase0 = (EdxPhase0) codeManager.getPhase0(configPathString, datasetId, runId,
-          exec);
-      status = phase0.run();
-    } finally {
-      if (exec != null) {
-        exec.shutdownNow();
-      }
-    }
-    System.exit(status.getCode());
-  }
-
   public EdxPhase0(final EdxDataConfig config, final String runId, final ExecutorService exec) {
     this.config = config;
     this.runId = runId;
@@ -60,14 +34,18 @@ public class EdxPhase0 extends Phase0 {
 
   @Override
   protected ReturnStatus run() throws IOException, InterruptedException, ExecutionException {
-    final File inFile = new File("/tmp/data/harvardx-edx-events-2016-08-23.log");
-    final File outFile = new File("/tmp/data/events-2016-08-23.gz");
+    log.info("Parsing files");
+    final AwsUtils aws = new AwsUtils();
     final InputTableIndex dataIndex = new InputTableIndex();
     final List<Future<InputTableIndex>> jobs = new ArrayList<Future<InputTableIndex>>();
-
-    final EdxSingleFileParser parser = new EdxSingleFileParser(inFile, outFile, config);
-    jobs.add(exec.submit(parser));
-
+    for (final S3ObjectSummary obj : aws.listKeys(config.getDropboxBucket())) {
+      if (obj.getKey().endsWith(".gz")) {
+        final S3ObjectId outputLocation = AwsUtils.key(config.getS3WorkingLocation(runId));
+        final EdxSingleFileParser parser = new EdxSingleFileParser(obj, outputLocation, config);
+        jobs.add(exec.submit(parser));
+        log.info("Queuing file " + obj.getBucketName() + "/" + obj.getKey());
+      }
+    }
     for (final Future<InputTableIndex> job : jobs) {
       dataIndex.addAll(job.get());
     }
@@ -75,6 +53,7 @@ public class EdxPhase0 extends Phase0 {
     for (final String table : dataIndex.getTableNames()) {
       dataIndex.setPartial(table, true);
     }
+    aws.writeJson(config.getIndexFileS3Location(runId), dataIndex);
 
     return ReturnStatus.OK;
   }
@@ -83,21 +62,23 @@ public class EdxPhase0 extends Phase0 {
 class EdxSingleFileParser implements Callable<InputTableIndex> {
   private static final Logger log = LogManager.getLogger();
 
+  private final S3ObjectSummary inputObj;
   private final EdxDataConfig config;
-  private final File inputFile;
-  private final File outputFile;
+  private final S3ObjectId outputLocation;
+  private final AwsUtils aws;
 
-  public EdxSingleFileParser(final File inputFile, final File outputFile,
+  public EdxSingleFileParser(final S3ObjectSummary inputObj, final S3ObjectId outputLocation,
       final EdxDataConfig config) {
-    this.inputFile = inputFile;
-    this.outputFile = outputFile;
+    this.inputObj = inputObj;
+    this.outputLocation = outputLocation;
     this.config = config;
+    this.aws = new AwsUtils();
   }
 
   @Override
   public InputTableIndex call() throws Exception {
-    log.info("Parsing file " + inputFile + " and writing to " + outputFile);
-    final InputParser parser = new InputParser(config, inputFile, outputFile);
+    log.info("Parsing file " + inputObj.getBucketName() + "/" + inputObj.getKey());
+    final InputParser parser = new InputParser(config, aws, AwsUtils.key(inputObj), outputLocation);
     return parser.parseFile();
   }
 

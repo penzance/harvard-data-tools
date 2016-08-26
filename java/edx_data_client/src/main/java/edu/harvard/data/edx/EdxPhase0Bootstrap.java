@@ -49,7 +49,7 @@ implements RequestHandler<String, String> {
   @Override
   protected boolean newDataAvailable()
       throws IOException, DataConfigurationException, UnexpectedApiResponseException {
-    return false;
+    return !aws.listKeys(((EdxDataConfig)config).getDropboxBucket()).isEmpty();
   }
 
   @Override
