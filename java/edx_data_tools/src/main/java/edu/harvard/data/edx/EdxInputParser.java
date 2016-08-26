@@ -22,7 +22,7 @@ import edu.harvard.data.io.JsonFileReader;
 import edu.harvard.data.io.TableWriter;
 import edu.harvard.data.pipeline.InputTableIndex;
 
-public class InputParser {
+public class EdxInputParser {
 
   private static final Logger log = LogManager.getLogger();
 
@@ -36,7 +36,7 @@ public class InputParser {
   private final TableFormat outFormat;
   private final S3ObjectId eventOutputDir;
 
-  public InputParser(final EdxDataConfig config, final AwsUtils aws,
+  public EdxInputParser(final EdxDataConfig config, final AwsUtils aws,
       final S3ObjectId inputObj, final S3ObjectId outputLocation) {
     this.config = config;
     this.aws = aws;

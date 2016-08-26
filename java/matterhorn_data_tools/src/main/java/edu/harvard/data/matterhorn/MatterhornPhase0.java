@@ -80,7 +80,7 @@ class MatterhornSingleFileParser implements Callable<InputTableIndex> {
   @Override
   public InputTableIndex call() throws Exception {
     log.info("Parsing file " + inputObj.getBucketName() + "/" + inputObj.getKey());
-    final InputParser parser = new InputParser(config, aws, AwsUtils.key(inputObj), outputLocation);
+    final EdxInputParser parser = new EdxInputParser(config, aws, AwsUtils.key(inputObj), outputLocation);
     return parser.parseFile();
   }
 
