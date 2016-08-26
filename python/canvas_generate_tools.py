@@ -1,12 +1,3 @@
-# This script requires the following environment variables:
-# - HARVARD_DATA_TOOLS_BASE: the directory where the harvard-data-tools
-#     repository has been checked out. Point to the root of the repository, e.g.
-#     /tmp/code/harvard-data-tools
-# - HARVARD_DATA_GENERATED_OUTPUT: the directory where generated scripts and
-#     .jar files should be stored.
-# - CANVAS_DATA_SCHEMA_VERSION: The version of the Canvas Data schema for which
-#     files will be generated. Format as a string, e.g. 1.2.0
-
 import os
 import shutil
 import subprocess
