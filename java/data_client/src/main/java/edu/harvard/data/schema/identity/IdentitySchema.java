@@ -142,7 +142,7 @@ public class IdentitySchema {
    * @param tableName
    *          the name of the table for which to find identifiers.
    *
-   * @return a <@link Map> from identifier column name to a {@link List} of
+   * @return a {@link Map} from identifier column name to a {@link List} of
    *         {@link IdentifierType} values. The identifiers are returned as a
    *         {@code List} because multiple identifiers may be multiplexed into a
    *         single column in a data set.

@@ -53,7 +53,7 @@ public class FullTextSchema {
    * @param tableName
    *          the name of the table for which to find identifiers.
    *
-   * @return a <@link List> of column names.
+   * @return a {@link FullTextTable} that contains a list of column names.
    */
   public FullTextTable get(final String tableName) {
     return tables.get(tableName);
