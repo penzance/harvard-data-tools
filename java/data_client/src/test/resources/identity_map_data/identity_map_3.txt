@@ -1,4 +1,0 @@
-research_id5	huid5	xid5	555555	555550
-research_id6	huid6	xid6	666666	666660
-research_id7	huid7	xid7	777777	777770
-research_id8	huid8	xid8	888888	888880
