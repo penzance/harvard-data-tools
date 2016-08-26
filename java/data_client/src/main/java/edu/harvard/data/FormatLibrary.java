@@ -9,7 +9,8 @@ public class FormatLibrary {
     DecompressedCanvasDataFlatFiles("decompressed_canvas"), CanvasDataFlatFiles(
         "canvas"), DecompressedExcel("decompressed_excel"), Excel("excel"), Matterhorn(
             "matterhorn"), DecompressedMatterhorn("decompressed_matterhorn"), CompressedInternal(
-                "compressed_internal"), DecompressedInternal("decompressed_internal");
+                "compressed_internal"), DecompressedInternal(
+                    "decompressed_internal"), Edx("edx"), DecompressedEdx("decompressed_edx");
 
     private final String label;
 
@@ -31,6 +32,10 @@ public class FormatLibrary {
         return Excel;
       case "decompressed_excel":
         return DecompressedExcel;
+      case "compressed_edx":
+        return Edx;
+      case "decompressed_edx":
+        return DecompressedEdx;
       case "matterhorn":
         return Matterhorn;
       case "decompressed_matterhorn":
@@ -55,6 +60,10 @@ public class FormatLibrary {
       return createExcelFormat();
     case DecompressedExcel:
       return createDecompressedExcelFormat();
+    case Edx:
+      return createEdxFormat();
+    case DecompressedEdx:
+      return createDecompressedEdxFormat();
     case Matterhorn:
       return createMatterhornFormat();
     case DecompressedMatterhorn:
@@ -71,6 +80,7 @@ public class FormatLibrary {
   public static final String CANVAS_TIMESTAMP_FORMAT_STRING = "yyyy-MM-dd HH:mm:ss";
   public static final String CANVAS_DATE_FORMAT_STRING = "yyyy-MM-dd";
   public static final String MATTERHORN_DATE_FORMAT_STRING = "yyyy-MM-dd'T'HH:mm:ssXXX";
+  public static final String EDX_DATE_FORMAT_STRING = "yyyy-MM-dd'T'HH:mm:ssXXX";
   public static final String LOCAL_DATE_FORMAT_STRING = "yyyy-MM-dd Z";
   public static final String JSON_DATE_FORMAT_STRING = "yyyy-MM-dd'T'HH:mm:ssZ";
 
@@ -82,6 +92,7 @@ public class FormatLibrary {
 
   private static final String CANVAS_FILE_ENCODING = "UTF-8";
   private static final String MATTERHORN_FILE_ENCODING = "UTF-8";
+  private static final String EDX_FILE_ENCODING = "UTF-8";
 
   private TableFormat createCanvasDataFlatFileFormat() {
     final TableFormat canvasFormat = new TableFormat(Format.CanvasDataFlatFiles);
@@ -117,7 +128,7 @@ public class FormatLibrary {
   }
 
   private TableFormat createDecompressedExcelFormat() {
-    final TableFormat canvasFormat = new TableFormat(Format.Excel);
+    final TableFormat canvasFormat = new TableFormat(Format.DecompressedExcel);
     canvasFormat.setTimestampFormat(new SimpleDateFormat(CANVAS_TIMESTAMP_FORMAT_STRING));
     canvasFormat.setDateFormat(new SimpleDateFormat(CANVAS_DATE_FORMAT_STRING));
     canvasFormat.setIncludeHeaders(true);
@@ -127,8 +138,28 @@ public class FormatLibrary {
     return canvasFormat;
   }
 
+  private TableFormat createDecompressedEdxFormat() {
+    final TableFormat format = new TableFormat(Format.DecompressedEdx);
+    format.setDateFormat(new SimpleDateFormat(EDX_DATE_FORMAT_STRING));
+    format.setTimestampFormat(new SimpleDateFormat(EDX_DATE_FORMAT_STRING));
+    format.setIncludeHeaders(false);
+    format.setEncoding(EDX_FILE_ENCODING);
+    format.setCompression(TableFormat.Compression.None);
+    return format;
+  }
+
+  private TableFormat createEdxFormat() {
+    final TableFormat format = new TableFormat(Format.Edx);
+    format.setDateFormat(new SimpleDateFormat(EDX_DATE_FORMAT_STRING));
+    format.setTimestampFormat(new SimpleDateFormat(EDX_DATE_FORMAT_STRING));
+    format.setIncludeHeaders(false);
+    format.setEncoding(EDX_FILE_ENCODING);
+    format.setCompression(TableFormat.Compression.Gzip);
+    return format;
+  }
+
   private TableFormat createDecompressedMatterhornFormat() {
-    final TableFormat format = new TableFormat(Format.Matterhorn);
+    final TableFormat format = new TableFormat(Format.DecompressedMatterhorn);
     format.setDateFormat(new SimpleDateFormat(MATTERHORN_DATE_FORMAT_STRING));
     format.setTimestampFormat(new SimpleDateFormat(MATTERHORN_DATE_FORMAT_STRING));
     format.setIncludeHeaders(false);

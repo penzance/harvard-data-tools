@@ -25,8 +25,7 @@ import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public abstract class Phase0 {
 
-  public static void main(final String[] args) throws ClassNotFoundException,
-  InstantiationException, IllegalAccessException, IOException, DataConfigurationException {
+  public static void main(final String[] args) throws Exception {
     final String configPathString = args[0];
     final String runId = args[1];
     final String datasetId = args[2];

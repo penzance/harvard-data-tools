@@ -1,0 +1,117 @@
+{ "tables": 
+  { "event": {
+      "columns" : [ 
+        {
+          "name" : "accept_language",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "event_source",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "event_type",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "event",
+          "type" : "varchar",
+          "length" : 4096
+        },
+        {
+          "name" : "host",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "name",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "page",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "referer",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "session",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "time",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "username",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "context.application",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "context.asides",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "context.client",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "context.component",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "context.course_id",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "context.course_user_tags",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "context.module",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "context.org_id",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "context.path",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "context.received_at",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "context.user_id",
+          "type" : "varchar",
+          "length" : 255
+        }
+      ]
+    }
+  }
+}
