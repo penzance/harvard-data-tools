@@ -25,7 +25,7 @@ import edu.harvard.data.matterhorn.bindings.phase0.Phase0GeoIp;
 import edu.harvard.data.matterhorn.bindings.phase0.Phase0Video;
 import edu.harvard.data.pipeline.InputTableIndex;
 
-public class EdxInputParser {
+public class MatterhornInputParser {
 
   private static final Logger log = LogManager.getLogger();
 
@@ -45,7 +45,7 @@ public class EdxInputParser {
   private final S3ObjectId eventOutputDir;
   private final S3ObjectId geoipOutputDir;
 
-  public EdxInputParser(final MatterhornDataConfig config, final AwsUtils aws,
+  public MatterhornInputParser(final MatterhornDataConfig config, final AwsUtils aws,
       final S3ObjectId inputObj, final S3ObjectId outputLocation) {
     this.config = config;
     this.aws = aws;

@@ -137,9 +137,11 @@ public abstract class Phase0Bootstrap {
     final String subject = "Run " + runId + " started.";
     final String msg = "Details at " + config.getHdtMonitorUrl() + "/data_dashboard/pipeline/"
         + config.getGitTagOrBranch() + "/" + runId;
-    final PublishRequest publishRequest = new PublishRequest(config.getSuccessSnsArn(), msg,
+    final String arn = config.getSuccessSnsArn();
+    final PublishRequest publishRequest = new PublishRequest(arn, msg,
         subject);
     sns.publish(publishRequest);
+    log.info("Sent message subject: " + subject + ", body: " + msg + " to " + arn);
   }
 
   private String getUserData(final DataConfig config)

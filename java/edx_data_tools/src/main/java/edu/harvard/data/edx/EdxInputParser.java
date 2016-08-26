@@ -66,7 +66,8 @@ public class EdxInputParser {
   private void getFileNames() {
     final String key = inputObj.getKey();
     final String filename = key.substring(key.lastIndexOf("/") + 1);
-    final String date = filename.substring(filename.indexOf(".") + 1, filename.indexOf(".json"));
+    final String[] parts = filename.split("-|\\.");
+    final String date = parts[3] + "-" + parts[4] + "-" + parts[5];
     originalFile = new File(config.getScratchDir(), filename);
     final String eventFileName = "event-" + date + ".gz";
     eventFile = new File(config.getScratchDir(), eventFileName);
