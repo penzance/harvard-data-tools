@@ -1,0 +1,301 @@
+{ "tables": 
+  { "event": {
+      "columns" : [ 
+        {
+          "name" : "action_id",
+          "description" : "Action identifier.",
+          "type" : "bigint"
+        },
+        {
+          "name" : "mpid",
+          "description" : "Video identifer. Foreign key relation with videos.id.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "created",
+          "description" : "Timestamp for when this event occurred.",
+          "type" : "datetime"
+        },
+        {
+          "name" : "@version",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 16
+        },
+        {
+          "name" : "@timestamp",
+          "description" : "",
+          "type" : "timestamp"
+        },
+        {
+          "name" : "ip",
+          "description" : "Originating IP address for this event.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "host",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "port",
+          "description" : "",
+          "type" : "integer"
+        },
+        {
+          "name" : "hostname",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "huid",
+          "description" : "Harvard ID of the user who initiated this event, or 'anonymous'.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "proxy1",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "proxy2",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "session_id",
+          "description" : "Tracking identifier for a per-user session.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "is_live",
+          "description" : "True if the user is watching a live video, false if the video is recorded.",
+          "type" : "boolean"
+        },
+        {
+          "name" : "action.inpoint",
+          "description" : "Timestamp within the video when the event occurred.",
+          "type" : "integer"
+        },
+        {
+          "name" : "action.type",
+          "description" : "Type of event.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "action.length",
+          "description" : "",
+          "type" : "integer"
+        },
+        {
+          "name" : "action.outpoint",
+          "description" : "Timestamp within the video when the event occurred.",
+          "type" : "integer"
+        },
+        {
+          "name" : "action.is_playing",
+          "description" : "True if the video is currently playing, false if not.",
+          "type" : "boolean"
+        },
+        {
+          "name" : "ua.name",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "ua.os",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "ua.os_name",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "ua.os_major",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "ua.os_minor",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "ua.device",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "ua.major",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "ua.minor",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "ua.patch",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "ua.build",
+          "type" : "varchar",
+          "length" : 255
+        }
+      ]
+    },
+    "video": {
+      "columns" : [ 
+        {
+          "name" : "id",
+          "description" : "Video identifer.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "series",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "course",
+          "description" : "Title of the course in which the video is embedded.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "type",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "duration",
+          "description" : "",
+          "type" : "bigint"
+        },
+        {
+          "name" : "start",
+          "description" : "",
+          "type" : "Timestamp"
+        },
+        {
+          "name" : "title",
+          "description" : "Video title.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "year",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "term",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "description",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "cdn",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        }
+      ]
+    },
+    "geo_ip": {
+      "columns": [
+        {
+          "name" : "ip",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "country_code2",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "country_code3",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "country_name",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "continent_code",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "region_name",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "city_name",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "postal_code",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "latitude",
+          "type" : "double precision"
+        },
+        {
+          "name" : "longitude",
+          "type" : "double precision"
+        },
+        {
+          "name" : "dma_code",
+          "type" : "integer"
+        },
+        {
+          "name" : "area_code",
+          "type" : "integer"
+        },
+        {
+          "name" : "timezone",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "real_region_name",
+          "type" : "varchar",
+          "length" : 255
+        }
+        ]
+      }
+    }
+  }
+}
