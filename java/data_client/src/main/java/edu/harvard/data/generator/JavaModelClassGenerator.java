@@ -515,7 +515,7 @@ public class JavaModelClassGenerator {
       break;
     case DoublePrecision:
       parseMethod = "Double.valueOf";
-      extraCheck = varName + " = " + varName + " == Double.NaN ? 0.0 : " + varName + ";";
+      extraCheck = varName + " = " + varName + ".equals(Double.NaN) ? 0.0 : " + varName + ";";
       break;
     case Integer:
       parseMethod = "Integer.valueOf";
