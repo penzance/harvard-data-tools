@@ -498,7 +498,7 @@ public class JavaModelClassGenerator {
     final String varName = JavaBindingGenerator.javaVariable(column.getName());
     String parseMethod = null;
     final String extraParams = "";
-    String extraCheck = null;
+    //    final String extraCheck = null;
     switch (column.getType()) {
     case BigInt:
       parseMethod = "Long.valueOf";
@@ -515,7 +515,7 @@ public class JavaModelClassGenerator {
       break;
     case DoublePrecision:
       parseMethod = "Double.valueOf";
-      extraCheck = varName + " = " + varName + " == Double.NaN ? 0.0 : " + varName + ";";
+      //      extraCheck = varName + " = " + varName + " == Double.NaN ? 0.0 : " + varName + ";";
       break;
     case Integer:
       parseMethod = "Integer.valueOf";
@@ -535,9 +535,9 @@ public class JavaModelClassGenerator {
       out.println("    if (" + tmpName + " != null && " + tmpName + ".length() > 0) {");
       out.println(
           "        this." + varName + " = " + parseMethod + "(" + tmpName + extraParams + ");");
-      if (extraCheck != null) {
-        out.println("        " + extraCheck);
-      }
+      //      if (extraCheck != null) {
+      //        out.println("        " + extraCheck);
+      //      }
       out.println("    }");
     }
   }

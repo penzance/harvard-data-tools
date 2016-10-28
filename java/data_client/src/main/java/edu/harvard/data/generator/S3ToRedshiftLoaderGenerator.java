@@ -67,7 +67,7 @@ public class S3ToRedshiftLoaderGenerator {
     }
     Collections.sort(tableNames);
     for (final String tableName : tableNames) {
-      if (dataIndex.containsTable(tableName)) {
+      if (dataIndex.containsTable(tableName) && (!tableName.equals("assignment_group_fact"))) {
         final DataSchemaTable table = phase.getSchema().getTableByName(tableName);
         final String columnList = getColumnList(table);
 
