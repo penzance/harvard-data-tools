@@ -69,4 +69,14 @@ public class RedshiftSchema implements DataSchema {
   public DataSchemaTable getTableByName(final String name) {
     return tables.get(name);
   }
+
+  @Override
+  public List<String> getTableNames() {
+    final List<String> names = new ArrayList<String>();
+    for (final DataSchemaTable table : tables.values()) {
+      names.add(table.getTableName());
+    }
+    return names;
+  }
+
 }

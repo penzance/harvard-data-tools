@@ -1,5 +1,6 @@
 package edu.harvard.data.schema;
 
+import java.util.List;
 import java.util.Map;
 
 public interface DataSchema {
@@ -13,5 +14,7 @@ public interface DataSchema {
   DataSchemaTable getTableByName(String name);
 
   void addTable(String tableName, DataSchemaTable newTable);
+
+  List<String> getTableNames();
 
 }

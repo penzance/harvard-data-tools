@@ -12,13 +12,13 @@ public class JavaTableEnumGenerator {
 
   private static final Logger log = LogManager.getLogger();
 
-  private final SchemaPhase tableVersion;
+  private final SchemaVersion tableVersion;
   private final List<String> tableNames;
   private final String schemaVersion;
   private final String tableEnumName;
 
   public JavaTableEnumGenerator(final String schemaVersion, final List<String> tableNames,
-      final SchemaPhase tableVersion, final String tableEnumName) {
+      final SchemaVersion tableVersion, final String tableEnumName) {
     this.schemaVersion = schemaVersion;
     this.tableNames = tableNames;
     this.tableVersion = tableVersion;

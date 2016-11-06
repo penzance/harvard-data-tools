@@ -34,9 +34,6 @@ public class Data {
       try (IdentityService idService = new IdentityService(config, workingLocation)) {
         final Set<Future<Void>> jobs = new HashSet<Future<Void>>();
         for (final String tableName : tables.keySet()) {
-          if (!tableName.equals("event")) {
-            continue;
-          }
           for (final String inFile : tables.get(tableName)) {
             final String fileName = inFile.substring(inFile.lastIndexOf("/") + 1);
             final S3ObjectId outFile = AwsUtils.key(workingLocation, "redshift_staging", tableName, fileName);

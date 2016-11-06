@@ -158,4 +158,13 @@ public class ExtensionSchema implements DataSchema {
         "Column " + column.getName() + " of table " + tableName + " " + msg);
   }
 
+  @Override
+  public List<String> getTableNames() {
+    final List<String> names = new ArrayList<String>();
+    for (final DataSchemaTable table : tables.values()) {
+      names.add(table.getTableName());
+    }
+    return names;
+  }
+
 }

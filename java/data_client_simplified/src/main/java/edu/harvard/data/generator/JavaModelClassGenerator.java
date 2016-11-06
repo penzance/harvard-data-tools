@@ -32,21 +32,21 @@ public class JavaModelClassGenerator {
 
   private static final Logger log = LogManager.getLogger();
 
-  private final String schemaVersion;
+  private final String schemaVersionId;
   private final DataSchemaTable table;
-  private final SchemaPhase tableVersion;
-  private final SchemaPhase previousVersion;
+  private final SchemaVersion tableVersion;
+  private final SchemaVersion previousVersion;
   private final String className;
   private final String previousClassName;
   private final String classPrefix;
 
-  public JavaModelClassGenerator(final String schemaVersion, final SchemaPhase tableVersion,
-      final SchemaPhase previousVersion, final DataSchemaTable table) {
-    this.schemaVersion = schemaVersion;
+  public JavaModelClassGenerator(final String schemaVersion, final SchemaVersion tableVersion,
+      final SchemaVersion previousVersion, final DataSchemaTable table) {
+    this.schemaVersionId = schemaVersion;
     this.table = table;
     this.tableVersion = tableVersion;
     this.previousVersion = previousVersion;
-    classPrefix = tableVersion.getPrefix();
+    this.classPrefix = tableVersion.getPrefix();
     this.className = JavaBindingGenerator.javaClass(table.getTableName(), classPrefix);
     this.previousClassName = previousVersion == null ? null
         : JavaBindingGenerator.javaClass(table.getTableName(), previousVersion.getPrefix());
@@ -54,7 +54,7 @@ public class JavaModelClassGenerator {
 
   public void generate(final PrintStream out) {
     log.info("Generating table " + className);
-    JavaBindingGenerator.writeFileHeader(out, schemaVersion);
+    JavaBindingGenerator.writeFileHeader(out, schemaVersionId);
 
     out.println("package " + tableVersion.getJavaBindingPackage() + ";");
     out.println();

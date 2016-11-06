@@ -131,11 +131,11 @@ public class CanvasPhase0 extends Phase0 {
     // Download and verify the dump
     final DataDump dump = setupForDump();
     // Bypass the download and verify step if it's already happened
-    if (!info.getVerified()) {
-      downloadDump(dump, exec);
-      checkSchema();
-      verifyDump(exec);
-    }
+    //    if (!info.getVerified()) {
+    downloadDump(dump, exec);
+    checkSchema();
+    verifyDump(exec);
+    //    }
     return dump;
   }
 

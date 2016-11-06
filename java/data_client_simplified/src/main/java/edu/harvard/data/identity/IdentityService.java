@@ -45,6 +45,7 @@ public class IdentityService implements Closeable {
   }
 
   private void unloadIdentityMap() throws SQLException {
+    aws.deleteDirectory(identityMapLocation);
     aws.unloadTable("pii.identity_map", identityMapLocation, config);
   }
 
@@ -75,7 +76,6 @@ public class IdentityService implements Closeable {
 
   @Override
   public void close() throws IOException {
-    // TODO Auto-generated method stub
-
+    // TODO: Save ID map back to Redshift
   }
 }

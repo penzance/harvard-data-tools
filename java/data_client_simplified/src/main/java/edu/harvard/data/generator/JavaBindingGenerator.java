@@ -26,40 +26,25 @@ import edu.harvard.data.schema.DataSchemaColumn;
 import edu.harvard.data.schema.DataSchemaTable;
 
 public class JavaBindingGenerator {
-
   private static final Logger log = LogManager.getLogger();
 
   private static final String POM_XML_TEMPLATE = "pom.xml.template";
 
-  private final GenerationSpec spec;
-  private final GenerationSpec schemaVersions;
+  private final CodeGenerator codeGen;
   private final String projectName;
   private final File javaSrcBase;
   private final File baseDir;
 
-  public JavaBindingGenerator(final GenerationSpec spec) {
-    this.spec = spec;
-    baseDir = new File(spec.getOutputBase(), "java");
+  public JavaBindingGenerator(final CodeGenerator codeGen) {
+    this.codeGen = codeGen;
+    baseDir = new File(codeGen.getOutputBase(), "java");
     this.javaSrcBase = new File(baseDir, "src/main/java");
-    this.schemaVersions = spec;
-    this.projectName = spec.getJavaProjectName();
+    this.projectName = codeGen.getJavaProjectName();
   }
 
   // Generates a new Maven project in the directory passed to the constructor.
-  // The project has a pom.xml file and three sets of bindings (one for each
-  // stage of data processing):
-  //
-  // Phase Zero bindings are generated from the JSON schema provided by
-  // Instructure (passed to the class constructor).
-  //
-  // Phase One bindings are produced by the first EMR job which supplements the
-  // existing data set with new calculated data. The new tables and fields are
-  // specified in PHASE_ONE_ADDITIONS_JSON.
-  //
-  // Phase Two bindings are produced by the second EMR job, and result from the
-  // merging of multiple data sets. The new tables and fields are specified in
-  // PHASE_TWO_ADDITIONS_JSON.
-  //
+  // The project has a pom.xml file and a set of bindings for each stage of data
+  // processing.
   public void generate() throws IOException {
     javaSrcBase.mkdirs();
 
@@ -67,9 +52,31 @@ public class JavaBindingGenerator {
     copyPomXml();
 
     // Generate bindings for each step in the processing pipeline.
-    generateTableSet(0, schemaVersions.getPhase(0), null);
-    generateTableSet(1, schemaVersions.getPhase(1), schemaVersions.getPhase(0));
-    generateTableSet(2, schemaVersions.getPhase(2), schemaVersions.getPhase(1));
+    final List<SchemaVersion> versions = codeGen.getSchemaVersions();
+    SchemaVersion prev = null;
+    for (int i=0; i<versions.size(); i++) {
+      generateTableSet(0, versions.get(i), prev);
+      prev = versions.get(i);
+    }
+  }
+
+  // Generate the pom.xml file for the Maven project, based off a template in
+  // the src/main/resources directory.
+  private void copyPomXml() throws IOException {
+    final File pomFile = new File(baseDir, "pom.xml");
+    log.info("Creating pom.xml file at " + pomFile);
+    try (
+        InputStream inStream = this.getClass().getClassLoader()
+        .getResourceAsStream(POM_XML_TEMPLATE);
+        BufferedReader in = new BufferedReader(new InputStreamReader(inStream));
+        BufferedWriter out = new BufferedWriter(new FileWriter(pomFile))) {
+      String line = in.readLine();
+      while (line != null) {
+        // Replace the $artifact_id variable in the template.
+        out.write(line.replaceAll("\\$artifact_id", projectName) + "\n");
+        line = in.readLine();
+      }
+    }
   }
 
   // Generate the bindings for one step in the processing pipeline. There are
@@ -83,14 +90,13 @@ public class JavaBindingGenerator {
   // TableGenerator is run once per table, and creates the individual table
   // class.
   //
-  private void generateTableSet(final int phase, final SchemaPhase currentVersion,
-      final SchemaPhase previousVersion) throws IOException {
-    final File srcDir = new File(javaSrcBase,
-        currentVersion.getJavaBindingPackage().replaceAll("\\.", File.separator));
+  private void generateTableSet(final int phase, final SchemaVersion currentVersion,
+      final SchemaVersion previousVersion) throws IOException {
+    final File srcDir = new File(javaSrcBase, currentVersion.getJavaBindingPackage().replaceAll("\\.", File.separator));
     final String classPrefix = currentVersion.getPrefix();
     final String version = currentVersion.getSchema().getVersion();
     final Map<String, DataSchemaTable> tables = currentVersion.getSchema().getTables();
-    final String tableEnumName = spec.getJavaTableEnumName();
+    final String tableEnumName = codeGen.getJavaTableEnumName();
 
     // Create the base directory where all of the classes will be generated
     log.info("Generating tables in " + srcDir);
@@ -126,25 +132,6 @@ public class JavaBindingGenerator {
     }
   }
 
-  // Generate the pom.xml file for the Maven project, based off a template in
-  // the src/main/resources directory.
-  private void copyPomXml() throws IOException {
-    final File pomFile = new File(baseDir, "pom.xml");
-    log.info("Creating pom.xml file at " + pomFile);
-    try (
-        InputStream inStream = this.getClass().getClassLoader()
-        .getResourceAsStream(POM_XML_TEMPLATE);
-        BufferedReader in = new BufferedReader(new InputStreamReader(inStream));
-        BufferedWriter out = new BufferedWriter(new FileWriter(pomFile))) {
-      String line = in.readLine();
-      while (line != null) {
-        // Replace the $artifact_id variable in the template.
-        out.write(line.replaceAll("\\$artifact_id", projectName) + "\n");
-        line = in.readLine();
-      }
-    }
-  }
-
   // Generate a sorted list of table names for the switch tables in the enum and
   // factory classes
   static List<String> generateTableNames(final int phase, final Map<String, DataSchemaTable> tables) {
@@ -163,6 +150,8 @@ public class JavaBindingGenerator {
   // generated files.
   public static void writeFileHeader(final PrintStream out, final String version) {
     writeComment("This file was generated automatically. Do not edit.",
+        0, out, false);
+    writeComment("This code is based on version " + version + " of the schema.",
         0, out, false);
     out.println();
   }

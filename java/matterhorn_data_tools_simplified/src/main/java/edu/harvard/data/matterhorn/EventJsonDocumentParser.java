@@ -15,9 +15,9 @@ import edu.harvard.data.DataTable;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.io.JsonDocumentParser;
-import edu.harvard.data.matterhorn.bindings.input.InputEvent;
-import edu.harvard.data.matterhorn.bindings.input.InputGeoIp;
-import edu.harvard.data.matterhorn.bindings.input.InputVideo;
+import edu.harvard.data.matterhorn.bindings.phase_0.Phase0Event;
+import edu.harvard.data.matterhorn.bindings.phase_0.Phase0GeoIp;
+import edu.harvard.data.matterhorn.bindings.phase_0.Phase0Video;
 
 public class EventJsonDocumentParser implements JsonDocumentParser {
   private static final Logger log = LogManager.getLogger();
@@ -35,24 +35,24 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
   public Map<String, List<? extends DataTable>> getDocuments(final Map<String, Object> values)
       throws ParseException, VerificationException {
     final Map<String, List<? extends DataTable>> tables = new HashMap<String, List<? extends DataTable>>();
-    final InputEvent event = new InputEvent(format, values);
+    final Phase0Event event = new Phase0Event(format, values);
     if (values.containsKey("episode") && ((Map<String, Object>) values.get("episode")).size() > 0) {
       final Map<String, Object> fields = (Map<String, Object>) values.get("episode");
-      final InputVideo video = new InputVideo(format, fields);
+      final Phase0Video video = new Phase0Video(format, fields);
       video.setId(event.getMpid());
-      final List<InputVideo> videos = new ArrayList<InputVideo>();
+      final List<Phase0Video> videos = new ArrayList<Phase0Video>();
       videos.add(video);
       tables.put("video", videos);
     }
     if (values.containsKey("geoip") && ((Map<String, Object>) values.get("geoip")).size() > 0) {
       final Map<String, Object> fields = (Map<String, Object>) values.get("geoip");
       fields.remove("location"); // Location is redundant, and typed as a list
-      final InputGeoIp geoip = new InputGeoIp(format, fields);
-      final List<InputGeoIp> geoips = new ArrayList<InputGeoIp>();
+      final Phase0GeoIp geoip = new Phase0GeoIp(format, fields);
+      final List<Phase0GeoIp> geoips = new ArrayList<Phase0GeoIp>();
       geoips.add(geoip);
       tables.put("geo_ip", geoips);
     }
-    final List<InputEvent> events = new ArrayList<InputEvent>();
+    final List<Phase0Event> events = new ArrayList<Phase0Event>();
     events.add(event);
     tables.put("event", events);
     if (verify) {

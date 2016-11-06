@@ -20,9 +20,9 @@ import edu.harvard.data.TableFormat.Compression;
 import edu.harvard.data.io.FileTableReader;
 import edu.harvard.data.io.JsonFileReader;
 import edu.harvard.data.io.TableWriter;
-import edu.harvard.data.matterhorn.bindings.input.InputEvent;
-import edu.harvard.data.matterhorn.bindings.input.InputGeoIp;
-import edu.harvard.data.matterhorn.bindings.input.InputVideo;
+import edu.harvard.data.matterhorn.bindings.phase_0.Phase0Event;
+import edu.harvard.data.matterhorn.bindings.phase_0.Phase0GeoIp;
+import edu.harvard.data.matterhorn.bindings.phase_0.Phase0Video;
 
 public class InputParser {
 
@@ -102,19 +102,19 @@ public class InputParser {
     try (
         final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
             new EventJsonDocumentParser(inFormat, true));
-        TableWriter<InputEvent> events = new TableWriter<InputEvent>(InputEvent.class, outFormat,
+        TableWriter<Phase0Event> events = new TableWriter<Phase0Event>(Phase0Event.class, outFormat,
             eventFile);
-        TableWriter<InputVideo> videos = new TableWriter<InputVideo>(InputVideo.class, outFormat,
+        TableWriter<Phase0Video> videos = new TableWriter<Phase0Video>(Phase0Video.class, outFormat,
             videoFile);
-        TableWriter<InputGeoIp> geoips = new TableWriter<InputGeoIp>(InputGeoIp.class, outFormat,
+        TableWriter<Phase0GeoIp> geoips = new TableWriter<Phase0GeoIp>(Phase0GeoIp.class, outFormat,
             geoipFile);) {
       for (final Map<String, List<? extends DataTable>> tables : in) {
-        events.add((InputEvent) tables.get("event").get(0));
+        events.add((Phase0Event) tables.get("event").get(0));
         if (tables.containsKey("video") && !tables.get("video").isEmpty()) {
-          videos.add((InputVideo) tables.get("video").get(0));
+          videos.add((Phase0Video) tables.get("video").get(0));
         }
         if (tables.containsKey("geo_ip") && !tables.get("geo_ip").isEmpty()) {
-          geoips.add((InputGeoIp) tables.get("geo_ip").get(0));
+          geoips.add((Phase0GeoIp) tables.get("geo_ip").get(0));
         }
       }
     }
@@ -123,22 +123,22 @@ public class InputParser {
   @SuppressWarnings("unused") // We run through each table's iterator, but don't
   // need the values.
   private void verify() throws IOException {
-    try (FileTableReader<InputEvent> in = new FileTableReader<InputEvent>(InputEvent.class,
+    try (FileTableReader<Phase0Event> in = new FileTableReader<Phase0Event>(Phase0Event.class,
         outFormat, eventFile)) {
       log.info("Verifying file " + eventFile);
-      for (final InputEvent i : in) {
+      for (final Phase0Event i : in) {
       }
     }
-    try (FileTableReader<InputVideo> in = new FileTableReader<InputVideo>(InputVideo.class,
+    try (FileTableReader<Phase0Video> in = new FileTableReader<Phase0Video>(Phase0Video.class,
         outFormat, videoFile)) {
       log.info("Verifying file " + videoFile);
-      for (final InputVideo i : in) {
+      for (final Phase0Video i : in) {
       }
     }
-    try (FileTableReader<InputGeoIp> in = new FileTableReader<InputGeoIp>(InputGeoIp.class,
+    try (FileTableReader<Phase0GeoIp> in = new FileTableReader<Phase0GeoIp>(Phase0GeoIp.class,
         outFormat, geoipFile)) {
       log.info("Verifying file " + geoipFile);
-      for (final InputGeoIp i : in) {
+      for (final Phase0GeoIp i : in) {
       }
     }
   }

@@ -26,6 +26,8 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CopyObjectRequest;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.amazonaws.services.s3.model.DeleteObjectsRequest;
+import com.amazonaws.services.s3.model.DeleteObjectsRequest.KeyVersion;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -207,6 +209,18 @@ public class AwsUtils {
 
   public void deleteKey(final S3ObjectId key) {
     client.deleteObject(key.getBucket(), key.getKey());
+  }
+
+  public void deleteDirectory(final S3ObjectId location) {
+    if (keyExists(location)) {
+      final DeleteObjectsRequest request = new DeleteObjectsRequest(location.getBucket());
+      final List<KeyVersion> keys = new ArrayList<KeyVersion>();
+      for (final S3ObjectSummary key : listKeys(location)) {
+        keys.add(new KeyVersion(key.getKey()));
+      }
+      request.setKeys(keys);
+      client.deleteObjects(request);
+    }
   }
 
   public void writeEmptyFile(final S3ObjectId obj) {
