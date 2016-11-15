@@ -308,16 +308,20 @@ public abstract class CodeGenerator {
     identitySchema = IdentitySchema.read(getIdentifierResource());
     final IdentitySchemaTransformer idTrans = new IdentitySchemaTransformer(phase0Schema,
         identitySchema, getMainIdentifier());
-    schemaVersions.add(new SchemaVersion(idTrans.transform(), bindingPackageBase, 1));
+    final DataSchema deidentified = idTrans.transform();
+    schemaVersions.add(new SchemaVersion(deidentified, bindingPackageBase, 1));
 
     // Finally, we transform the schema according to any custom transformations
     // that the data source calls for.
     final List<String> extensionResources = getCustomTransformationResources();
+    DataSchema previousSchema = deidentified;
     for (int i = 0; i < extensionResources.size(); i++) {
       final String resource = extensionResources.get(i);
-      final ExtensionSchema transformed = ExtensionSchema.readExtensionSchema(resource);
+      final ExtensionSchema extension = ExtensionSchema.readExtensionSchema(resource);
+      final DataSchema transformed = transformer.transform(previousSchema, extension, true);
       final SchemaVersion schemaVersion = new SchemaVersion(transformed, bindingPackageBase, i + 2);
       schemaVersions.add(schemaVersion);
+      previousSchema = transformed;
     }
     return schemaVersions;
   }

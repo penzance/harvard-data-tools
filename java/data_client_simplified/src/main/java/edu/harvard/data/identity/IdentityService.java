@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
@@ -19,7 +20,7 @@ import edu.harvard.data.TableFormat;
 import edu.harvard.data.io.S3TableReader;
 import edu.harvard.data.io.TableReader;
 
-public class IdentityService implements Closeable {
+public class IdentityService implements Closeable, Callable<Void> {
 
   private final DataConfig config;
   private final AwsUtils aws;
@@ -36,12 +37,13 @@ public class IdentityService implements Closeable {
     this.mainIdentifier = config.getMainIdentifier();
     this.identityMap = new HashMap<Object, IdentityMap>();
     this.identityMapFormat = new FormatLibrary().getFormat(Format.DecompressedInternal);
-    setup();
   }
 
-  public void setup() throws SQLException, IOException {
+  @Override
+  public Void call() throws SQLException, IOException {
     unloadIdentityMap();
     readIdentityMap();
+    return null;
   }
 
   private void unloadIdentityMap() throws SQLException {

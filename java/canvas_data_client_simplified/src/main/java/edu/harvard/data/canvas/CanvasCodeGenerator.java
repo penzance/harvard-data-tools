@@ -20,6 +20,8 @@ import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class CanvasCodeGenerator extends CodeGenerator {
 
+  public static final String ADMIN_UUID_RESOURCE = "canvas/admin_uuids.txt";
+
   public static void main(final String[] args) throws IOException, DataConfigurationException,
   UnexpectedApiResponseException, SQLException, VerificationException {
     if (args.length != 5) {
@@ -62,7 +64,10 @@ public class CanvasCodeGenerator extends CodeGenerator {
 
   @Override
   protected List<String> getCustomTransformationResources() {
-    return new ArrayList<String>();
+    final List<String> resources = new ArrayList<String>();
+    resources.add("canvas/phase2_schema_additions.json");
+    resources.add("canvas/phase3_schema_additions.json");
+    return resources;
   }
 
   @Override

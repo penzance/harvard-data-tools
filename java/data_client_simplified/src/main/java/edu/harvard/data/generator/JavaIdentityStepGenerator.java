@@ -76,6 +76,8 @@ public class JavaIdentityStepGenerator {
       out.println();
       outputGetResearchIdMethod(out);
     }
+    out.println();
+    outputCallMethod(out);
     out.println("}");
   }
 
@@ -131,6 +133,13 @@ public class JavaIdentityStepGenerator {
     out.println("    final IdentityMap id = new IdentityMap();");
     out.println("        id.set(IdentifierType." + mainIdentifier + ", mainId);");
     out.println("    return idService.getResearchUuid(id, config.getMainIdentifier());");
+    out.println("  }");
+  }
+
+  private void outputCallMethod(final PrintStream out) {
+    out.println("  @Override");
+    out.println("  public Void call() throws Exception {");
+    out.println("    return null;");
     out.println("  }");
   }
 

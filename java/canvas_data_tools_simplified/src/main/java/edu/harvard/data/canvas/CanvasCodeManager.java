@@ -1,6 +1,5 @@
 package edu.harvard.data.canvas;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,18 +7,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
-import com.amazonaws.services.s3.model.S3ObjectId;
-
 import edu.harvard.data.CodeManager;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
-import edu.harvard.data.DataTable;
 import edu.harvard.data.DownloadAndVerify;
 import edu.harvard.data.ProcessingStep;
-import edu.harvard.data.TableFormat;
 import edu.harvard.data.canvas.bindings.phase_0.Phase0CanvasTableFactory;
 import edu.harvard.data.canvas.bindings.phase_1.Phase1CanvasTableFactory;
-import edu.harvard.data.io.TableWriter;
+import edu.harvard.data.canvas.steps.Phase2RequestsStep;
+import edu.harvard.data.canvas.steps.Phase3AdminRequestsStep;
 
 public class CanvasCodeManager extends CodeManager {
 
@@ -42,14 +38,11 @@ public class CanvasCodeManager extends CodeManager {
   }
 
   @Override
-  public List<ProcessingStep> getCustomSteps(final String tableName, final DataConfig config) {
-    return new ArrayList<ProcessingStep>();
+  public Map<String, List<ProcessingStep>> getCustomSteps(final DataConfig config) {
+    final Map<String, List<ProcessingStep>> steps = new HashMap<String, List<ProcessingStep>>();
+    steps.put("requests", new ArrayList<ProcessingStep>());
+    steps.get("requests").add(new Phase2RequestsStep());
+    steps.get("requests").add(new Phase3AdminRequestsStep());
+    return steps;
   }
-
-  @Override
-  public Map<String, TableWriter<DataTable>> getAdditionalWriters(final String tableName,
-      final TableFormat format, final S3ObjectId output, final File tmpFile) throws IOException {
-    return new HashMap<String, TableWriter<DataTable>>();
-  }
-
 }

@@ -3,12 +3,6 @@
       "owner": "java",
       "columns" : [ 
         {
-          "name" : "research_id",
-          "description" : "UUID generated for research data set.",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
           "name" : "browser",
           "description" : "Client-side browser from which the request was sent",
           "type" : "varchar",
@@ -19,11 +13,13 @@
           "description" : "Operating system from which the request was sent",
           "type" : "varchar",
           "length" : 255
+        },
+        {
+          "name" : "mobile",
+          "description" : "Whether the request originated from a mobile device, determined by the user agent string.",
+          "type" : "boolean"
         }
       ]
-    },
-    "admin_requests": {
-      "like": "requests"
     }
   }
 }

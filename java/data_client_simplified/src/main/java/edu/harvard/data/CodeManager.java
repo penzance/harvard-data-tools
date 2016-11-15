@@ -2,9 +2,12 @@ package edu.harvard.data;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
@@ -36,17 +39,18 @@ public abstract class CodeManager {
       final String runId, final ExecutorService exec)
           throws IOException, DataConfigurationException;
 
-  public abstract List<ProcessingStep> getCustomSteps(String tableName, DataConfig config);
-
-  public abstract Map<String, TableWriter<DataTable>> getAdditionalWriters(final String tableName,
-      final TableFormat format, final S3ObjectId output, final File tmpFile) throws IOException;
+  public abstract Map<String, List<ProcessingStep>> getCustomSteps(DataConfig config);
 
   @SuppressWarnings("unchecked")
   public static CodeManager getCodeManager(final String codeManagerClassName)
-      throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+      throws ClassNotFoundException, NoSuchMethodException, SecurityException,
+      InstantiationException, IllegalAccessException, IllegalArgumentException,
+      InvocationTargetException {
     final Class<? extends CodeManager> codeManagerClass = (Class<? extends CodeManager>) Class
         .forName(codeManagerClassName);
-    return codeManagerClass.newInstance();
+    final Constructor<? extends CodeManager> constructor = codeManagerClass
+        .getConstructor(IdentityService.class);
+    return constructor.newInstance();
   }
 
   public ProcessingStep getIdentityStep(final String tableName, final IdentityService idService,
@@ -56,6 +60,14 @@ public abstract class CodeManager {
 
   public ProcessingStep getFullTextStep(final String tableName) {
     return generatedManager.getFullTextStep(tableName);
+  }
+
+  public Set<ProcessingStep> getAllSteps(final DataConfig config) {
+    final Set<ProcessingStep> steps = generatedManager.getAllSteps();
+    for (final List<ProcessingStep> stepsForTable : getCustomSteps(config).values()) {
+      steps.addAll(stepsForTable);
+    }
+    return steps;
   }
 
   public TableReader<? extends DataTable> getS3InputTableReader(final String tableName,
@@ -70,9 +82,9 @@ public abstract class CodeManager {
     map.put(tableName, (TableWriter<DataTable>) outputTableFactory.getTableWriter(tableName, format,
         output, tmpFile));
     if (getFullTextStep(tableName) != null) {
-      map.putAll(generatedManager.getFullTextWriters(inputTableFactory, tableName, format, tmpFile.toString()));
+      map.putAll(generatedManager.getFullTextWriters(inputTableFactory, tableName, format,
+          tmpFile.toString()));
     }
-    map.putAll(getAdditionalWriters(tableName, format, output, tmpFile));
     return new CloseableMap<String, TableWriter<DataTable>>(map);
   }
 

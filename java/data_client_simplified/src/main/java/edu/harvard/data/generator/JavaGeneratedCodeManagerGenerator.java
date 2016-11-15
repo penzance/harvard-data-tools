@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -52,9 +54,15 @@ public class JavaGeneratedCodeManagerGenerator {
     out.println();
     out.println("public class " + className + " implements GeneratedCodeManager {");
     out.println();
+    outputFields(out);
+    out.println();
+    outputConstructor(out);
+    out.println();
     outputGetIdentityStep(out);
     out.println();
     outputGetFullTextStep(out);
+    out.println();
+    outputGetAllSteps(out);
     out.println();
     outputGetFullTextWriters(out);
     out.println("}");
@@ -63,8 +71,10 @@ public class JavaGeneratedCodeManagerGenerator {
   private void outputImportStatements(final PrintStream out) {
     out.println("import " + File.class.getName() + ";");
     out.println("import " + HashMap.class.getName() + ";");
+    out.println("import " + HashSet.class.getName() + ";");
     out.println("import " + IOException.class.getName() + ";");
     out.println("import " + Map.class.getName() + ";");
+    out.println("import " + Set.class.getName() + ";");
     out.println("import " + DataConfig.class.getName() + ";");
     out.println("import " + DataTable.class.getName() + ";");
     out.println("import " + GeneratedCodeManager.class.getName() + ";");
@@ -85,52 +95,86 @@ public class JavaGeneratedCodeManagerGenerator {
     }
   }
 
+  private void outputFields(final PrintStream out) {
+    out.println("  private final Map<String, ProcessingStep> identitySteps;");
+    out.println("  private final Map<String, ProcessingStep> fullTextSteps;");
+  }
+
+  private void outputConstructor(final PrintStream out) {
+    out.println("  public " + className + "() {");
+    out.println("    this.identitySteps = new HashMap<String, ProcessingStep>();");
+    out.println("    this.fullTextSteps = new HashMap<String, ProcessingStep>();");
+    out.println("  }");
+  }
+
   private void outputGetIdentityStep(final PrintStream out) {
     out.println("  @Override");
     out.println(
         "  public ProcessingStep getIdentityStep(final String tableName, final IdentityService idService,");
     out.println("    final DataConfig config) {");
-    out.println("    switch (tableName) {");
+    out.println("    if (!identitySteps.containsKey(tableName)) {");
+    out.println("      switch (tableName) {");
     for (final String tableName : inputSchema.getSchema().getTableNames()) {
-      out.println("    case \"" + tableName + "\":");
-      out.println("      return new " + JavaIdentityStepGenerator.getClassName(tableName)
-      + "(idService, config);");
+      out.println("      case \"" + tableName + "\":");
+      out.println("        identitySteps.put(\"" + tableName + "\", new "
+          + JavaIdentityStepGenerator.getClassName(tableName) + "(idService, config));");
+      out.println("        break;");
     }
-    out.println("    default:");
-    out.println("      throw new RuntimeException(\"Unknown table \" + tableName);");
+    out.println("      default:");
+    out.println("        throw new RuntimeException(\"Unknown table \" + tableName);");
+    out.println("      }");
     out.println("    }");
+    out.println("    return identitySteps.get(tableName);");
     out.println("  }");
   }
 
   private void outputGetFullTextStep(final PrintStream out) {
     out.println("  @Override");
-    out.println(
-        "  public ProcessingStep getFullTextStep(final String tableName) {");
-    out.println("    switch (tableName) {");
+    out.println("  public ProcessingStep getFullTextStep(final String tableName) {");
+    out.println("    if (!fullTextSteps.containsKey(tableName)) {");
+    out.println("      switch (tableName) {");
     for (final String tableName : inputSchema.getSchema().getTableNames()) {
-      out.println("    case \"" + tableName + "\":");
-      out.println(
-          "      return new " + JavaFullTextStepGenerator.getClassName(tableName) + "();");
+      out.println("      case \"" + tableName + "\":");
+      out.println("        fullTextSteps.put(\"" + tableName + "\", new "
+          + JavaFullTextStepGenerator.getClassName(tableName) + "());");
+      out.println("        break;");
     }
-    out.println("    default:");
-    out.println("      throw new RuntimeException(\"Unknown table \" + tableName);");
+    out.println("      default:");
+    out.println("        throw new RuntimeException(\"Unknown table \" + tableName);");
+    out.println("      }");
     out.println("    }");
+    out.println("    return fullTextSteps.get(tableName);");
+    out.println("  }");
+  }
+
+  private void outputGetAllSteps(final PrintStream out) {
+    out.println("  @Override");
+    out.println("  public Set<ProcessingStep> getAllSteps() {");
+    out.println("    Set<ProcessingStep> steps = new HashSet<ProcessingStep>();");
+    out.println("    steps.addAll(identitySteps.values());");
+    out.println("    steps.addAll(fullTextSteps.values());");
+    out.println("    return steps;");
     out.println("  }");
   }
 
   private void outputGetFullTextWriters(final PrintStream out) {
     out.println("  @SuppressWarnings(\"unchecked\")");
     out.println("  @Override");
-    out.println("  public Map<String, TableWriter<DataTable>> getFullTextWriters(final TableFactory tableFactory,");
-    out.println("      final String tableName, final TableFormat format, final String tmpFileBase) throws IOException {");
-    out.println("    final Map<String, TableWriter<DataTable>> writers = new HashMap<String, TableWriter<DataTable>>();");
+    out.println(
+        "  public Map<String, TableWriter<DataTable>> getFullTextWriters(final TableFactory tableFactory,");
+    out.println(
+        "      final String tableName, final TableFormat format, final String tmpFileBase) throws IOException {");
+    out.println(
+        "    final Map<String, TableWriter<DataTable>> writers = new HashMap<String, TableWriter<DataTable>>();");
     out.println("    switch (tableName) {");
     for (final String tableName : inputSchema.getSchema().getTableNames()) {
       final FullTextTable table = codeGen.getFullTextSchema().get(tableName);
       out.println("    case \"" + tableName + "\":");
       if (table != null) {
         for (final String column : table.getColumns()) {
-          out.println("      writers.put(\"" + column+ "\", (TableWriter<DataTable>) tableFactory.getTableWriter(tableName, format, new File(tmpFileBase + \"-" + column + "\")));");
+          out.println("      writers.put(\"" + column
+              + "\", (TableWriter<DataTable>) tableFactory.getTableWriter(tableName, format, new File(tmpFileBase + \"-"
+              + column + ".gz\")));");
         }
       }
       out.println("      break;");

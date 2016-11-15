@@ -3,6 +3,7 @@ package edu.harvard.data;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
@@ -47,8 +48,11 @@ public class DataFileProcessor implements Callable<Void> {
       final List<ProcessingStep> steps = new ArrayList<ProcessingStep>();
       addStep(steps, codeManager.getIdentityStep(tableName, idService, config));
       addStep(steps, codeManager.getFullTextStep(tableName));
-      for (final ProcessingStep step : codeManager.getCustomSteps(tableName, config)) {
-        addStep(steps, step);
+      final Map<String, List<ProcessingStep>> customSteps = codeManager.getCustomSteps(config);
+      if (customSteps.containsKey(tableName)) {
+        for (final ProcessingStep step : customSteps.get(tableName)) {
+          addStep(steps, step);
+        }
       }
       final TableWriter<DataTable> out = outputs.getMap().get(tableName);
       for (final DataTable inputRecord : in) {

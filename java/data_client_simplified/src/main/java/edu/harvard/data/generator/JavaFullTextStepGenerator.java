@@ -56,6 +56,8 @@ public class JavaFullTextStepGenerator {
     out.println("public class " + className + " implements ProcessingStep {");
     out.println();
     outputProcessMethod(out);
+    out.println();
+    outputCallMethod(out);
     out.println("}");
   }
 
@@ -86,6 +88,13 @@ public class JavaFullTextStepGenerator {
           + keyGetter + "(), in." + valueGetter + "()));");
     }
     out.println("    return in;");
+    out.println("  }");
+  }
+
+  private void outputCallMethod(final PrintStream out) {
+    out.println("  @Override");
+    out.println("  public Void call() throws Exception {");
+    out.println("    return null;");
     out.println("  }");
   }
 
