@@ -1,10 +1,28 @@
 { "tables": 
   { "submission_dim": {
-      "columns" : [ 
+      "columns" : [
         {
           "name" : "submission_type",
           "type": "enum",
           "description" : "Type of submission. Possible values are 'discussion_topic', 'external_tool', 'media_recording', 'online_file_upload', 'online_quiz', 'online_text_entry', 'online_upload', 'basic_lti_launch' and 'online_url'."
+        }
+      ]
+    },
+    "course_dim": {
+      "columns" : [
+        {
+          "name" : "workflow_state",
+          "type": "enum",
+          "description" : "Possible values are 'completed', 'created', 'deleted', 'available', 'claimed'."
+        }
+      ]
+    },
+    "role_dim": {
+      "columns" : [
+        {
+          "name" : "workflow_state",
+          "type": "enum",
+          "description" : "Possible values are 'deleted', 'inactive'."
         }
       ]
     }
