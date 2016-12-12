@@ -22,7 +22,7 @@
         {
           "name" : "workflow_state",
           "type": "enum",
-          "description" : "Possible values are 'deleted', 'inactive'."
+          "description" : "Possible values are 'deleted', 'inactive', 'built_in'."
         }
       ]
     }
