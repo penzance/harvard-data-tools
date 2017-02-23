@@ -83,6 +83,15 @@
           "description" : "Possible values are 'completed', 'locked', 'started', 'unlocked'."
         }
       ]
+    },
+    "score_dim": {
+      "columns" : [
+        {
+          "name" : "workflow_state",
+          "type": "enum",
+          "description" : "Possible values are 'active', 'deleted'."
+        }
+      ]
     }
   }
 }
