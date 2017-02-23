@@ -31,7 +31,7 @@
         {
           "name" : "requirement_type",
           "type": "enum",
-          "description" : "Possible values are 'X', 'Y', 'Z'."
+          "description" : "Possible values are 'min_score', 'must_contribute', 'must_mark_done', 'must_submit', 'must_view'."
         }
       ]
     },
@@ -40,7 +40,7 @@
         {
           "name" : "workflow_state",
           "type": "enum",
-          "description" : "Possible values are 'X', 'Y', 'Z'."
+          "description" : "Possible values are 'active', 'deleted', 'unpublished'."
         }
       ]
     },
@@ -49,7 +49,7 @@
         {
           "name" : "requirement_type",
           "type": "enum",
-          "description" : "Possible values are 'X', 'Y', 'Z'."
+          "description" : "Possible values are 'min_score', 'must_contribute', 'must_mark_done', 'must_submit', 'must_view'."
         }
       ]
     },
@@ -57,18 +57,16 @@
       "columns" : [
         {
           "name" : "collapsed",
-          "type": "enum",
-          "description" : "Possible values are 'X', 'Y', 'Z'."
+          "type": "boolean"
         },
         {
           "name" : "is_current",
-          "type": "enum",
-          "description" : "Possible values are 'X', 'Y', 'Z'."
+          "type": "boolean"
         },
         {
           "name" : "workflow_state",
           "type": "enum",
-          "description" : "Possible values are 'X', 'Y', 'Z'."
+          "description" : "Possible values are 'completed', 'locked', 'started', 'unlocked'."
         }
       ]
     }
