@@ -25,6 +25,52 @@
           "description" : "Possible values are 'active', 'deleted', 'inactive', 'built_in'."
         }
       ]
+    },
+    "module_completion_requirement_dim": {
+      "columns" : [
+        {
+          "name" : "requirement_type",
+          "type": "enum",
+          "description" : "Possible values are 'X', 'Y', 'Z'."
+        }
+      ]
+    },
+    "module_item_dim": {
+      "columns" : [
+        {
+          "name" : "workflow_state",
+          "type": "enum",
+          "description" : "Possible values are 'X', 'Y', 'Z'."
+        }
+      ]
+    },
+    "module_progression_completion_requirement_dim": {
+      "columns" : [
+        {
+          "name" : "requirement_type",
+          "type": "enum",
+          "description" : "Possible values are 'X', 'Y', 'Z'."
+        }
+      ]
+    },
+    "module_progression_dim": {
+      "columns" : [
+        {
+          "name" : "collapsed",
+          "type": "enum",
+          "description" : "Possible values are 'X', 'Y', 'Z'."
+        },
+        {
+          "name" : "is_current",
+          "type": "enum",
+          "description" : "Possible values are 'X', 'Y', 'Z'."
+        },
+        {
+          "name" : "workflow_state",
+          "type": "enum",
+          "description" : "Possible values are 'X', 'Y', 'Z'."
+        }
+      ]
     }
   }
 }
