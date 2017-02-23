@@ -26,6 +26,15 @@
         }
       ]
     },
+    "module_dim": {
+      "columns" : [
+        {
+          "name" : "require_sequential_progress",
+          "type": "enum",
+          "description" : "Should module items be completed sequentially? Valid values are 'required', 'not_required', 'not_specified'."
+        }
+      ]
+    },
     "module_completion_requirement_dim": {
       "columns" : [
         {
