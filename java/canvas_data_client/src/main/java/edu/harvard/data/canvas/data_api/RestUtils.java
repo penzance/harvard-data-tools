@@ -68,8 +68,8 @@ public class RestUtils {
             while (line != null) {
               sb.append(line);
               sb.append('\n');
+              line = in.readLine();
             }
-            line = in.readLine();
           }
           log.warn(sb.toString());
         }
