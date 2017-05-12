@@ -1,11 +1,8 @@
 package edu.harvard.data.identity;
 
 import java.io.IOException;
-import java.net.URI;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
@@ -29,9 +26,7 @@ import edu.harvard.data.AwsUtils;
 import edu.harvard.data.CodeManager;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
-import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.HadoopUtilities;
-import edu.harvard.data.TableFormat;
 import edu.harvard.data.leases.LeaseRenewalException;
 import edu.harvard.data.leases.LeaseRenewalThread;
 import edu.harvard.data.pipeline.InputTableIndex;
@@ -73,7 +68,8 @@ public class IdentityMapHadoopJob {
     this.hadoopUtils = new HadoopUtilities();
   }
 
-  protected void run() throws IOException, LeaseRenewalException, SQLException, DataConfigurationException {
+  protected void run()
+      throws IOException, LeaseRenewalException, SQLException, DataConfigurationException {
     final LeaseRenewalThread leaseThread = LeaseRenewalThread.setup(config.getLeaseDynamoTable(),
         config.getIdentityLease(), runId, config.getIdentityLeaseLengthSeconds());
     final IdentifierType mainIdentifier = config.getMainIdentifier();
@@ -90,32 +86,38 @@ public class IdentityMapHadoopJob {
       throw new RuntimeException(e);
     }
 
-    lookupEppnAndHuid(mainIdentifier);
+    // TODO: This is currently unavailable, while database issues are resolved
+    // by IAM. For now, we won't have EPPNs for any new identities introduced
+    // through the data. Once the database is available again, re-enable this
+    // line. Any missing EPPNs will be looked up the first time the code runs,
+    // filling in any gaps.
+    //    lookupEppnAndHuid(mainIdentifier);
     leaseThread.checkLease();
   }
 
-  private void lookupEppnAndHuid(final IdentifierType mainIdentifier) throws SQLException, DataConfigurationException, IOException {
-    log.info("Looking up any unknown EPPNs or HUIDs");
-    final TableFormat format = new FormatLibrary().getFormat(config.getPipelineFormat());
-    final HuidEppnLookup lookup = new HuidEppnLookup(config, format, mainIdentifier);
+  //  private void lookupEppnAndHuid(final IdentifierType mainIdentifier)
+  //      throws SQLException, DataConfigurationException, IOException {
+  //    log.info("Looking up any unknown EPPNs or HUIDs");
+  //    final TableFormat format = new FormatLibrary().getFormat(config.getPipelineFormat());
+  //    final HuidEppnLookup lookup = new HuidEppnLookup(config, format, mainIdentifier);
+  //
+  //    final String idMapDir = config.getPhase1IdMapPath() + "/";
+  //
+  //    final URI[] latest = getInputUris(idMapDir + config.getPhase1TempIdMapOutput());
+  //    final URI[] original = getInputUris(config.getPhase0IdMapPath());
+  //    final Path outputPath = new Path(idMapDir + config.getPhase1IdMapOutput());
+  //
+  //    lookup.expandIdentities(latest, original, outputPath.toUri(), mainIdentifier.getType());
+  //  }
 
-    final String idMapDir = config.getPhase1IdMapPath() + "/";
-
-    final URI[] latest = getInputUris(idMapDir + config.getPhase1TempIdMapOutput());
-    final URI[] original = getInputUris(config.getPhase0IdMapPath());
-    final Path outputPath = new Path(idMapDir + config.getPhase1IdMapOutput());
-
-    lookup.expandIdentities(latest, original, outputPath.toUri(), mainIdentifier.getType());
-  }
-
-  private URI[] getInputUris(final String path) throws IOException {
-    final Path inputDirPath = new Path(path);
-    final List<URI> inputUris = new ArrayList<URI>();
-    for (final Path inputPath : hadoopUtils.listHdfsFiles(hadoopConfig, inputDirPath)) {
-      inputUris.add(inputPath.toUri());
-    }
-    return inputUris.toArray(new URI[] {});
-  }
+  //  private URI[] getInputUris(final String path) throws IOException {
+  //    final Path inputDirPath = new Path(path);
+  //    final List<URI> inputUris = new ArrayList<URI>();
+  //    for (final Path inputPath : hadoopUtils.listHdfsFiles(hadoopConfig, inputDirPath)) {
+  //      inputUris.add(inputPath.toUri());
+  //    }
+  //    return inputUris.toArray(new URI[] {});
+  //  }
 
   @SuppressWarnings("rawtypes")
   private void configureMapperClasses(final Job job) {
