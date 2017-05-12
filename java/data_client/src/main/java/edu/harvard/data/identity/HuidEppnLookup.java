@@ -59,14 +59,19 @@ public class HuidEppnLookup {
     readIdentities(originalPaths, seenIds);
     log.info("Found " + unknownEppn.size() + " unknown EPPNs and " + unknownHuid.size()
     + " unknown HUIDs");
-    try (Connection connection = establishConnection()) {
-      if (!unknownEppn.isEmpty()) {
-        expand(unknownEppn, IdentifierType.HUID, IdentifierType.EPPN, connection);
-      }
-      if (!unknownHuid.isEmpty()) {
-        expand(unknownHuid, IdentifierType.EPPN, IdentifierType.HUID, connection);
-      }
-    }
+    // TODO: This is currently unavailable, while database issues are resolved
+    // by IAM. For now, we won't have EPPNs for any new identities introduced
+    // through the data. Once the database is available again, re-enable this
+    // line. Any missing EPPNs will be looked up the first time the code runs,
+    // filling in any gaps.
+    //    try (Connection connection = establishConnection()) {
+    //      if (!unknownEppn.isEmpty()) {
+    //        expand(unknownEppn, IdentifierType.HUID, IdentifierType.EPPN, connection);
+    //      }
+    //      if (!unknownHuid.isEmpty()) {
+    //        expand(unknownHuid, IdentifierType.EPPN, IdentifierType.HUID, connection);
+    //      }
+    //    }
     writeIdentities(outputPath);
   }
 
