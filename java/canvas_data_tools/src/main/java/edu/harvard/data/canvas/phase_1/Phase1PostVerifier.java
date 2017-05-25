@@ -77,11 +77,11 @@ public class Phase1PostVerifier {
 
     new PostVerifyIdentityMap(hadoopConfig, hdfsService, inputDir + "/identity_map",
         outputDir + "/identity_map/identitymap", format).verify();
-    updateInterestingTables();
+    //    updateInterestingTables();
 
-    for (final HadoopJob job : setupJobs()) {
-      job.runJob();
-    }
+    //    for (final HadoopJob job : setupJobs()) {
+    //      job.runJob();
+    //    }
   }
 
   private List<HadoopJob> setupJobs() throws IOException, DataConfigurationException {
