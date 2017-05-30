@@ -20,6 +20,33 @@ import edu.harvard.data.canvas.CanvasDataConfig;
 import edu.harvard.data.leases.LeaseRenewalException;
 import edu.harvard.data.leases.LeaseRenewalThread;
 
+/**
+ * Preverification sets up the necessary data that will be used by the
+ * postverifier to ensure that identify mapping was performed correctly. It does
+ * the following things:
+ *
+ * - Find a set of interesting users (as defined by VerificationPeople). This is
+ * a subset of the users in the system chosen for some set of characteristics
+ * such as account creation date, activity level and so on. It is hoped that the
+ * interesting people will cover a diverse group and should flag any errors in
+ * identity mapping.
+ *
+ * - Fetch the current identity map information for the interesting people
+ * directly from Redshift. This will hopefully be redundant, since we've already
+ * unloaded the identity map as part of the setup for this phase, but by going
+ * directly to the source we may catch any errors that could spring up during
+ * the unload operation.
+ *
+ * - Write that identity information out to the HDFS verification directory,
+ * where it can be used by the verification Hadoop jobs.
+ *
+ * - Kick off the PreVerify Hadoop job defined in the PreVerifyRequestsJob
+ * class.
+ *
+ * The PreVerify job consists only of a mapper, which runs through all the
+ * request records and outputs a two-column file that maps from request ID to
+ * Canvas Data User ID.
+ */
 public class Phase1PreVerifier {
   private static final Logger log = LogManager.getLogger();
   private final String inputDir;
@@ -44,7 +71,7 @@ public class Phase1PreVerifier {
   public Phase1PreVerifier(final CanvasDataConfig config) throws DataConfigurationException {
     this.config = config;
     this.inputDir = config.getHdfsDir(0);
-    this.outputDir = config.getVerifyHdfsDir(0);
+    this.outputDir = config.getVerifyHdfsDir(1);
     this.hadoopConfig = new Configuration();
     this.format = new FormatLibrary().getFormat(config.getPipelineFormat());
     try {
@@ -58,7 +85,8 @@ public class Phase1PreVerifier {
     log.info("Running pre-verifier for phase 1");
     log.info("Input directory: " + inputDir);
     log.info("Output directory: " + outputDir);
-    final String interestingIdFile = outputDir + "/interesting_canvas_data_ids";
+    final String interestingIdFile = outputDir + "/ ";
+    log.info("Interesting ID file: " + interestingIdFile);
     final VerificationPeople people = new VerificationPeople(config, hadoopConfig, hdfsService,
         inputDir, format);
     try {

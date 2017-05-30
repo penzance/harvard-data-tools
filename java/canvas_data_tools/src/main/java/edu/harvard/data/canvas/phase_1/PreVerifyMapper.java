@@ -45,5 +45,4 @@ abstract class PreVerifyMapper extends Mapper<Object, Text, Text, LongWritable> 
       }
     }
   }
-
 }

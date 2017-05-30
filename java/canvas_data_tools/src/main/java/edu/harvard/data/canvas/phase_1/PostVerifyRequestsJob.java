@@ -18,6 +18,7 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.mortbay.log.Log;
 
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
@@ -69,6 +70,7 @@ class PostVerifyRequestMapper extends Mapper<Object, Text, Text, LongWritable> {
     final FileSystem fs = FileSystem.get(context.getConfiguration());
     for (final URI uri : context.getCacheFiles()) {
       final Path path = new Path(uri.toString());
+      Log.info("Reading requests from file " + path);
       try (FSDataInputStream fsin = fs.open(path);
           BufferedReader in = new BufferedReader(new InputStreamReader(fsin))) {
         String line = in.readLine();
@@ -79,6 +81,7 @@ class PostVerifyRequestMapper extends Mapper<Object, Text, Text, LongWritable> {
         }
       }
     }
+    Log.info("Read " + interestingRequests.size() + " interesting requests");
   }
 
   @Override

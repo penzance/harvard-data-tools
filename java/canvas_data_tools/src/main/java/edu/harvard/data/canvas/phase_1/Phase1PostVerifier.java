@@ -77,11 +77,11 @@ public class Phase1PostVerifier {
 
     new PostVerifyIdentityMap(hadoopConfig, hdfsService, inputDir + "/identity_map",
         outputDir + "/identity_map/identitymap", format).verify();
-    //    updateInterestingTables();
+    updateInterestingTables();
 
-    //    for (final HadoopJob job : setupJobs()) {
-    //      job.runJob();
-    //    }
+    for (final HadoopJob job : setupJobs()) {
+      job.runJob();
+    }
   }
 
   private List<HadoopJob> setupJobs() throws IOException, DataConfigurationException {
@@ -103,12 +103,14 @@ public class Phase1PostVerifier {
     }
 
     for (final Path path : hadoopUtils.listFiles(hdfsService, verifyDir + "/requests")) {
+      int count = 0;
       try (FSDataInputStream fsin = fs.open(path);
           BufferedReader in = new BufferedReader(new InputStreamReader(fsin));
           FSDataOutputStream out = fs
               .create(new Path(verifyDir + "/updated/requests/" + hadoopUtils.getFileName(path)))) {
         String line = in.readLine();
         while (line != null) {
+          count++;
           final String[] parts = line.split("\t");
           final Long oldId = Long.parseLong(parts[1]);
           if (!identities.containsKey(oldId)) {
@@ -120,6 +122,7 @@ public class Phase1PostVerifier {
           line = in.readLine();
         }
       }
+      log.info("Read " + count + " request IDs from " + path);
     }
   }
 }
