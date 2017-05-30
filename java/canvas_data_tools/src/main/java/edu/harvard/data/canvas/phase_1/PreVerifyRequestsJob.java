@@ -9,6 +9,8 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
@@ -41,12 +43,15 @@ class PreVerifyRequestsJob extends HadoopJob {
 
 class PreVerifyRequestMapper extends PreVerifyMapper {
 
+  private static final Logger log = LogManager.getLogger();
+
   @Override
   public void map(final Object key, final Text value, final Context context)
       throws IOException, InterruptedException {
     final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
     for (final CSVRecord csvRecord : parser.getRecords()) {
       final Phase0Requests request = new Phase0Requests(format, csvRecord);
+      log.info("Request: " + csvRecord);
       if (request.getUserId() != null && idByCanvasDataId.containsKey(request.getUserId())) {
         context.write(new Text(request.getId()), new LongWritable(request.getUserId()));
       }

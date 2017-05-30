@@ -16,5 +16,4 @@ public interface TableFactory {
 
   TableWriter<? extends DataTable> getTableWriter(String table, TableFormat format, File file) throws IOException;
 
-
 }
