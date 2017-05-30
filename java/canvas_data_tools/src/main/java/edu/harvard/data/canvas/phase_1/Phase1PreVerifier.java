@@ -71,7 +71,7 @@ public class Phase1PreVerifier {
   public Phase1PreVerifier(final CanvasDataConfig config) throws DataConfigurationException {
     this.config = config;
     this.inputDir = config.getHdfsDir(0);
-    this.outputDir = config.getVerifyHdfsDir(0);
+    this.outputDir = config.getVerifyHdfsDir(1);
     this.hadoopConfig = new Configuration();
     this.format = new FormatLibrary().getFormat(config.getPipelineFormat());
     try {
@@ -85,7 +85,7 @@ public class Phase1PreVerifier {
     log.info("Running pre-verifier for phase 1");
     log.info("Input directory: " + inputDir);
     log.info("Output directory: " + outputDir);
-    final String interestingIdFile = outputDir + "/ ";
+    final String interestingIdFile = outputDir + "/interesting_canvas_data_ids";
     log.info("Interesting ID file: " + interestingIdFile);
     final VerificationPeople people = new VerificationPeople(config, hadoopConfig, hdfsService,
         inputDir, format);
