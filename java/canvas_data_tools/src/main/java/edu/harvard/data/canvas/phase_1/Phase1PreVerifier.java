@@ -71,7 +71,7 @@ public class Phase1PreVerifier {
   public Phase1PreVerifier(final CanvasDataConfig config) throws DataConfigurationException {
     this.config = config;
     this.inputDir = config.getHdfsDir(0);
-    this.outputDir = config.getVerifyHdfsDir(1);
+    this.outputDir = config.getVerifyHdfsDir(0);
     this.hadoopConfig = new Configuration();
     this.format = new FormatLibrary().getFormat(config.getPipelineFormat());
     try {
