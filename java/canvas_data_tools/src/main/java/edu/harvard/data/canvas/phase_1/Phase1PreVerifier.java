@@ -96,7 +96,7 @@ public class Phase1PreVerifier {
     }
 
     for (final HadoopJob job : setupJobs()) {
-      job.addCacheFile(URI.create(interestingIdFile));
+      //      job.addCacheFile(URI.create(interestingIdFile));
       job.runJob();
     }
   }

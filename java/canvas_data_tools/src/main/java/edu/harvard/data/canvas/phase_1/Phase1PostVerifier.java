@@ -31,6 +31,11 @@ import edu.harvard.data.io.HdfsTableReader;
 import edu.harvard.data.leases.LeaseRenewalException;
 import edu.harvard.data.leases.LeaseRenewalThread;
 
+/**
+ * Application that runs after the identity Hadoop jobs have completed. This
+ * class ensures that the processed contents of any interesting tables have the
+ * identities that we would expect.
+ */
 public class Phase1PostVerifier {
   private static final Logger log = LogManager.getLogger();
   private final Configuration hadoopConfig;
@@ -48,9 +53,15 @@ public class Phase1PostVerifier {
     final String runId = args[1];
     final CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class,
         configPathString, true);
+    // This is part of the identity mapping process, so we need to own the
+    // identity lease. Since this job will be running for a while, we create a
+    // background thread to re-acquire the lease for as long as we need it.
     final LeaseRenewalThread leaseThread = LeaseRenewalThread.setup(config.getLeaseDynamoTable(),
         config.getIdentityLease(), runId, config.getIdentityLeaseLengthSeconds());
     new Phase1PostVerifier(config).verify();
+    // Once the processing's done, make sure that we owned the lease throughout.
+    // If there was an error, the checkLease method will raise an exception that
+    // will kill the pipeline.
     leaseThread.checkLease();
   }
 
@@ -69,6 +80,14 @@ public class Phase1PostVerifier {
     }
   }
 
+  /**
+   * Verify the identity map table and any other tables that were flagged prior
+   * to the identity Hadoop jobs.
+   *
+   * @throws VerificationException
+   * @throws IOException
+   * @throws DataConfigurationException
+   */
   public void verify() throws VerificationException, IOException, DataConfigurationException {
     log.info("Running post-verifier for phase 1");
     log.info("Input directory: " + inputDir);
@@ -77,7 +96,10 @@ public class Phase1PostVerifier {
 
     new PostVerifyIdentityMap(hadoopConfig, hdfsService, inputDir + "/identity_map",
         outputDir + "/identity_map/identitymap", format).verify();
+    log.info("Verified identity map");
+
     updateInterestingTables();
+    log.info("Updated interesting tables");
 
     for (final HadoopJob job : setupJobs()) {
       job.runJob();
@@ -90,10 +112,18 @@ public class Phase1PostVerifier {
     return jobs;
   }
 
-  private void updateInterestingTables() throws IOException {
+  /**
+   * In the pre-verify stage we identified some records as interesting (see
+   * {@link VerificationPeople} for details). Run through the metadata that we
+   * cached for those records and update them with research UUIDs. As part of
+   * the post-verification Hadoop jobs, we'll be checking that the actual
+   * records match the IDs that we store here.
+   */
+  void updateInterestingTables() throws IOException {
     final FileSystem fs = FileSystem.get(hdfsService, hadoopConfig);
     final Map<Long, IdentityMap> identities = new HashMap<Long, IdentityMap>();
-    for (final Path path : hadoopUtils.listFiles(hdfsService, outputDir + "/identity_map/identitymap")) {
+    for (final Path path : hadoopUtils.listFiles(hdfsService,
+        outputDir + "/identity_map/identitymap")) {
       try (HdfsTableReader<IdentityMap> in = new HdfsTableReader<IdentityMap>(IdentityMap.class,
           format, fs, path)) {
         for (final IdentityMap id : in) {
@@ -102,6 +132,8 @@ public class Phase1PostVerifier {
       }
     }
 
+    // XXX: This code should probably be part of the PostVerifyRequestsJob
+    // class, since it's very request-specific.
     for (final Path path : hadoopUtils.listFiles(hdfsService, verifyDir + "/requests")) {
       int count = 0;
       try (FSDataInputStream fsin = fs.open(path);

@@ -10,6 +10,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.FormatLibrary.Format;
@@ -20,6 +22,7 @@ import edu.harvard.data.io.HdfsTableReader;
 
 abstract class PreVerifyMapper extends Mapper<Object, Text, Text, LongWritable> {
 
+  private static final Logger log = LogManager.getLogger();
   protected final Map<Long, IdentityMap> idByCanvasDataId;
   protected TableFormat format;
 
@@ -35,6 +38,7 @@ abstract class PreVerifyMapper extends Mapper<Object, Text, Text, LongWritable> 
     final FileSystem fs = FileSystem.get(context.getConfiguration());
     if (context.getCacheFiles() != null) {
       for (final URI uri : context.getCacheFiles()) {
+        log.info("Reading cache file " + uri);
         final Path path = new Path(uri.toString());
         try (HdfsTableReader<IdentityMap> in = new HdfsTableReader<IdentityMap>(IdentityMap.class,
             format, fs, path)) {

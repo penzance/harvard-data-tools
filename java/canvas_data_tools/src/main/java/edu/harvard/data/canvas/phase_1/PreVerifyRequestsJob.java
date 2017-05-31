@@ -1,9 +1,13 @@
 package edu.harvard.data.canvas.phase_1;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -17,10 +21,14 @@ import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.HadoopJob;
 import edu.harvard.data.NoInputDataException;
 import edu.harvard.data.canvas.bindings.phase0.Phase0Requests;
+import edu.harvard.data.identity.IdentifierType;
+import edu.harvard.data.identity.IdentityMap;
+import edu.harvard.data.io.HdfsTableReader;
 
 class PreVerifyRequestsJob extends HadoopJob {
 
-  public PreVerifyRequestsJob(final DataConfig config, final int phase) throws DataConfigurationException {
+  public PreVerifyRequestsJob(final DataConfig config, final int phase)
+      throws DataConfigurationException {
     super(config, phase);
   }
 
@@ -44,11 +52,27 @@ class PreVerifyRequestsJob extends HadoopJob {
 class PreVerifyRequestMapper extends PreVerifyMapper {
 
   private static final Logger log = LogManager.getLogger();
+  private final Map<Long, IdentityMap> interestingPeople;
+
+  public PreVerifyRequestMapper() {
+    super();
+    this.interestingPeople = new HashMap<Long, IdentityMap>();
+  }
 
   @Override
   protected void setup(final Context context) throws IOException, InterruptedException {
     super.setup(context);
-    log.info("Finished setting up PreVerifyRequestMapper.");
+    final Path path = new Path(
+        context.getConfiguration().get("/verify/phase_1/interesting_canvas_data_ids"));
+    final FileSystem fs = FileSystem.get(context.getConfiguration());
+    try (HdfsTableReader<IdentityMap> in = new HdfsTableReader<IdentityMap>(IdentityMap.class,
+        format, fs, path)) {
+      for (final IdentityMap id : in) {
+        interestingPeople.put((Long) id.get(IdentifierType.CanvasDataID), id);
+      }
+    }
+    log.info("Finished setting up PreVerifyRequestMapper. Read " + interestingPeople.size()
+    + " interesting people");
   }
 
   @Override
@@ -57,8 +81,8 @@ class PreVerifyRequestMapper extends PreVerifyMapper {
     final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
     for (final CSVRecord csvRecord : parser.getRecords()) {
       final Phase0Requests request = new Phase0Requests(format, csvRecord);
-      System.err.println("Request: " + csvRecord);
-      if (request.getUserId() != null && idByCanvasDataId.containsKey(request.getUserId())) {
+      if (request.getUserId() != null && interestingPeople.containsKey(request.getUserId())) {
+        System.err.println("Interesting request: " + csvRecord);
         context.write(new Text(request.getId()), new LongWritable(request.getUserId()));
       }
     }
