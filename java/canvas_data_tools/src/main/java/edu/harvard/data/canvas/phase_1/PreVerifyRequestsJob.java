@@ -46,12 +46,18 @@ class PreVerifyRequestMapper extends PreVerifyMapper {
   private static final Logger log = LogManager.getLogger();
 
   @Override
+  protected void setup(final Context context) throws IOException, InterruptedException {
+    super.setup(context);
+    log.info("Finished setting up PreVerifyRequestMapper.");
+  }
+
+  @Override
   public void map(final Object key, final Text value, final Context context)
       throws IOException, InterruptedException {
     final CSVParser parser = CSVParser.parse(value.toString(), format.getCsvFormat());
     for (final CSVRecord csvRecord : parser.getRecords()) {
       final Phase0Requests request = new Phase0Requests(format, csvRecord);
-      log.info("Request: " + csvRecord);
+      System.err.println("Request: " + csvRecord);
       if (request.getUserId() != null && idByCanvasDataId.containsKey(request.getUserId())) {
         context.write(new Text(request.getId()), new LongWritable(request.getUserId()));
       }
