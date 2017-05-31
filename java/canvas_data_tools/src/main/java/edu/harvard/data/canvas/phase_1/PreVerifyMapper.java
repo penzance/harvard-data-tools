@@ -20,6 +20,11 @@ import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.identity.IdentityMap;
 import edu.harvard.data.io.HdfsTableReader;
 
+/**
+ * Common base class for all table-specific pre-verification mappers. This
+ * abstract class just simplifies the common task of reading in an existing
+ * identity map from HDFS.
+ */
 abstract class PreVerifyMapper extends Mapper<Object, Text, Text, LongWritable> {
 
   private static final Logger log = LogManager.getLogger();

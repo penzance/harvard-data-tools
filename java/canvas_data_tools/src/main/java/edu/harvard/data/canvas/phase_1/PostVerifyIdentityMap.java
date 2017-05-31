@@ -55,6 +55,12 @@ public class PostVerifyIdentityMap implements Verifier {
     final Map<Long, String> updatedIds = readIdMap(updatedDir);
 
     for (final Entry<Long, String> entry : originalIds.entrySet()) {
+      // Not every original ID will necessarily be in the updated map; the
+      // updated map is generated based on the tables used during this run of
+      // the pipeline; if a user is not referenced in those tables they won't be
+      // in the updated map. The identity map is stored back to Redshift as an
+      // update operation, so any users that aren't in the updated map will be
+      // unaffected in the database.
       if (updatedIds.containsKey(entry.getKey())) {
         final String updatedRid = updatedIds.get(entry.getKey());
         if (!updatedRid.equals(entry.getValue())) {
