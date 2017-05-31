@@ -38,6 +38,8 @@ import edu.harvard.data.leases.LeaseRenewalThread;
  */
 public class Phase1PostVerifier {
   private static final Logger log = LogManager.getLogger();
+  private static final int MAX_REQUEST_RECORDS = 100000;
+
   private final Configuration hadoopConfig;
   private final URI hdfsService;
   private final String inputDir;
@@ -152,6 +154,11 @@ public class Phase1PostVerifier {
           final String newId = (String) identities.get(oldId).get(IdentifierType.ResearchUUID);
           out.writeBytes(parts[0] + "\t" + newId + "\n");
           line = in.readLine();
+        }
+        // Quick fix for an issue that arises on large dumps, where we may end
+        // up with so many records that we run out of memory.
+        if (count > MAX_REQUEST_RECORDS) {
+          break;
         }
       }
       log.info("Read " + count + " request IDs from " + path);

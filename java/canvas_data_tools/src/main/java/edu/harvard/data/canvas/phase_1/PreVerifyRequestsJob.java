@@ -94,7 +94,6 @@ class PreVerifyRequestMapper extends PreVerifyMapper {
     for (final CSVRecord csvRecord : parser.getRecords()) {
       final Phase0Requests request = new Phase0Requests(format, csvRecord);
       if (request.getUserId() != null && interestingPeople.containsKey(request.getUserId())) {
-        System.err.println("Interesting request: " + csvRecord);
         context.write(new Text(request.getId()), new LongWritable(request.getUserId()));
       }
     }
