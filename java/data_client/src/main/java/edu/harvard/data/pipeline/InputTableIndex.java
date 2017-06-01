@@ -124,6 +124,10 @@ public class InputTableIndex {
     return partial.get(tableName);
   }
 
+  public boolean isCanvasMegadump() {
+    return containsTable("requests") && !isPartial("requests");
+  }
+
   public void addNewlyGeneratedTables(final List<SchemaPhase> schemaPhases) {
     for (final SchemaPhase phase : schemaPhases) {
       for (final DataSchemaTable table : phase.getSchema().getTables().values()) {
