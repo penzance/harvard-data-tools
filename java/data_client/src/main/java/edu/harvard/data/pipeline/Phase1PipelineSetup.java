@@ -108,7 +108,7 @@ public class Phase1PipelineSetup {
   }
 
   private PipelineObjectBase identityPreverify(final PipelineObjectBase previousStep) {
-    if (!dataIndex.isCanvasMegadump()) {
+    if (!dataIndex.canvasMegadump()) {
       final Class<?> cls = codeManager.getIdentityPreverifyJob();
       if (cls != null) {
         final List<String> args = new ArrayList<String>();
@@ -124,7 +124,7 @@ public class Phase1PipelineSetup {
   }
 
   private PipelineObjectBase identityPostverify(final PipelineObjectBase previousStep) {
-    if (!dataIndex.isCanvasMegadump()) {
+    if (!dataIndex.canvasMegadump()) {
       final Class<?> cls = codeManager.getIdentityPostverifyJob();
       if (cls != null) {
         final List<String> args = new ArrayList<String>();

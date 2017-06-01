@@ -124,7 +124,7 @@ public class InputTableIndex {
     return partial.get(tableName);
   }
 
-  public boolean isCanvasMegadump() {
+  public boolean canvasMegadump() {
     return containsTable("requests") && !isPartial("requests");
   }
 
