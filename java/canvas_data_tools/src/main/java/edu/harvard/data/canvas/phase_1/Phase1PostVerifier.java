@@ -38,7 +38,7 @@ import edu.harvard.data.leases.LeaseRenewalThread;
  */
 public class Phase1PostVerifier {
   private static final Logger log = LogManager.getLogger();
-  private static final int MAX_REQUEST_RECORDS = 100000;
+  private static final int MAX_REQUEST_RECORDS = 10000;
 
   private final Configuration hadoopConfig;
   private final URI hdfsService;
