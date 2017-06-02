@@ -125,7 +125,7 @@ public class InputTableIndex {
   }
 
   public boolean canvasMegadump() {
-    return containsTable("requests") && !isPartial("requests");
+    return !(containsTable("requests") && !isPartial("requests"));
   }
 
   public void addNewlyGeneratedTables(final List<SchemaPhase> schemaPhases) {
