@@ -1,4 +1,4 @@
-package edu.harvard.data.matterhorn;
+package edu.harvard.data.mediasites;
 
 import java.io.IOException;
 import java.util.List;
