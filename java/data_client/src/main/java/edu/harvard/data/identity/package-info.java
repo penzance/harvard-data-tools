@@ -80,7 +80,7 @@
  * to the identity_map is controlled by a lease in DynamoDB (see the
  * {@link edu.harvard.data.leases} package for details on leases).
  * <p>
- * It is recommended (although not requred) that the per-table mappers and
+ * It is recommended (although not required) that the per-table mappers and
  * scrubbers be generated. See
  * {@link edu.harvard.data.generator.IdentityMapperGenerator} and
  * {@link edu.harvard.data.generator.IdentityScrubberGenerator} for generator
