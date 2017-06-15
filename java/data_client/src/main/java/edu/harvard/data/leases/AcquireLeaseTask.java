@@ -3,6 +3,12 @@ package edu.harvard.data.leases;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * Simple wrapper application around a lease acquire operation, intended to be
+ * called as a step in the data pipeline. The main method for this class will
+ * attempt to acquire a lease using the settings passed on the command line, and
+ * wait indefinitely until the lease becomes available.
+ */
 public class AcquireLeaseTask {
   private static final Logger log = LogManager.getLogger();
   private static final int MAX_WAIT_SECONDS = 60;
