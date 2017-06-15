@@ -1,0 +1,42 @@
+{ "tables": 
+  { "presentations": {
+      "columns" : [ 
+        {
+          "name" : "video_id",
+          "description" : "Video identifier.",
+          "type" : "varchar",
+          "length" : 255
+        }
+      ]
+    },
+    "users": {
+      "columns" : [ 
+        {
+          "name" : "huid",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "email",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "name",
+          "type" : "varchar",
+          "length" : 255
+        }
+      ]
+    },
+    "sessions": {
+      "columns" : [ 
+        {
+          "name" : "session_id",
+          "description" : "Session identifer.",
+          "type" : "varchar",
+          "length" : 255
+        }
+      ]
+    }
+  }
+}

@@ -495,8 +495,10 @@ public class JavaModelClassGenerator {
   // class to parse dates and timestamps.
   private void outputParseFromString(final PrintStream out, final DataSchemaColumn column,
       final String getRecord) {
+    final String varName = JavaBindingGenerator.javaVariable(column.getName());
     String parseMethod = null;
     final String extraParams = "";
+    //    final String extraCheck = null;
     switch (column.getType()) {
     case BigInt:
       parseMethod = "Long.valueOf";
@@ -513,6 +515,7 @@ public class JavaModelClassGenerator {
       break;
     case DoublePrecision:
       parseMethod = "Double.valueOf";
+      // extraCheck = varName + " = " + varName + ".equals(Double.NaN) ? 0.0 : " + varName + ";";
       break;
     case Integer:
       parseMethod = "Integer.valueOf";
@@ -524,7 +527,6 @@ public class JavaModelClassGenerator {
     case VarChar:
       break;
     }
-    final String varName = JavaBindingGenerator.javaVariable(column.getName());
     if (parseMethod == null) {
       out.println("    this." + varName + " = " + getRecord + ";");
     } else {
@@ -532,7 +534,10 @@ public class JavaModelClassGenerator {
       out.println("    String " + tmpName + " = " + getRecord + ";");
       out.println("    if (" + tmpName + " != null && " + tmpName + ".length() > 0) {");
       out.println(
-          "      this." + varName + " = " + parseMethod + "(" + tmpName + extraParams + ");");
+          "        this." + varName + " = " + parseMethod + "(" + tmpName + extraParams + ");");
+      //      if (extraCheck != null) {
+      //        out.println("        " + extraCheck);
+      //      }
       out.println("    }");
     }
   }

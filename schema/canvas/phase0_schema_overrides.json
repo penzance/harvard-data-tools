@@ -1,1 +1,97 @@
-{ }
+{ "tables": 
+  { "submission_dim": {
+      "columns" : [
+        {
+          "name" : "submission_type",
+          "type": "enum",
+          "description" : "Type of submission. Possible values are 'discussion_topic', 'external_tool', 'media_recording', 'online_file_upload', 'online_quiz', 'online_text_entry', 'online_upload', 'basic_lti_launch' and 'online_url'."
+        }
+      ]
+    },
+    "course": {
+      "columns" : [
+        {
+          "name" : "workflow_state",
+          "type": "enum",
+          "description" : "Possible values are 'completed', 'created', 'deleted', 'available', 'claimed'."
+        }
+      ]
+    },
+    "role_dim": {
+      "columns" : [
+        {
+          "name" : "workflow_state",
+          "type": "enum",
+          "description" : "Possible values are 'active', 'deleted', 'inactive', 'built_in'."
+        }
+      ]
+    },
+    "module_dim": {
+      "columns" : [
+        {
+          "name" : "require_sequential_progress",
+          "type": "enum",
+          "description" : "Should module items be completed sequentially? Valid values are 'required', 'not_required', 'not_specified'."
+        },
+        {
+          "name" : "workflow_state",
+          "type": "enum",
+          "description" : "Possible values are 'active', 'deleted', 'unpublished'."
+        }
+      ]
+    },
+    "module_completion_requirement_dim": {
+      "columns" : [
+        {
+          "name" : "requirement_type",
+          "type": "enum",
+          "description" : "Possible values are 'min_score', 'must_contribute', 'must_mark_done', 'must_submit', 'must_view'."
+        }
+      ]
+    },
+    "module_item_dim": {
+      "columns" : [
+        {
+          "name" : "workflow_state",
+          "type": "enum",
+          "description" : "Possible values are 'active', 'deleted', 'unpublished'."
+        }
+      ]
+    },
+    "module_progression_completion_requirement_dim": {
+      "columns" : [
+        {
+          "name" : "requirement_type",
+          "type": "enum",
+          "description" : "Possible values are 'min_score', 'must_contribute', 'must_mark_done', 'must_submit', 'must_view'."
+        }
+      ]
+    },
+    "module_progression_dim": {
+      "columns" : [
+        {
+          "name" : "collapsed",
+          "type": "boolean"
+        },
+        {
+          "name" : "is_current",
+          "type": "boolean"
+        },
+        {
+          "name" : "workflow_state",
+          "type": "enum",
+          "description" : "Possible values are 'completed', 'locked', 'started', 'unlocked'."
+        }
+      ]
+    },
+    "score_dim": {
+      "columns" : [
+        {
+          "name" : "workflow_state",
+          "type": "enum",
+          "description" : "Possible values are 'active', 'deleted'."
+        }
+      ]
+    }
+  }
+}

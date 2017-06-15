@@ -3,6 +3,10 @@
 # This script is called by the bootstrapAction attribute on the EMR cluster in a data pipeline.
 # See java/data_client/src/main/java/edu/harvard/data/pipeline/Pipeline.java
 
+# After modifying this script, it must be uploaded to S3. The S3 location is defined by the
+# configuration settings for the system, using the following pattern:
+#    s3://<code_bucket>/<git_tag_or_branch>/emr_bootstrap.sh
+
 export DATA_SCHEMA_VERSION=$1  # Used by code generator
 export GIT_BRANCH=$2
 export GENERATOR=$3

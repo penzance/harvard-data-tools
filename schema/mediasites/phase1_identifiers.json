@@ -1,0 +1,7 @@
+{
+	"users": {
+		"huid": ["HUID"],
+		"name": ["Name"],
+		"email": ["EmailAddress"]
+	}
+}

@@ -223,6 +223,7 @@ class CanvasPhase0VerifierJob2 implements Callable<Long> {
     if (line != null) {
       line = line.replaceAll("\\\\N", "\\\\n");
       line = line.replaceAll("\\.0\\t", "\t");
+      line = line.replaceAll("\\.0\\n", "\n");
     }
     return line;
   }

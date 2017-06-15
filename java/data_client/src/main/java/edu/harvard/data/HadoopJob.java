@@ -53,8 +53,9 @@ public abstract class HadoopJob {
     job.setJarByClass(HadoopJob.class);
     try {
       log.info("Submitted job " + job.getJobName());
-      job.submit();
+      //      job.submit();
       job.waitForCompletion(true);
+      log.info("Job complete: " + job.getJobName());
     } catch (final ClassNotFoundException e) {
       throw new DataConfigurationException(e);
     } catch (final InterruptedException e) {

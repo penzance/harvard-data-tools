@@ -73,7 +73,8 @@ public class IdentityMapHadoopJob {
     this.hadoopUtils = new HadoopUtilities();
   }
 
-  protected void run() throws IOException, LeaseRenewalException, SQLException, DataConfigurationException {
+  protected void run()
+      throws IOException, LeaseRenewalException, SQLException, DataConfigurationException {
     final LeaseRenewalThread leaseThread = LeaseRenewalThread.setup(config.getLeaseDynamoTable(),
         config.getIdentityLease(), runId, config.getIdentityLeaseLengthSeconds());
     final IdentifierType mainIdentifier = config.getMainIdentifier();
@@ -94,7 +95,8 @@ public class IdentityMapHadoopJob {
     leaseThread.checkLease();
   }
 
-  private void lookupEppnAndHuid(final IdentifierType mainIdentifier) throws SQLException, DataConfigurationException, IOException {
+  private void lookupEppnAndHuid(final IdentifierType mainIdentifier)
+      throws SQLException, DataConfigurationException, IOException {
     log.info("Looking up any unknown EPPNs or HUIDs");
     final TableFormat format = new FormatLibrary().getFormat(config.getPipelineFormat());
     final HuidEppnLookup lookup = new HuidEppnLookup(config, format, mainIdentifier);

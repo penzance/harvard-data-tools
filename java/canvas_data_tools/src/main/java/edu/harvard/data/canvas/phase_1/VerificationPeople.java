@@ -35,7 +35,8 @@ import edu.harvard.data.identity.IdentityMap;
 import edu.harvard.data.io.HdfsTableReader;
 import edu.harvard.data.io.TableWriter;
 
-// TODO: Add them ost recently created users as interesting people, to make sure that new IDs are properly created.
+// TODO: Add them most recently created users as interesting people, to make sure that new IDs are
+// properly created.
 public class VerificationPeople {
 
   private static final Logger log = LogManager.getLogger();

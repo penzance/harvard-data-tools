@@ -108,29 +108,33 @@ public class Phase1PipelineSetup {
   }
 
   private PipelineObjectBase identityPreverify(final PipelineObjectBase previousStep) {
-    final Class<?> cls = codeManager.getIdentityPreverifyJob();
-    if (cls != null) {
-      final List<String> args = new ArrayList<String>();
-      args.add(config.getPaths());
-      args.add(runId);
-      final PipelineObjectBase verify = factory.getEmrActivity("IdentityPreverify",
-          pipeline.getEmr(), cls, args);
-      verify.addDependency(previousStep);
-      return verify;
+    if (!dataIndex.canvasMegadump()) {
+      final Class<?> cls = codeManager.getIdentityPreverifyJob();
+      if (cls != null) {
+        final List<String> args = new ArrayList<String>();
+        args.add(config.getPaths());
+        args.add(runId);
+        final PipelineObjectBase verify = factory.getEmrActivity("IdentityPreverify",
+            pipeline.getEmr(), cls, args);
+        verify.addDependency(previousStep);
+        return verify;
+      }
     }
     return previousStep;
   }
 
   private PipelineObjectBase identityPostverify(final PipelineObjectBase previousStep) {
-    final Class<?> cls = codeManager.getIdentityPostverifyJob();
-    if (cls != null) {
-      final List<String> args = new ArrayList<String>();
-      args.add(config.getPaths());
-      args.add(runId);
-      final PipelineObjectBase verify = factory.getEmrActivity("IdentityPostverify",
-          pipeline.getEmr(), cls, args);
-      verify.addDependency(previousStep);
-      return verify;
+    if (!dataIndex.canvasMegadump()) {
+      final Class<?> cls = codeManager.getIdentityPostverifyJob();
+      if (cls != null) {
+        final List<String> args = new ArrayList<String>();
+        args.add(config.getPaths());
+        args.add(runId);
+        final PipelineObjectBase verify = factory.getEmrActivity("IdentityPostverify",
+            pipeline.getEmr(), cls, args);
+        verify.addDependency(previousStep);
+        return verify;
+      }
     }
     return previousStep;
   }

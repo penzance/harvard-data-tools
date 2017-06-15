@@ -38,4 +38,10 @@ public class BootstrapParameters {
     this.downloadOnly = downloadOnly;
   }
 
+  @Override
+  public String toString() {
+    return "BootstrapParams\n  ConfigPath: " + configPathString + "\n  dumpSequence: "
+        + dumpSequence + "\n  table: " + table + "\n  downloadOnly: " + downloadOnly;
+  }
+
 }

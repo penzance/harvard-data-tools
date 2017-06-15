@@ -175,6 +175,7 @@ public class JavaBindingGenerator {
     if (text == null) {
       return;
     }
+    final String cleanText = cleanText(text);
     if (javadoc) {
       writeIndent(indent, out);
       out.println("/**");
@@ -182,7 +183,7 @@ public class JavaBindingGenerator {
     final int maxLine = 80;
     startNewCommentLine(indent, out, javadoc);
     int currentLine = indent + 3;
-    for (final String word : text.split(" ")) {
+    for (final String word : cleanText.split(" ")) {
       currentLine += word.length() + 1;
       if (currentLine > maxLine) {
         out.println();
@@ -197,6 +198,14 @@ public class JavaBindingGenerator {
       out.print(" */");
     }
     out.println();
+  }
+
+  private static String cleanText(final String text) {
+    String clean = text;
+    if(clean.contains(">")) {
+      clean = clean.replaceAll(">", "");
+    }
+    return clean;
   }
 
   // Helper to indent comments properly

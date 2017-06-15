@@ -49,6 +49,24 @@
 	"group_membership_fact": {
 		"user_id": ["CanvasDataID"]
 	},
+	"module_completion_requirement_fact": {
+		"discussion_topic_editor_id": ["CanvasDataID"],
+		"user_id": ["CanvasDataID"]
+	},
+	"module_item_fact": {
+		"discussion_topic_editor_id": ["CanvasDataID"],
+		"user_id": ["CanvasDataID"]
+	},
+	"module_progression_completion_requirement_fact": {
+		"discussion_topic_editor_id": ["CanvasDataID"],
+		"user_id": ["CanvasDataID"]
+	},
+	"module_progression_dim": {
+		"user_id": ["CanvasDataID"]
+	},
+	"module_progression_fact": {
+		"user_id": ["CanvasDataID"]
+	},
 	"pseudonym_dim": {
 		"id": ["Other"],
 		"user_id": ["CanvasDataID"],

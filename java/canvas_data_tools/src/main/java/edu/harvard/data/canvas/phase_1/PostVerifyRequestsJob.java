@@ -18,6 +18,7 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.mortbay.log.Log;
 
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
@@ -28,9 +29,14 @@ import edu.harvard.data.NoInputDataException;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.canvas.bindings.phase1.Phase1Requests;
 
+/**
+ * Wrapper class around the {@link PostVerifyRequestMapper} that configures a
+ * new Hadoop job to do post-verification.
+ */
 public class PostVerifyRequestsJob extends HadoopJob {
 
-  public PostVerifyRequestsJob(final DataConfig config, final int phase) throws DataConfigurationException {
+  public PostVerifyRequestsJob(final DataConfig config, final int phase)
+      throws DataConfigurationException {
     super(config, phase);
   }
 
@@ -52,6 +58,19 @@ public class PostVerifyRequestsJob extends HadoopJob {
   }
 }
 
+/**
+ * Request post-verification Hadoop job. This class reads in the set of
+ * interesting requests that were saved by the {@link PreVerifyRequestsJob}
+ * Hadoop mapper, and stores them in local memory. It then runs through all
+ * requests, looking for request IDs that were flagged as interesting.
+ *
+ * For every interesting request, we stored the Canvas Data ID of the user
+ * making the request, and then converted it to the research UUID stored in the
+ * identity map (see {@link Phase1PostVerifier#updateInterestingTables()}). We
+ * can then check that the research UUID stored in the record read in via
+ * Hadoop's map mechanism matches what we expected to see according to our
+ * pre-calculated set of identifiers.
+ */
 class PostVerifyRequestMapper extends Mapper<Object, Text, Text, LongWritable> {
 
   private final Map<String, String> interestingRequests;
@@ -79,6 +98,7 @@ class PostVerifyRequestMapper extends Mapper<Object, Text, Text, LongWritable> {
         }
       }
     }
+    Log.info("Read " + interestingRequests.size() + " interesting requests");
   }
 
   @Override
