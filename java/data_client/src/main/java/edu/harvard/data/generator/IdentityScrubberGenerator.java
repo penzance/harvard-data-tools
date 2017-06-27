@@ -84,7 +84,7 @@ public class IdentityScrubberGenerator {
       final String getter = JavaBindingGenerator.javaGetter(idColumn);
       final String setter = JavaBindingGenerator
           .javaSetter(idColumn + IdentitySchemaTransformer.RESEARCH_UUID_SUFFIX);
-      out.println("    if (phase0." + getter + "() != null) {");
+      out.println("    if ( identities.get(phase0." + getter + "()) != null) {");
       out.println("      phase1." + setter + "((String) identities.get(phase0." + getter
           + "()).get(IdentifierType.ResearchUUID));");
       out.println("    }");
