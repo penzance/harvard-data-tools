@@ -16,12 +16,12 @@ import edu.harvard.data.pipeline.Phase0Bootstrap;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class MatterhornPhase0Bootstrap extends Phase0Bootstrap
-implements RequestHandler<String, String> {
+implements RequestHandler<BootstrapParameters, String> {
 
   @Override
-  public String handleRequest(final String configPathString, final Context context) {
+  public String handleRequest(final BootstrapParameters params, final Context context) {
     try {
-      super.init(configPathString, MatterhornDataConfig.class, true);
+      super.init(params.getConfigPathString(), MatterhornDataConfig.class, true);
       super.run(context);
     } catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
       return "Error: " + e.getMessage();
