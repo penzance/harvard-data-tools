@@ -79,8 +79,10 @@ public class PostVerifyIdentityMap implements Verifier {
           format, fs, path)) {
         log.info("Loading IDs from path " + path);
         for (final IdentityMap id : in) {
-          ids.put((Long) id.get(IdentifierType.CanvasDataID),
-              (String) id.get(IdentifierType.ResearchUUID));
+            if (id.get(IdentifierType.CanvasDataID) != null ) {
+        	    ids.put( (Long) id.get(IdentifierType.CanvasDataID),
+                         (String) id.get(IdentifierType.ResearchUUID) );
+            }
         }
       }
     }
