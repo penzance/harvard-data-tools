@@ -11,6 +11,11 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
 import edu.harvard.data.FormatLibrary;
 
+/**
+ * Mapping class that reads and writes the Lease table on DynamoDB. During setup
+ * the table name will be provided from a DataConfig setting, so the name passed
+ * in the DynamoDBTable annotation is never used.
+ */
 @DynamoDBTable(tableName = "DummyTableName")
 public class Lease {
 

@@ -17,6 +17,12 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
 import com.amazonaws.services.dynamodbv2.model.ExpectedAttributeValue;
 
+/**
+ * Main class in the lease package that performs all acquisition, renewal and
+ * release operations on leases. The implementation uses DynamoDB's consistent
+ * read mechanism, as well as it conditional field updates to provide the atomic
+ * operations that allow us to ensure mutual exclusion.
+ */
 public class LeaseManager {
 
   private static final Logger log = LogManager.getLogger();
@@ -33,6 +39,24 @@ public class LeaseManager {
     mapperConfig = builder.build();
   }
 
+  /**
+   * Update the expiration timestamp on a lease that the given owner already
+   * holds. If the given owner is not the current holder of the lease, this
+   * method throws an exception.
+   *
+   * @param name
+   *          the globally-unique name of the lease
+   * @param owner
+   *          a string that identifies the current process. This string must be
+   *          the same as the one supplied when the lease was first acquired.
+   * @param seconds
+   *          the length of time to renew the lease, in seconds.
+   * @return a new Lease instance that includes the updated expiration time. The
+   *         caller should check the expiration time on this lease, as it may
+   *         not match the number of seconds requested.
+   * @throws LeaseRenewalException
+   *           if the lease is not currently held by the expected owner.
+   */
   public Lease renew(final String name, final String owner, final int seconds)
       throws LeaseRenewalException {
     final Lease lease = find(name);
@@ -62,6 +86,28 @@ public class LeaseManager {
     return newLease;
   }
 
+  /**
+   * Assign the named lease to a given owner. This call will succeed in one of
+   * three ways:
+   * <ol>
+   * <li>The lease is currently unassigned (i.e. its owner is null).
+   * <li>The lease is currently assigned to the intended owner.
+   * <li>The lease is currently assigned but its expiration timestamp is in the
+   * past.
+   * </ol>
+   *
+   * @param name
+   *          the globally-unique name of the lease
+   * @param owner
+   *          an identifying string that is unique to this process
+   * @param seconds
+   *          the requested length of time for which the lease should be
+   *          acquired.
+   * @return a new Lease object if the lease is available, or null if some other
+   *         process currently holds the lease. The caller should check the
+   *         expiration time on any returned lease, as it may not match the
+   *         number of seconds requested.
+   */
   public Lease acquire(final String name, final String owner, final int seconds) {
     // Lookup the lease in the dynamo table.
     final Lease lease = find(name);
@@ -111,6 +157,19 @@ public class LeaseManager {
     }
   }
 
+  /**
+   * Set the lease to unassigned earlier than it would be according to its
+   * expiration timestamp. The current process should own the lease before
+   * attempting to release it.
+   *
+   * @param name
+   *          the globally-unique name of the lease
+   * @param owner
+   *          the expected owner of the lease. If the owner ID is different from
+   *          this value, the lease will not be released. It is recommended (but
+   *          not enforced) that a process only ever supply its own identifying
+   *          string for this parameter.
+   */
   public void release(final String name, final String owner) {
     // Lookup the lease in the dynamo table.
     final Lease lease = find(name);

@@ -16,6 +16,24 @@ import com.amazonaws.services.s3.model.S3ObjectId;
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.identity.IdentifierType;
 
+/**
+ * The DataConfig class is a central repository for all configuration settings
+ * across the system. Each configuration setting is represented in this class
+ * (or one of its subclasses) as a field, which is populated from some
+ * properties file stored on S3. The properties files are assumed to be
+ * formatted as Java key/value files.
+ *
+ * The class can be used in two ways. During early phases in the processing run
+ * a partial DataConfig object may be created. For example, during the initial
+ * bootstrap lambda function for a data set it is not yet known what type of
+ * infrastructure will be required, and so any settings regarding infrastructure
+ * will be null. Later in the run, it is expected that all configuration
+ * settings will be known, and so the complete config object may be created.
+ * These two cases can be distinguished by whether or not the data config is
+ * verified; an incomplete config object will not be verified, and so clients
+ * should be aware that some values may be null, while a complete config will be
+ * verified and should not contain null values.
+ */
 public class DataConfig {
 
   protected String paths;
@@ -646,7 +664,8 @@ public class DataConfig {
   }
 
   public String getIdentityOracleUrl() {
-    return "jdbc:oracle:thin:@"+ identityOracleServer + ":" + identityOraclePort + ":" + identityOracleSid;
+    return "jdbc:oracle:thin:@" + identityOracleServer + ":" + identityOraclePort + ":"
+        + identityOracleSid;
   }
 
   public String getIdentityOracleSchema() {
