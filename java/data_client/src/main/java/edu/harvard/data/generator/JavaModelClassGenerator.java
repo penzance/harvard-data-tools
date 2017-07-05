@@ -145,6 +145,7 @@ public class JavaModelClassGenerator {
     out.println("import " + HashMap.class.getName() + ";");
     out.println();
     out.println("import org.apache.commons.csv.CSVRecord;");
+    out.println("import org.apache.commons.lang.StringEscapeUtils;");
     out.println("import " + DataTable.class.getName() + ";");
     out.println("import " + TableFormat.class.getName() + ";");
     out.println();
@@ -480,7 +481,7 @@ public class JavaModelClassGenerator {
     case Guid:
     case Text:
     case VarChar:
-      out.println("      this." + variableName + " = String.valueOf(" + getMethod + ");");
+      out.println("      this." + variableName + " = StringEscapeUtils.escapeJava(String.valueOf(" + getMethod + "));");
       break;
     case Integer:
       out.println("      this." + variableName + " = (Integer) " + getMethod + ";");
