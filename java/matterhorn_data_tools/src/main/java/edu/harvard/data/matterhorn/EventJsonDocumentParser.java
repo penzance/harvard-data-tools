@@ -110,7 +110,7 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
         }
         compareMaps((Map<String, Object>) m1.get(key), (Map<String, Object>) m2.get(m2Key));
       } else {
-        final String v1 = m1.get(key).toString();
+        final String v1 = m1.get(key).toString().replaceAll("\t", " ");
         if (m2.get(m2Key) == null) {
           throw new VerificationException("Key " + key + " should not be null");
         }
@@ -127,7 +127,7 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
             }
           }
         } else {
-          final String v2 = convertToString(m2.get(m2Key));
+          final String v2 = convertToString(m2.get(m2Key)).replaceAll("\t", " ");
           if (m2.get(m2Key) instanceof Timestamp) {
             compareTimestamps(v1, v2, key);
           } else if (m2.get(m2Key) instanceof Double) {
