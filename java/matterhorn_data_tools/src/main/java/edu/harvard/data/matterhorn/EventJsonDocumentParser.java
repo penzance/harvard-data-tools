@@ -1,5 +1,6 @@
 package edu.harvard.data.matterhorn;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -110,7 +111,7 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
         }
         compareMaps((Map<String, Object>) m1.get(key), (Map<String, Object>) m2.get(m2Key));
       } else {
-        final String v1 = m1.get(key).toString().replaceAll("\t", " ");
+        final String v1 = cleanValue( m1.get(key).toString() );
         if (m2.get(m2Key) == null) {
           throw new VerificationException("Key " + key + " should not be null");
         }
@@ -127,7 +128,7 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
             }
           }
         } else {
-          final String v2 = convertToString(m2.get(m2Key)).replaceAll("\t", " ");
+          final String v2 = cleanValue( convertToString(m2.get(m2Key)) );
           if (m2.get(m2Key) instanceof Timestamp) {
             compareTimestamps(v1, v2, key);
           } else if (m2.get(m2Key) instanceof Double) {
@@ -170,6 +171,13 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     }
   }
 
+  private String cleanValue(String value) throws VerificationException {
+	    if (value != null) {
+	      value = value.replaceAll("\t", " ");
+	    }
+	    return value;
+  }
+  
   private String convertToString(final Object object) {
     if (object instanceof Timestamp) {
       return format.formatTimestamp(new Date(((Timestamp) object).getTime()));
