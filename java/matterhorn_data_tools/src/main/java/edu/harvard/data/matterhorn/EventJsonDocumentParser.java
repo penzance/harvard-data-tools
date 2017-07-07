@@ -1,6 +1,5 @@
 package edu.harvard.data.matterhorn;
 
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;

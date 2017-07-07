@@ -480,7 +480,7 @@ public class JavaModelClassGenerator {
     case Guid:
     case Text:
     case VarChar:
-      out.println("      this." + variableName + " = String.valueOf(" + getMethod + ").replaceAll(\"\\t\", \" \");");
+      out.println("      this." + variableName + " = String.valueOf(" + getMethod + ");");
       break;
     case Integer:
       out.println("      this." + variableName + " = (Integer) " + getMethod + ";");
