@@ -40,6 +40,7 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
       final Map<String, Object> fields = (Map<String, Object>) values.get("episode");
       final Phase0Video video = new Phase0Video(format, fields);
       video.setId(event.getMpid());
+      video.setTitle( cleanValue(video.getTitle()) );
       final List<Phase0Video> videos = new ArrayList<Phase0Video>();
       videos.add(video);
       tables.put("video", videos);
