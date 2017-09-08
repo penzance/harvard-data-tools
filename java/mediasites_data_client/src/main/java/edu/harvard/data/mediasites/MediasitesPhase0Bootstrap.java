@@ -9,27 +9,40 @@ import java.util.Map;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.s3.model.S3ObjectId;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfigurationException;
+import edu.harvard.data.mediasites.BootstrapParameters;
+import edu.harvard.data.mediasites.MediasitesPhase0Bootstrap;
 import edu.harvard.data.pipeline.Phase0Bootstrap;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class MediasitesPhase0Bootstrap extends Phase0Bootstrap
 implements RequestHandler<BootstrapParameters, String> {
-
+	   
+  // Main method for testing
+  public static void main(final String[] args) 
+		      throws JsonParseException, JsonMappingException, IOException {
+	System.out.println(args[0]);
+	final BootstrapParameters params = new ObjectMapper().readValue(args[0],
+		        BootstrapParameters.class);
+	System.out.println(new MediasitesPhase0Bootstrap().handleRequest(params, null));
+  }	
+		
   @Override
   public String handleRequest(final BootstrapParameters params, final Context context) {
-    try {
-      super.init(params.getConfigPathString(), MediasitesDataConfig.class, true);
-      System.out.println("The message was " + params.getMessage());
-      super.run(context);
-    } catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
-      return "Error: " + e.getMessage();
-    }
-    return "";
+	try {
+	      super.init(params.getConfigPathString(), MediasitesDataConfig.class, true);
+	      super.run(context);
+	} catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
+	      return "Error: " + e.getMessage();
+	}
+	    return "";
   }
-
+  
   @Override
   protected List<S3ObjectId> getInfrastructureConfigPaths() {
     final List<S3ObjectId> paths = new ArrayList<S3ObjectId>();
@@ -50,7 +63,7 @@ implements RequestHandler<BootstrapParameters, String> {
   @Override
   protected boolean newDataAvailable()
       throws IOException, DataConfigurationException, UnexpectedApiResponseException {
-    return true;
+	return !aws.listKeys(((MediasitesDataConfig)config).getDropboxBucket()).isEmpty();
   }
 
   @Override

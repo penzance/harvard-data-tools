@@ -9,7 +9,8 @@ public class FormatLibrary {
     DecompressedCanvasDataFlatFiles("decompressed_canvas"), CanvasDataFlatFiles(
         "canvas"), DecompressedExcel("decompressed_excel"), Excel("excel"), Matterhorn(
             "matterhorn"), DecompressedMatterhorn("decompressed_matterhorn"), CompressedInternal(
-                "compressed_internal"), DecompressedInternal("decompressed_internal");
+                "compressed_internal"), DecompressedInternal("decompressed_internal"), Mediasites(
+                    "mediasites"), DecompressedMediasites("decompressed_mediasites");
 
     private final String label;
 
@@ -35,6 +36,10 @@ public class FormatLibrary {
         return Matterhorn;
       case "decompressed_matterhorn":
         return DecompressedMatterhorn;
+      case "mediasites":
+    	return Mediasites;
+      case "decompressed_mediasites":
+    	return DecompressedMediasites;
       case "compressed_internal":
         return CompressedInternal;
       case "decompressed_internal":
@@ -59,6 +64,10 @@ public class FormatLibrary {
       return createMatterhornFormat();
     case DecompressedMatterhorn:
       return createDecompressedMatterhornFormat();
+    case Mediasites:
+      return createMediasitesFormat();
+    case DecompressedMediasites:
+      return createDecompressedMediasitesFormat();
     case CompressedInternal:
       return createCompressedInternalFormat();
     case DecompressedInternal:
@@ -71,6 +80,7 @@ public class FormatLibrary {
   public static final String CANVAS_TIMESTAMP_FORMAT_STRING = "yyyy-MM-dd HH:mm:ss";
   public static final String CANVAS_DATE_FORMAT_STRING = "yyyy-MM-dd";
   public static final String MATTERHORN_DATE_FORMAT_STRING = "yyyy-MM-dd'T'HH:mm:ssXXX";
+  public static final String MEDIASITES_DATE_FORMAT_STRING = "yyyy-MM-dd'T'HH:mm:ssXXX";
   public static final String LOCAL_DATE_FORMAT_STRING = "yyyy-MM-dd Z";
   public static final String JSON_DATE_FORMAT_STRING = "yyyy-MM-dd'T'HH:mm:ssZ";
 
@@ -82,6 +92,7 @@ public class FormatLibrary {
 
   private static final String CANVAS_FILE_ENCODING = "UTF-8";
   private static final String MATTERHORN_FILE_ENCODING = "UTF-8";
+  private static final String MEDIASITES_FILE_ENCODING = "UTF-8";
 
   private TableFormat createCanvasDataFlatFileFormat() {
     final TableFormat canvasFormat = new TableFormat(Format.CanvasDataFlatFiles);
@@ -145,6 +156,26 @@ public class FormatLibrary {
     format.setEncoding(MATTERHORN_FILE_ENCODING);
     format.setCompression(TableFormat.Compression.Gzip);
     return format;
+  }
+  
+  private TableFormat createDecompressedMediasitesFormat() {
+	final TableFormat format = new TableFormat(Format.Mediasites);
+	format.setDateFormat(new SimpleDateFormat(MEDIASITES_DATE_FORMAT_STRING));
+	format.setTimestampFormat(new SimpleDateFormat(MEDIASITES_DATE_FORMAT_STRING));
+	format.setIncludeHeaders(false);
+	format.setEncoding(MEDIASITES_FILE_ENCODING);
+	format.setCompression(TableFormat.Compression.None);
+	return format;
+  }
+
+  private TableFormat createMediasitesFormat() {
+	final TableFormat format = new TableFormat(Format.Mediasites);
+	format.setDateFormat(new SimpleDateFormat(MEDIASITES_DATE_FORMAT_STRING));
+	format.setTimestampFormat(new SimpleDateFormat(MEDIASITES_DATE_FORMAT_STRING));
+	format.setIncludeHeaders(false);
+	format.setEncoding(MEDIASITES_FILE_ENCODING);
+	format.setCompression(TableFormat.Compression.Gzip);
+	return format;
   }
 
   private TableFormat createCompressedInternalFormat() {

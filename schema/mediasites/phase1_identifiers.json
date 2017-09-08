@@ -1,7 +1,5 @@
 {
-	"users": {
-		"huid": ["HUID"],
-		"name": ["Name"],
-		"email": ["EmailAddress"]
+	"viewing_trends_user": {
+		"user_id": ["HUID"]
 	}
 }

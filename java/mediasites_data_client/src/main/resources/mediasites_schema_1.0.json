@@ -6,33 +6,361 @@
           "description" : "Video identifier.",
           "type" : "varchar",
           "length" : 255
-        }
-      ]
-    },
-    "users": {
-      "columns" : [ 
+        },
         {
-          "name" : "huid",
+          "name" : "course_identifier",
+          "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "email",
+          "name" : "course_identifier_type",
+          "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "name",
+          "name" : "folder_id",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "title",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "status",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "source",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "rootid",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "registrationrequired",
+          "description" : "",
+          "type" : "boolean"
+        },
+        {
+          "name" : "description",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "recorddate",
+          "description" : "",
+          "type" : "timestamp"
+        },
+        {
+          "name" : "recorddatelocal",
+          "description" : "",
+          "type" : "timestamp"
+        },
+        {
+          "name" : "duration",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "numberofviews",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "owner",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "creator",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "primarypresenter",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "thumbnailurl",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "islive",
+          "description" : "",
+          "type" : "boolean"
+        },
+        {
+          "name" : "creationdate",
+          "description" : "",
+          "type" : "timestamp"
+        },
+        {
+          "name" : "playerid",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "presentationtemplateid",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "alternatename",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "copyrightnotice",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "maximumconnections",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "publishingpointname",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "isuploadautomatic",
+          "description" : "",
+          "type" : "boolean"
+        },
+        {
+          "name" : "timezone",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "pollsenabled",
+          "description" : "",
+          "type" : "boolean"
+        },
+        {
+          "name" : "forumsenabled",
+          "description" : "",
+          "type" : "boolean"
+        },
+        {
+          "name" : "sharingenabled",
+          "description" : "",
+          "type" : "boolean"
+        },
+        {
+          "name" : "playerlocked",
+          "description" : "",
+          "type" : "boolean"
+        },
+        {
+          "name" : "pollsinternal",
+          "description" : "",
+          "type" : "boolean"
+        },
+        {
+          "name" : "private_setting",
+          "description" : "",
+          "type" : "boolean"
+        },
+        {
+          "name" : "notifyonmetadatachanged",
+          "description" : "",
+          "type" : "boolean"
+        },
+        {
+          "name" : "approvalstate",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "approvalrequiredchangetypes",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "isapproved",
+          "description" : "",
+          "type" : "boolean"
+        },
+        {
+          "name" : "contentrevision",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "polllink",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "parentfoldername",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "parentfolderid",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "displayrecorddate",
+          "description" : "",
+          "type" : "timestamp"
+        },
+        {
+          "name" : "isliveenabled",
+          "description" : "",
+          "type" : "boolean"
+        },
+        {
+          "name" : "playstatus",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "customvaluefields",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "taglist",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "isheadrevisioncontentcomplete",
+          "description" : "",
+          "type" : "boolean"
+        },
+        {
+          "name" : "totalfilelength",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "externallinks",
+          "description" : "",
           "type" : "varchar",
           "length" : 255
         }
       ]
     },
-    "sessions": {
+    "viewing_trends": {
       "columns" : [ 
         {
-          "name" : "session_id",
-          "description" : "Session identifer.",
+          "name" : "course_identifier",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "course_identifier_type",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "video_id",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "starttime",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "endtime",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "duration",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "views",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        }
+      ]
+    },
+    "viewing_trends_user": {
+      "columns" : [ 
+        {
+          "name" : "user_id",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "video_id",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "starttime",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "endtime",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "totalviews",
+          "description" : "",
           "type" : "varchar",
           "length" : 255
         }
