@@ -12,11 +12,15 @@ import edu.harvard.data.DataConfigurationException;
 public class MediasitesDataConfig extends DataConfig {
 
   private final String apiKey;
+  private final String dropboxBucket;
+
 
   public MediasitesDataConfig(final List<? extends InputStream> streams, final boolean verify)
       throws IOException, DataConfigurationException {
     super(streams, verify);
     this.apiKey = getConfigParameter("api_key", verify);
+    this.dropboxBucket = getConfigParameter("dropbox_bucket", verify);
+
 
     this.codeGeneratorScript = "mediasites_generate_tools.py";
     this.codeManagerClass = "edu.harvard.data.mediasites.MediasitesCodeManager";
@@ -42,4 +46,9 @@ public class MediasitesDataConfig extends DataConfig {
   public String getApiKey() {
     return apiKey;
   }
+  
+  public String getDropboxBucket() {
+	    return dropboxBucket;
+	  }
+  
 }

@@ -78,7 +78,7 @@ public class MediasitesCodeGenerator extends CodeGenerator {
     // Specify the four versions of the table bindings
     final GenerationSpec spec = new GenerationSpec(TRANFORMATION_PHASES, schemaVersion);
     spec.setJavaProjectName("mediasites_generated_code");
-    spec.setJavaTableEnumName("mediasitesTable");
+    spec.setJavaTableEnumName("MediasitesTable");
     spec.setPrefixes("Phase0", "Phase1", "Phase2", "Phase3");
     spec.setHdfsDirectories(config.getHdfsDir(0), config.getHdfsDir(1), config.getHdfsDir(2),
         config.getHdfsDir(3));

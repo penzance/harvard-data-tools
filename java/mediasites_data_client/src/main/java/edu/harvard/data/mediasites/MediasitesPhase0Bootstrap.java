@@ -50,7 +50,7 @@ implements RequestHandler<BootstrapParameters, String> {
   @Override
   protected boolean newDataAvailable()
       throws IOException, DataConfigurationException, UnexpectedApiResponseException {
-    return true;
+	return !aws.listKeys(((MediasitesDataConfig)config).getDropboxBucket()).isEmpty();
   }
 
   @Override
