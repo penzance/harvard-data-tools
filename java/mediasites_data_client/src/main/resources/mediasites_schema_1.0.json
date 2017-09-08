@@ -26,260 +26,260 @@
           "length" : 255
         },
         {
-          "name" : "title",
+          "name" : "Title",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "status",
+          "name" : "Status",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "source",
+          "name" : "Source",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "rootid",
+          "name" : "RootId",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "registrationrequired",
+          "name" : "RegistrationRequired",
           "description" : "",
           "type" : "boolean"
         },
         {
-          "name" : "description",
+          "name" : "Description",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "recorddate",
+          "name" : "RecordDate",
           "description" : "",
           "type" : "timestamp"
         },
         {
-          "name" : "recorddatelocal",
+          "name" : "RecordDateLocal",
           "description" : "",
           "type" : "timestamp"
         },
         {
-          "name" : "duration",
+          "name" : "Duration",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "numberofviews",
+          "name" : "NumberOfViews",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "owner",
+          "name" : "Owner",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "creator",
+          "name" : "Creator",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "primarypresenter",
+          "name" : "PrimaryPresenter",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "thumbnailurl",
+          "name" : "ThumbnailUrl",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "islive",
+          "name" : "IsLive",
           "description" : "",
           "type" : "boolean"
         },
         {
-          "name" : "creationdate",
+          "name" : "CreationDate",
           "description" : "",
           "type" : "timestamp"
         },
         {
-          "name" : "playerid",
+          "name" : "PlayerId",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "presentationtemplateid",
+          "name" : "PresentationTemplateId",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "alternatename",
+          "name" : "AlternateName",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "copyrightnotice",
+          "name" : "CopyrightNotice",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "maximumconnections",
+          "name" : "MaximumConnections",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "publishingpointname",
+          "name" : "PublishingPointName",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "isuploadautomatic",
+          "name" : "IsUploadAutomatic",
           "description" : "",
           "type" : "boolean"
         },
         {
-          "name" : "timezone",
+          "name" : "TimeZone",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "pollsenabled",
+          "name" : "PollsEnabled",
           "description" : "",
           "type" : "boolean"
         },
         {
-          "name" : "forumsenabled",
+          "name" : "ForumsEnabled",
           "description" : "",
           "type" : "boolean"
         },
         {
-          "name" : "sharingenabled",
+          "name" : "SharingEnabled",
           "description" : "",
           "type" : "boolean"
         },
         {
-          "name" : "playerlocked",
+          "name" : "PlayerLocked",
           "description" : "",
           "type" : "boolean"
         },
         {
-          "name" : "pollsinternal",
+          "name" : "PollsInternal",
           "description" : "",
           "type" : "boolean"
         },
         {
-          "name" : "private_setting",
+          "name" : "Private",
           "description" : "",
           "type" : "boolean"
         },
         {
-          "name" : "notifyonmetadatachanged",
+          "name" : "NotifyOnMetadataChanged",
           "description" : "",
           "type" : "boolean"
         },
         {
-          "name" : "approvalstate",
+          "name" : "ApprovalState",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "approvalrequiredchangetypes",
+          "name" : "ApprovalRequiredChangeTypes",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "isapproved",
+          "name" : "IsApproved",
           "description" : "",
           "type" : "boolean"
         },
         {
-          "name" : "contentrevision",
+          "name" : "ContentRevision",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "polllink",
+          "name" : "PollLink",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "parentfoldername",
+          "name" : "ParentFolderName",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "parentfolderid",
+          "name" : "ParentFolderId",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "displayrecorddate",
+          "name" : "DisplayRecordDate",
           "description" : "",
           "type" : "timestamp"
         },
         {
-          "name" : "isliveenabled",
+          "name" : "IsLiveEnabled",
           "description" : "",
           "type" : "boolean"
         },
         {
-          "name" : "playstatus",
+          "name" : "PlayStatus",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "customvaluefields",
+          "name" : "CustomFieldValues",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "taglist",
+          "name" : "TagList",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "isheadrevisioncontentcomplete",
+          "name" : "IsHeadRevisionContentComplete",
           "description" : "",
           "type" : "boolean"
         },
         {
-          "name" : "totalfilelength",
+          "name" : "TotalFileLength",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "externallinks",
+          "name" : "ExternalLinks",
           "description" : "",
           "type" : "varchar",
           "length" : 255
@@ -307,25 +307,19 @@
           "length" : 255
         },
         {
-          "name" : "starttime",
+          "name" : "StartTime",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "endtime",
+          "name" : "Duration",
           "description" : "",
           "type" : "varchar",
           "length" : 255
         },
         {
-          "name" : "duration",
-          "description" : "",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "views",
+          "name" : "Views",
           "description" : "",
           "type" : "varchar",
           "length" : 255
