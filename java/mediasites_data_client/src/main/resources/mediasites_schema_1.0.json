@@ -189,7 +189,7 @@
           "type" : "boolean"
         },
         {
-          "name" : "Private",
+          "name" : "Private_var",
           "description" : "",
           "type" : "boolean"
         },
