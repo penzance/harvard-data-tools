@@ -100,7 +100,7 @@ public class MediasitesCodeGenerator extends CodeGenerator {
   private static DataSchema readSchema(final String version)
       throws JsonParseException, JsonMappingException, IOException {
     final ObjectMapper jsonMapper = new ObjectMapper();
-    jsonMapper.setDateFormat(new SimpleDateFormat(FormatLibrary.JSON_DATE_FORMAT_STRING));
+    jsonMapper.setDateFormat(new SimpleDateFormat(FormatLibrary.MEDIASITES_DATE_FORMAT_STRING));
     final ClassLoader classLoader = MediasitesCodeGenerator.class.getClassLoader();
     try (final InputStream in = classLoader
         .getResourceAsStream("mediasites_schema_" + version + ".json")) {
