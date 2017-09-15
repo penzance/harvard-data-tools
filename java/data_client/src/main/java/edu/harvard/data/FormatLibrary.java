@@ -80,7 +80,8 @@ public class FormatLibrary {
   public static final String CANVAS_TIMESTAMP_FORMAT_STRING = "yyyy-MM-dd HH:mm:ss";
   public static final String CANVAS_DATE_FORMAT_STRING = "yyyy-MM-dd";
   public static final String MATTERHORN_DATE_FORMAT_STRING = "yyyy-MM-dd'T'HH:mm:ssXXX";
-  public static final String MEDIASITES_DATE_FORMAT_STRING = "yyyy-MM-dd'T'HH:mm:ssXXXZ";
+  public static final String MEDIASITES_TIMESTAMP_FORMAT_STRING = "yyyy-MM-dd'T'HH:mm:ssXXXZ";
+  public static final String MEDIASITES_DATE_FORMAT_STRING = "yyyy-MM-dd'T'HH:mm:ss";
   public static final String LOCAL_DATE_FORMAT_STRING = "yyyy-MM-dd Z";
   public static final String JSON_DATE_FORMAT_STRING = "yyyy-MM-dd'T'HH:mm:ssZ";
 
@@ -161,7 +162,7 @@ public class FormatLibrary {
   private TableFormat createDecompressedMediasitesFormat() {
 	final TableFormat format = new TableFormat(Format.Mediasites);
 	format.setDateFormat(new SimpleDateFormat(MEDIASITES_DATE_FORMAT_STRING));
-	format.setTimestampFormat(new SimpleDateFormat(MEDIASITES_DATE_FORMAT_STRING));
+	format.setTimestampFormat(new SimpleDateFormat(MEDIASITES_TIMESTAMP_FORMAT_STRING));
 	format.setIncludeHeaders(false);
 	format.setEncoding(MEDIASITES_FILE_ENCODING);
 	format.setCompression(TableFormat.Compression.None);
@@ -171,7 +172,7 @@ public class FormatLibrary {
   private TableFormat createMediasitesFormat() {
 	final TableFormat format = new TableFormat(Format.Mediasites);
 	format.setDateFormat(new SimpleDateFormat(MEDIASITES_DATE_FORMAT_STRING));
-	format.setTimestampFormat(new SimpleDateFormat(MEDIASITES_DATE_FORMAT_STRING));
+	format.setTimestampFormat(new SimpleDateFormat(MEDIASITES_TIMESTAMP_FORMAT_STRING));
 	format.setIncludeHeaders(false);
 	format.setEncoding(MEDIASITES_FILE_ENCODING);
 	format.setCompression(TableFormat.Compression.Gzip);
