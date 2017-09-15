@@ -133,9 +133,15 @@ public class InputParser {
     	// End    		
     		) {
       for (final Map<String, List<? extends DataTable>> tables : in) {
-    	  presentations.add((Phase0Presentations) tables.get("presentations").get(0));
-    	  vtrends.add((Phase0ViewingTrends) tables.get("viewing_trends").get(0));
-    	  vtrendsusers.add((Phase0ViewingTrendsUser) tables.get("viewing_trends_users").get(0));
+    	  if (tables.containsKey("presentations") && !tables.get("presentations").isEmpty()) {
+              presentations.add((Phase0Presentations) tables.get("presentations").get(0));
+          }
+    	  if (tables.containsKey("viewing_trends") && !tables.get("viewing_trends").isEmpty()) {
+    		  vtrends.add((Phase0ViewingTrends) tables.get("viewing_trends").get(0));
+          }
+    	  if (tables.containsKey("viewing_trends_users") && !tables.get("viewing_trends_users").isEmpty()) {
+    		  vtrendsusers.add((Phase0ViewingTrendsUser) tables.get("viewing_trends_users").get(0));
+          }
       }
     }
   }
