@@ -63,12 +63,12 @@
         {
           "name" : "RecordDate",
           "description" : "",
-          "type" : "timestamp"
+          "type" : "date"
         },
         {
           "name" : "RecordDateLocal",
           "description" : "",
-          "type" : "timestamp"
+          "type" : "date"
         },
         {
           "name" : "Duration",
