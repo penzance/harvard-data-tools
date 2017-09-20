@@ -64,13 +64,13 @@
           "name" : "RecordDate",
           "description" : "",
           "type" : "varchar",
-          "type" : 255
+          "length" : 255
         },
         {
           "name" : "RecordDateLocal",
           "description" : "",
           "type" : "varchar",
-          "type" : 255
+          "length" : 255
         },
         {
           "name" : "Duration",
