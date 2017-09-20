@@ -113,26 +113,40 @@ public class InputParser {
 
   private void parse() throws IOException {
     log.info("Parsing file " + originalFile);
-    try (
-        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
-            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
-    	TableWriter<Phase0Presentations> presentations = new TableWriter<Phase0Presentations>(Phase0Presentations.class, outFormat,
-            dataproductFile);
-    	TableWriter<Phase0ViewingTrends> vtrends = new TableWriter<Phase0ViewingTrends>(Phase0ViewingTrends.class, outFormat,
-            dataproductFile);
-    	TableWriter<Phase0ViewingTrendsUser> vtrendsusers = new TableWriter<Phase0ViewingTrendsUser>(Phase0ViewingTrendsUser.class, outFormat,
-            dataproductFile);) {
-    	
-      for (final Map<String, List<? extends DataTable>> tables : in) {
-          if (currentDataProduct.equals("Presentations")) {
-              presentations.add((Phase0Presentations) tables.get("presentations").get(0));
-    	  } else if (currentDataProduct.equals("ViewingTrends")) {
-              vtrends.add((Phase0ViewingTrends) tables.get("viewing_trends").get(0));
-    	  } else if (currentDataProduct.equals("ViewingTrendsUsers")) {
-              vtrendsusers.add((Phase0ViewingTrendsUser) tables.get("viewing_trends_users").get(0));
-          }
-      }
-    }
+    if (currentDataProduct.equals("Presentations")) {
+        log.info("Parsing data product " + currentDataProduct);
+    	try (
+    	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
+    	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
+    	    	TableWriter<Phase0Presentations> presentations = new TableWriter<Phase0Presentations>(Phase0Presentations.class, outFormat,
+    	            dataproductFile);) {
+    		for (final Map<String, List<? extends DataTable>> tables : in) {
+    	              presentations.add((Phase0Presentations) tables.get("presentations").get(0));
+    		}
+    	}
+	} else if (currentDataProduct.equals("ViewingTrends")) {
+        log.info("Parsing data product " + currentDataProduct);
+    	try (
+    	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
+    	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
+    	    	TableWriter<Phase0ViewingTrends> vtrends = new TableWriter<Phase0ViewingTrends>(Phase0ViewingTrends.class, outFormat,
+    	                dataproductFile);) {
+    		for (final Map<String, List<? extends DataTable>> tables : in) {
+    				vtrends.add((Phase0ViewingTrends) tables.get("viewing_trends").get(0));
+    		}
+    	}			
+	} else if (currentDataProduct.equals("ViewingTrendsUsers")) {
+        log.info("Parsing data product " + currentDataProduct);
+    	try (
+    	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
+    	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
+    			TableWriter<Phase0ViewingTrendsUser> vtrendsusers = new TableWriter<Phase0ViewingTrendsUser>(Phase0ViewingTrendsUser.class, outFormat,
+    		            dataproductFile);) {
+    		for (final Map<String, List<? extends DataTable>> tables : in) {
+    				vtrendsusers.add((Phase0ViewingTrendsUser) tables.get("viewing_trends_users").get(0));
+    		}
+    	}
+	}
     log.info("Done Parsing file " + originalFile);
   }
 
