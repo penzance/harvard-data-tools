@@ -301,6 +301,12 @@
           "length" : 255
         },
         {
+          "name" : "folder_id",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
           "name" : "video_id",
           "description" : "",
           "type" : "varchar",
