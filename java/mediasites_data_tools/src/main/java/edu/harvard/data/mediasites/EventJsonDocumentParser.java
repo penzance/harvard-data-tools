@@ -24,10 +24,12 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 
   private final TableFormat format;
   private final boolean verify;
+  private final String dataproduct;
 
-  public EventJsonDocumentParser(final TableFormat format, final boolean verify) {
+  public EventJsonDocumentParser(final TableFormat format, final boolean verify, final String dataproduct) {
     this.format = format;
     this.verify = verify;
+    this.dataproduct = dataproduct;
   }
 
   @SuppressWarnings("unchecked")
@@ -70,34 +72,40 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 	final Map<String, Object> parsedPresentations = presentations.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedViewingTrends = viewingtrends.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedViewingTrendsUsers = viewingtrendsusers.get(0).getFieldsAsMap();
-	// Presentations
-	try {
-		compareMaps(values, parsedPresentations);
-	} catch (final VerificationException e) {
-	    log.error("Failed to verify JSON document. " + e.getMessage());
-	    log.error("Original map: " + values);
-	    log.error("Parsed map:   " + parsedPresentations);
-	    throw e;			
-	}
 	
-	// Viewing Trends
-	try {
-		compareMaps(values, parsedViewingTrends);
-	} catch (final VerificationException e) {
-	    log.error("Failed to verify JSON document. " + e.getMessage());
-	    log.error("Original map: " + values);
-	    log.error("Parsed map:   " + parsedViewingTrends);
-	    throw e;			
+	// Presentations
+	if (dataproduct.equals("Presentations")) {
+	    try {
+		    compareMaps(values, parsedPresentations);
+	    } catch (final VerificationException e) {
+	        log.error("Failed to verify JSON document. " + e.getMessage());
+	        log.error("Original map: " + values);
+	        log.error("Parsed map:   " + parsedPresentations);
+	        throw e;			
+	    }
 	}
-		
+	// Viewing Trends
+	else if (dataproduct.equals("ViewingTrends")) {
+
+	    try {
+		    compareMaps(values, parsedViewingTrends);
+	    } catch (final VerificationException e) {
+	        log.error("Failed to verify JSON document. " + e.getMessage());
+	        log.error("Original map: " + values);
+	        log.error("Parsed map:   " + parsedViewingTrends);
+	        throw e;			
+	    }
+	}		
 	// Viewing Trends Users
-	try {
-		compareMaps(values, parsedViewingTrendsUsers);
-	} catch (final VerificationException e) {
-	    log.error("Failed to verify JSON document. " + e.getMessage());
-	    log.error("Original map: " + values);
-	    log.error("Parsed map:   " + parsedViewingTrendsUsers);
-	    throw e;			
+	else if (dataproduct.equals("ViewingTrendsUsers")) {
+	    try {
+		    compareMaps(values, parsedViewingTrendsUsers);
+	    } catch (final VerificationException e) {
+	        log.error("Failed to verify JSON document. " + e.getMessage());
+	        log.error("Original map: " + values);
+	        log.error("Parsed map:   " + parsedViewingTrendsUsers);
+	        throw e;			
+	    }
 	}
   }
 

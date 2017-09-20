@@ -63,7 +63,7 @@ public class InputParser {
 	this.filename = key.substring(key.lastIndexOf("/") + 1);	  
     this.dataproductPrefix = "PrepMediasites-";
     this.currentDataProduct = getDataProduct();
-    this.presentationsOutputDir = AwsUtils.key( outputLocation, "presentations ");
+    this.presentationsOutputDir = AwsUtils.key( outputLocation, "presentations");
     this.vtrendsOutputDir = AwsUtils.key( outputLocation, "viewing_trends" );
     this.vtrendsusersOutputDir = AwsUtils.key( outputLocation, "viewing_trends_users" );
     final FormatLibrary formatLibrary = new FormatLibrary();
@@ -115,7 +115,7 @@ public class InputParser {
     log.info("Parsing file " + originalFile);
     try (
         final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
-            new EventJsonDocumentParser(inFormat, true));
+            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
     	TableWriter<Phase0Presentations> presentations = new TableWriter<Phase0Presentations>(Phase0Presentations.class, outFormat,
             dataproductFile);
     	TableWriter<Phase0ViewingTrends> vtrends = new TableWriter<Phase0ViewingTrends>(Phase0ViewingTrends.class, outFormat,
