@@ -44,11 +44,6 @@ public class InputParser {
   private final String currentDataProduct;
   private final String dataproductPrefix;
 
-  // Start
-  private File presentationsFile;
-  private File vtrendsFile;
-  private File vtrendsusersFile;
-  // End
   private File originalFile;
 
   private final TableFormat inFormat;
@@ -122,11 +117,11 @@ public class InputParser {
         final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
             new EventJsonDocumentParser(inFormat, true));
     	TableWriter<Phase0Presentations> presentations = new TableWriter<Phase0Presentations>(Phase0Presentations.class, outFormat,
-    		presentationsFile);
+            dataproductFile);
     	TableWriter<Phase0ViewingTrends> vtrends = new TableWriter<Phase0ViewingTrends>(Phase0ViewingTrends.class, outFormat,
-    		vtrendsFile);
+            dataproductFile);
     	TableWriter<Phase0ViewingTrendsUser> vtrendsusers = new TableWriter<Phase0ViewingTrendsUser>(Phase0ViewingTrendsUser.class, outFormat,
-    		vtrendsusersFile);) {
+            dataproductFile);) {
     	
       for (final Map<String, List<? extends DataTable>> tables : in) {
 
@@ -144,26 +139,30 @@ public class InputParser {
   @SuppressWarnings("unused") // We run through each table's iterator, but don't
   // need the values.
   private void verify() throws IOException {
-	// Start
-	try(FileTableReader<Phase0Presentations> in = new FileTableReader<Phase0Presentations>(Phase0Presentations.class,
-		outFormat, presentationsFile)) {
-	  log.info("Verifying file " + presentationsFile);	
-	  for (final Phase0Presentations i : in ) {
-	  }
-	}
-	try(FileTableReader<Phase0ViewingTrends> in = new FileTableReader<Phase0ViewingTrends>(Phase0ViewingTrends.class,
-			outFormat, vtrendsFile)) {
-		  log.info("Verifying file " + vtrendsFile);	
-	  for (final Phase0ViewingTrends i : in ) {
-	  }
-	}
-	try(FileTableReader<Phase0ViewingTrendsUser> in = new FileTableReader<Phase0ViewingTrendsUser>(Phase0ViewingTrendsUser.class,
-			outFormat, vtrendsusersFile)) {
-		  log.info("Verifying file " + vtrendsusersFile);	
-	  for (final Phase0ViewingTrendsUser i : in ) {
-	  }
-	}
-	// End
+    if (currentDataProduct.equals("Presentations")) {
+
+	    try(FileTableReader<Phase0Presentations> in = new FileTableReader<Phase0Presentations>(Phase0Presentations.class,
+		    outFormat, dataproductFile)) {
+	      log.info("Verifying file " + dataproductFile);	
+	      for (final Phase0Presentations i : in ) {
+	      }
+	    }
+    } else if (currentDataProduct.equals("ViewingTrends")) {
+	    try(FileTableReader<Phase0ViewingTrends> in = new FileTableReader<Phase0ViewingTrends>(Phase0ViewingTrends.class,
+			outFormat, dataproductFile)) {
+		  log.info("Verifying file " + dataproductFile);	
+	      for (final Phase0ViewingTrends i : in ) {
+	      }
+	    }
+    } else if (currentDataProduct.equals("ViewingTrendsUsers")) {
+	
+	    try(FileTableReader<Phase0ViewingTrendsUser> in = new FileTableReader<Phase0ViewingTrendsUser>(Phase0ViewingTrendsUser.class,
+			outFormat, dataproductFile)) {
+		  log.info("Verifying file " + dataproductFile);	
+	      for (final Phase0ViewingTrendsUser i : in ) {
+	      }
+        }
+    }
   }
 
   private void cleanup() {
@@ -171,15 +170,9 @@ public class InputParser {
       originalFile.delete();
     }
     // STart
-    if (presentationsFile != null && presentationsFile.exists()) {
-    	presentationsFile.delete();
-      }    
-    if (vtrendsFile != null && vtrendsFile.exists()) {
-    	vtrendsFile.delete();
-      }
-    if (vtrendsusersFile != null && vtrendsusersFile.exists()) {
-    	vtrendsusersFile.delete();
-      }    
+    if (dataproductFile != null && dataproductFile.exists()) {
+    	dataproductFile.delete();
+    }
   }
 
 }
