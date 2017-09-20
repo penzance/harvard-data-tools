@@ -34,17 +34,23 @@ public class InputParser {
   private final MediasitesDataConfig config;
   private final AwsUtils aws;
   private final S3ObjectId inputObj;
+  
+  private File dataproductFile;
+  private S3ObjectId dataproductOutputObj;
+  
+  private final String key;
+  private final String filename;
+  
+  private final String currentDataProduct;
+  private final String dataproductPrefix;
+
   // Start
   private File presentationsFile;
   private File vtrendsFile;
   private File vtrendsusersFile;
   // End
   private File originalFile;
-  // Start
-  private S3ObjectId presentationsOutputObj;
-  private S3ObjectId vtrendsOutputObj;
-  private S3ObjectId vtrendsusersOutputObj;
-  // End 
+
   private final TableFormat inFormat;
   private final TableFormat outFormat;
   //Start 
@@ -58,6 +64,10 @@ public class InputParser {
     this.config = config;
     this.aws = aws;
     this.inputObj = inputObj;
+    this.key = inputObj.getKey();
+	this.filename = key.substring(key.lastIndexOf("/") + 1);	  
+    this.dataproductPrefix = "PrepMediasites-";
+    this.currentDataProduct = getDataProduct();
     this.presentationsOutputDir = AwsUtils.key( outputLocation, "presentations ");
     this.vtrendsOutputDir = AwsUtils.key( outputLocation, "viewing_trends" );
     this.vtrendsusersOutputDir = AwsUtils.key( outputLocation, "viewing_trends_users" );
@@ -70,52 +80,40 @@ public class InputParser {
   public InputTableIndex parseFile() throws IOException {
     final InputTableIndex dataIndex = new InputTableIndex();
     try {
-      getFileNames();
+      getFileName();
       aws.getFile(inputObj, originalFile);
       parse();
       verify();
-      // start
-      aws.putFile(presentationsOutputObj, presentationsFile);
-      aws.putFile(vtrendsOutputObj, vtrendsFile);
-      aws.putFile(vtrendsusersOutputObj, vtrendsusersFile);
-      // end
-      //start
-      dataIndex.addFile("presentations", presentationsOutputObj, presentationsFile.length() );
-      dataIndex.addFile("viewing_trends", vtrendsOutputObj, vtrendsFile.length());
-      dataIndex.addFile("viewing_trends_users", vtrendsusersOutputObj, vtrendsusersFile.length());
-      //end      
+      aws.putFile(dataproductOutputObj, dataproductFile);
+      dataIndex.addFile(currentDataProduct, dataproductOutputObj, dataproductFile.length());
     } finally {
       cleanup();
     }
     return dataIndex;
   }
-
-  private void getFileNames() {
-    final String key = inputObj.getKey();
-    final String filename = key.substring(key.lastIndexOf("/") + 1);
+  
+  private final String getDataProduct() {
+    final String dataproduct = filename.substring( filename.lastIndexOf(dataproductPrefix)+dataproductPrefix.length(), filename.lastIndexOf("-"));
+    return dataproduct;
+  }
+  
+  private void getFileName() {
     final String date = filename.substring(filename.indexOf(".") + 1, filename.indexOf(".json"));
     originalFile = new File(config.getScratchDir(), filename);
-    //Start
-    final String presentationsFileName = "PrepMediasites-Presentations-" + date + ".gz";
-    final String vtrendsFileName = "PrepMediasites-ViewingTrends-" + date + ".gz";
-    final String vtrendsusersFileName = "PrepMediasites-ViewingTrendsUsers-" + date + ".gz";
-    //End
-    //Start
-    presentationsFile = new File(config.getScratchDir(), presentationsFileName );
-    vtrendsFile = new File(config.getScratchDir(), vtrendsFileName );
-    vtrendsusersFile = new File(config.getScratchDir(), vtrendsusersFileName );
-    //End
-    //Start
-    presentationsOutputObj = AwsUtils.key(presentationsOutputDir, presentationsFileName );
-    vtrendsOutputObj = AwsUtils.key(vtrendsOutputDir, vtrendsFileName );
-    vtrendsusersOutputObj = AwsUtils.key(vtrendsusersOutputDir, vtrendsusersFileName );
-    //End
-    //Start
-    log.info("Parsing " + filename + " to " + presentationsFile + ", " + vtrendsFile + ", " + vtrendsusersFile );
-    log.info("Presentations key: " + presentationsOutputObj );
-    log.info("Viewing Trends key: " + vtrendsOutputObj );
-    log.info("Viewing Trends Users key: " + vtrendsusersOutputObj );
-    //End
+
+    final String dataproductFilename = currentDataProduct + "-" + date + ".gz";
+    dataproductFile = new File(config.getScratchDir(), dataproductFilename );
+    
+    if (currentDataProduct.equals("Presentations") ) {
+        dataproductOutputObj = AwsUtils.key(presentationsOutputDir, dataproductFilename );   	
+    } else if ( currentDataProduct.equals("ViewingTrends") ) {
+        dataproductOutputObj = AwsUtils.key(vtrendsOutputDir, dataproductFilename);    	    	
+    } else if ( currentDataProduct.equals("ViewingTrendsUsers") ) {
+        dataproductOutputObj = AwsUtils.key(vtrendsusersOutputDir, dataproductFilename);    	
+    }
+    log.info("Parsing" + filename + " to " + dataproductFile);
+    log.info("DataProduct Key: " + dataproductOutputObj );
+    
   }
 
   private void parse() throws IOException {
@@ -123,24 +121,21 @@ public class InputParser {
     try (
         final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
             new EventJsonDocumentParser(inFormat, true));
-    	// Start
     	TableWriter<Phase0Presentations> presentations = new TableWriter<Phase0Presentations>(Phase0Presentations.class, outFormat,
     		presentationsFile);
     	TableWriter<Phase0ViewingTrends> vtrends = new TableWriter<Phase0ViewingTrends>(Phase0ViewingTrends.class, outFormat,
     		vtrendsFile);
     	TableWriter<Phase0ViewingTrendsUser> vtrendsusers = new TableWriter<Phase0ViewingTrendsUser>(Phase0ViewingTrendsUser.class, outFormat,
-    		vtrendsusersFile);       	    		
-    	// End    		
-    		) {
+    		vtrendsusersFile);) {
+    	
       for (final Map<String, List<? extends DataTable>> tables : in) {
-    	  if (tables.containsKey("presentations") && !tables.get("presentations").isEmpty()) {
+
+          if (currentDataProduct.equals("Presentations")) {
               presentations.add((Phase0Presentations) tables.get("presentations").get(0));
-          }
-    	  if (tables.containsKey("viewing_trends") && !tables.get("viewing_trends").isEmpty()) {
-    		  vtrends.add((Phase0ViewingTrends) tables.get("viewing_trends").get(0));
-          }
-    	  if (tables.containsKey("viewing_trends_users") && !tables.get("viewing_trends_users").isEmpty()) {
-    		  vtrendsusers.add((Phase0ViewingTrendsUser) tables.get("viewing_trends_users").get(0));
+    	  } else if (currentDataProduct.equals("ViewingTrends")) {
+              vtrends.add((Phase0ViewingTrends) tables.get("viewing_trends").get(0));
+    	  } else if (currentDataProduct.equals("ViewingTrendsUsers")) {
+              vtrendsusers.add((Phase0ViewingTrendsUser) tables.get("viewing_trends_users").get(0));
           }
       }
     }
