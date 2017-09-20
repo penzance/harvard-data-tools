@@ -106,7 +106,7 @@ public class InputParser {
     } else if ( currentDataProduct.equals("ViewingTrendsUsers") ) {
         dataproductOutputObj = AwsUtils.key(vtrendsusersOutputDir, dataproductFilename);    	
     }
-    log.info("Parsing" + filename + " to " + dataproductFile);
+    log.info("Parsing " + filename + " to " + dataproductFile);
     log.info("DataProduct Key: " + dataproductOutputObj );
     
   }
@@ -124,16 +124,12 @@ public class InputParser {
             dataproductFile);) {
     	
       for (final Map<String, List<? extends DataTable>> tables : in) {
-    	  log.info("Parsing data product " + currentDataProduct);
           if (currentDataProduct.equals("Presentations")) {
               presentations.add((Phase0Presentations) tables.get("presentations").get(0));
-        	  log.info("Added data product " + currentDataProduct);
     	  } else if (currentDataProduct.equals("ViewingTrends")) {
               vtrends.add((Phase0ViewingTrends) tables.get("viewing_trends").get(0));
-        	  log.info("Added data product " + currentDataProduct);
     	  } else if (currentDataProduct.equals("ViewingTrendsUsers")) {
               vtrendsusers.add((Phase0ViewingTrendsUser) tables.get("viewing_trends_users").get(0));
-        	  log.info("Added data product " + currentDataProduct);
           }
       }
     }
