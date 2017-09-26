@@ -336,7 +336,7 @@
         }
       ]
     },
-    "viewing_trends_user": {
+    "viewing_trends_users": {
       "columns" : [ 
         {
           "name" : "user_id",
