@@ -17,7 +17,7 @@ import edu.harvard.data.VerificationException;
 import edu.harvard.data.io.JsonDocumentParser;
 import edu.harvard.data.mediasites.bindings.phase0.Phase0Presentations;
 import edu.harvard.data.mediasites.bindings.phase0.Phase0ViewingTrends;
-import edu.harvard.data.mediasites.bindings.phase0.Phase0ViewingTrendsUser;
+import edu.harvard.data.mediasites.bindings.phase0.Phase0ViewingTrendsUsers;
 
 public class EventJsonDocumentParser implements JsonDocumentParser {
   private static final Logger log = LogManager.getLogger();
@@ -51,8 +51,8 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     tables.put("viewing_trends", viewingtrends);    
     
     // Viewing Trends Users
-    final Phase0ViewingTrendsUser viewingtrendsuser = new Phase0ViewingTrendsUser(format, values);
-    final List<Phase0ViewingTrendsUser> viewingtrendsusers = new ArrayList<Phase0ViewingTrendsUser>();
+    final Phase0ViewingTrendsUsers viewingtrendsuser = new Phase0ViewingTrendsUsers(format, values);
+    final List<Phase0ViewingTrendsUsers> viewingtrendsusers = new ArrayList<Phase0ViewingTrendsUsers>();
     viewingtrendsusers.add(viewingtrendsuser);
     tables.put("viewing_trends_users", viewingtrendsusers);
     

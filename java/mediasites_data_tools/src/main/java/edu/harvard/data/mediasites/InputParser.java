@@ -23,7 +23,7 @@ import edu.harvard.data.mediasites.MediasitesDataConfig;
 // Start
 import edu.harvard.data.mediasites.bindings.phase0.Phase0Presentations;
 import edu.harvard.data.mediasites.bindings.phase0.Phase0ViewingTrends;
-import edu.harvard.data.mediasites.bindings.phase0.Phase0ViewingTrendsUser;
+import edu.harvard.data.mediasites.bindings.phase0.Phase0ViewingTrendsUsers;
 // End
 import edu.harvard.data.pipeline.InputTableIndex;
 
@@ -79,7 +79,9 @@ public class InputParser {
       aws.getFile(inputObj, originalFile);
       parse();
       verify();
+      // Add product check here
       aws.putFile(dataproductOutputObj, dataproductFile);
+      // Add product check here
       dataIndex.addFile(currentDataProduct, dataproductOutputObj, dataproductFile.length());
     } finally {
       cleanup();
@@ -140,10 +142,10 @@ public class InputParser {
     	try (
     	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
     	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
-    			TableWriter<Phase0ViewingTrendsUser> vtrendsusers = new TableWriter<Phase0ViewingTrendsUser>(Phase0ViewingTrendsUser.class, outFormat,
+    			TableWriter<Phase0ViewingTrendsUsers> vtrendsusers = new TableWriter<Phase0ViewingTrendsUsers>(Phase0ViewingTrendsUsers.class, outFormat,
     		            dataproductFile);) {
     		for (final Map<String, List<? extends DataTable>> tables : in) {
-    				vtrendsusers.add((Phase0ViewingTrendsUser) tables.get("viewing_trends_users").get(0));
+    				vtrendsusers.add((Phase0ViewingTrendsUsers) tables.get("viewing_trends_users").get(0));
     		}
     	}
 	}
@@ -170,10 +172,10 @@ public class InputParser {
 	    }
     } else if (currentDataProduct.equals("ViewingTrendsUsers")) {
 	
-	    try(FileTableReader<Phase0ViewingTrendsUser> in = new FileTableReader<Phase0ViewingTrendsUser>(Phase0ViewingTrendsUser.class,
+	    try(FileTableReader<Phase0ViewingTrendsUsers> in = new FileTableReader<Phase0ViewingTrendsUsers>(Phase0ViewingTrendsUsers.class,
 			outFormat, dataproductFile)) {
 		  log.info("Verifying file " + dataproductFile);	
-	      for (final Phase0ViewingTrendsUser i : in ) {
+	      for (final Phase0ViewingTrendsUsers i : in ) {
 	      }
         }
     }
