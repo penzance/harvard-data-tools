@@ -42,19 +42,19 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     final Phase0Presentations presentation = new Phase0Presentations(format, values);
     final List<Phase0Presentations> presentations = new ArrayList<Phase0Presentations>();
     presentations.add(presentation);
-    tables.put("presentations", presentations);
+    tables.put("Presentations", presentations);
     
     // Viewing Trends
     final Phase0ViewingTrends viewingtrend = new Phase0ViewingTrends(format, values);
     final List<Phase0ViewingTrends> viewingtrends = new ArrayList<Phase0ViewingTrends>();
     viewingtrends.add(viewingtrend);
-    tables.put("viewing_trends", viewingtrends);    
+    tables.put("ViewingTrends", viewingtrends);    
     
     // Viewing Trends Users
     final Phase0ViewingTrendsUsers viewingtrendsuser = new Phase0ViewingTrendsUsers(format, values);
     final List<Phase0ViewingTrendsUsers> viewingtrendsusers = new ArrayList<Phase0ViewingTrendsUsers>();
     viewingtrendsusers.add(viewingtrendsuser);
-    tables.put("viewing_trends_users", viewingtrendsusers);
+    tables.put("ViewingTrendsUsers", viewingtrendsusers);
     
     // Verification Step (optional)
     if (verify) {
@@ -66,9 +66,9 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
   public void verifyParser(final Map<String, Object> values,
       final Map<String, List<? extends DataTable>> tables) throws VerificationException {
     // Start
-	final List<? extends DataTable> presentations = tables.get("presentations");
-	final List<? extends DataTable> viewingtrends = tables.get("viewing_trends");
-	final List<? extends DataTable> viewingtrendsusers = tables.get("viewing_trends_users");
+	final List<? extends DataTable> presentations = tables.get("Presentations");
+	final List<? extends DataTable> viewingtrends = tables.get("ViewingTrends");
+	final List<? extends DataTable> viewingtrendsusers = tables.get("ViewingTrendsUsers");
 	final Map<String, Object> parsedPresentations = presentations.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedViewingTrends = viewingtrends.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedViewingTrendsUsers = viewingtrendsusers.get(0).getFieldsAsMap();

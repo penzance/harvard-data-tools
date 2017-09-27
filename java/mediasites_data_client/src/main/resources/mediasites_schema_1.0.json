@@ -1,5 +1,5 @@
 { "tables": 
-  { "presentations": {
+  { "Presentations": {
       "columns" : [ 
         {
           "name" : "video_id",
@@ -290,7 +290,7 @@
         }
       ]
     },
-    "viewing_trends": {
+    "ViewingTrends": {
       "columns" : [ 
         {
           "name" : "course_identifier",
@@ -336,7 +336,7 @@
         }
       ]
     },
-    "viewing_trends_users": {
+    "ViewingTrendsUsers": {
       "columns" : [ 
         {
           "name" : "user_id",

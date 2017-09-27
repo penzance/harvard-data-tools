@@ -63,9 +63,9 @@ public class InputParser {
 	this.filename = key.substring(key.lastIndexOf("/") + 1);	  
     this.dataproductPrefix = "PrepMediasites-";
     this.currentDataProduct = getDataProduct();
-    this.presentationsOutputDir = AwsUtils.key( outputLocation, "presentations");
-    this.vtrendsOutputDir = AwsUtils.key( outputLocation, "viewing_trends" );
-    this.vtrendsusersOutputDir = AwsUtils.key( outputLocation, "viewing_trends_users" );
+    this.presentationsOutputDir = AwsUtils.key( outputLocation, "Presentations");
+    this.vtrendsOutputDir = AwsUtils.key( outputLocation, "ViewingTrends" );
+    this.vtrendsusersOutputDir = AwsUtils.key( outputLocation, "ViewingTrendsUsers" );
     final FormatLibrary formatLibrary = new FormatLibrary();
     this.inFormat = formatLibrary.getFormat(Format.Mediasites);
     this.outFormat = formatLibrary.getFormat(config.getPipelineFormat());
@@ -145,7 +145,7 @@ public class InputParser {
     			TableWriter<Phase0ViewingTrendsUsers> vtrendsusers = new TableWriter<Phase0ViewingTrendsUsers>(Phase0ViewingTrendsUsers.class, outFormat,
     		            dataproductFile);) {
     		for (final Map<String, List<? extends DataTable>> tables : in) {
-    				vtrendsusers.add((Phase0ViewingTrendsUsers) tables.get("viewing_trends_users").get(0));
+    				vtrendsusers.add((Phase0ViewingTrendsUsers) tables.get("ViewingTrendsUsers").get(0));
     		}
     	}
 	}
