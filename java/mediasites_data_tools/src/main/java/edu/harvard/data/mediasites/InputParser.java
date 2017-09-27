@@ -123,7 +123,7 @@ public class InputParser {
     	    	TableWriter<Phase0Presentations> presentations = new TableWriter<Phase0Presentations>(Phase0Presentations.class, outFormat,
     	            dataproductFile);) {
     		for (final Map<String, List<? extends DataTable>> tables : in) {
-    	              presentations.add((Phase0Presentations) tables.get("presentations").get(0));
+    	              presentations.add((Phase0Presentations) tables.get("Presentations").get(0));
     		}
     	}
 	} else if (currentDataProduct.equals("ViewingTrends")) {
@@ -134,7 +134,7 @@ public class InputParser {
     	    	TableWriter<Phase0ViewingTrends> vtrends = new TableWriter<Phase0ViewingTrends>(Phase0ViewingTrends.class, outFormat,
     	                dataproductFile);) {
     		for (final Map<String, List<? extends DataTable>> tables : in) {
-    				vtrends.add((Phase0ViewingTrends) tables.get("viewing_trends").get(0));
+    				vtrends.add((Phase0ViewingTrends) tables.get("ViewingTrends").get(0));
     		}
     	}			
 	} else if (currentDataProduct.equals("ViewingTrendsUsers")) {
