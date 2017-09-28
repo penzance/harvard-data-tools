@@ -64,6 +64,10 @@ public class Phase3PipelineSetup {
         last = i;
       }
     }
+    // debugging: remove this
+    if (last == 0) {
+    	last = 2;
+    }
     return last;
   }
 
