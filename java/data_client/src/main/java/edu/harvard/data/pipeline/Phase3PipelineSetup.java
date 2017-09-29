@@ -58,15 +58,17 @@ public class Phase3PipelineSetup {
   }
 
   private int getLastPhase() {
-    int last = 0;
+	// Set minimum to 2
+	// Currently, even if no Hadoop Processing jobs are added, the 
+	// 'skipPhase2' step in Phase2Pipeline will still move files 
+	// on HDFS from /phase_1 to /phase_2
+	// This was originally set to 0, which would FAIL on step 'CopyAllTablesToS3'
+	// when attempting to copy from /phase_0 hdfs files which have been moved to /phase_2
+	int last = 2;
     for (final Integer i : codeManager.getHadoopProcessingJobs().keySet()) {
       if (i > last) {
         last = i;
       }
-    }
-    // debugging: remove this
-    if (last == 0) {
-    	last = 2;
     }
     return last;
   }
