@@ -18,6 +18,7 @@ import edu.harvard.data.io.JsonDocumentParser;
 import edu.harvard.data.mediasites.bindings.phase0.Phase0Presentations;
 import edu.harvard.data.mediasites.bindings.phase0.Phase0ViewingTrends;
 import edu.harvard.data.mediasites.bindings.phase0.Phase0ViewingTrendsUsers;
+import edu.harvard.data.mediasites.bindings.phase0.Phase0ViewingSessions;
 
 public class EventJsonDocumentParser implements JsonDocumentParser {
   private static final Logger log = LogManager.getLogger();
@@ -55,6 +56,13 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     final List<Phase0ViewingTrendsUsers> viewingtrendsusers = new ArrayList<Phase0ViewingTrendsUsers>();
     viewingtrendsusers.add(viewingtrendsuser);
     tables.put("ViewingTrendsUsers", viewingtrendsusers);
+
+    // Viewing Sessions
+    final Phase0ViewingSessions viewingsession = new Phase0ViewingSessions(format, values);
+    final List<Phase0ViewingSessions> viewingsessions = new ArrayList<Phase0ViewingSessions>();
+    viewingsessions.add(viewingsession);
+    tables.put("ViewingSessions", viewingsessions);
+
     
     // Verification Step (optional)
     if (verify) {
@@ -69,10 +77,13 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 	final List<? extends DataTable> presentations = tables.get("Presentations");
 	final List<? extends DataTable> viewingtrends = tables.get("ViewingTrends");
 	final List<? extends DataTable> viewingtrendsusers = tables.get("ViewingTrendsUsers");
+	final List<? extends DataTable> viewingsessions = tables.get("ViewingSessions");
+
 	final Map<String, Object> parsedPresentations = presentations.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedViewingTrends = viewingtrends.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedViewingTrendsUsers = viewingtrendsusers.get(0).getFieldsAsMap();
-	
+	final Map<String, Object> parsedViewingSessions = viewingsessions.get(0).getFieldsAsMap();
+
 	// Presentations
 	if (dataproduct.equals("Presentations")) {
 	    try {
@@ -104,6 +115,17 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 	        log.error("Failed to verify JSON document. " + e.getMessage());
 	        log.error("Original map: " + values);
 	        log.error("Parsed map:   " + parsedViewingTrendsUsers);
+	        throw e;			
+	    }
+	}
+	// Viewing Sessions
+	else if (dataproduct.equals("ViewingSessions")) {
+	    try {
+		    compareMaps(values, parsedViewingSessions);
+	    } catch (final VerificationException e) {
+	        log.error("Failed to verify JSON document. " + e.getMessage());
+	        log.error("Original map: " + values);
+	        log.error("Parsed map:   " + parsedViewingSessions);
 	        throw e;			
 	    }
 	}

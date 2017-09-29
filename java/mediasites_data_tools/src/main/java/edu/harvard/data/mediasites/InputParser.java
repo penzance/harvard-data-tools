@@ -24,6 +24,8 @@ import edu.harvard.data.mediasites.MediasitesDataConfig;
 import edu.harvard.data.mediasites.bindings.phase0.Phase0Presentations;
 import edu.harvard.data.mediasites.bindings.phase0.Phase0ViewingTrends;
 import edu.harvard.data.mediasites.bindings.phase0.Phase0ViewingTrendsUsers;
+import edu.harvard.data.mediasites.bindings.phase0.Phase0ViewingSessions;
+
 // End
 import edu.harvard.data.pipeline.InputTableIndex;
 
@@ -52,6 +54,7 @@ public class InputParser {
   private final S3ObjectId presentationsOutputDir;
   private final S3ObjectId vtrendsOutputDir;
   private final S3ObjectId vtrendsusersOutputDir;
+  private final S3ObjectId vsessionsOutputDir;
   //End
 
   public InputParser(final MediasitesDataConfig config, final AwsUtils aws,
@@ -66,6 +69,7 @@ public class InputParser {
     this.presentationsOutputDir = AwsUtils.key( outputLocation, "Presentations");
     this.vtrendsOutputDir = AwsUtils.key( outputLocation, "ViewingTrends" );
     this.vtrendsusersOutputDir = AwsUtils.key( outputLocation, "ViewingTrendsUsers" );
+    this.vsessionsOutputDir = AwsUtils.key( outputLocation, "ViewingSessions");
     final FormatLibrary formatLibrary = new FormatLibrary();
     this.inFormat = formatLibrary.getFormat(Format.Mediasites);
     this.outFormat = formatLibrary.getFormat(config.getPipelineFormat());
@@ -106,7 +110,9 @@ public class InputParser {
     } else if ( currentDataProduct.equals("ViewingTrends") ) {
         dataproductOutputObj = AwsUtils.key(vtrendsOutputDir, dataproductFilename);    	    	
     } else if ( currentDataProduct.equals("ViewingTrendsUsers") ) {
-        dataproductOutputObj = AwsUtils.key(vtrendsusersOutputDir, dataproductFilename);    	
+        dataproductOutputObj = AwsUtils.key(vtrendsusersOutputDir, dataproductFilename);
+    } else if ( currentDataProduct.equals("ViewingSessions") ) {
+      dataproductOutputObj = AwsUtils.key(vsessionsOutputDir, dataproductFilename);    	
     }
     log.info("Parsing " + filename + " to " + dataproductFile);
     log.info("DataProduct Key: " + dataproductOutputObj );
@@ -148,6 +154,17 @@ public class InputParser {
     				vtrendsusers.add((Phase0ViewingTrendsUsers) tables.get("ViewingTrendsUsers").get(0));
     		}
     	}
+	} else if (currentDataProduct.equals("ViewingSessions")) {
+        log.info("Parsing data product " + currentDataProduct);
+    	try (
+    	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
+    	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
+    			TableWriter<Phase0ViewingSessions> vsessions = new TableWriter<Phase0ViewingSessions>(Phase0ViewingSessions.class, outFormat,
+    		            dataproductFile);) {
+    		for (final Map<String, List<? extends DataTable>> tables : in) {
+    				vsessions.add((Phase0ViewingSessions) tables.get("ViewingSessions").get(0));
+    		}
+    	}
 	}
     log.info("Done Parsing file " + originalFile);
   }
@@ -176,6 +193,14 @@ public class InputParser {
 			outFormat, dataproductFile)) {
 		  log.info("Verifying file " + dataproductFile);	
 	      for (final Phase0ViewingTrendsUsers i : in ) {
+	      }
+        }
+    } else if (currentDataProduct.equals("ViewingSessions")) {
+    	
+	    try(FileTableReader<Phase0ViewingSessions> in = new FileTableReader<Phase0ViewingSessions>(Phase0ViewingSessions.class,
+			outFormat, dataproductFile)) {
+		  log.info("Verifying file " + dataproductFile);
+	      for (final Phase0ViewingSessions i : in ) {
 	      }
         }
     }
