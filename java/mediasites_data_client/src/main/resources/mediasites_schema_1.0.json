@@ -417,7 +417,7 @@
           "length" : 255
 	},
         {
-          "name" : "System",
+          "name" : "OperatingSystem",
           "description" : "",
           "type" : "varchar",
           "length" : 255
