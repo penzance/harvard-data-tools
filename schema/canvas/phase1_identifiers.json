@@ -9,120 +9,120 @@
         "user_id": ["CanvasDataID"]   	
    },
    "communication_channel_dim": {
-		"canvas_id": ["CanvasID"],
-		"user_id": ["CanvasDataID"],
-		"address": ["EmailAddress", "Other"]
+   	"canvas_id": ["CanvasID"],
+   	"user_id": ["CanvasDataID"],
+   	"address": ["EmailAddress", "Other"]
+   },
+   "conversation_message_dim": {
+   	"author_id": ["CanvasDataID"]
+   },
+   "conversation_message_participant_fact": {
+   	"user_id": ["CanvasDataID"]
+   },
+  "discussion_entry_fact": {
+   	"user_id": ["CanvasDataID"]
+   },
+   "discussion_topic_fact": {
+   	"user_id": ["CanvasDataID"],
+   	"editor_id": ["CanvasDataID"]
 	},
-	"conversation_message_dim": {
-		"author_id": ["CanvasDataID"]
-	},
-	"conversation_message_participant_fact": {
-		"user_id": ["CanvasDataID"]
-	},
-	"discussion_entry_fact": {
-		"user_id": ["CanvasDataID"]
-	},
-	"discussion_topic_fact": {
-		"user_id": ["CanvasDataID"],
-		"editor_id": ["CanvasDataID"]
-	},
-	"enrollment_dim": {
-		"sis_source_id": ["Other"],
-		"user_id": ["CanvasDataID"]
-	},
-	"enrollment_fact": {
-		"user_id": ["CanvasDataID"]
-	},
-	"enrollment_rollup_dim": {
-		"user_id": ["CanvasDataID"]
-	},
-	"file_dim": {
-		"user_id": ["CanvasDataID"],
-		"uploader_id": ["CanvasDataID"]
-	},
-	"file_fact": {
-		"conversation_message_author_id": ["CanvasDataID"],
-		"grader_id": ["CanvasDataID"],
-		"uploader_id": ["CanvasDataID"],
-		"user_id": ["CanvasDataID"]
-	},
-	"group_membership_fact": {
-		"user_id": ["CanvasDataID"]
-	},
-	"module_completion_requirement_fact": {
-		"discussion_topic_editor_id": ["CanvasDataID"],
-		"user_id": ["CanvasDataID"]
-	},
-	"module_item_fact": {
-		"discussion_topic_editor_id": ["CanvasDataID"],
-		"user_id": ["CanvasDataID"]
-	},
-	"module_progression_completion_requirement_fact": {
-		"discussion_topic_editor_id": ["CanvasDataID"],
-		"user_id": ["CanvasDataID"]
-	},
-	"module_progression_dim": {
-		"user_id": ["CanvasDataID"]
-	},
-	"module_progression_fact": {
-		"user_id": ["CanvasDataID"]
-	},
-	"pseudonym_dim": {
-		"id": ["Other"],
-		"user_id": ["CanvasDataID"],
-		"canvas_id": ["CanvasID"],
-		"sis_user_id": ["HUID", "XID"],
-		"unique_name": ["Other"]
-	},
-	"pseudonym_fact": {
-		"user_id": ["CanvasDataID"]
-	},
-	"quiz_submission_dim": {
-		"user_id": ["CanvasDataID"]
-	},
-	"quiz_submission_fact": {
-		"user_id": ["CanvasDataID"]
-	},
-	"quiz_submission_historical_dim": {
-		"user_id": ["CanvasDataID"]
-	},
-	"quiz_submission_historical_fact": {
-		"user_id": ["CanvasDataID"]
-	},
-	"requests": {
-		"user_id": ["CanvasDataID"],
-		"real_user_id": ["CanvasDataID"]
-	},
-	"submission_comment_dim": {
-		"recipient_id": ["CanvasDataID"],
-		"author_id": ["CanvasDataID"],
-		"author_name": ["Other"],
-		"comment":  ["Other"]
-	},
-	"submission_comment_fact": {
-		"recipient_id": ["CanvasDataID"],
-		"author_id": ["CanvasDataID"]
-	},
-	"submission_comment_participant_fact": {
-		"user_id": ["CanvasDataID"]
-	},
-	"submission_dim": {
-		"user_id": ["CanvasDataID"],
-		"grader_id": ["CanvasDataID"]
-	},
-	"submission_fact": {
-		"user_id": ["CanvasDataID"],
-		"grader_id": ["CanvasDataID"]
-	},
-	"user_dim": {
-		"id": ["CanvasDataID"],
-		"canvas_id": ["CanvasID"],
-		"gender": ["Other"],
-		"birthdate": ["Other"],
-		"name": ["Name"],
-		"sortable_name": ["Other"]
-	},
-	"wiki_page_fact": {
-		"user_id": ["CanvasDataID"]
-	}
+   "enrollment_dim": {
+   	"sis_source_id": ["Other"],
+   	"user_id": ["CanvasDataID"]
+   },
+   "enrollment_fact": {
+   	"user_id": ["CanvasDataID"]
+   },
+   "enrollment_rollup_dim": {
+   	"user_id": ["CanvasDataID"]
+   },
+   "file_dim": {
+   	"user_id": ["CanvasDataID"],
+   	"uploader_id": ["CanvasDataID"]
+   },
+   "file_fact": {
+   	"conversation_message_author_id": ["CanvasDataID"],
+   	"grader_id": ["CanvasDataID"],
+   	"uploader_id": ["CanvasDataID"],
+   	"user_id": ["CanvasDataID"]
+   },
+   "group_membership_fact": {
+   	"user_id": ["CanvasDataID"]
+   },
+   "module_completion_requirement_fact": {
+   	"discussion_topic_editor_id": ["CanvasDataID"],
+   	"user_id": ["CanvasDataID"]
+   },
+   "module_item_fact": {
+   	"discussion_topic_editor_id": ["CanvasDataID"],
+   	"user_id": ["CanvasDataID"]
+   },
+   "module_progression_completion_requirement_fact": {
+   	"discussion_topic_editor_id": ["CanvasDataID"],
+   	"user_id": ["CanvasDataID"]
+   },
+   "module_progression_dim": {
+   	"user_id": ["CanvasDataID"]
+   },
+   "module_progression_fact": {
+   	"user_id": ["CanvasDataID"]
+   },
+   "pseudonym_dim": {
+   	"id": ["Other"],
+   	"user_id": ["CanvasDataID"],
+   	"canvas_id": ["CanvasID"],
+   	"sis_user_id": ["HUID", "XID"],
+   	"unique_name": ["Other"]
+   },
+   "pseudonym_fact": {
+   	"user_id": ["CanvasDataID"]
+   },
+   "quiz_submission_dim": {
+   	"user_id": ["CanvasDataID"]
+   },
+   "quiz_submission_fact": {
+   	"user_id": ["CanvasDataID"]
+   },
+   "quiz_submission_historical_dim": {
+   	"user_id": ["CanvasDataID"]
+   },
+   "quiz_submission_historical_fact": {
+   	"user_id": ["CanvasDataID"]
+   },
+   "requests": {
+   	"user_id": ["CanvasDataID"],
+   	"real_user_id": ["CanvasDataID"]
+   },
+   "submission_comment_dim": {
+   	"recipient_id": ["CanvasDataID"],
+   	"author_id": ["CanvasDataID"],
+   	"author_name": ["Other"],
+   	"comment":  ["Other"]
+   },
+   "submission_comment_fact": {
+   	"recipient_id": ["CanvasDataID"],
+   	"author_id": ["CanvasDataID"]
+   },
+   "submission_comment_participant_fact": {
+   	"user_id": ["CanvasDataID"]
+   },
+   "submission_dim": {
+   	"user_id": ["CanvasDataID"],
+   	"grader_id": ["CanvasDataID"]
+   },
+   "submission_fact": {
+   	"user_id": ["CanvasDataID"],
+   	"grader_id": ["CanvasDataID"]
+   },
+   "user_dim": {
+   	"id": ["CanvasDataID"],
+   	"canvas_id": ["CanvasID"],
+   	"gender": ["Other"],
+   	"birthdate": ["Other"],
+   	"name": ["Name"],
+   	"sortable_name": ["Other"]
+   },
+   "wiki_page_fact": {
+   	"user_id": ["CanvasDataID"]
+   }
 }
