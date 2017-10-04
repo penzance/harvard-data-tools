@@ -104,6 +104,7 @@
    	"author_id": ["CanvasDataID"]
    },
    "submission_comment_participant_fact": {
+	"submission_comment_participant_id": ["CanvasDataID"],
    	"user_id": ["CanvasDataID"]
    },
    "submission_dim": {
@@ -116,6 +117,7 @@
    },
    "user_dim": {
    	"id": ["CanvasDataID"],
+   	"global_canvas_id": ["CanvasGlobalID"],
    	"canvas_id": ["CanvasID"],
    	"gender": ["Other"],
    	"birthdate": ["Other"],
