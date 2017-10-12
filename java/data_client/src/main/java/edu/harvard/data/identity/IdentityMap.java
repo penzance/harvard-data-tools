@@ -25,7 +25,7 @@ import edu.harvard.data.schema.extension.ExtensionSchemaTable;
 //     canvas_data_id BIGINT,
 //     eppn VARCHAR(255),
 //     active_directory_id VARCHAR(255),
-//     canvas_global_id BIGINT
+//     canvas_global_id VARCHAR(255)
 // );
 //
 // CREATE TABLE pii.name (
@@ -104,7 +104,7 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     columns.add(new ExtensionSchemaColumn("canvas_data_id", "", "bigint", 0));
     columns.add(new ExtensionSchemaColumn("eppn", "", "varchar", 255));
     columns.add(new ExtensionSchemaColumn("active_directory_id", "", "varchar", 255));
-    columns.add(new ExtensionSchemaColumn("canvas_global_id", "", "bigint", 0));
+    columns.add(new ExtensionSchemaColumn("canvas_global_id", "", "varchar", 255));
     tables.put("identity_map", new ExtensionSchemaTable("identity_map", columns));
 
     //    columns = new ArrayList<DataSchemaColumn>();
@@ -164,9 +164,8 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     if (record.get(6) != null && record.get(0).length() > 0) {
       identities.put(IdentifierType.ActiveDirectoryID, record.get(6));
     }
-    final String $canvasGlobalId = record.get(7);
-    if ($canvasGlobalId != null && $canvasGlobalId.length() > 0) {
-      identities.put(IdentifierType.CanvasGlobalID, Long.valueOf($canvasGlobalId));
+    if (record.get(7) != null && record.get(7).length() > 0) {
+      identities.put(IdentifierType.CanvasGlobalID, record.get(7));
     }
   }
 
@@ -209,9 +208,8 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     if (resultSet.getString("eppn") != null) {
       identities.put(IdentifierType.ActiveDirectoryID, resultSet.getString("active_directory_id"));
     }
-    final long canvasGlobalId = resultSet.getLong("canvas_global_id");
-    if (!resultSet.wasNull()) {
-      identities.put(IdentifierType.CanvasGlobalID, canvasGlobalId);
+    if (resultSet.getString("canvas_global_id") != null) {
+      identities.put(IdentifierType.CanvasGlobalID, resultSet.getString("canvas_global_id"));
     }
 
   }
@@ -231,11 +229,10 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
         ? identities.get(IdentifierType.CanvasDataID) : formatter.getCsvFormat().getNullString());
     fields.add(identities.containsKey(IdentifierType.EPPN) ? identities.get(IdentifierType.EPPN)
         : formatter.getCsvFormat().getNullString());
-    fields.add(identities.containsKey(IdentifierType.ActiveDirectoryID)
-        ? identities.get(IdentifierType.ActiveDirectoryID)
-            : formatter.getCsvFormat().getNullString());
-    fields.add(identities.containsKey(IdentifierType.CanvasGlobalID)
-        ? identities.get(IdentifierType.CanvasGlobalID) : formatter.getCsvFormat().getNullString());
+    fields.add(identities.containsKey(IdentifierType.ActiveDirectoryID) ? identities.get(IdentifierType.ActiveDirectoryID)
+        : formatter.getCsvFormat().getNullString());
+    fields.add(identities.containsKey(IdentifierType.CanvasGlobalID) ? identities.get(IdentifierType.CanvasGlobalID)
+        : formatter.getCsvFormat().getNullString());
     return fields;
   }
 
