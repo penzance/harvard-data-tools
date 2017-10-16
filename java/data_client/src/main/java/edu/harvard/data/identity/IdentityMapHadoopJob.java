@@ -20,6 +20,7 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.LazyOutputFormat;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -163,7 +164,7 @@ public class IdentityMapHadoopJob {
     }
     job.setMapOutputValueClass(HadoopIdentityKey.class);
     job.setInputFormatClass(TextInputFormat.class);
-    job.setOutputFormatClass(TextOutputFormat.class);
+    LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);
 
     MultipleOutputs.addNamedOutput(job, config.getPhase1TempIdMapOutput(), TextOutputFormat.class,
         Text.class, NullWritable.class);
