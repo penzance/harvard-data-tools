@@ -150,12 +150,12 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     if (record.get(2) != null && record.get(0).length() > 0) {
       identities.put(IdentifierType.XID, record.get(2));
     }
-    final String $canvasId = record.get(3);
-    if ($canvasId != null && $canvasId.length() > 0) {
+    if (record.get(3) != null && record.get(3).length() > 0) {
+      final String $canvasId = record.get(3);
       identities.put(IdentifierType.CanvasID, Long.valueOf($canvasId));
     }
-    final String $canvasDataId = record.get(4);
-    if ($canvasDataId != null && $canvasDataId.length() > 0) {
+    if (record.get(4) != null && record.get(4).length() > 0) {
+      final String $canvasDataId = record.get(4);    	
       identities.put(IdentifierType.CanvasDataID, Long.valueOf($canvasDataId));
     }
     if (record.get(5) != null && record.get(0).length() > 0) {
