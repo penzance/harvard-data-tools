@@ -144,7 +144,7 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     if (record.get(0) != null && record.get(0).length() > 0) {
       identities.put(IdentifierType.ResearchUUID, record.get(0));
     }
-    if (record.get(1) != null && record.get(0).length() > 0) {
+    if (record.get(1) != null && record.get(1).length() > 0) {
       identities.put(IdentifierType.HUID, record.get(1));
     }
     if (record.get(2) != null && record.get(0).length() > 0) {
