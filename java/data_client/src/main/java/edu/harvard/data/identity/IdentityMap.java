@@ -161,7 +161,7 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     if (record.get(5) != null && record.get(0).length() > 0) {
       identities.put(IdentifierType.EPPN, record.get(5));
     }
-    if (record.get(6) != null && record.get(0).length() > 0) {
+    if (record.get(6) != null && record.get(6).length() > 0) {
       identities.put(IdentifierType.ActiveDirectoryID, record.get(6));
     }
     if (record.get(7) != null && record.get(0).length() > 0) {
