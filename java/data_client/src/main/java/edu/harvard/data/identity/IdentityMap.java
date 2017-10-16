@@ -147,7 +147,7 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     if (record.get(1) != null && record.get(1).length() > 0) {
       identities.put(IdentifierType.HUID, record.get(1));
     }
-    if (record.get(2) != null && record.get(0).length() > 0) {
+    if (record.get(2) != null && record.get(2).length() > 0) {
       identities.put(IdentifierType.XID, record.get(2));
     }
     if (record.get(3) != null && record.get(3).length() > 0) {
@@ -158,13 +158,13 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
       final String $canvasDataId = record.get(4);    	
       identities.put(IdentifierType.CanvasDataID, Long.valueOf($canvasDataId));
     }
-    if (record.get(5) != null && record.get(0).length() > 0) {
+    if (record.get(5) != null && record.get(5).length() > 0) {
       identities.put(IdentifierType.EPPN, record.get(5));
     }
-    if (record.get(6) != null && record.get(0).length() > 0) {
+    if (record.get(6) != null && record.get(6).length() > 0) {
       identities.put(IdentifierType.ActiveDirectoryID, record.get(6));
     }
-    if (record.get(7) != null && record.get(0).length() > 0) {
+    if (record.get(7) != null && record.get(7).length() > 0) {
       identities.put(IdentifierType.CanvasGlobalID, record.get(7));
     }
   }
