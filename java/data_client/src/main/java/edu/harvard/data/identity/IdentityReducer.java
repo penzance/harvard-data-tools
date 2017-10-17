@@ -152,11 +152,8 @@ public class IdentityReducer<T> {
         names.add(name);
       }
     }
-    if ( IdentifierType.values().length == id.getFieldsAsList(format).toArray().length ) {
-      outputResult("tempidentitymap", outputs, id.getFieldsAsList(format).toArray());
-    } else {
-        log.debug("Identity Reduce: Column Mismatch: " + id.getFieldsAsList(format).toArray().length );
-    }
+    log.debug("Identity Reduce: Column count: " + id.getFieldsAsList(format).toArray().length );
+    outputResult("tempidentitymap", outputs, id.getFieldsAsList(format).toArray());
     for (final String email : emails) {
       outputResult(IdentifierType.EmailAddress.getFieldName(), outputs,
           id.get(IdentifierType.ResearchUUID), email);
