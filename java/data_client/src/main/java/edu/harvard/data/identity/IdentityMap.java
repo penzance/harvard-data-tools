@@ -205,7 +205,7 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     if (resultSet.getString("eppn") != null) {
       identities.put(IdentifierType.EPPN, resultSet.getString("eppn"));
     }
-    if (resultSet.getString("eppn") != null) {
+    if (resultSet.getString("active_directory_id") != null) {
       identities.put(IdentifierType.ActiveDirectoryID, resultSet.getString("active_directory_id"));
     }
     if (resultSet.getString("canvas_global_id") != null) {
