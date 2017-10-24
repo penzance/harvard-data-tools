@@ -99,10 +99,9 @@ public class InputParser {
   }
   
   private void getFileName() {
-    final String date = filename.substring(filename.indexOf(".") + 1, filename.indexOf(".json"));
     originalFile = new File(config.getScratchDir(), filename);
 
-    final String dataproductFilename = currentDataProduct + "-" + date + ".gz";
+    final String dataproductFilename = currentDataProduct + ".gz";
     dataproductFile = new File(config.getScratchDir(), dataproductFilename );
     
     if (currentDataProduct.equals("Presentations") ) {

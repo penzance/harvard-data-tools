@@ -351,18 +351,6 @@
           "length" : 255
 	},
         {
-          "name" : "course_identifier",
-          "description" : "",
-          "type" : "varchar",
-          "length" : 255
-	},
-        {
-          "name" : "course_identifier_type",
-          "description" : "",
-          "type" : "varchar",
-          "length" : 255
-	},
-        {
           "name" : "Opened",
           "description" : "",
           "type" : "varchar",
@@ -370,18 +358,6 @@
 	},
         {
           "name" : "PlaybackTicket",
-          "description" : "",
-          "type" : "varchar",
-          "length" : 255
-	},
-        {
-          "name" : "IPAddress",
-          "description" : "",
-          "type" : "varchar",
-          "length" : 255
-	},
-        {
-          "name" : "HostName",
           "description" : "",
           "type" : "varchar",
           "length" : 255
@@ -399,13 +375,13 @@
           "length" : 255
 	},
         {
-          "name" : "TimeWatchedSeconds",
+          "name" : "TotalTimeWatched",
           "description" : "",
           "type" : "varchar",
           "length" : 255
 	},
         {
-          "name" : "CoverageWatchedSeconds",
+          "name" : "Coverage",
           "description" : "",
           "type" : "varchar",
           "length" : 255
