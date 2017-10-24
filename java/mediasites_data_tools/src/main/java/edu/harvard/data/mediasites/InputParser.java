@@ -45,6 +45,7 @@ public class InputParser {
   
   private final String currentDataProduct;
   private final String dataproductPrefix;
+  private final String dataproductFiletype;
 
   private File originalFile;
 
@@ -65,6 +66,7 @@ public class InputParser {
     this.key = inputObj.getKey();
 	this.filename = key.substring(key.lastIndexOf("/") + 1);	  
     this.dataproductPrefix = "PrepMediasites-";
+    this.dataproductFiletype = ".json.gz";
     this.currentDataProduct = getDataProduct();
     this.presentationsOutputDir = AwsUtils.key( outputLocation, "Presentations");
     this.vtrendsOutputDir = AwsUtils.key( outputLocation, "ViewingTrends" );
@@ -94,7 +96,7 @@ public class InputParser {
   }
   
   private final String getDataProduct() {
-    final String dataproduct = filename.substring( filename.lastIndexOf(dataproductPrefix)+dataproductPrefix.length(), filename.lastIndexOf("-"));
+    final String dataproduct = filename.substring( filename.lastIndexOf(dataproductPrefix)+dataproductPrefix.length() ).replace(dataproductFiletype, "");
     return dataproduct;
   }
   
