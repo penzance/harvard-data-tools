@@ -6,8 +6,6 @@ import java.util.Iterator;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.DataTable;
 import edu.harvard.data.TableFormat;
@@ -23,8 +21,6 @@ import edu.harvard.data.TableFormat;
  *          the record type that this file reader parses.
  */
 public class HdfsTableReader<T extends DataTable> implements TableReader<T> {
-	
-  private static final Logger log = LogManager.getLogger();
 
   private final HdfsDelimitedFileIterator<T> iterator;
 
@@ -50,7 +46,6 @@ public class HdfsTableReader<T extends DataTable> implements TableReader<T> {
     if (!fs.exists(path) || fs.isDirectory(path)) {
       throw new FileNotFoundException(path.toString());
     }
-    log.debug("Reading HDFS Table file: " + path.toString());
     iterator = new HdfsDelimitedFileIterator<T>(tableType, format, fs, path);
   }
 

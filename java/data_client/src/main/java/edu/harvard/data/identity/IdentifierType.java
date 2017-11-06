@@ -39,8 +39,6 @@ public enum IdentifierType {
   CanvasID("canvas_id", "", Long.class),
 
   CanvasDataID("canvas_data_id", "", Long.class),
-  
-  CanvasGlobalID("canvas_global_id", "", String.class),
 
   EPPN("eppn", "", String.class),
 

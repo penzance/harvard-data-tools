@@ -13,8 +13,6 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopUtilities;
@@ -37,8 +35,6 @@ import edu.harvard.data.io.TableReader;
  */
 public class IdentityReducer<T> {
 
-  private static final Logger log = LogManager.getLogger();
-	
   Map<T, IdentityMap> identities;
   TableFormat format;
   IdentifierType mainIdentifier;
@@ -152,7 +148,6 @@ public class IdentityReducer<T> {
         names.add(name);
       }
     }
-    log.debug("Identity Reduce: Column count: " + id.getFieldsAsList(format).toArray().length );
     outputResult("tempidentitymap", outputs, id.getFieldsAsList(format).toArray());
     for (final String email : emails) {
       outputResult(IdentifierType.EmailAddress.getFieldName(), outputs,
@@ -167,11 +162,11 @@ public class IdentityReducer<T> {
   private void outputResult(final String outputName,
       final MultipleOutputs<Text, NullWritable> outputs, final Object... fields)
           throws IOException, InterruptedException {
-    final StringWriter writer = new StringWriter(512);
+    final StringWriter writer = new StringWriter();
     try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
       printer.printRecord(fields);
-      final Text csvText = new Text(writer.toString().trim());
-      outputs.write(outputName, csvText, NullWritable.get(), outputName + "/" + outputName);
     }
+    final Text csvText = new Text(writer.toString().trim());
+    outputs.write(outputName, csvText, NullWritable.get(), outputName + "/" + outputName);
   }
 }
