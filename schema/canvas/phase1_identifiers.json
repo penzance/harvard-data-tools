@@ -104,6 +104,7 @@
    	"author_id": ["CanvasDataID"]
    },
    "submission_comment_participant_fact": {
+        "submission_comment_participant_id": ["CanvasDataID"],
    	"user_id": ["CanvasDataID"]
    },
    "submission_dim": {
