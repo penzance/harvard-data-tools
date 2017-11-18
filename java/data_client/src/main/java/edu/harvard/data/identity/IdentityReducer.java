@@ -162,7 +162,7 @@ public class IdentityReducer<T> {
   private void outputResult(final String outputName,
       final MultipleOutputs<Text, NullWritable> outputs, final Object... fields)
           throws IOException, InterruptedException {
-    final StringWriter writer = new StringWriter();
+    final StringWriter writer = new StringWriter(1024);
     try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
       printer.printRecord(fields);
     }
