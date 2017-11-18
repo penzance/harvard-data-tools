@@ -148,7 +148,6 @@ public class IdentityReducer<T> {
         names.add(name);
       }
     }
-    outputResult("tempidentitymap", outputs, id.getFieldsAsList(format).toArray());
     for (final String email : emails) {
       outputResult(IdentifierType.EmailAddress.getFieldName(), outputs,
           id.get(IdentifierType.ResearchUUID), email);
@@ -157,6 +156,7 @@ public class IdentityReducer<T> {
       outputResult(IdentifierType.Name.getFieldName(), outputs, id.get(IdentifierType.ResearchUUID),
           name);
     }
+    outputResult("tempidentitymap", outputs, id.getFieldsAsList(format).toArray());    
   }
 
   private void outputResult(final String outputName,
