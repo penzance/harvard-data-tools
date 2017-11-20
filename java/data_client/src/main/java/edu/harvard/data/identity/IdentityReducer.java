@@ -165,8 +165,8 @@ public class IdentityReducer<T> {
     final StringWriter writer = new StringWriter(32768);
     try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
       printer.printRecord(fields);
-    }
-    final Text csvText = new Text(writer.toString());
+    final Text csvText = new Text(writer.toString().trim());
     outputs.write(outputName, csvText, NullWritable.get(), outputName + "/" + outputName);
+    }
   }
 }
