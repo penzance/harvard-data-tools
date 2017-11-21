@@ -13,6 +13,8 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopUtilities;
@@ -43,6 +45,9 @@ public class IdentityReducer<T> {
   public IdentityReducer() {
     this.hadoopUtils = new HadoopUtilities();
   }
+  
+  private static final Logger log = LogManager.getLogger();
+
 
   /**
    * Perform initial setup tasks before running the reducer. This method should
@@ -162,11 +167,12 @@ public class IdentityReducer<T> {
   private void outputResult(final String outputName,
       final MultipleOutputs<Text, NullWritable> outputs, final Object... fields)
           throws IOException, InterruptedException {
-    final StringWriter writer = new StringWriter(1048576);
+    final StringWriter writer = new StringWriter(1073741824);
     try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
       printer.printRecord(fields);
-    final Text csvText = new Text(writer.toString().trim());
-    outputs.write(outputName, csvText, NullWritable.get(), outputName + "/" + outputName);
+      log.info("tempidentitymap: " + writer.toString().trim() );
+      final Text csvText = new Text(writer.toString().trim());
+      outputs.write(outputName, csvText, NullWritable.get(), outputName + "/" + outputName);
     }
   }
 }
