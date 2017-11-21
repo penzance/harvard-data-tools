@@ -175,7 +175,7 @@ public class IdentityReducer<T> {
       log.info("tempidentitymap (String): " + writeLine );
       outputs.write(outputName, csvText, NullWritable.get(), outputName + "/" + outputName);
       log.info("tempidentitymap (Text): " + csvText );
-
+      outputs.wait(5000);
     }
   }
 }
