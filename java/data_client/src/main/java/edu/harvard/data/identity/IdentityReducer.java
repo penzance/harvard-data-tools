@@ -173,8 +173,7 @@ public class IdentityReducer<T> {
       final String writeLine = writer.toString().trim();
       final Text csvText = new Text( writeLine );
       outputs.write(outputName, csvText, NullWritable.get(), outputName + "/" + outputName);
-      log.info("tempidentitymap (Text): " + csvText );
-      Thread.sleep(5);
+      Thread.sleep(8);
     }
   }
 }
