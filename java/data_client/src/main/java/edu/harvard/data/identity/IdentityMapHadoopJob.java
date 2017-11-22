@@ -165,11 +165,11 @@ public class IdentityMapHadoopJob {
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
 
+    MultipleOutputs.addNamedOutput(job, config.getPhase1TempIdMapOutput(), TextOutputFormat.class,
+        Text.class, NullWritable.class);
     MultipleOutputs.addNamedOutput(job, config.getPhase1EmailOutput(), TextOutputFormat.class,
         Text.class, NullWritable.class);
     MultipleOutputs.addNamedOutput(job, config.getPhase1NameOutput(), TextOutputFormat.class,
-        Text.class, NullWritable.class);
-    MultipleOutputs.addNamedOutput(job, config.getPhase1TempIdMapOutput(), TextOutputFormat.class,
         Text.class, NullWritable.class);
     
     return job;

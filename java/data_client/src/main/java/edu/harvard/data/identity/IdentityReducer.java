@@ -13,8 +13,6 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopUtilities;
@@ -46,8 +44,6 @@ public class IdentityReducer<T> {
     this.hadoopUtils = new HadoopUtilities();
   }
   
-  private static final Logger log = LogManager.getLogger();
-
 
   /**
    * Perform initial setup tasks before running the reducer. This method should
@@ -153,6 +149,7 @@ public class IdentityReducer<T> {
         names.add(name);
       }
     }
+    outputResult("tempidentitymap", outputs, id.getFieldsAsList(format).toArray());    
     for (final String email : emails) {
       outputResult(IdentifierType.EmailAddress.getFieldName(), outputs,
           id.get(IdentifierType.ResearchUUID), email);
@@ -161,7 +158,6 @@ public class IdentityReducer<T> {
       outputResult(IdentifierType.Name.getFieldName(), outputs, id.get(IdentifierType.ResearchUUID),
           name);
     }
-    outputResult("tempidentitymap", outputs, id.getFieldsAsList(format).toArray());    
   }
 
   private void outputResult(final String outputName,
@@ -170,10 +166,10 @@ public class IdentityReducer<T> {
     final StringWriter writer = new StringWriter();
     try (final CSVPrinter printer = new CSVPrinter(writer, format.getCsvFormat())) {
       printer.printRecord(fields);
-      final String writeLine = writer.toString().trim();
-      final Text csvText = new Text( writeLine );
-      outputs.write(outputName, csvText, NullWritable.get(), outputName + "/" + outputName);
-      Thread.sleep(8);
     }
+    final String writeLine = writer.toString().trim();
+    final Text csvText = new Text( writeLine );
+    outputs.write(outputName, csvText, NullWritable.get(), outputName + "/" + outputName);
+    Thread.sleep(8);
   }
 }
