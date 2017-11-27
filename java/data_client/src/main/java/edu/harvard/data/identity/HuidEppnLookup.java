@@ -91,7 +91,6 @@ public class HuidEppnLookup {
         if (!seenIdentities.contains(id.get(mainIdentifier))) {
           identities.add(id);
           seenIdentities.add((T) id.get(mainIdentifier));
-          log.info("Identities: " + id + "SeenIdentifier: " + id.get(mainIdentifier) );
           final String huid = (String) id.get(IdentifierType.HUID);
           final String eppn = (String) id.get(IdentifierType.EPPN);
           if (huid != null && eppn == null) {

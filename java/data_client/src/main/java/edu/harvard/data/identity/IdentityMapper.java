@@ -8,8 +8,6 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.TableFormat;
@@ -47,7 +45,6 @@ public class IdentityMapper<T> {
     this.format = hadoopUtils.getFormat(context);
   }
   
-  private static final Logger log = LogManager.getLogger();
 
   /**
    * Process a single record to produce a map from the data set's main
@@ -99,7 +96,6 @@ public class IdentityMapper<T> {
     for (final CSVRecord csvRecord : parser.getRecords()) {
       idMapper.readRecord(csvRecord);
       final Map<String, T> hadoopKeys = idMapper.getMainIdentifiers();
-      log.info("class: " + idMapper.getClass().toString() + ", Number of hadoopKeys: " + hadoopKeys.size() + ",hadoopKey=" + hadoopKeys.values().toString() );    	  
       if (hadoopKeys.size() == 1) {
         // If there's only one main ID, we can use this table to figure
         // out other identities for that individual.
