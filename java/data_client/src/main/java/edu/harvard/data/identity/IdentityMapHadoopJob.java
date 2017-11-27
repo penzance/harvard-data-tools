@@ -99,6 +99,7 @@ public class IdentityMapHadoopJob {
       throws SQLException, DataConfigurationException, IOException {
     log.info("Looking up any unknown EPPNs or HUIDs");
     final TableFormat format = new FormatLibrary().getFormat(config.getPipelineFormat());
+    log.info("Main Identifier is " + mainIdentifier);
     final HuidEppnLookup lookup = new HuidEppnLookup(config, format, mainIdentifier);
 
     final String idMapDir = config.getPhase1IdMapPath() + "/";

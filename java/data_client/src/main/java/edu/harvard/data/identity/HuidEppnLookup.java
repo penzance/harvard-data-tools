@@ -55,7 +55,9 @@ public class HuidEppnLookup {
   public <T> void expandIdentities(final URI[] latestPaths,final URI[] originalPaths, final URI outputPath, final Class<T> cls)
       throws SQLException, DataConfigurationException, IOException {
     final Set<T> seenIds = new HashSet<T>();
+    log.info("Reading latest paths...");
     readIdentities(latestPaths, seenIds);
+    log.info("Reading original paths...");
     readIdentities(originalPaths, seenIds);
     log.info("Found " + unknownEppn.size() + " unknown EPPNs and " + unknownHuid.size()
     + " unknown HUIDs");
@@ -89,6 +91,7 @@ public class HuidEppnLookup {
         if (!seenIdentities.contains(id.get(mainIdentifier))) {
           identities.add(id);
           seenIdentities.add((T) id.get(mainIdentifier));
+          log.info("Identities: " + id + "SeenIdentifier: " + id.get(mainIdentifier) );
           final String huid = (String) id.get(IdentifierType.HUID);
           final String eppn = (String) id.get(IdentifierType.EPPN);
           if (huid != null && eppn == null) {
