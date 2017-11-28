@@ -48,4 +48,14 @@ extends Reducer<LongWritable, HadoopIdentityKey, Text, NullWritable> {
     final Long mainIdValue = key.get();
     identityReducer.reduce(mainIdValue, values, outputs);
   }
+
+  /**
+   * Cleanup the identity records associated with a single main identifier
+   * value and ensure files are closed. See the definition of {@link IdentityReducer#cleanup} for details.
+   */
+  @Override
+  public void cleanup( final Context context ) throws IOException, InterruptedException {
+    identityReducer.cleanup( outputs );
+  }
+
 }
