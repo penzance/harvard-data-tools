@@ -171,8 +171,8 @@ public class IdentityReducer<T> {
     final Text csvText = new Text( writeLine );
     outputs.write(outputName, csvText, NullWritable.get(), outputName + "/" + outputName);
   }
-  
+
   public void cleanup(final MultipleOutputs<Text, NullWritable> outputs) throws IOException, InterruptedException {
-	outputs.close();
+	  	outputs.close();
   }
 }

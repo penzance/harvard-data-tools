@@ -57,5 +57,5 @@ extends Reducer<LongWritable, HadoopIdentityKey, Text, NullWritable> {
   public void cleanup( final Context context ) throws IOException, InterruptedException {
     identityReducer.cleanup( outputs );
   }
-  
+
 }

@@ -70,6 +70,12 @@
           "length" : 255
         },
         {
+          "name" : "proxy3",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
           "name" : "session_id",
           "description" : "Tracking identifier for a per-user session.",
           "type" : "varchar",

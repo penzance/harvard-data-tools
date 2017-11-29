@@ -46,7 +46,7 @@ public class StringIdentityReducer extends Reducer<Text, HadoopIdentityKey, Text
     final String mainIdValue = key.toString();
     identityReducer.reduce(mainIdValue, values, outputs);
   }
-  
+
   /**
    * Cleanup the identity records associated with a single main identifier
    * value and ensure files are closed. See the definition of {@link IdentityReducer#cleanup} for details.
@@ -55,5 +55,5 @@ public class StringIdentityReducer extends Reducer<Text, HadoopIdentityKey, Text
   public void cleanup( final Context context ) throws IOException, InterruptedException {
     identityReducer.cleanup( outputs );
   }
-  
+
 }
