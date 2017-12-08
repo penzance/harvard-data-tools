@@ -87,11 +87,6 @@
           "type" : "boolean"
         },
         {
-          "name" : "live_start",
-          "description" : "",
-          "type" : "varchar"
-        },
-        {
           "name" : "action.inpoint",
           "description" : "Timestamp within the video when the event occurred.",
           "type" : "integer"
