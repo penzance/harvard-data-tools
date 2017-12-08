@@ -89,7 +89,7 @@
         {
           "name" : "live_start",
           "description" : "",
-          "type" : "timestamp"
+          "type" : "varchar"
         },
         {
           "name" : "action.inpoint",
