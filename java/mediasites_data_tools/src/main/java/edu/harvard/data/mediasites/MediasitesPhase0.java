@@ -54,7 +54,15 @@ public class MediasitesPhase0 extends Phase0 {
     }
     dataIndex.setSchemaVersion("1.0");
     for (final String table : dataIndex.getTableNames()) {
-       dataIndex.setPartial(table, false);
+       if ( table.equals("Presentations") ) {
+            dataIndex.setPartial(table, false); 	
+       } else if ( table.equals("ViewingTrends") ) {
+           dataIndex.setPartial(table, false); 	
+       } else if ( table.equals("ViewingTrendsUsers") ) {
+           dataIndex.setPartial(table, true); 	
+       } else if ( table.equals("ViewingSessions") ) {
+           dataIndex.setPartial(table, true); 	
+       }
     }
     aws.writeJson(config.getIndexFileS3Location(runId), dataIndex );
     
