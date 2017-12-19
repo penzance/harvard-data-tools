@@ -339,6 +339,12 @@
     "ViewingSessions": {
       "columns" : [ 
         {
+          "name" : "PlaybackTicket",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+	},
+        {
           "name" : "video_id",
           "description" : "",
           "type" : "varchar",
@@ -352,12 +358,6 @@
 	},
         {
           "name" : "Opened",
-          "description" : "",
-          "type" : "varchar",
-          "length" : 255
-	},
-        {
-          "name" : "PlaybackTicket",
           "description" : "",
           "type" : "varchar",
           "length" : 255
@@ -414,6 +414,12 @@
     },
     "ViewingTrendsUsers": {
       "columns" : [ 
+        {
+          "name" : "vtu_videouser_id",
+          "description" : "",
+          "type" : "varchar",
+          "length" : 255
+        },
         {
           "name" : "user_id",
           "description" : "",
