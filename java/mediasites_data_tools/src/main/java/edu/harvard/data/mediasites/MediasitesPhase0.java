@@ -55,7 +55,7 @@ public class MediasitesPhase0 extends Phase0 {
     dataIndex.setSchemaVersion("1.0");
     for (final String table : dataIndex.getTableNames()) {
        if ( table.equals("Presentations") ) {
-            dataIndex.setPartial(table, false); 	
+            dataIndex.setPartial(table, true); 	
        } else if ( table.equals("ViewingTrends") ) {
            dataIndex.setPartial(table, false); 	
        } else if ( table.equals("ViewingTrendsUsers") ) {
