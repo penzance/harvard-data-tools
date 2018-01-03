@@ -77,7 +77,7 @@ public class FormatLibrary {
     }
   }
 
-  public static final String CANVAS_TIMESTAMP_FORMAT_STRING = "yyyy-MM-dd HH:mm:ss";
+  public static final String CANVAS_TIMESTAMP_FORMAT_STRING = "yyyy-MM-dd HH:mm:ssXXX";
   public static final String CANVAS_DATE_FORMAT_STRING = "yyyy-MM-dd";
   public static final String MATTERHORN_DATE_FORMAT_STRING = "yyyy-MM-dd'T'HH:mm:ssXXX";
   public static final String MEDIASITES_TIMESTAMP_FORMAT_STRING = "yyyy-MM-dd'T'HH:mm:ssXXXZ";
