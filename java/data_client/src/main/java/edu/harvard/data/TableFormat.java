@@ -111,7 +111,7 @@ public class TableFormat {
     if (time == null) {
       return null;
     }
-    final String timestamp = time.toString();
+    final String timestamp = timestampFormat.format(time).toString();
     return cleanTimestampString(timestamp);
   }
 
