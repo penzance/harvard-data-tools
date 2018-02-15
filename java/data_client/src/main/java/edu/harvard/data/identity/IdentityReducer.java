@@ -19,6 +19,9 @@ import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.io.TableReader;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Helper class that implements the actual logic for the reduce phase during the
  * identity generation job. Since Hadoop requires that Hadoop-specific wrapper
@@ -44,7 +47,7 @@ public class IdentityReducer<T> {
     this.hadoopUtils = new HadoopUtilities();
   }
   
-
+  private static final Logger log = LogManager.getLogger();
   /**
    * Perform initial setup tasks before running the reducer. This method should
    * be called by the {@code setup} method of the actual identity reducer Hadoop
@@ -145,7 +148,8 @@ public class IdentityReducer<T> {
         emails.add(email);
       }
       final String name = (String) value.getIdentityMap().get(IdentifierType.Name);
-      if (name != null && !name.isEmpty()) {
+      if (name != null && !name.isEmpty() && name.length() > 1) {
+    	  log.info( "Adding id to name output " + value.getIdentityMap().get(IdentifierType.ResearchUUID) );
         names.add(name);
       }
     }
@@ -157,7 +161,7 @@ public class IdentityReducer<T> {
       }
     }
     for (final String name : names) {
-      if (name != null && !name.isEmpty()) {
+      if (name != null && !name.isEmpty() && name.length() > 1) {
           outputResult(IdentifierType.Name.getFieldName(), outputs, id.get(IdentifierType.ResearchUUID),
              name);
       }
