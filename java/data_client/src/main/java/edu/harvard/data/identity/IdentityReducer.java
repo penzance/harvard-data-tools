@@ -151,12 +151,16 @@ public class IdentityReducer<T> {
     }
     outputResult("tempidentitymap", outputs, id.getFieldsAsList(format).toArray());    
     for (final String email : emails) {
-      outputResult(IdentifierType.EmailAddress.getFieldName(), outputs,
-          id.get(IdentifierType.ResearchUUID), email);
+      if (email != null && !email.isEmpty()) {	
+    	  outputResult(IdentifierType.EmailAddress.getFieldName(), outputs,
+    	     id.get(IdentifierType.ResearchUUID), email);
+      }
     }
     for (final String name : names) {
-      outputResult(IdentifierType.Name.getFieldName(), outputs, id.get(IdentifierType.ResearchUUID),
-          name);
+      if (name != null && !name.isEmpty()) {
+          outputResult(IdentifierType.Name.getFieldName(), outputs, id.get(IdentifierType.ResearchUUID),
+             name);
+      }
     }
   }
 
