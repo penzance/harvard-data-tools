@@ -140,11 +140,11 @@ public class IdentityReducer<T> {
         }
       }
       final String email = (String) value.getIdentityMap().get(IdentifierType.EmailAddress);
-      if (email != null) {
+      if (email != null && !email.isEmpty()) {
         emails.add(email);
       }
       final String name = (String) value.getIdentityMap().get(IdentifierType.Name);
-      if (name != null) {
+      if (name != null && !name.isEmpty()) {
         names.add(name);
       }
     }
