@@ -95,7 +95,7 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
 
   public static Map<String, DataSchemaTable> getIdentityMapTables() {
     final Map<String, DataSchemaTable> tables = new HashMap<String, DataSchemaTable>();
-    final List<DataSchemaColumn> columns = new ArrayList<DataSchemaColumn>();
+    List<DataSchemaColumn> columns = new ArrayList<DataSchemaColumn>();
     columns.add(new ExtensionSchemaColumn("research_id", "", "varchar", 255));
     columns.add(new ExtensionSchemaColumn("huid", "", "varchar", 255));
     columns.add(new ExtensionSchemaColumn("xid", "", "varchar", 255));
@@ -105,15 +105,15 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     columns.add(new ExtensionSchemaColumn("active_directory_id", "", "varchar", 255));
     tables.put("identity_map", new ExtensionSchemaTable("identity_map", columns));
 
-    //    columns = new ArrayList<DataSchemaColumn>();
-    //    columns.add(new ExtensionSchemaColumn("research_id", "", "varchar", 255));
-    //    columns.add(new ExtensionSchemaColumn("name", "", "varchar", 255));
-    //    tables.put("name", new ExtensionSchemaTable("name", columns));
-    //
-    //    columns = new ArrayList<DataSchemaColumn>();
-    //    columns.add(new ExtensionSchemaColumn("research_id", "", "varchar", 255));
-    //    columns.add(new ExtensionSchemaColumn("email", "", "varchar", 255));
-    //    tables.put("email", new ExtensionSchemaTable("email", columns));
+    columns = new ArrayList<DataSchemaColumn>();
+    columns.add(new ExtensionSchemaColumn("research_id", "", "varchar", 255));
+    columns.add(new ExtensionSchemaColumn("name", "", "varchar", 255));
+    tables.put("name", new ExtensionSchemaTable("name", columns));
+    
+    columns = new ArrayList<DataSchemaColumn>();
+    columns.add(new ExtensionSchemaColumn("research_id", "", "varchar", 255));
+    columns.add(new ExtensionSchemaColumn("email", "", "varchar", 255));
+    tables.put("email", new ExtensionSchemaTable("email", columns));
 
     return tables;
   }
