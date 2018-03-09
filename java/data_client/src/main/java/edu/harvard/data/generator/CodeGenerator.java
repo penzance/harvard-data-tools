@@ -233,7 +233,7 @@ public abstract class CodeGenerator {
       new HiveQueryManifestGenerator(codeDir, spec).generate();
 
       log.info("Generating Redshift copy from S3 script in " + codeDir);
-      new S3ToRedshiftLoaderGenerator(codeDir, spec, config, workingDir, dataIndex).generate();
+      new S3ToRedshiftLoaderGenerator(codeDir, spec, config, workingDir, dataIndex, IdentitySchema.read(getIdentifierResource())).generate();
 
       log.info("Generating move unmodified files script in " + codeDir);
       new MoveUnmodifiedTableGenerator(codeDir, spec).generate();

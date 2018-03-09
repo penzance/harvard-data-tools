@@ -3,6 +3,7 @@ package edu.harvard.data.schema.identity;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -149,6 +150,22 @@ public class IdentitySchema {
    */
   public Map<String, List<IdentifierType>> get(final String tableName) {
     return tables.get(tableName);
+  }
+  
+  /**
+   * Get the unique identifier types across all tables as defined by this schema
+   * 
+   * @return a {@link List} of {@link IdentifierType} values
+   * 
+   */
+  public List<IdentifierType> getIdentifierTypes() {
+	List<IdentifierType> identifierTypes = new ArrayList<>();
+ 	for (final String key : tables.keySet() ) {
+ 	    for (List<IdentifierType> list: tables.get(key).values()) {
+ 	    	identifierTypes.addAll(list);
+ 	 	}
+ 	}
+ 	return identifierTypes;
   }
 
   /**
