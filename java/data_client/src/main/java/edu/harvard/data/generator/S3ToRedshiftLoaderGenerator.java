@@ -58,7 +58,7 @@ public class S3ToRedshiftLoaderGenerator {
 	final Map<String, DataSchemaTable> tables = IdentityMap.getIdentityMapTables();    
 	for (final String tableName : tables.keySet()) {
 	  for (final IdentifierType idType : identities.getIdentifierTypes() ) {
-		  if (tableName.equals( idType.getFieldName() )) {			  
+		  if (tableName.equals( IdentifierType.valueOf(idType.toString()).getFieldName() )) {			  
 		    final DataSchemaTable table = tables.get(tableName);
 		    final String columnList = getColumnList(table);
 		    final List<String> joinFields = IdentityMap.getPrimaryKeyFields(tableName);
