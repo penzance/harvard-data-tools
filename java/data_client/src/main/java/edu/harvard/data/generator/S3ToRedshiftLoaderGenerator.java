@@ -14,7 +14,9 @@ import org.apache.commons.lang.StringUtils;
 import com.amazonaws.services.s3.model.S3ObjectId;
 
 import edu.harvard.data.DataConfig;
+import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.identity.IdentityMap;
+import edu.harvard.data.schema.identity.IdentitySchema;
 import edu.harvard.data.pipeline.InputTableIndex;
 import edu.harvard.data.schema.DataSchemaColumn;
 import edu.harvard.data.schema.DataSchemaTable;
@@ -26,14 +28,18 @@ public class S3ToRedshiftLoaderGenerator {
   private final S3ObjectId workingDir;
   private final DataConfig config;
   private final InputTableIndex dataIndex;
+  private final IdentitySchema identities;
+
 
   public S3ToRedshiftLoaderGenerator(final File dir, final GenerationSpec spec,
-      final DataConfig config, final S3ObjectId workingDir, final InputTableIndex dataIndex) {
+      final DataConfig config, final S3ObjectId workingDir, final InputTableIndex dataIndex,
+      final IdentitySchema identities) {
     this.config = config;
     this.dir = dir;
     this.spec = spec;
     this.workingDir = workingDir;
     this.dataIndex = dataIndex;
+    this.identities = identities;
   }
 
   public void generate() throws IOException {
@@ -44,18 +50,22 @@ public class S3ToRedshiftLoaderGenerator {
       generateRedshiftLoaderFile(out, spec.getPhase(3));
     }
     try (final PrintStream out = new PrintStream(new FileOutputStream(identityTableFile))) {
-      generateIdentityRedshiftLoaderFile(out, spec.getPhase(3));
+      generateIdentityRedshiftLoaderFile(out, spec.getPhase(3) );
     }
   }
 
   private void generateIdentityRedshiftLoaderFile(final PrintStream out, final SchemaPhase phase) {
-    final Map<String, DataSchemaTable> tables = IdentityMap.getIdentityMapTables();
-    for (final String tableName : tables.keySet()) {
-      final DataSchemaTable table = tables.get(tableName);
-      final String columnList = getColumnList(table);
-      final List<String> joinFields = IdentityMap.getPrimaryKeyFields(tableName);
-      outputPartialTableUpdate(out, table, config.getIdentityRedshiftSchema(), columnList,
-          getLocation("identity_map/" + table.getTableName().replaceAll("_", "")), joinFields);
+	final Map<String, DataSchemaTable> tables = IdentityMap.getIdentityMapTables();    
+	for (final String tableName : tables.keySet()) {
+	  for (final IdentifierType idType : identities.getIdentifierTypes() ) {
+		  if (tableName.equals( idType.getFieldName() )) {			  
+		    final DataSchemaTable table = tables.get(tableName);
+		    final String columnList = getColumnList(table);
+		    final List<String> joinFields = IdentityMap.getPrimaryKeyFields(tableName);
+		    outputPartialTableUpdate(out, table, config.getIdentityRedshiftSchema(), columnList,
+		        getLocation("identity_map/" + table.getTableName().replaceAll("_", "")), joinFields);  
+		  }
+	  }
     }
   }
 
