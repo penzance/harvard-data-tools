@@ -55,17 +55,19 @@ public class S3ToRedshiftLoaderGenerator {
   }
 
   private void generateIdentityRedshiftLoaderFile(final PrintStream out, final SchemaPhase phase) {
-	final Map<String, DataSchemaTable> tables = IdentityMap.getIdentityMapTables();    
-	for (final String tableName : tables.keySet()) {
-	  for (final IdentifierType idType : identities.getIdentifierTypes() ) {
-		  if (tableName.equals( IdentifierType.valueOf(idType.toString()).getFieldName() )) {			  
+    final Map<String, DataSchemaTable> tables = IdentityMap.getIdentityMapTables(); 
+    List<String> checkOptionalIdentityTables = new ArrayList<String>();
+    for (final IdentifierType cit : identities.getIdentifierTypes() ){
+        checkOptionalIdentityTables.add( IdentifierType.valueOf(cit.toString()).getFieldName());   	 		
+    }
+    for (final String tableName : tables.keySet()) {
+      if (checkOptionalIdentityTables.contains(tableName) | tableName.equals("identity_map") ) {
 		    final DataSchemaTable table = tables.get(tableName);
 		    final String columnList = getColumnList(table);
 		    final List<String> joinFields = IdentityMap.getPrimaryKeyFields(tableName);
 		    outputPartialTableUpdate(out, table, config.getIdentityRedshiftSchema(), columnList,
 		        getLocation("identity_map/" + table.getTableName().replaceAll("_", "")), joinFields);  
-		  }
-	  }
+      }
     }
   }
 
