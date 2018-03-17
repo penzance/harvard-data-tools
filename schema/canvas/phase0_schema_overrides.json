@@ -13,6 +13,15 @@
         }
       ]
     },
+    "conference_participant_type": {
+      "columns" : [
+        {
+          "name" : "participation_type",
+          "type": "enum",
+          "description" : "Possible values are 'invitee', 'attendee'."
+        }
+      ]
+    },
     "course": {
       "columns" : [
         {

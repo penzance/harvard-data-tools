@@ -8,6 +8,14 @@
             "key": "id",
             "columns": ["default_assignment_name"]
         },
+        "conference_dim": {
+            "key": "id",
+            "columns": ["title", "conference_type"]
+        },
+        "course_dim": {
+            "key": "id",
+            "columns": ["syllabus_body"]
+        },
         "discussion_entry_dim": {
             "key": "id",
             "columns": ["message"]
