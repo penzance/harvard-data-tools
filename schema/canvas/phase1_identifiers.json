@@ -13,6 +13,12 @@
         "user_id": ["CanvasDataID"],
         "address": ["EmailAddress", "Other"]
    },
+   "conference_participant_dim": {
+        "user_id": ["CanvasDataID"]
+   },
+   "conference_participant_fact": {
+        "user_id": ["CanvasDataID"]
+   },
    "conversation_message_dim": {
         "author_id": ["CanvasDataID"]
    },
@@ -111,6 +117,10 @@
         "grader_id": ["CanvasDataID"]
    },
    "submission_fact": {
+        "user_id": ["CanvasDataID"],
+        "grader_id": ["CanvasDataID"]
+   },
+   "submission_file_fact": {
         "user_id": ["CanvasDataID"],
         "grader_id": ["CanvasDataID"]
    },
