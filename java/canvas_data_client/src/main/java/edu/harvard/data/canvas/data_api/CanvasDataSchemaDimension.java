@@ -1,5 +1,6 @@
 package edu.harvard.data.canvas.data_api;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -12,19 +13,23 @@ public class CanvasDataSchemaDimension {
   private final String name;
   private final String id;
   private final String role;
+  private final String[] sources;
 
   @JsonCreator
   public CanvasDataSchemaDimension(@JsonProperty("name") final String name,
-      @JsonProperty("id") final String id, @JsonProperty("role") final String role) {
+      @JsonProperty("id") final String id, @JsonProperty("role") final String role,
+      @JsonProperty("sources") final String[] sources) {
     this.name = name;
     this.id = id;
     this.role = role;
+    this.sources = sources;
   }
 
   public CanvasDataSchemaDimension(final CanvasDataSchemaDimension original) {
     this.name = original.name;
     this.id = original.id;
     this.role = original.role;
+    this.sources = original.sources;
   }
 
   public String getName() {
@@ -38,6 +43,10 @@ public class CanvasDataSchemaDimension {
   public String getRole() {
     return role;
   }
+  
+  public String[] getSources() {
+	return sources;
+  }
 
   public void calculateDifferences(final String tableName, final String columnName,
       final CanvasDataSchemaDimension dimension2, final List<SchemaDifference> differences) {
@@ -50,6 +59,9 @@ public class CanvasDataSchemaDimension {
     if (!compareStrings(role, dimension2.role)) {
       differences.add(new SchemaDifference("role", role, dimension2.role, tableName, columnName));
     }
+    if (!compareStringArrays(sources, dimension2.sources)) {
+        differences.add(new SchemaDifference("sources", sources, dimension2.sources, tableName, columnName));
+    }
   }
 
   private boolean compareStrings(final String s1, final String s2) {
@@ -58,5 +70,7 @@ public class CanvasDataSchemaDimension {
     }
     return s1.equals(s2);
   }
-
+  private boolean compareStringArrays(final String[] s1, final String[] s2) {
+	return Arrays.equals(s1, s2);	
+  }
 }
