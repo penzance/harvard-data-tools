@@ -109,9 +109,6 @@
         "recipient_id": ["CanvasDataID"],
         "author_id": ["CanvasDataID"]
    },
-   "submission_comment_participant_fact": {
-        "user_id": ["CanvasDataID"]
-   },
    "submission_dim": {
         "user_id": ["CanvasDataID"],
         "grader_id": ["CanvasDataID"]
