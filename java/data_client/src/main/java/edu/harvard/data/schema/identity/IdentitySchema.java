@@ -168,6 +168,15 @@ public class IdentitySchema {
  	return identifierTypes;
   }
 
+  /**
+   * Get the unique identifier types for a specified subset of tables
+   * 
+   * @param tableNames
+   * 		the list of table name(s) to lookup identifier types
+   * 
+   * @return a {@link List} of {@link IdentifierType} values
+   * 
+   */
   public List<IdentifierType> getIdentifierTypes(final List<String> tableNames) {
 	List<IdentifierType> identifierTypes = new ArrayList<>();
  	for (final String key : tables.keySet() ) {
