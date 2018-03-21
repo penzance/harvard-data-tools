@@ -56,8 +56,12 @@ public class S3ToRedshiftLoaderGenerator {
 
   private void generateIdentityRedshiftLoaderFile(final PrintStream out, final SchemaPhase phase) {
     final Map<String, DataSchemaTable> tables = IdentityMap.getIdentityMapTables(); 
+    final List<String> tableNames = new ArrayList<String>();
+    for (final DataSchemaTable table : phase.getSchema().getTables().values()) {
+      tableNames.add(table.getTableName());
+    }
     List<String> checkOptionalIdentityTables = new ArrayList<String>();
-    for (final IdentifierType cit : identities.getIdentifierTypes() ){
+    for (final IdentifierType cit : identities.getIdentifierTypes(tableNames) ) {
     	if (!cit.toString().equals("Other")) {
     		checkOptionalIdentityTables.add( IdentifierType.valueOf(cit.toString()).getFieldName());  
     	}

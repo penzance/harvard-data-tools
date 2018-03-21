@@ -168,6 +168,18 @@ public class IdentitySchema {
  	return identifierTypes;
   }
 
+  public List<IdentifierType> getIdentifierTypes(final List<String> tableNames) {
+	List<IdentifierType> identifierTypes = new ArrayList<>();
+ 	for (final String key : tables.keySet() ) {
+ 		if (tableNames.contains(key)) {
+ 	        for (List<IdentifierType> list: tables.get(key).values()) {
+ 	    	    identifierTypes.addAll(list);
+ 	 	    }
+ 		}
+ 	}
+ 	return identifierTypes;
+  }
+  
   /**
    * Parse a JSON document to extract an IdentitySchema. The JSON document is
    * specified as a Java classpath resource name, and must be formatted as
