@@ -21,6 +21,9 @@ import edu.harvard.data.pipeline.InputTableIndex;
 import edu.harvard.data.schema.DataSchemaColumn;
 import edu.harvard.data.schema.DataSchemaTable;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class S3ToRedshiftLoaderGenerator {
 
   private final File dir;
@@ -29,6 +32,7 @@ public class S3ToRedshiftLoaderGenerator {
   private final DataConfig config;
   private final InputTableIndex dataIndex;
   private final IdentitySchema identities;
+  private static final Logger log = LogManager.getLogger();
 
 
   public S3ToRedshiftLoaderGenerator(final File dir, final GenerationSpec spec,
@@ -56,10 +60,8 @@ public class S3ToRedshiftLoaderGenerator {
 
   private void generateIdentityRedshiftLoaderFile(final PrintStream out, final SchemaPhase phase) {
     final Map<String, DataSchemaTable> tables = IdentityMap.getIdentityMapTables(); 
-    final List<String> tableNames = new ArrayList<String>();
-    for (final DataSchemaTable table : phase.getSchema().getTables().values()) {
-      tableNames.add(table.getTableName());
-    }
+    final List<String> tableNames = dataIndex.getTableNames();
+    log.info( "Data Index Table names: " + tableNames);
     List<String> checkOptionalIdentityTables = new ArrayList<String>();
     for (final IdentifierType cit : identities.getIdentifierTypes(tableNames) ) {
     	if (!cit.toString().equals("Other")) {
