@@ -52,10 +52,6 @@
             "key": "id",
             "columns": ["body"]
         },
-        "submission_comment_dim": {
-            "key": "id",
-            "columns": ["comment"]
-        },
         "wiki_dim": {
             "key": "id",
             "columns": ["front_page_url", "title"]
