@@ -113,7 +113,7 @@ public class VerificationPeople {
   private void processRequest(final Phase0Requests request) {
     final Long userId = request.getUserId();
     final String controller = request.getWebApplicationController();
-    final String action = request.getWebApplicaitonAction();
+    final String action = request.getWebApplicationAction();
     if (userId != null && controller != null && action != null) {
       final String operation = controller + "#" + action;
       if (!userOperations.containsKey(userId)) {
