@@ -48,7 +48,7 @@ public class RestUtils {
 
   public <T> T makeApiCall(final String resourcePath, final int expectedStatus, final JavaType type)
       throws DataConfigurationException, UnexpectedApiResponseException, IOException {
-    int retry = 3;
+    int retry = 10;
     while (true) {
       final String url = "https://" + host + resourcePath;
       try {
