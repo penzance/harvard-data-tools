@@ -39,7 +39,7 @@ public class RestUtils {
   private final String secret;
   private final ObjectMapper mapper;
   private static final int THROTTLE_SEC = 12;
-  
+  private Throwable error;
 
   public RestUtils(final String host, final String key, final String secret) {
     this.host = host;
@@ -49,12 +49,19 @@ public class RestUtils {
   }
 
   public <T> T makeApiCall(final String resourcePath, final int expectedStatus, final JavaType type)
-      throws DataConfigurationException, UnexpectedApiResponseException, InterruptedException, IOException {
+      throws DataConfigurationException, UnexpectedApiResponseException, IOException {
     int retry = 3;
+   
     while (true) {
+
+      try {
+        log.info("Waiting for " + THROTTLE_SEC + " seconds");
+        Thread.sleep(THROTTLE_SEC);
+      } catch (final InterruptedException e) {
+        error = e;
+      }
+    	    	
       final String url = "https://" + host + resourcePath;
-      log.info("Waiting for " + THROTTLE_SEC + " seconds");
-      Thread.sleep(THROTTLE_SEC);
       try {
         log.debug("Making Canvas API call to " + url);
         final String date = getDate();
