@@ -97,7 +97,8 @@
    },
    "requests": {
         "user_id": ["CanvasDataID"],
-        "real_user_id": ["CanvasDataID"]
+        "real_user_id": ["CanvasDataID"],
+        "developer_key_id": ["CanvasDataID"]
    },
    "submission_comment_dim": {
         "recipient_id": ["CanvasDataID"],
