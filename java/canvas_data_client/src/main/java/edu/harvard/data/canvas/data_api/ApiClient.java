@@ -11,10 +11,13 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.schema.DataSchema;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ApiClient {
   private final RestUtils rest;
   private final TypeFactory typeFactory;
+  private static final Logger log = LogManager.getLogger();
 
   public ApiClient(final String host, final String key, final String secret) {
     this.rest = new RestUtils(host, key, secret);
@@ -45,6 +48,8 @@ public class ApiClient {
     final JavaType type = typeFactory.constructType(DataDump.class);
     final DataDump dump = rest.makeApiCall("/api/account/self/file/byDump/" + id, 200, type);
     dump.setRestUtils(rest);
+    log.info( "Get Number of Files: " + dump.getNumFiles());
+    log.info( "Count Files to Download: " + dump.countFilesToDownload());
     return dump;
   }
 
