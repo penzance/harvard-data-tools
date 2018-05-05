@@ -18,6 +18,8 @@ public class ApiClient {
   private final RestUtils rest;
   private final TypeFactory typeFactory;
   private static final Logger log = LogManager.getLogger();
+  private static final int THROTTLE_SEC = 150;
+  private Throwable error;  
 
   public ApiClient(final String host, final String key, final String secret) {
     this.rest = new RestUtils(host, key, secret);
@@ -50,6 +52,12 @@ public class ApiClient {
     dump.setRestUtils(rest);
     log.info( "Get Number of Files: " + dump.getNumFiles());
     log.info( "Count Files to Download: " + dump.countFilesToDownload());
+    try {
+        log.info("Waiting for " + THROTTLE_SEC + " seconds");
+        Thread.sleep(THROTTLE_SEC);
+    } catch (final InterruptedException e) {
+        error = e;
+    }    
     return dump;
   }
 
