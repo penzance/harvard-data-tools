@@ -38,7 +38,7 @@ public class RestUtils {
   private final String key;
   private final String secret;
   private final ObjectMapper mapper;
-  private static final int THROTTLE_SEC = 60;
+  private static final int THROTTLE_SEC = 500;
   private Throwable error;
 
   public RestUtils(final String host, final String key, final String secret) {
