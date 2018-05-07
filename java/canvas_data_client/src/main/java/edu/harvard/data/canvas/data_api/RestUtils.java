@@ -53,13 +53,6 @@ public class RestUtils {
     int retry = 3;
    
     while (true) {
-
-      try {
-        log.info("Waiting for " + THROTTLE_SEC + " seconds");
-        Thread.sleep(THROTTLE_SEC);
-      } catch (final InterruptedException e) {
-        error = e;
-      }
     	    	
       final String url = "https://" + host + resourcePath;
       try {

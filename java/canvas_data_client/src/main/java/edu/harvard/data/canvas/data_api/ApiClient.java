@@ -52,12 +52,6 @@ public class ApiClient {
     dump.setRestUtils(rest);
     log.info( "Get Number of Files: " + dump.getNumFiles());
     log.info( "Count Files to Download: " + dump.countFilesToDownload());
-    try {
-        log.info("Waiting for " + THROTTLE_SEC + " seconds");
-        Thread.sleep(THROTTLE_SEC);
-    } catch (final InterruptedException e) {
-        error = e;
-    }    
     return dump;
   }
 
