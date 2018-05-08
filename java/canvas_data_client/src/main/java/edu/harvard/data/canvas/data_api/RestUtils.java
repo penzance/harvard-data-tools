@@ -153,7 +153,7 @@ public class RestUtils {
         if (entity != null) {
           entity.writeTo(out);
         }
-        if (dest.length() != contentLength) {
+        if ( (dest.length() != contentLength) & (contentLength != -1) ) {
           throw new IOException("Downloaded incomplete file. Expected " + contentLength
               + " bytes, got " + dest.length());
         }
