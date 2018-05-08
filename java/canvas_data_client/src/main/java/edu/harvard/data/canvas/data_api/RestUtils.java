@@ -16,6 +16,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -142,6 +143,13 @@ public class RestUtils {
           final FileOutputStream out = new FileOutputStream(dest.toString());) {
         final HttpEntity entity = response.getEntity();
         final long contentLength = response.getEntity().getContentLength();
+        if ( contentLength == -1) { 
+            log.info("Response is -1, print header data");
+            Header[] headers = response.getAllHeaders();
+            for (Header header : headers) {
+                log.info(header);
+            }
+        }
         if (entity != null) {
           entity.writeTo(out);
         }
