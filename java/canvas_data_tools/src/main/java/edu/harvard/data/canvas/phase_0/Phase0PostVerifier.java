@@ -90,10 +90,15 @@ public class Phase0PostVerifier implements Verifier {
           final S3ObjectId awsFile = AwsUtils.key(file.getBucketName(), file.getKey());
           log.info("Verifying S3 file " + file.getBucketName() + "/" + file.getKey()
           + " representing table " + table);
-          final Callable<Long> job = new CanvasPhase0VerifierJob2(aws, awsFile, format, table,
-              tmpDir);
-          final Future<Long> future = exec.submit(job);
-          futures.add(future);
+          if ( !file.getKey().equals("empty_file") ) {
+              final Callable<Long> job = new CanvasPhase0VerifierJob2(aws, awsFile, format, table,
+                  tmpDir);
+              final Future<Long> future = exec.submit(job);
+              futures.add(future);
+          } else {
+        	  log.info("Skipping empty file: " + file.getBucketName() + "/" + file.getKey()
+              + " representing table " + table);
+          }          
         }
       }
     }
