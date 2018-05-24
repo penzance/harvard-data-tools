@@ -10,7 +10,8 @@ public class FormatLibrary {
         "canvas"), DecompressedExcel("decompressed_excel"), Excel("excel"), Matterhorn(
             "matterhorn"), DecompressedMatterhorn("decompressed_matterhorn"), CompressedInternal(
                 "compressed_internal"), DecompressedInternal("decompressed_internal"), Mediasites(
-                    "mediasites"), DecompressedMediasites("decompressed_mediasites");
+                    "mediasites"), DecompressedMediasites("decompressed_mediasites"), Sis(
+                    		"sis"), DecompressedSis("decompressed_sis");
 
     private final String label;
 
@@ -40,6 +41,10 @@ public class FormatLibrary {
     	return Mediasites;
       case "decompressed_mediasites":
     	return DecompressedMediasites;
+      case "sis":
+    	return Sis;
+      case "decompressed_sis":
+    	return DecompressedSis;    	
       case "compressed_internal":
         return CompressedInternal;
       case "decompressed_internal":
@@ -68,6 +73,10 @@ public class FormatLibrary {
       return createMediasitesFormat();
     case DecompressedMediasites:
       return createDecompressedMediasitesFormat();
+    case Sis:
+      return createSisFormat();
+    case DecompressedSis:
+      return createDecompressedSisFormat();
     case CompressedInternal:
       return createCompressedInternalFormat();
     case DecompressedInternal:
@@ -179,6 +188,27 @@ public class FormatLibrary {
 	return format;
   }
 
+  private TableFormat createDecompressedSisFormat() {
+	final TableFormat format = new TableFormat(Format.Mediasites);
+	format.setDateFormat(new SimpleDateFormat(MEDIASITES_DATE_FORMAT_STRING));
+	format.setTimestampFormat(new SimpleDateFormat(MEDIASITES_TIMESTAMP_FORMAT_STRING));
+	format.setIncludeHeaders(false);
+	format.setEncoding(MEDIASITES_FILE_ENCODING);
+	format.setCompression(TableFormat.Compression.None);
+	return format;
+  }
+
+  private TableFormat createSisFormat() {
+	final TableFormat format = new TableFormat(Format.Mediasites);
+	format.setDateFormat(new SimpleDateFormat(MEDIASITES_DATE_FORMAT_STRING));
+	format.setTimestampFormat(new SimpleDateFormat(MEDIASITES_TIMESTAMP_FORMAT_STRING));
+	format.setIncludeHeaders(false);
+	format.setEncoding(MEDIASITES_FILE_ENCODING);
+	format.setCompression(TableFormat.Compression.Gzip);
+	return format;
+  }
+  
+  
   private TableFormat createCompressedInternalFormat() {
     final TableFormat format = new TableFormat(Format.CompressedInternal);
     format.setTimestampFormat(new SimpleDateFormat(CANVAS_TIMESTAMP_FORMAT_STRING));
