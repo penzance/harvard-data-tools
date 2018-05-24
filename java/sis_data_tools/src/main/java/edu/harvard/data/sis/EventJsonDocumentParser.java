@@ -151,7 +151,7 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 
   private String cleanValue(String value) throws VerificationException {
 	    if (value != null) {
-	      value = value.replaceAll("\t", " ");
+	      value = value.replaceAll("\\t", " ");
 	    }
 	    return value;
   }
