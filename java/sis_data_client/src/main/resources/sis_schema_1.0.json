@@ -314,7 +314,8 @@
       "columns" : [ 
         {
             "name": "EMPLID",
-	    "type": "integer",
+	    "type": "varchar",
+	    "length": 255,
 	    "description": ""
         },
         {
