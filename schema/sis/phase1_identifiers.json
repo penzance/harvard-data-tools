@@ -9,5 +9,8 @@
 		"ODS_I_INSTRUCTOR_MIDDLE_NAME": ["Other"],
 		"ODS_I_INSTRUCTOR_NAME_PREFIX": ["Other"],
 		"ODS_I_INSTRUCTOR_NAME_SUFFIX": ["Other"]
+	},
+	"CourseEnroll": {
+		"EMPLID": ["HUID"]
 	}
 }
