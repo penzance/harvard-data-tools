@@ -16,6 +16,7 @@ import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.io.JsonDocumentParser;
 import edu.harvard.data.sis.bindings.phase0.Phase0CourseCatalog;
+import edu.harvard.data.sis.bindings.phase0.Phase0CourseEnroll;
 
 
 public class EventJsonDocumentParser implements JsonDocumentParser {
@@ -43,6 +44,12 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     coursecatalogs.add(coursecatalog);
     tables.put("CourseCatalog", coursecatalogs);
     
+    // Course Enroll
+    final Phase0CourseEnroll courseenroll = new Phase0CourseEnroll(format, values);
+    final List<Phase0CourseEnroll> courseenrollments = new ArrayList<Phase0CourseEnroll>();
+    courseenrollments.add(courseenroll);
+    tables.put("CourseEnroll", courseenrollments);
+    
     // Verification Step (optional)
     if (verify) {
     	verifyParser(values, tables);
@@ -54,11 +61,16 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
       final Map<String, List<? extends DataTable>> tables) throws VerificationException {
     // Start
 	final List<? extends DataTable> coursecatalogs = tables.get("CourseCatalog");
+	final List<? extends DataTable> courseenrollments = tables.get("CourseEnroll");
+
 
 	final Map<String, Object> parsedCourseCatalogs = coursecatalogs.get(0).getFieldsAsMap();
+	final Map<String, Object> parsedCourseEnrollments = courseenrollments.get(0).getFieldsAsMap();
 
+	
 	// Course Catalogs
-	if (dataproduct.equals("CourseCatalogs")) {
+	if (dataproduct.equals("CourseCatalog")) {
+		
 	    try {
 		    compareMaps(values, parsedCourseCatalogs);
 	    } catch (final VerificationException e) {
@@ -68,6 +80,19 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 	        throw e;			
 	    }
 	}
+	// Viewing Trends
+	else if (dataproduct.equals("CourseEnroll")) {
+
+		try {
+			compareMaps(values, parsedCourseEnrollments);
+		} catch (final VerificationException e) {
+		    log.error("Failed to verify JSON document. " + e.getMessage());
+		    log.error("Original map: " + values);
+		    log.error("Parsed map:   " + parsedCourseEnrollments);
+		    throw e;			
+		}
+	}		
+	
   }
 
   @SuppressWarnings("unchecked")
