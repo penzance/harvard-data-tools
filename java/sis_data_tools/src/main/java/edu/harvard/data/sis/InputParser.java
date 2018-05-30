@@ -114,10 +114,10 @@ public class InputParser {
     	try (
     	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
     	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
-    	    	TableWriter<Phase0CourseCatalog> presentations = new TableWriter<Phase0CourseCatalog>(Phase0CourseCatalog.class, outFormat,
+    	    	TableWriter<Phase0CourseCatalog> catalogs = new TableWriter<Phase0CourseCatalog>(Phase0CourseCatalog.class, outFormat,
     	            dataproductFile);) {
     		for (final Map<String, List<? extends DataTable>> tables : in) {
-    	              presentations.add((Phase0CourseCatalog) tables.get("CourseCatalog").get(0));
+    	              catalogs.add((Phase0CourseCatalog) tables.get("CourseCatalog").get(0));
     		}
     	}
 	} else if (currentDataProduct.equals("CourseEnroll")) {
@@ -125,10 +125,10 @@ public class InputParser {
     	try (
     	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
     	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
-    	    	TableWriter<Phase0CourseEnroll> vtrends = new TableWriter<Phase0CourseEnroll>(Phase0CourseEnroll.class, outFormat,
+    	    	TableWriter<Phase0CourseEnroll> enroll = new TableWriter<Phase0CourseEnroll>(Phase0CourseEnroll.class, outFormat,
     	                dataproductFile);) {
     		for (final Map<String, List<? extends DataTable>> tables : in) {
-    				vtrends.add((Phase0CourseEnroll) tables.get("CourseEnroll").get(0));
+    		      enroll.add((Phase0CourseEnroll) tables.get("CourseEnroll").get(0));
     		}
     	}			
 	}
