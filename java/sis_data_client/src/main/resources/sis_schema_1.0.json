@@ -321,37 +321,37 @@
         {
             "name": "ACAD_YEAR",
 	    "type": "varchar",
-	    "length": 4,
+	    "length": 255,
 	    "description": ""
         },
         {
             "name": "TERM_CODE",
 	    "type": "varchar",
-	    "length": 4,
+	    "length": 255,
 	    "description": ""
         },
         {
             "name": "TERM_DESCRIPTION",
 	    "type": "varchar",
-	    "length": 30,
+	    "length": 255,
 	    "description": ""
         },
         {
             "name": "COURSE_ID",
 	    "type": "varchar",
-	    "length": 6,
+	    "length": 255,
 	    "description": ""
         },
         {
             "name": "SUBJECT",
 	    "type": "varchar",
-	    "length": 8,
+	    "length": 255,
 	    "description": ""
         },
         {
             "name": "SUBJECT_DESCRIPTION",
 	    "type": "varchar",
-	    "length": 50,
+	    "length": 255,
 	    "description": ""
         },
         {
@@ -375,19 +375,19 @@
         {
             "name": "CLASS_SHORT_NAME",
 	    "type": "varchar",
-	    "length": 2,
+	    "length": 255,
 	    "description": ""
         },
         {
             "name": "STDNT_ENRL_STATUS",
 	    "type": "varchar",
-	    "length": 2,
+	    "length": 255,
 	    "description": ""
         },
         {
             "name": "INSTITUTION",
 	    "type": "varchar",
-	    "length": 5,
+	    "length": 255,
 	    "description": ""
         },
         {
@@ -398,7 +398,7 @@
         {
             "name": "COURSE_CAREER",
 	    "type": "varchar",
-	    "length": 4,
+	    "length": 255,
 	    "description": ""
         },
         {
@@ -409,19 +409,19 @@
         {
             "name": "SESSION_CODE",
 	    "type": "varchar",
-	    "length": 3,
+	    "length": 255,
 	    "description": ""
         },
         {
             "name": "CLASS_SECTION",
 	    "type": "varchar",
-	    "length": 4,
+	    "length": 255,
 	    "description": ""
         },
         {
             "name": "CLASS_TYPE",
 	    "type": "varchar",
-	    "length": 4,
+	    "length": 255,
 	    "description": ""
         },
         {
