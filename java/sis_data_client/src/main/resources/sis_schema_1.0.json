@@ -379,9 +379,59 @@
 	    "description": ""
         },
         {
-            "name": "Withdrawn",
+            "name": "STDNT_ENRL_STATUS",
 	    "type": "varchar",
 	    "length": 2,
+	    "description": ""
+        },
+        {
+            "name": "INSTITUTION",
+	    "type": "varchar",
+	    "length": 5,
+	    "description": ""
+        },
+        {
+            "name": "CLASS_NUMBER",
+	    "type": "integer",
+	    "description": ""
+        },
+        {
+            "name": "COURSE_CAREER",
+	    "type": "varchar",
+	    "length": 4,
+	    "description": ""
+        },
+        {
+            "name": "COURSE_OFFER_NUMBER",
+	    "type": "integer",
+	    "description": ""
+        },
+        {
+            "name": "SESSION_CODE",
+	    "type": "varchar",
+	    "length": 3,
+	    "description": ""
+        },
+        {
+            "name": "CLASS_SECTION",
+	    "type": "varchar",
+	    "length": 4,
+	    "description": ""
+        },
+        {
+            "name": "CLASS_TYPE",
+	    "type": "varchar",
+	    "length": 4,
+	    "description": ""
+        },
+        {
+            "name": "ENRL_LAST_UPDATE_DT",
+	    "type": "timestamp",
+	    "description": ""
+        },
+        {
+            "name": "CLASS_LAST_UPDATE_DT",
+	    "type": "timestamp",
 	    "description": ""
         }
       ]
