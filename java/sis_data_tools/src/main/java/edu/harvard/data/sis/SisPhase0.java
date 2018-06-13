@@ -56,7 +56,7 @@ public class SisPhase0 extends Phase0 {
     for (final String table : dataIndex.getTableNames()) {
        if ( table.equals("CourseCatalog") ) {
             dataIndex.setPartial(table, true); 	
-       } else if ( table.equals("CourseEnroll") ) {
+       } else if ( table.equals("PrimeCourseEnroll") ) {
            dataIndex.setPartial(table, true);             
        } else if ( table.equals("HistoricalCourse") ) {
            dataIndex.setPartial(table, true); 	

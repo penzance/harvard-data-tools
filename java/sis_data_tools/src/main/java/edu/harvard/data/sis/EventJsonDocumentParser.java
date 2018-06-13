@@ -16,7 +16,7 @@ import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.io.JsonDocumentParser;
 import edu.harvard.data.sis.bindings.phase0.Phase0CourseCatalog;
-import edu.harvard.data.sis.bindings.phase0.Phase0CourseEnroll;
+import edu.harvard.data.sis.bindings.phase0.Phase0PrimeCourseEnroll;
 
 
 public class EventJsonDocumentParser implements JsonDocumentParser {
@@ -44,11 +44,11 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     coursecatalogs.add(coursecatalog);
     tables.put("CourseCatalog", coursecatalogs);
     
-    // Course Enroll
-    final Phase0CourseEnroll courseenroll = new Phase0CourseEnroll(format, values);
-    final List<Phase0CourseEnroll> courseenrollments = new ArrayList<Phase0CourseEnroll>();
-    courseenrollments.add(courseenroll);
-    tables.put("CourseEnroll", courseenrollments);
+    // Prime Course Enroll
+    final Phase0PrimeCourseEnroll primecourseenroll = new Phase0PrimeCourseEnroll(format, values);
+    final List<Phase0PrimeCourseEnroll> primecourseenrollments = new ArrayList<Phase0PrimeCourseEnroll>();
+    primecourseenrollments.add(primecourseenroll);
+    tables.put("PrimeCourseEnroll", primecourseenrollments);
     
     // Verification Step (optional)
     if (verify) {
@@ -61,11 +61,11 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
       final Map<String, List<? extends DataTable>> tables) throws VerificationException {
     // Start
 	final List<? extends DataTable> coursecatalogs = tables.get("CourseCatalog");
-	final List<? extends DataTable> courseenrollments = tables.get("CourseEnroll");
+	final List<? extends DataTable> primecourseenrollments = tables.get("PrimeCourseEnroll");
 
 
 	final Map<String, Object> parsedCourseCatalogs = coursecatalogs.get(0).getFieldsAsMap();
-	final Map<String, Object> parsedCourseEnrollments = courseenrollments.get(0).getFieldsAsMap();
+	final Map<String, Object> parsedPrimeCourseEnrollments = primecourseenrollments.get(0).getFieldsAsMap();
 
 	
 	// Course Catalogs
@@ -81,14 +81,14 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 	    }
 	}
 	// Viewing Trends
-	else if (dataproduct.equals("CourseEnroll")) {
+	else if (dataproduct.equals("PrimeCourseEnroll")) {
 
 		try {
-			compareMaps(values, parsedCourseEnrollments);
+			compareMaps(values, parsedPrimeCourseEnrollments);
 		} catch (final VerificationException e) {
 		    log.error("Failed to verify JSON document. " + e.getMessage());
 		    log.error("Original map: " + values);
-		    log.error("Parsed map:   " + parsedCourseEnrollments);
+		    log.error("Parsed map:   " + parsedPrimeCourseEnrollments);
 		    throw e;			
 		}
 	}		

@@ -310,7 +310,7 @@
         }
       ]
     },
-    "CourseEnroll": {
+    "PrimeCourseEnroll": {
       "columns" : [ 
         {
             "name": "EMPLID",

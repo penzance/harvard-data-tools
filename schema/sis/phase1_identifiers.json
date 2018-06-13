@@ -10,7 +10,7 @@
 		"ODS_I_INSTRUCTOR_NAME_PREFIX": ["Other"],
 		"ODS_I_INSTRUCTOR_NAME_SUFFIX": ["Other"]
 	},
-	"CourseEnroll": {
+	"PrimeCourseEnroll": {
 		"EMPLID": ["HUID"]
 	}
 }
