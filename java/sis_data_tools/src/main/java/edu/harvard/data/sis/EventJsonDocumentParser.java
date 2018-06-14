@@ -17,6 +17,7 @@ import edu.harvard.data.VerificationException;
 import edu.harvard.data.io.JsonDocumentParser;
 import edu.harvard.data.sis.bindings.phase0.Phase0CourseCatalog;
 import edu.harvard.data.sis.bindings.phase0.Phase0PrimeCourseEnroll;
+import edu.harvard.data.sis.bindings.phase0.Phase0CourseEnroll;
 
 
 public class EventJsonDocumentParser implements JsonDocumentParser {
@@ -49,6 +50,12 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     final List<Phase0PrimeCourseEnroll> primecourseenrollments = new ArrayList<Phase0PrimeCourseEnroll>();
     primecourseenrollments.add(primecourseenroll);
     tables.put("PrimeCourseEnroll", primecourseenrollments);
+
+    // Course Enroll
+    final Phase0CourseEnroll courseenroll = new Phase0CourseEnroll(format, values);
+    final List<Phase0CourseEnroll> courseenrollments = new ArrayList<Phase0CourseEnroll>();
+    courseenrollments.add(courseenroll);
+    tables.put("CourseEnroll", courseenrollments);    
     
     // Verification Step (optional)
     if (verify) {
@@ -62,11 +69,11 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     // Start
 	final List<? extends DataTable> coursecatalogs = tables.get("CourseCatalog");
 	final List<? extends DataTable> primecourseenrollments = tables.get("PrimeCourseEnroll");
-
+	final List<? extends DataTable> courseenrollments = tables.get("CourseEnroll");
 
 	final Map<String, Object> parsedCourseCatalogs = coursecatalogs.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedPrimeCourseEnrollments = primecourseenrollments.get(0).getFieldsAsMap();
-
+	final Map<String, Object> parsedCourseEnrollments = primecourseenrollments.get(0).getFieldsAsMap();
 	
 	// Course Catalogs
 	if (dataproduct.equals("CourseCatalog")) {
@@ -80,7 +87,7 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 	        throw e;			
 	    }
 	}
-	// Viewing Trends
+	// Prime Course Enroll
 	else if (dataproduct.equals("PrimeCourseEnroll")) {
 
 		try {
@@ -91,7 +98,19 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 		    log.error("Parsed map:   " + parsedPrimeCourseEnrollments);
 		    throw e;			
 		}
-	}		
+	}
+	// Course Enroll
+	else if (dataproduct.equals("CourseEnroll")) {
+
+		try {
+			compareMaps(values, parsedCourseEnrollments);
+		} catch (final VerificationException e) {
+		    log.error("Failed to verify JSON document. " + e.getMessage());
+		    log.error("Original map: " + values);
+		    log.error("Parsed map:   " + parsedCourseEnrollments);
+		    throw e;			
+		}
+	}	
 	
   }
 
