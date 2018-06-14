@@ -73,7 +73,7 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 
 	final Map<String, Object> parsedCourseCatalogs = coursecatalogs.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedPrimeCourseEnrollments = primecourseenrollments.get(0).getFieldsAsMap();
-	final Map<String, Object> parsedCourseEnrollments = primecourseenrollments.get(0).getFieldsAsMap();
+	final Map<String, Object> parsedCourseEnrollments = courseenrollments.get(0).getFieldsAsMap();
 	
 	// Course Catalogs
 	if (dataproduct.equals("CourseCatalog")) {
