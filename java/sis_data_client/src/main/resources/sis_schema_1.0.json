@@ -518,7 +518,8 @@
         },
         {
             "name": "CATALOG_NUMBER_INT",
-	    "type": "integer",
+	    "type": "varchar",
+	    "length": 10,
 	    "description": "BOTH. The leading integers of the catalog number. For 50A, this would be 50. For '1.34', this would be 1."
         },
         {
