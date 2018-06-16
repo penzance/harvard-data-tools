@@ -392,7 +392,8 @@
         },
         {
             "name": "CLASS_NUMBER",
-	    "type": "integer",
+	    "type": "varchar",
+	    "length": 255,
 	    "description": ""
         },
         {
