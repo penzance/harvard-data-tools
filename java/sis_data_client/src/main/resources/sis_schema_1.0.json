@@ -404,7 +404,8 @@
         },
         {
             "name": "COURSE_OFFER_NUMBER",
-	    "type": "integer",
+	    "type": "varchar",
+	    "length": 255,
 	    "description": ""
         },
         {
