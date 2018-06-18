@@ -126,7 +126,9 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
         throw new VerificationException("Missing key: " + m2Key);
       }
       if (m1.get(key) == null && m2.get(m2Key) != null) {
-        throw new VerificationException("Key " + key + " should be null, not " + m2.get(m2Key));
+    	if ( m1.get(key).toString() == (String) null && m2.get(m2Key).toString() != (String) null ) {
+          throw new VerificationException("Key " + key + " should be null, not " + m2.get(m2Key));
+    	}
       } else if (m1.get(key) instanceof Map) {
         if (!(m2.get(m2Key) instanceof Map)) {
           throw new VerificationException("Incorrect type for key " + key);
