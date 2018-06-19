@@ -130,10 +130,10 @@ public class InputParser {
     	try (
     	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
     	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
-    	    	TableWriter<Phase0PrimeCourseEnroll> enroll = new TableWriter<Phase0PrimeCourseEnroll>(Phase0PrimeCourseEnroll.class, outFormat,
+    	    	TableWriter<Phase0PrimeCourseEnroll> primeenroll = new TableWriter<Phase0PrimeCourseEnroll>(Phase0PrimeCourseEnroll.class, outFormat,
     	                dataproductFile);) {
     		for (final Map<String, List<? extends DataTable>> tables : in) {
-    		      enroll.add((Phase0PrimeCourseEnroll) tables.get("PrimeCourseEnroll").get(0));
+    			  primeenroll.add((Phase0PrimeCourseEnroll) tables.get("PrimeCourseEnroll").get(0));
     		}
     	}			
 	} else if (currentDataProduct.equals("CourseEnroll")) {
