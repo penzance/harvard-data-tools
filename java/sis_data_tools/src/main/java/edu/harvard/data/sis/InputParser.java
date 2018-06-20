@@ -9,6 +9,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataTable;
@@ -67,6 +70,9 @@ public class InputParser {
     this.enrollOutputDir = AwsUtils.key( outputLocation, "CourseEnroll" );
     final FormatLibrary formatLibrary = new FormatLibrary();
     this.inFormat = formatLibrary.getFormat(Format.Sis);
+    final ObjectMapper jsonMapper = new ObjectMapper();
+    jsonMapper.setSerializationInclusion(Include.NON_NULL);    
+    this.inFormat.setJsonMapper(jsonMapper);
     this.outFormat = formatLibrary.getFormat(config.getPipelineFormat());
     this.outFormat.setCompression(Compression.Gzip);
   }

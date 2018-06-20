@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -101,6 +102,7 @@ public class SisCodeGenerator extends CodeGenerator {
       throws JsonParseException, JsonMappingException, IOException {
     final ObjectMapper jsonMapper = new ObjectMapper();
     jsonMapper.setDateFormat(new SimpleDateFormat(FormatLibrary.MEDIASITES_DATE_FORMAT_STRING));
+    jsonMapper.setSerializationInclusion(Include.NON_NULL);
     final ClassLoader classLoader = SisCodeGenerator.class.getClassLoader();
     try (final InputStream in = classLoader
         .getResourceAsStream("sis_schema_" + version + ".json")) {
