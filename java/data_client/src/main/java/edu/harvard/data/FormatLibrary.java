@@ -100,6 +100,9 @@ public class FormatLibrary {
   private static final CSVFormat INTERNAL_CSV_FORMAT = CSVFormat.TDF.withQuote(null).withEscape('/')
       .withNullString("\\N").withRecordSeparator("\n").withIgnoreSurroundingSpaces(false);
 
+  private static final CSVFormat INTERNAL_SIS_FORMAT = CSVFormat.TDF.withQuote(null).withEscape('/')
+	      .withNullString("null").withRecordSeparator("\n").withIgnoreSurroundingSpaces(false);  
+  
   private static final String CANVAS_FILE_ENCODING = "UTF-8";
   private static final String MATTERHORN_FILE_ENCODING = "UTF-8";
   private static final String MEDIASITES_FILE_ENCODING = "UTF-8";
@@ -189,11 +192,12 @@ public class FormatLibrary {
   }
 
   private TableFormat createDecompressedSisFormat() {
-	final TableFormat format = new TableFormat(Format.Mediasites);
-	format.setDateFormat(new SimpleDateFormat(MEDIASITES_DATE_FORMAT_STRING));
-	format.setTimestampFormat(new SimpleDateFormat(MEDIASITES_TIMESTAMP_FORMAT_STRING));
+	final TableFormat format = new TableFormat(Format.DecompressedInternal);
+	format.setTimestampFormat(new SimpleDateFormat(CANVAS_TIMESTAMP_FORMAT_STRING));
+	format.setDateFormat(new SimpleDateFormat(CANVAS_DATE_FORMAT_STRING));
 	format.setIncludeHeaders(false);
-	format.setEncoding(MEDIASITES_FILE_ENCODING);
+	format.setEncoding(CANVAS_FILE_ENCODING);
+	format.setCsvFormat(INTERNAL_SIS_FORMAT);
 	format.setCompression(TableFormat.Compression.None);
 	return format;
   }
