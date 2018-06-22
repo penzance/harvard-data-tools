@@ -73,7 +73,7 @@ public class InputParser {
     final ObjectMapper jsonMapper = new ObjectMapper();
     jsonMapper.setSerializationInclusion(Include.NON_NULL);    
     this.inFormat.setJsonMapper(jsonMapper);
-    this.outFormat = formatLibrary.getFormat( Format.fromLabel("decompressed_sis") );
+    this.outFormat = formatLibrary.getFormat(config.getPipelineFormat());
     this.outFormat.setCompression(Compression.Gzip);
   }
 
