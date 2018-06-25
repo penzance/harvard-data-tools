@@ -310,6 +310,170 @@
         }
       ]
     },
+    "Classes": {
+      "columns" : [ 
+        {
+            "name": "CID",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "CID_COURSE",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "ACADEMIC_YEAR",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "TERM_CODE",
+	    "type": "integer",
+	    "description": "BOTH. sterm instead of term and term num."
+        },
+        {
+            "name": "CLASS_ACAD_ORG",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "CLASS_ACAD_ORG_DESCRIPTION",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "SUBJECT",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "SUBJECT_DESCRIPTION",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "BOTH. Subject description as of the term's start date."
+        },
+        {
+            "name": "CATALOG_NUMBER",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "BOTH. Just the catalog number portion."
+        },
+        {
+            "name": "CATALOG_NUMBER_INT",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "BOTH. The leading integers of the catalog number. For 50A, this would be 50. For '1.34', this would be 1."
+        },
+        {
+            "name": "CATALOG_NUMBER_CHAR",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "BOTH. Everything from the first non-number character to the right. For 50A, this would be A. For '1.34', this would be '.34'"
+        },
+        {
+            "name": "CLASS_SHORT_NAME",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "BOTH. In my.harvard this is subject + catalog number."
+        },
+        {
+            "name": "COURSE_ID",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "BOTH. Course ID"
+        },
+        {
+            "name": "COMPONENT_CODE",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "component code in my.harvard"
+        },
+        {
+            "name": "COMPONENT_DESCRIPTION",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "course type"
+        },
+        {
+            "name": "COURSE_LEVEL_CODE",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "COURSE_LEVEL_DESCR",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "Both. Course Level Description"
+        },
+        {
+            "name": "COURSE_TITLE_LONG",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "Both. Course Title"
+        },
+        {
+            "name": "ENROLLMENT_COUNT",
+	    "type": "integer",
+	    "description": ""
+        },
+        {
+            "name": "CLASS_NUMBER",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "NULL for Historical Dataset. In my.harvard ODS data, class_number + term_code + EMPLID + academic_career (excluded) will be unique. In historic data, course_id + term_code + emplid will be unique."
+        },
+        {
+            "name": "CLASS_TYPE",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "NULL for Historical Dataset. E = enrollment section, N = non enrollment section. All historic data is 'E' data only."
+        },
+        {
+            "name": "CLASS_TYPE_DESCRIPTION",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "SESSION_CODE",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "NULL for Historical Dataset. The portion of the term a class is held. 1 = Full Term. As of now, all FAS classes are scheduled for the full term."
+        },
+        {
+            "name": "CLASS_SECTION",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "NULL for Historical Dataset. A string to uniquely identify each section."
+        },
+        {
+            "name": "CLASS_STATUS",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "CLASS_STATUS_DESCRIPTION",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "ACADEMIC_CAREER",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        }
+      ]
+    },
     "PrimeCourseEnroll": {
       "columns" : [ 
         {

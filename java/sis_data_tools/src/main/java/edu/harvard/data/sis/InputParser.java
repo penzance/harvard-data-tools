@@ -9,7 +9,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -24,6 +23,7 @@ import edu.harvard.data.io.JsonFileReader;
 import edu.harvard.data.io.TableWriter;
 import edu.harvard.data.sis.SisDataConfig;
 import edu.harvard.data.sis.bindings.phase0.Phase0CourseCatalog;
+import edu.harvard.data.sis.bindings.phase0.Phase0Classes;
 import edu.harvard.data.sis.bindings.phase0.Phase0PrimeCourseEnroll;
 import edu.harvard.data.sis.bindings.phase0.Phase0CourseEnroll;
 import edu.harvard.data.pipeline.InputTableIndex;
@@ -51,6 +51,7 @@ public class InputParser {
   private final TableFormat inFormat;
   private final TableFormat outFormat; 
   private final S3ObjectId catalogOutputDir;
+  private final S3ObjectId classesOutputDir;
   private final S3ObjectId primeEnrollOutputDir;
   private final S3ObjectId enrollOutputDir;
 
@@ -66,6 +67,7 @@ public class InputParser {
     this.dataproductFiletype = ".json.gz";
     this.currentDataProduct = getDataProduct();
     this.catalogOutputDir = AwsUtils.key(outputLocation, "CourseCatalog");
+    this.classesOutputDir = AwsUtils.key(outputLocation, "Classes");
     this.primeEnrollOutputDir = AwsUtils.key( outputLocation, "PrimeCourseEnroll" );
     this.enrollOutputDir = AwsUtils.key( outputLocation, "CourseEnroll" );
     final FormatLibrary formatLibrary = new FormatLibrary();
@@ -106,7 +108,9 @@ public class InputParser {
     dataproductFile = new File(config.getScratchDir(), dataproductFilename );
     
     if (currentDataProduct.equals("CourseCatalog") ) {
-        dataproductOutputObj = AwsUtils.key(catalogOutputDir, dataproductFilename );   	
+        dataproductOutputObj = AwsUtils.key(catalogOutputDir, dataproductFilename );  
+    } else if ( currentDataProduct.equals("Classes") ) {
+        dataproductOutputObj = AwsUtils.key(classesOutputDir, dataproductFilename);        
     } else if ( currentDataProduct.equals("PrimeCourseEnroll") ) {
         dataproductOutputObj = AwsUtils.key(primeEnrollOutputDir, dataproductFilename);
     } else if ( currentDataProduct.equals("CourseEnroll") ) {
@@ -131,6 +135,17 @@ public class InputParser {
     	              catalogs.add((Phase0CourseCatalog) tables.get("CourseCatalog").get(0));
     		}
     	}
+	} else if (currentDataProduct.equals("Classes")) {
+        log.info("Parsing data product " + currentDataProduct);
+    	try (
+    	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
+    	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
+    	    	TableWriter<Phase0Classes> classes = new TableWriter<Phase0Classes>(Phase0Classes.class, outFormat,
+    	                dataproductFile);) {
+    		for (final Map<String, List<? extends DataTable>> tables : in) {
+    			  classes.add((Phase0Classes) tables.get("Classes").get(0));
+    		}
+    	}	    	
 	} else if (currentDataProduct.equals("PrimeCourseEnroll")) {
         log.info("Parsing data product " + currentDataProduct);
     	try (
@@ -168,6 +183,13 @@ public class InputParser {
 	      for (final Phase0CourseCatalog i : in ) {
 	      }
 	    }
+    } else if (currentDataProduct.equals("Classes")) {
+	    try(FileTableReader<Phase0Classes> in = new FileTableReader<Phase0Classes>(Phase0Classes.class,
+			outFormat, dataproductFile)) {
+		  log.info("Verifying file " + dataproductFile);	
+	      for (final Phase0Classes i : in ) {
+	      }
+	    }	    
     } else if (currentDataProduct.equals("PrimeCourseEnroll")) {
 	    try(FileTableReader<Phase0PrimeCourseEnroll> in = new FileTableReader<Phase0PrimeCourseEnroll>(Phase0PrimeCourseEnroll.class,
 			outFormat, dataproductFile)) {
