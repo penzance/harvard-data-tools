@@ -15,6 +15,7 @@ import edu.harvard.data.DataTable;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.io.JsonDocumentParser;
+import edu.harvard.data.sis.bindings.phase0.Phase0Classes;
 import edu.harvard.data.sis.bindings.phase0.Phase0CourseCatalog;
 import edu.harvard.data.sis.bindings.phase0.Phase0PrimeCourseEnroll;
 import edu.harvard.data.sis.bindings.phase0.Phase0CourseEnroll;
@@ -44,6 +45,12 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     final List<Phase0CourseCatalog> coursecatalogs = new ArrayList<Phase0CourseCatalog>();
     coursecatalogs.add(coursecatalog);
     tables.put("CourseCatalog", coursecatalogs);
+
+    // Classes
+    final Phase0Classes cclass = new Phase0Classes(format, values);
+    final List<Phase0Classes> classes = new ArrayList<Phase0Classes>();
+    classes.add(cclass);
+    tables.put("Classes", classes);
     
     // Prime Course Enroll
     final Phase0PrimeCourseEnroll primecourseenroll = new Phase0PrimeCourseEnroll(format, values);
@@ -68,10 +75,12 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
       final Map<String, List<? extends DataTable>> tables) throws VerificationException {
     // Start
 	final List<? extends DataTable> coursecatalogs = tables.get("CourseCatalog");
+	final List<? extends DataTable> classes = tables.get("Classes");
 	final List<? extends DataTable> primecourseenrollments = tables.get("PrimeCourseEnroll");
 	final List<? extends DataTable> courseenrollments = tables.get("CourseEnroll");
 
 	final Map<String, Object> parsedCourseCatalogs = coursecatalogs.get(0).getFieldsAsMap();
+	final Map<String, Object> parsedClasses = classes.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedPrimeCourseEnrollments = primecourseenrollments.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedCourseEnrollments = courseenrollments.get(0).getFieldsAsMap();
 	
@@ -86,6 +95,18 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 	        log.error("Parsed map:   " + parsedCourseCatalogs);
 	        throw e;			
 	    }
+	}
+	// Classes
+	else if (dataproduct.equals("Classes")) {
+		
+		try {	
+			compareMaps(values, parsedClasses);		
+		} catch (final VerificationException e) {
+		    log.error("Failed to verify JSON document. " + e.getMessage());
+		    log.error("Original map: " + values);
+		    log.error("Parsed map:   " + parsedClasses);
+		    throw e;				
+		}
 	}
 	// Prime Course Enroll
 	else if (dataproduct.equals("PrimeCourseEnroll")) {
