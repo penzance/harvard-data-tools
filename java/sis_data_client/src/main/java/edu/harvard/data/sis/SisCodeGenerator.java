@@ -38,6 +38,7 @@ public class SisCodeGenerator extends CodeGenerator {
   public static final String PHASE_ONE_IDENTIFIERS_JSON = "sis/phase1_identifiers.json";
   public static final String PHASE_TWO_ADDITIONS_JSON = "sis/phase2_schema_additions.json";
   public static final String PHASE_THREE_ADDITIONS_JSON = "sis/phase3_schema_additions.json";
+  public static final String FULL_TEXT_TABLES = "sis/full_text_tables.json";
 
   private final String schemaVersion;
   private final File gitDir;
@@ -141,7 +142,7 @@ public class SisCodeGenerator extends CodeGenerator {
 
   @Override
   protected String getFullTextResource() {
-    return null;
+    return FULL_TEXT_TABLES;
   }
 
   @Override
