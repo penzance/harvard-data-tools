@@ -2,7 +2,7 @@
     "tables": {
         "CourseCatalog": {
             "key": "ODS_CATALOG_ID",
-            "columns": ["ODS_COURSE_DESCRLONG", "ODS_SUBJECT_DESCR", "ODS_COURSE_TITLE_LONG", "ODS_COMPONENT_DESC"]
+            "columns": ["ODS_COURSE_DESCRLONG", "ODS_SUBJECT_DESCR", "ODS_COURSE_TITLE_LONG", "ODS_COMPONENT_DESCR"]
         },
         "Classes": {
             "key": "CID",
