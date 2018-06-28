@@ -5,7 +5,7 @@
             "columns": ["ODS_COURSE_DESCRLONG", "ODS_SUBJECT_DESCR", "ODS_COURSE_TITLE_LONG", "ODS_COMPONENT_DESC"]
         },
         "Classes": {
-            "key": "ODS_CATALOG_ID",
+            "key": "CID",
             "columns": ["COURSE_TITLE_LONG", "CLASS_ACAD_ORG_DESCRIPTION", "SUBJECT_DESCRIPTION", "COMPONENT_DESCRIPTION", "COURSE_LEVEL_DESCR", "CLASS_TYPE_DESCRIPTION", "CLASS_STATUS_DESCRIPTION"]
         }        
     }
