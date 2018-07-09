@@ -83,6 +83,10 @@ public class AwsUtils {
       }
       objects = client.listNextBatchOfObjects(objects);
     } while (objects.isTruncated());
+    for (final S3ObjectSummary objectSummary : objects.getObjectSummaries()) {
+        summaries.add(objectSummary);
+        log.debug("  key: " + objectSummary.getKey());
+    }
     return summaries;
   }
 
