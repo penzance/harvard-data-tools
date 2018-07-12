@@ -53,6 +53,20 @@ public class FullTextCopyScriptGenerator {
           + tableName + ";\" > " + filename);
       out.println("gzip " + filename);
     }
+    if ( dataIndex.isPartial(tableName) ) {
+      generateFullTable( out, tableName );
+    }
     out.println();
+  }
+	  
+  private void generateFullTable( final PrintStream out, final String tableName) {
+    final FullTextTable table = textSchema.get(tableName);
+    final String filename = config.getFullTextDir() + "/" + tableName + "/" + tableName;
+    out.print("sudo hive -S -e \"select " + table.getKey() );
+    for (final String column : table.getColumns() ) {
+        out.print("," + column);
+    }
+    out.println(" from in_" + tableName + ";\" > " + filename);
+    out.println("gzip " + filename);
   }
 }
