@@ -61,7 +61,7 @@ public class FullTextCopyScriptGenerator {
 	  
   private void generateFullTable( final PrintStream out, final String tableName) {
     final FullTextTable table = textSchema.get(tableName);
-    final String filename = config.getFullTextDir() + "/" + tableName + "/" + tableName;
+    final String filename = config.getFullTextDir() + "/" + tableName + "/fulltable/" + tableName;
     out.print("sudo hive -S -e \"select " + table.getKey() );
     for (final String column : table.getColumns() ) {
         out.print("," + column);
