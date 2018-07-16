@@ -310,6 +310,81 @@
         }
       ]
     },
+    "CourseMap": {
+      "columns" : [ 
+        {
+            "name": "CID",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "CID_COURSE",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "CANVAS_COURSE_ID_FROM_URL",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "MATCH",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "MH_COURSE_ID",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "MH_CLASS_NUMBER",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "MH_STRM",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "MH_SESSION",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "AT_TERM_ID",
+	    "type": "integer",
+	    "description": ""
+	},
+        {
+            "name": "AT_COURSE_INSTANCE_ID",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "CANVAS_COURSE_ID",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "CANVAS_SITE_URL",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	}
+      ]
+    },
     "Classes": {
       "columns" : [ 
         {
