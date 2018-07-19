@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.amazonaws.services.datapipeline.model.PutPipelineDefinitionRequest;
 import com.amazonaws.services.s3.model.S3ObjectId;
@@ -24,6 +26,9 @@ public class Pipeline {
   private final PipelineObjectBase schedule;
   private final String schemaVersion;
   private final String runId;
+  
+  private static final Logger log = LogManager.getLogger();
+
 
   public Pipeline(final String name, final DataConfig config, final String pipelineId,
       final PipelineFactory factory, final String schemaVersion, final String runId)
@@ -55,6 +60,7 @@ public class Pipeline {
 
   private PipelineObjectBase createEmr() {
     final PipelineObjectBase emr = factory.getEmr(name + "_Emr_Cluster");
+    log.info("Pipelineobject: " + emr.getPipelineObject());
     emr.set("bootstrapAction", emrBootstrapAction());
     return emr;
   }

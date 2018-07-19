@@ -314,14 +314,14 @@ public class PipelineFactory {
   
   //testing
   public PipelineObjectBase testEmrConfiguration() {
-	  final PipelineObjectBase obj = new PipelineObjectBase(config, "EMR Configuration", "EmrConfiguration");
+	  final PipelineObjectBase obj = new PipelineObjectBase(config, "EMRConfiguration", "EmrConfiguration");
 	  obj.set("ref", testEmrHiveConfiguration() );
 	  return obj;
   }
   
   public PipelineObjectBase testEmrHiveConfiguration() {
 	  
-	  final PipelineObjectBase obj = new PipelineObjectBase(config, "configureEmrHiveSite", "HiveSiteConfiguration"); 
+	  final PipelineObjectBase obj = new PipelineObjectBase(config, "EMRConfiguration", "EMRConfiguration"); 
 	  Map<String,String> hiveProperties = new HashMap<String,String>();
 		hiveProperties.put("hive.support.concurrency","true");
 		hiveProperties.put("hive.enforce.bucketing","true");
@@ -340,7 +340,7 @@ public class PipelineFactory {
 		
   public PipelineObjectBase testEmrFsConfiguration() {
 	  
-	  final PipelineObjectBase obj = new PipelineObjectBase(config, "EMR Configuration", "EmrConfiguration");
+	  final PipelineObjectBase obj = new PipelineObjectBase(config, "EMRConfiguration", "EmrConfiguration");
 
       Map<String,String> emrfsProperties = new HashMap<String,String>();
         emrfsProperties.put("fs.s3.enableServerSideEncryption","true");
