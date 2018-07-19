@@ -101,6 +101,7 @@ public class DataConfig {
   private final String emrTaskBidPrice;
   private final String emrMaximumRetries;
   private final String emrAvailabilityZoneGroup;
+  private final String emrConfiguration;
 
   private final String phase0InstanceType;
   private final String phase0BidPrice;
@@ -217,6 +218,7 @@ public class DataConfig {
     this.emrCoreInstanceCount = getConfigParameter("emr_core_instance_count", verify);
     this.emrTaskInstanceCount = getConfigParameter("emr_task_instance_count", verify);
     this.emrAvailabilityZoneGroup = getConfigParameter("emr_availability_zone_group", verify);
+    this.emrConfiguration = getConfigParameter("emr_configuration", verify);
 
     this.phase0InstanceType = getConfigParameter("phase_0_instance_type", verify);
     this.phase0BidPrice = getConfigParameter("phase_0_bid_price", verify);
@@ -619,6 +621,10 @@ public class DataConfig {
     return emrAvailabilityZoneGroup;
   }
 
+  public String getEmrConfiguration() {
+	  return emrConfiguration;
+  }
+  
   public String getLeaseDynamoTable() {
     return leaseDynamoTable;
   }

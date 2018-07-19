@@ -98,6 +98,9 @@ public class PipelineFactory {
         obj.set("taskInstanceBidPrice", config.getEmrTaskBidPrice());
       }
     }
+    if (config.getEmrConfiguration() != null ) {
+    	obj.set("configuration", config.getEmrConfiguration());
+    }
     allObjects.add(obj);
     return obj;
   }
