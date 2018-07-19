@@ -2,9 +2,12 @@ package edu.harvard.data.pipeline;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.amazonaws.services.datapipeline.model.Field;
 import com.amazonaws.services.datapipeline.model.PipelineObject;
+import com.amazonaws.services.elasticmapreduce.model.Configuration;
+
 
 import edu.harvard.data.DataConfig;
 
@@ -35,6 +38,12 @@ public class PipelineObjectBase {
     fields.add(new Field().withKey(key).withRefValue(ref.id));
   }
 
+  protected void set(final String key, final Map<String, String> ref) {
+	for (final String item : ref.values()) {
+	    fields.add(new Field().withKey(item).withStringValue( ref.get(item)));
+	}
+  }  
+  
   public void setSuccess(final PipelineObjectBase success) {
     set("onSuccess", success);
   }
