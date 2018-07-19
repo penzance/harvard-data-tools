@@ -314,14 +314,14 @@ public class PipelineFactory {
   
   //testing
   public PipelineObjectBase testEmrConfiguration() {
-	  final PipelineObjectBase obj = new PipelineObjectBase(config, "EMRConfiguration", "EmrConfiguration");
+	  final PipelineObjectBase obj = new PipelineObjectBase(config, "EmrConfiguration", "EmrConfiguration");
 	  obj.set("ref", testEmrHiveConfiguration() );
 	  return obj;
   }
   
   public PipelineObjectBase testEmrHiveConfiguration() {
 	  
-	  final PipelineObjectBase obj = new PipelineObjectBase(config, "EMRConfiguration", "EMRConfiguration"); 
+	  final PipelineObjectBase obj = new PipelineObjectBase(config, "EmrConfiguration", "EmrConfiguration"); 
 	  Map<String,String> hiveProperties = new HashMap<String,String>();
 		hiveProperties.put("hive.support.concurrency","true");
 		hiveProperties.put("hive.enforce.bucketing","true");
@@ -335,12 +335,13 @@ public class PipelineFactory {
 			  .withProperties(hiveProperties);
 	  obj.set("classification", customEmrHiveConfig.getClassification());
 	  obj.set("properties", customEmrHiveConfig.getProperties());
+	  allObjects.add(obj);
 	  return obj;
   }
 		
   public PipelineObjectBase testEmrFsConfiguration() {
 	  
-	  final PipelineObjectBase obj = new PipelineObjectBase(config, "EMRConfiguration", "EmrConfiguration");
+	  final PipelineObjectBase obj = new PipelineObjectBase(config, "EmrConfiguration", "EmrConfiguration");
 
       Map<String,String> emrfsProperties = new HashMap<String,String>();
         emrfsProperties.put("fs.s3.enableServerSideEncryption","true");
