@@ -24,6 +24,7 @@ public class Pipeline {
   private final PipelineObjectBase redshift;
   private final PipelineObjectBase emr;
   private final PipelineObjectBase schedule;
+  private final PipelineObjectBase configuration;
   private final String schemaVersion;
   private final String runId;
   
@@ -41,6 +42,7 @@ public class Pipeline {
     this.runId = runId;
     this.schedule = factory.getSchedule();
     this.redshift = factory.getRedshift();
+    this.configuration = factory.testEmrHiveConfiguration();
     this.emr = createEmr();
     createDefaultObject();
   }
@@ -58,8 +60,9 @@ public class Pipeline {
     return defaultObj;
   }
 
-  private PipelineObjectBase createEmr() {
+  private PipelineObjectBase createEmr() {	 
     final PipelineObjectBase emr = factory.getEmr(name + "_Emr_Cluster");
+    log.info("EmrConfig: " + this.configuration.getPipelineObject());
     log.info("Pipelineobject: " + emr.getPipelineObject());
     emr.set("bootstrapAction", emrBootstrapAction());
     return emr;
