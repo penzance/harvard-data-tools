@@ -39,9 +39,12 @@ public class PipelineObjectBase {
   }
 
   protected void set(final String key, final Map<String, String> ref) {
+	final List<Field> subfields;
+	subfields = new ArrayList<Field>();
 	for (final String item : ref.keySet()) {
-	    fields.add(new Field().withKey(item).withStringValue( ref.get(item)));
+	    subfields.add(new Field().withKey(item).withStringValue( ref.get(item)));
 	}
+	fields.add(new Field().withKey(key).withStringValue(subfields.toString()));
   }  
   
   public void setSuccess(final PipelineObjectBase success) {
