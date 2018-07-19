@@ -334,7 +334,7 @@ public class PipelineFactory {
 			  .withClassification("hive-site")
 			  .withProperties(hiveProperties);
 	  obj.set("classification", customEmrHiveConfig.getClassification());
-	  obj.set("properties", customEmrHiveConfig.getProperties());
+	  obj.set("properties", hiveProperties );
 	  allObjects.add(obj);
 	  return obj;
   }
