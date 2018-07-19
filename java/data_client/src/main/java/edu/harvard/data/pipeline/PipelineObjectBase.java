@@ -39,7 +39,7 @@ public class PipelineObjectBase {
   }
 
   protected void set(final String key, final Map<String, String> ref) {
-	for (final String item : ref.values()) {
+	for (final String item : ref.keySet()) {
 	    fields.add(new Field().withKey(item).withStringValue( ref.get(item)));
 	}
   }  
