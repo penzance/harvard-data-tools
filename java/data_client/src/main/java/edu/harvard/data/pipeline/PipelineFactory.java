@@ -352,7 +352,7 @@ public class PipelineFactory {
   public PipelineObjectBase testCreateEmrConfigObject(final String key, final String value ) {
 
 	  final PipelineObjectBase obj = new PipelineObjectBase(config, key, "Property"); 
-	  obj.set("key", key);
+  	  obj.set("key", key.replace("-", ".") );
 	  obj.set("value", value);
 	  allObjects.add(obj);
 	  return obj;
