@@ -6,7 +6,6 @@ import java.util.Map;
 
 import com.amazonaws.services.datapipeline.model.Field;
 import com.amazonaws.services.datapipeline.model.PipelineObject;
-import com.amazonaws.services.elasticmapreduce.model.Configuration;
 
 
 import edu.harvard.data.DataConfig;
@@ -38,6 +37,15 @@ public class PipelineObjectBase {
     fields.add(new Field().withKey(key).withRefValue(ref.id));
   }
 
+  protected void set(final String key, final ArrayList<PipelineObjectBase> listref) {
+	final List<Field> subfields;
+	subfields = new ArrayList<Field>();
+	for (final PipelineObjectBase obj: listref ) { 
+		subfields.add( new Field().withKey("ref").withRefValue(obj.id) ); 
+	}
+    fields.addAll(subfields);
+  }  
+  
   protected void set(final String key, final Map<String, String> ref) {
 	final List<Field> subfields;
 	subfields = new ArrayList<Field>();
