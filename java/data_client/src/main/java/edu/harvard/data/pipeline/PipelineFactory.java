@@ -102,7 +102,10 @@ public class PipelineFactory {
       }
     }
     if (config.getEmrConfiguration() != null ) {
-    	obj.set("configuration", testEmrHiveConfiguration() );
+	  Map<String,String> hivesite = new HashMap<String,String>();
+	  hivesite.put("ref","hivesite");
+      obj.set("configuration", hivesite );
+      testEmrHiveConfiguration();
     }
     allObjects.add(obj);
     return obj;
@@ -322,20 +325,38 @@ public class PipelineFactory {
   
   public PipelineObjectBase testEmrHiveConfiguration() {
 	  
-	  final PipelineObjectBase obj = new PipelineObjectBase(config, "EmrConfiguration", "EmrConfiguration"); 
-	  Map<String,String> hiveProperties = new HashMap<String,String>();
-		hiveProperties.put("hive.support.concurrency","true");
-		hiveProperties.put("hive.enforce.bucketing","true");
-		hiveProperties.put("hive.exec.dynamic.partition.mode","nonstrict");
-		hiveProperties.put("hive.txn.manager","org.apache.hadoop.hive.ql.lockmgr.DbTxnManager");
-		hiveProperties.put("hive.compactor.initiator.on","true");
-		hiveProperties.put("hive.compactor.worker.threads","2");	
-		
-	  Configuration customEmrHiveConfig = new Configuration()
-			  .withClassification("hive-site")
-			  .withProperties(hiveProperties);
-	  obj.set("classification", customEmrHiveConfig.getClassification());
-	  obj.set("properties", hiveProperties );
+	  final PipelineObjectBase obj = new PipelineObjectBase(config, "hivesite", "EmrConfiguration"); 
+
+	  // Create Property
+	  List<Map<String, String>> propertylist = new ArrayList<Map<String, String>>();
+	  Map<String, String> hProperties = new HashMap<String,String>();
+	  hProperties.put("hive-support-concurrency", "true");
+	  hProperties.put("hive-enforce-bucketing", "true");
+	  hProperties.put("hive-exec-dynamic-partition-mode", "nonstrict");
+	  hProperties.put("hive-txn-manager", "org.apache.hadoop.hive.ql.lockmgr.DbTxnManager");
+	  hProperties.put("hive-compactor-initiator-on", "true");
+	  hProperties.put("hive-compactor-worker-threads", "2");
+	  for( final String hProperty: hProperties.keySet() ) {
+	  	Map<String, String> mMap = new HashMap<String, String>();
+	  	mMap.put( "ref", hProperty );
+	  	propertylist.add( mMap );
+	  }
+	  obj.set("property", propertylist );
+	  
+	  // Create Data Pipeline Objects for each property
+	  for( final String hProperty: hProperties.keySet() ) {
+		  testCreateEmrConfigObjects( hProperty, hProperties.get(hProperty));
+	  }
+	  
+	  allObjects.add(obj);
+	  return obj;
+  }
+  
+  public PipelineObjectBase testCreateEmrConfigObjects(final String key, final String value ) {
+
+	  final PipelineObjectBase obj = new PipelineObjectBase(config, key, "Property"); 
+	  obj.set("key", key);
+	  obj.set("value", value);
 	  allObjects.add(obj);
 	  return obj;
   }
