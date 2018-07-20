@@ -341,7 +341,7 @@ public class PipelineFactory {
 		
   public PipelineObjectBase testEmrFsConfiguration() {
 	  
-	  final PipelineObjectBase obj = new PipelineObjectBase(config, "EmrConfiguration", "EmrConfiguration");
+	  final PipelineObjectBase obj = new PipelineObjectBase(config, "TestEmrFsConfiguration", "EmrConfiguration");
 
       Map<String,String> emrfsProperties = new HashMap<String,String>();
         emrfsProperties.put("fs.s3.enableServerSideEncryption","true");
