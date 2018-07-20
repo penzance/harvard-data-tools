@@ -102,7 +102,7 @@ public class PipelineFactory {
       }
     }
     if (config.getEmrConfiguration() != null ) {
-    	obj.set("configuration", testEmrConfiguration() );
+    	obj.set("configuration", testEmrHiveConfiguration() );
     }
     allObjects.add(obj);
     return obj;
