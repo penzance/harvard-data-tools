@@ -102,10 +102,7 @@ public class PipelineFactory {
       }
     }
     if (config.getEmrConfiguration() != null ) {
-	  Map<String,String> hivesite = new HashMap<String,String>();
-	  hivesite.put("ref","hivesite");
-      obj.set("configuration", hivesite );
-      testEmrHiveConfiguration();
+      obj.set("configuration", testEmrHiveConfiguration() );
     }
     allObjects.add(obj);
     return obj;
@@ -327,8 +324,17 @@ public class PipelineFactory {
 	  
 	  final PipelineObjectBase obj = new PipelineObjectBase(config, "hivesite", "EmrConfiguration"); 
 
-	  // Create Property
-	  List<Map<String, String>> propertylist = new ArrayList<Map<String, String>>();
+	  obj.set("Property", testCreateEmrConfigObjects() );
+	  
+	  allObjects.add(obj);
+	  return obj;
+  }
+  
+  public ArrayList<PipelineObjectBase> testCreateEmrConfigObjects() {
+
+	  ArrayList<PipelineObjectBase> listconfigobjects = new ArrayList<PipelineObjectBase>();
+	  
+	  // Create Properties
 	  Map<String, String> hProperties = new HashMap<String,String>();
 	  hProperties.put("hive-support-concurrency", "true");
 	  hProperties.put("hive-enforce-bucketing", "true");
@@ -337,22 +343,12 @@ public class PipelineFactory {
 	  hProperties.put("hive-compactor-initiator-on", "true");
 	  hProperties.put("hive-compactor-worker-threads", "2");
 	  for( final String hProperty: hProperties.keySet() ) {
-	  	Map<String, String> mMap = new HashMap<String, String>();
-	  	mMap.put( "ref", hProperty );
-	  	propertylist.add( mMap );
-	  }
-	  obj.set("property", propertylist );
-	  
-	  // Create Data Pipeline Objects for each property
-	  for( final String hProperty: hProperties.keySet() ) {
-		  testCreateEmrConfigObjects( hProperty, hProperties.get(hProperty));
-	  }
-	  
-	  allObjects.add(obj);
-	  return obj;
+	  	listconfigobjects.add( testCreateEmrConfigObject(hProperty, hProperties.get( hProperty)));
+	  }	 
+	  return listconfigobjects;
   }
-  
-  public PipelineObjectBase testCreateEmrConfigObjects(final String key, final String value ) {
+
+  public PipelineObjectBase testCreateEmrConfigObject(final String key, final String value ) {
 
 	  final PipelineObjectBase obj = new PipelineObjectBase(config, key, "Property"); 
 	  obj.set("key", key);
@@ -360,7 +356,7 @@ public class PipelineFactory {
 	  allObjects.add(obj);
 	  return obj;
   }
-		
+  
   public PipelineObjectBase testEmrFsConfiguration() {
 	  
 	  final PipelineObjectBase obj = new PipelineObjectBase(config, "TestEmrFsConfiguration", "EmrConfiguration");
