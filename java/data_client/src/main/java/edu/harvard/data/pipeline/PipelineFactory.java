@@ -324,7 +324,7 @@ public class PipelineFactory {
 	  
 	  final PipelineObjectBase obj = new PipelineObjectBase(config, "hivesite", "EmrConfiguration"); 
 
-	  obj.set("Property", testCreateEmrConfigObjects() );
+	  obj.set("property", testCreateEmrConfigObjects() );
 	  
 	  allObjects.add(obj);
 	  return obj;
