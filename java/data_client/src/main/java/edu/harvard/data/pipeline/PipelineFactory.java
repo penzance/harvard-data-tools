@@ -316,6 +316,7 @@ public class PipelineFactory {
   public PipelineObjectBase testEmrConfiguration() {
 	  final PipelineObjectBase obj = new PipelineObjectBase(config, "TestEmrConfiguration", "EmrConfiguration");
 	  obj.set("ref", testEmrHiveConfiguration() );
+	  allObjects.add(obj);
 	  return obj;
   }
   
