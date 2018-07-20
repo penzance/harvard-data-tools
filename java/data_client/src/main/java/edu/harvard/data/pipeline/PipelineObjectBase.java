@@ -41,7 +41,7 @@ public class PipelineObjectBase {
 	final List<Field> subfields;
 	subfields = new ArrayList<Field>();
 	for (final PipelineObjectBase obj: listref ) { 
-		subfields.add( new Field().withKey("ref").withRefValue(obj.id) ); 
+		subfields.add( new Field().withKey(key).withRefValue(obj.id) ); 
 	}
     fields.addAll(subfields);
   }  
