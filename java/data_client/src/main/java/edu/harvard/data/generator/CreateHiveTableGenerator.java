@@ -15,6 +15,8 @@ import org.apache.logging.log4j.Logger;
 import edu.harvard.data.schema.DataSchemaColumn;
 import edu.harvard.data.schema.DataSchemaTable;
 import edu.harvard.data.schema.TableOwner;
+import edu.harvard.data.schema.fulltext.FullTextSchema;
+import edu.harvard.data.schema.fulltext.FullTextTable;
 
 public class CreateHiveTableGenerator {
 
@@ -22,10 +24,13 @@ public class CreateHiveTableGenerator {
 
   private final GenerationSpec schemaVersions;
   private final File dir;
+  private final FullTextSchema textSchema;
 
-  public CreateHiveTableGenerator(final File dir, final GenerationSpec schemaVersions) {
+  public CreateHiveTableGenerator(final File dir, final GenerationSpec schemaVersions,
+		  final FullTextSchema textSchema ) {
     this.dir = dir;
     this.schemaVersions = schemaVersions;
+    this.textSchema = textSchema;
   }
 
   public void generate() throws IOException {
@@ -34,6 +39,7 @@ public class CreateHiveTableGenerator {
       final File phaseFile = new File(dir, fileBase + ".sh");
       try (final PrintStream out = new PrintStream(new FileOutputStream(phaseFile))) {
         log.info("Creating Hive " + phaseFile + " file in " + dir);
+        
         generateCreateTablesFile(out, i + 1, schemaVersions.getPhase(i), schemaVersions.getPhase(i + 1),
             "/home/hadoop/" + fileBase + ".out");
       }
@@ -46,15 +52,51 @@ public class CreateHiveTableGenerator {
     Collections.sort(tableNames);
     out.println("sudo mkdir -p /var/log/hive/user/hadoop # Workaround for Hive logging bug");
     out.println("sudo chown hive:hive -R /var/log/hive");
+    generatePersistentTables(out, phase, input, "merged_", true, true, logFile );
+    generatePersistentTables(out, phase, input, "cur_", true, false, logFile );    
     out.println("hive -e \"");
     generateDropStatements(out, phase, "in_", tableNames, input.getSchema().getTables());
     out.println();
     generateDropStatements(out, phase, "out_", tableNames, output.getSchema().getTables());
-    out.println();
+    out.println(); 
     generateCreateStatements(out, phase, input, "in_", true);
     generateCreateStatements(out, phase, output, "out_", false);
     out.println("\" &> " + logFile);
     out.println("exit $?");
+  }
+  
+  private void generatePersistentTables(final PrintStream out, final int phase, final SchemaPhase currentPhase, 
+		  final String prefix, final boolean ignoreOwner, final boolean isTransactional, final String logFile ) {
+  	  
+	out.println("if ! hadoop fs -test -e " + "/current" + "; then ");	       
+	if (currentPhase != null) {
+	  final Map<String, DataSchemaTable> inTables = currentPhase.getSchema().getTables();
+	  final List<String> inTableKeys = new ArrayList<String>(inTables.keySet());
+	  Collections.sort(inTableKeys);
+
+	  for (final String tableKey : inTableKeys) {
+	    final DataSchemaTable table = inTables.get(tableKey);
+	    if (!(table.isTemporary() && table.getExpirationPhase() < phase)) {
+	      if (ignoreOwner || (table.getOwner() != null && table.getOwner().equals(TableOwner.hive))) {
+	        final String tableName = prefix + table.getTableName();
+	        if (textSchema.tableNames().contains(tableName) ) {
+	            if ( isTransactional ) {
+	                out.println("hive -e \"");
+	                createTableTransactional( out, tableName, table );
+	                out.println("\" &> " + logFile);
+	            } else {
+	        	    out.println("hadoop fs -mkdir /current" + "; fi");
+	                out.println("hive -e \"");
+	                createTable( out, tableName, table, "/current" + "/" + table.getTableName() );
+	                out.println("\" &> " + logFile);
+	            }
+	        }
+	      }
+	    }
+	  }
+	}
+	out.println("; fi");
+	out.println();
   }
 
   private void generateDropStatements(final PrintStream out, final int phase, final String prefix,
@@ -95,6 +137,18 @@ public class CreateHiveTableGenerator {
     out.println("    STORED AS TEXTFILE");
     out.println("    LOCATION '" + locationVar + "/" + table.getTableName() + "/';");
     out.println();
+  }
+  
+  private void createTableTransactional(final PrintStream out, final String tableName,
+	      final DataSchemaTable table ) {
+	final FullTextTable fulltexttable = textSchema.get(tableName);
+	out.println("  CREATE EXTERNAL TABLE " + tableName + " (");
+	listFields(out, table);
+	out.println("    )");
+	out.println("    COMMENT 'Latest comprehensive output data merging current + historical'");
+	out.println("    CLUSTERED BY (" + fulltexttable.getKey() + ") into 2 buckets stored as orc");
+	out.println("    TBLPROPERTIES ('transactional'='true');");
+	out.println();
   }
 
   private void listFields(final PrintStream out, final DataSchemaTable table) {
