@@ -53,9 +53,7 @@ public class FullTextCopyScriptGenerator {
           + tableName + ";\" > " + filename);
       out.println("gzip " + filename);
     }
-    if ( dataIndex.isPartial(tableName) ) {
-      generateFullTable( out, tableName );
-    }
+    generateFullTable( out, tableName );
     out.println();
   }
 	  
