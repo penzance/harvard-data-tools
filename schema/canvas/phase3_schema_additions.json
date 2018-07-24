@@ -77,6 +77,36 @@
           "length" : 255
         }
       ]
+     },
+     "texttransform": {
+      "owner": "java",
+      "description" : "Generating full text timestamps, when one doesn't exist.",
+      "columns" : [ 
+        {
+          "name" : "id",
+          "description" : "Long Canvas Course ID.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "id_canvas",
+          "description" : "Short Canvas Course ID.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "syllabus_body_hash",
+          "description" : "Currently, MD5 hash of full text string of Syllabus Body.",
+          "type" : "varchar",
+          "length" : 255
+        },
+        {
+          "name" : "syllabus_body_timestamp",
+          "description" : "Last known time when Syllabus Body was modified",
+          "type" : "varchar",
+          "length" : 255
+        }
+      ]
     }
   }
 }
