@@ -85,7 +85,7 @@ public class CreateHiveTableGenerator {
 	                createTableTransactional( out, tableName, table );
 	                out.println("\" &> " + logFile);
 	            } else {
-	        	    out.println("hadoop fs -mkdir /current" + "; fi");
+	        	    out.println("hadoop fs -mkdir /current" + "/" + table.getTableName() );
 	                out.println("hive -e \"");
 	                createTable( out, tableName, table, "/current" + "/" + table.getTableName() );
 	                out.println("\" &> " + logFile);
@@ -95,7 +95,7 @@ public class CreateHiveTableGenerator {
 	    }
 	  }
 	}
-	out.println("; fi");
+	out.println("fi");
 	out.println();
   }
 
