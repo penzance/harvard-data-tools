@@ -47,29 +47,29 @@ public class CreateHiveTableGenerator {
     Collections.sort(tableNames);
     out.println("sudo mkdir -p /var/log/hive/user/hadoop # Workaround for Hive logging bug");
     out.println("sudo chown hive:hive -R /var/log/hive");
-    out.println("sudo hive -e \"");
-    generateDropStatements(out, phase, "in_", tableNames, input.getSchema().getTables());
+    generateDropStatements(out, phase, "in_", tableNames, input.getSchema().getTables(), logFile );
     out.println();
-    generateDropStatements(out, phase, "out_", tableNames, output.getSchema().getTables());
+    generateDropStatements(out, phase, "out_", tableNames, output.getSchema().getTables(), logFile );
     out.println();
-    generateCreateStatements(out, phase, input, "in_", true);
-    generateCreateStatements(out, phase, output, "out_", false);
-    out.println("\" &> " + logFile);
+    generateCreateStatements(out, phase, input, "in_", true, logFile );
+    generateCreateStatements(out, phase, output, "out_", false, logFile );
     out.println("exit $?");
   }
 
   private void generateDropStatements(final PrintStream out, final int phase, final String prefix,
-      final List<String> tableNames, final Map<String, DataSchemaTable> tables) {
-    for (final String tableName : tableNames) {
+      final List<String> tableNames, final Map<String, DataSchemaTable> tables, final String logFile ) {
+	out.println("sudo hive -e \"");
+	for (final String tableName : tableNames) {
       final DataSchemaTable table = tables.get(tableName);
-      if (!(table.isTemporary() && table.getExpirationPhase() < phase)) {
-        out.println("  DROP TABLE IF EXISTS " + prefix + table.getTableName() + " PURGE;");
-      }
+        if (!(table.isTemporary() && table.getExpirationPhase() < phase)) {
+          out.println("  DROP TABLE IF EXISTS " + prefix + table.getTableName() + " PURGE;");
+        }
     }
+	out.println("\" &> " + logFile);
   }
 
   private void generateCreateStatements(final PrintStream out, final int phase, final SchemaPhase currentPhase,
-      final String prefix, final boolean ignoreOwner) {
+      final String prefix, final boolean ignoreOwner, final String logFile ) {
     if (currentPhase != null) {
       final Map<String, DataSchemaTable> inTables = currentPhase.getSchema().getTables();
       final List<String> inTableKeys = new ArrayList<String>(inTables.keySet());
@@ -80,7 +80,10 @@ public class CreateHiveTableGenerator {
         if (!(table.isTemporary() && table.getExpirationPhase() < phase)) {
           if (ignoreOwner || (table.getOwner() != null && table.getOwner().equals(TableOwner.hive))) {
             final String tableName = prefix + table.getTableName();
-            createTable(out, tableName, table, currentPhase.getHDFSDir());
+            out.println("if ! hadoop fs -test -e " + currentPhase.getHDFSDir() + "/" + tableName + " ; then ");
+            createTable(out, tableName, table, currentPhase.getHDFSDir(), logFile );
+            out.println("fi");
+            out.println("");
           }
         }
       }
@@ -88,7 +91,8 @@ public class CreateHiveTableGenerator {
   }
 
   private void createTable(final PrintStream out, final String tableName,
-      final DataSchemaTable table, final String locationVar) {
+      final DataSchemaTable table, final String locationVar, final String logFile ) {
+	out.println("sudo hive -e \"");
     out.println("  CREATE EXTERNAL TABLE " + tableName + " (");
     listFields(out, table);
     out.println("    )");
@@ -96,6 +100,7 @@ public class CreateHiveTableGenerator {
     out.println("    STORED AS TEXTFILE");
     out.println("    LOCATION '" + locationVar + "/" + table.getTableName() + "/';");
     out.println();
+    out.println("\" &> " + logFile);
   }
 
   private void listFields(final PrintStream out, final DataSchemaTable table) {
