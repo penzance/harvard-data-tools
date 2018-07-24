@@ -47,7 +47,7 @@ public class CreateHiveTableGenerator {
     Collections.sort(tableNames);
     out.println("sudo mkdir -p /var/log/hive/user/hadoop # Workaround for Hive logging bug");
     out.println("sudo chown hive:hive -R /var/log/hive");
-    out.println("hive -e \"");
+    out.println("sudo hive -e \"");
     generateDropStatements(out, phase, "in_", tableNames, input.getSchema().getTables());
     out.println();
     generateDropStatements(out, phase, "out_", tableNames, output.getSchema().getTables());
