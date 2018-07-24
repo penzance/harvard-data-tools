@@ -89,6 +89,7 @@ public class FullTextCopyScriptGenerator {
   
   private void generateMergeTable( final PrintStream out, final String tableName, final String copyFrom ) {
 	final FullTextTable table = textSchema.get(tableName);
+    out.println("sudo hive -S -e \"");
 	out.println("  MERGE INTO merged_" + tableName );
 	out.println("  USING " + copyFrom + tableName + " ON merged_" + tableName
 			    + "." + table.getKey() + " = " + copyFrom + tableName + "." + table.getKey() );
@@ -100,6 +101,8 @@ public class FullTextCopyScriptGenerator {
 	insertFields(out, table, tableName, copyFrom );
 	out.println("    ); ");
 	out.println("");
+    out.println("\"");
+
   }
   
   private void setFields( final PrintStream out, final FullTextTable table, 
