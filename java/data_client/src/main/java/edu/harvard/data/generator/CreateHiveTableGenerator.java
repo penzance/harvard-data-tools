@@ -65,7 +65,7 @@ public class CreateHiveTableGenerator {
           out.println("  DROP TABLE IF EXISTS " + prefix + table.getTableName() + " PURGE;");
         }
     }
-	out.println("\" &> " + logFile);
+	out.println("\" &> " + logFile + "2>&1");
   }
 
   private void generateCreateStatements(final PrintStream out, final int phase, final SchemaPhase currentPhase,
@@ -100,7 +100,7 @@ public class CreateHiveTableGenerator {
     out.println("    STORED AS TEXTFILE");
     out.println("    LOCATION '" + locationVar + "/" + table.getTableName() + "/';");
     out.println();
-    out.println("\" &> " + logFile);
+    out.println("\" &> " + logFile + "2>&1");
   }
 
   private void listFields(final PrintStream out, final DataSchemaTable table) {
