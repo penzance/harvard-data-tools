@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -98,6 +99,7 @@ public class CreateHiveTableGenerator {
   }
 
   private void listFields(final PrintStream out, final DataSchemaTable table) {
+	final List<String> keywords = Arrays.asList("timestamp", "date");
     final List<DataSchemaColumn> columns = table.getColumns();
     for (int i = 0; i < columns.size(); i++) {
       final DataSchemaColumn column = columns.get(i);
@@ -105,7 +107,11 @@ public class CreateHiveTableGenerator {
       if (columnName.contains(".")) {
         columnName = columnName.substring(columnName.lastIndexOf(".") + 1);
       }
-      out.print("    " + columnName + " " + column.getType().getHiveType());
+      if (keywords.contains(columnName)) {
+          out.print("    " + "`" + columnName + "`" + " " + column.getType().getHiveType());
+      } else {
+          out.print("    " + columnName + " " + column.getType().getHiveType());
+      }
       if (i < columns.size() - 1) {
         out.println(",");
       } else {
