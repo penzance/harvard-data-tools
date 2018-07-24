@@ -108,7 +108,7 @@ public class CreateHiveTableGenerator {
         columnName = columnName.substring(columnName.lastIndexOf(".") + 1);
       }
       if (keywords.contains(columnName)) {
-          out.print("    " + "`" + columnName + "`" + " " + column.getType().getHiveType());
+          out.print("    " + "\\`" + columnName + "\\`" + " " + column.getType().getHiveType());
       } else {
           out.print("    " + columnName + " " + column.getType().getHiveType());
       }
