@@ -82,6 +82,8 @@ public class CreateHiveTableGenerator {
             final String tableName = prefix + table.getTableName();
             out.println("if hadoop fs -test -d " + currentPhase.getHDFSDir() + "/" + tableName + " ; then ");
             createTable(out, tableName, table, currentPhase.getHDFSDir(), logFile );
+            out.println("else echo \"" + currentPhase.getHDFSDir() + "/" + table.getTableName() 
+                        + " does not exist \" >> " + logFile );
             out.println("fi");
             out.println("");
           }
