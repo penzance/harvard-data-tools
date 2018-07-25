@@ -80,7 +80,7 @@ public class CreateHiveTableGenerator {
         if (!(table.isTemporary() && table.getExpirationPhase() < phase)) {
           if (ignoreOwner || (table.getOwner() != null && table.getOwner().equals(TableOwner.hive))) {
             final String tableName = prefix + table.getTableName();
-            out.println("if ! hadoop fs -test -e " + currentPhase.getHDFSDir() + "/" + tableName + " ; then ");
+            out.println("if hadoop fs -test -d " + currentPhase.getHDFSDir() + "/" + tableName + " ; then ");
             createTable(out, tableName, table, currentPhase.getHDFSDir(), logFile );
             out.println("fi");
             out.println("");
