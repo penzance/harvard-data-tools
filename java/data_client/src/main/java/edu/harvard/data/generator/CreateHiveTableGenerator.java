@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -145,7 +144,7 @@ public class CreateHiveTableGenerator {
       final DataSchemaTable table, final String locationVar, final String logFile ) {
 	out.println("sudo hive -e \"");
     out.println("  CREATE EXTERNAL TABLE " + tableName + " (");
-    listFields(out, table);
+    listFields(out, table, table.getListofColumns() );
     out.println("    )");
     out.println("    ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' LINES TERMINATED By '\\n'");
     out.println("    STORED AS TEXTFILE");
@@ -169,31 +168,9 @@ public class CreateHiveTableGenerator {
 	out.println();
   }
 
-  private void listFields(final PrintStream out, final DataSchemaTable table) {
-	final List<String> keywords = Arrays.asList("timestamp", "date");
-    final List<DataSchemaColumn> columns = table.getColumns();
-    String concatFields = new String();
-    List<String> listofstrings = new ArrayList<String>();
-    String separator = ",\n";
-    for (int i = 0; i < columns.size(); i++) {
-      final DataSchemaColumn column = columns.get(i);
-      String columnName = column.getName();
-      if (columnName.contains(".")) {
-        columnName = columnName.substring(columnName.lastIndexOf(".") + 1);
-      }
-      if (keywords.contains(columnName)) {
-    	  listofstrings.add("    " + "\\`" + columnName + "\\`" + " " + column.getType().getHiveType());
-      } else {
-    	  listofstrings.add("    " + columnName + " " + column.getType().getHiveType());
-      }
-    }
-    concatFields = StringUtils.join( listofstrings, separator );
-    out.println(concatFields);    
-  }
-  
   private void listFields(final PrintStream out, final DataSchemaTable table, 
 		  final List<String> subsetcolumns ) {
-    final List<DataSchemaColumn> columns = table.getColumns();
+	final List<DataSchemaColumn> columns = table.getColumns();
     String concatFields = new String();
     List<String> listofstrings = new ArrayList<String>();
     String separator = ",\n";
@@ -201,14 +178,27 @@ public class CreateHiveTableGenerator {
       final DataSchemaColumn column = columns.get(i);
       String columnName = column.getName();
       if (subsetcolumns.contains(columnName)) {
-          if (columnName.contains(".")) {
-            columnName = columnName.substring(columnName.lastIndexOf(".") + 1);
-          }
-          listofstrings.add("    " + columnName + " " + column.getType().getHiveType());
+    	  columnName = checkField( columnName, column, true );
+    	  listofstrings.add(columnName);
       }
     }
     concatFields = StringUtils.join( listofstrings, separator );
     out.println(concatFields);
+  }
+  
+  private String checkField( final String columnName, final DataSchemaColumn column,
+		  final boolean protectAgainstReservedKeywords ) {
+	String verifiedColumn = new String();
+	String verifiedColumnString = new String();
+    if (columnName.contains(".")) verifiedColumn = columnName.substring(columnName.lastIndexOf(".") + 1);  
+    else verifiedColumn = columnName;
+    
+    if (protectAgainstReservedKeywords) {
+        verifiedColumnString = ("    " + "\\`" + verifiedColumn + "\\`" + " " + column.getType().getHiveType());
+    } else {
+    	verifiedColumnString = ("    " + verifiedColumn + " " + column.getType().getHiveType());
+    }
+	return verifiedColumnString;
   }
   
 }
