@@ -158,6 +158,7 @@ public class CreateHiveTableGenerator {
 	      final DataSchemaTable table, final String logFile ) {
 	final FullTextTable fulltexttable = textSchema.get( table.getTableName() );
 	final List<String> textfieldsonly = fulltexttable.getColumns();
+	textfieldsonly.add(0, fulltexttable.getKey());
 	out.println("sudo hive -e \"");	
 	out.println("  CREATE EXTERNAL TABLE " + tableName + " (");
 	listFields(out, table, textfieldsonly );

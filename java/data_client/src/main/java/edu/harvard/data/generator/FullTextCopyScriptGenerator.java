@@ -121,6 +121,7 @@ public class FullTextCopyScriptGenerator {
 		  final String tableName, final String copyFrom ) {
 	String finalstring = new String();
     List<String> listofstrings = new ArrayList<String>(); 
+    listofstrings.add(0, copyFrom + tableName + "." + table.getKey());
     String separator = ", ";
     for (final String column : table.getColumns() ) {
       listofstrings.add( copyFrom + tableName + "." + column );
