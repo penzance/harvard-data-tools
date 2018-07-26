@@ -172,6 +172,9 @@ public class CreateHiveTableGenerator {
   private void listFields(final PrintStream out, final DataSchemaTable table) {
 	final List<String> keywords = Arrays.asList("timestamp", "date");
     final List<DataSchemaColumn> columns = table.getColumns();
+    String concatFields = new String();
+    List<String> listofstrings = new ArrayList<String>();
+    String separator = ",\n";
     for (int i = 0; i < columns.size(); i++) {
       final DataSchemaColumn column = columns.get(i);
       String columnName = column.getName();
@@ -179,16 +182,13 @@ public class CreateHiveTableGenerator {
         columnName = columnName.substring(columnName.lastIndexOf(".") + 1);
       }
       if (keywords.contains(columnName)) {
-          out.print("    " + "\\`" + columnName + "\\`" + " " + column.getType().getHiveType());
+    	  listofstrings.add("    " + "\\`" + columnName + "\\`" + " " + column.getType().getHiveType());
       } else {
-          out.print("    " + columnName + " " + column.getType().getHiveType());
-      }
-      if (i < columns.size() - 1) {
-        out.println(",");
-      } else {
-        out.println();
+    	  listofstrings.add("    " + columnName + " " + column.getType().getHiveType());
       }
     }
+    concatFields = StringUtils.join( listofstrings, separator );
+    out.println(concatFields);    
   }
   
   private void listFields(final PrintStream out, final DataSchemaTable table, 
