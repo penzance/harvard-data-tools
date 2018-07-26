@@ -60,7 +60,6 @@ public class CreateHiveTableGenerator {
     out.println("sudo chown hive:hive -R /var/log/hive");
     generatePersistentTables(out, phase, input, "merged_", true, true, logFile );
     generatePersistentTables(out, phase, input, "cur_", true, false, logFile );    
-    out.println("hive -e \"");
     generateDropStatements(out, phase, "in_", tableNames, input.getSchema().getTables(), logFile );
     out.println();
     generateDropStatements(out, phase, "out_", tableNames, output.getSchema().getTables(), logFile );
