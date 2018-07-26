@@ -13,7 +13,7 @@
         }
       ]
     },
-    "conference_participant_type": {
+    "conference_participant_dim": {
       "columns" : [
         {
           "name" : "participation_type",
