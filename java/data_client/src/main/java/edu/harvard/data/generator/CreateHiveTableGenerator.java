@@ -159,7 +159,7 @@ public class CreateHiveTableGenerator {
 	final List<String> textfieldsonly = fulltexttable.getColumns();
 	textfieldsonly.add(0, fulltexttable.getKey());
 	out.println("sudo hive -e \"");	
-	out.println("  CREATE EXTERNAL TABLE " + tableName + " (");
+	out.println("  CREATE TABLE " + tableName + " (");
 	listFields(out, table, textfieldsonly );
 	out.println("    )");
 	out.println("    COMMENT 'Latest comprehensive output data merging current + historical'");
