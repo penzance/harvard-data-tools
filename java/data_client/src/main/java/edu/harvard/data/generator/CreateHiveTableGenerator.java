@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -60,13 +61,12 @@ public class CreateHiveTableGenerator {
     generatePersistentTables(out, phase, input, "merged_", true, true, logFile );
     generatePersistentTables(out, phase, input, "cur_", true, false, logFile );    
     out.println("hive -e \"");
-    generateDropStatements(out, phase, "in_", tableNames, input.getSchema().getTables());
+    generateDropStatements(out, phase, "in_", tableNames, input.getSchema().getTables(), logFile );
     out.println();
-    generateDropStatements(out, phase, "out_", tableNames, output.getSchema().getTables());
+    generateDropStatements(out, phase, "out_", tableNames, output.getSchema().getTables(), logFile );
     out.println(); 
-    generateCreateStatements(out, phase, input, "in_", true);
-    generateCreateStatements(out, phase, output, "out_", false);
-    out.println("\" &> " + logFile);
+    generateCreateStatements(out, phase, input, "in_", true, logFile );
+    generateCreateStatements(out, phase, output, "out_", false, logFile );
     out.println("exit $?");
   }
   
@@ -87,15 +87,11 @@ public class CreateHiveTableGenerator {
 	        log.info("List text schema tables " + textSchema.tableNames() + "Current: " + tableName );
 	        if (textSchema.tableNames().contains(table.getTableName() ) ) {
 	            if ( isTransactional ) {
-	                out.println("hive -e \"");
-	                createTableTransactional( out, tableName, table );
-	                out.println("\" &> " + logFile);
+	                createTableTransactional( out, tableName, table, logFile );
 	            } else {
 	        	    out.println("hadoop fs -mkdir /current" + "/" + table.getTableName() );
 	        	    generateCopyStatement(out, tableName, table );
-	                out.println("hive -e \"");
-	                createTable( out, tableName, table, "/current" );
-	                out.println("\" &> " + logFile);
+	                createTable( out, tableName, table, "/current", logFile );
 	            	out.println();
 	            }
 	        }
@@ -108,17 +104,19 @@ public class CreateHiveTableGenerator {
   }
 
   private void generateDropStatements(final PrintStream out, final int phase, final String prefix,
-      final List<String> tableNames, final Map<String, DataSchemaTable> tables) {
-    for (final String tableName : tableNames) {
+      final List<String> tableNames, final Map<String, DataSchemaTable> tables, final String logFile ) {
+	out.println("sudo hive -e \"");
+	for (final String tableName : tableNames) {
       final DataSchemaTable table = tables.get(tableName);
-      if (!(table.isTemporary() && table.getExpirationPhase() < phase)) {
-        out.println("  DROP TABLE IF EXISTS " + prefix + table.getTableName() + " PURGE;");
-      }
+        if (!(table.isTemporary() && table.getExpirationPhase() < phase)) {
+          out.println("  DROP TABLE IF EXISTS " + prefix + table.getTableName() + " PURGE;");
+        }
     }
+	out.println("\" >> " + logFile + " 2>&1");
   }
 
   private void generateCreateStatements(final PrintStream out, final int phase, final SchemaPhase currentPhase,
-      final String prefix, final boolean ignoreOwner) {
+      final String prefix, final boolean ignoreOwner, final String logFile ) {
     if (currentPhase != null) {
       final Map<String, DataSchemaTable> inTables = currentPhase.getSchema().getTables();
       final List<String> inTableKeys = new ArrayList<String>(inTables.keySet());
@@ -129,7 +127,7 @@ public class CreateHiveTableGenerator {
         if (!(table.isTemporary() && table.getExpirationPhase() < phase)) {
           if (ignoreOwner || (table.getOwner() != null && table.getOwner().equals(TableOwner.hive))) {
             final String tableName = prefix + table.getTableName();
-            createTable(out, tableName, table, currentPhase.getHDFSDir());
+            createTable(out, tableName, table, currentPhase.getHDFSDir(), logFile );
           }
         }
       }
@@ -144,7 +142,8 @@ public class CreateHiveTableGenerator {
   }
 
   private void createTable(final PrintStream out, final String tableName,
-      final DataSchemaTable table, final String locationVar) {
+      final DataSchemaTable table, final String locationVar, final String logFile ) {
+	out.println("sudo hive -e \"");
     out.println("  CREATE EXTERNAL TABLE " + tableName + " (");
     listFields(out, table);
     out.println("    )");
@@ -152,22 +151,26 @@ public class CreateHiveTableGenerator {
     out.println("    STORED AS TEXTFILE");
     out.println("    LOCATION '" + locationVar + "/" + table.getTableName() + "/';");
     out.println();
+    out.println("\" >> " + logFile + " 2>&1");
   }
   
   private void createTableTransactional(final PrintStream out, final String tableName,
-	      final DataSchemaTable table ) {
+	      final DataSchemaTable table, final String logFile ) {
 	final FullTextTable fulltexttable = textSchema.get( table.getTableName() );
 	final List<String> textfieldsonly = fulltexttable.getColumns();
+	out.println("sudo hive -e \"");	
 	out.println("  CREATE EXTERNAL TABLE " + tableName + " (");
 	listFields(out, table, textfieldsonly );
 	out.println("    )");
 	out.println("    COMMENT 'Latest comprehensive output data merging current + historical'");
 	out.println("    CLUSTERED BY (" + fulltexttable.getKey() + ") into 2 buckets stored as orc");
 	out.println("    TBLPROPERTIES ('transactional'='true');");
+    out.println("\" >> " + logFile + " 2>&1");	
 	out.println();
   }
 
-  private void listFields(final PrintStream out, final DataSchemaTable table ) {
+  private void listFields(final PrintStream out, final DataSchemaTable table) {
+	final List<String> keywords = Arrays.asList("timestamp", "date");
     final List<DataSchemaColumn> columns = table.getColumns();
     for (int i = 0; i < columns.size(); i++) {
       final DataSchemaColumn column = columns.get(i);
@@ -175,7 +178,11 @@ public class CreateHiveTableGenerator {
       if (columnName.contains(".")) {
         columnName = columnName.substring(columnName.lastIndexOf(".") + 1);
       }
-      out.print("    " + columnName + " " + column.getType().getHiveType());
+      if (keywords.contains(columnName)) {
+          out.print("    " + "\\`" + columnName + "\\`" + " " + column.getType().getHiveType());
+      } else {
+          out.print("    " + columnName + " " + column.getType().getHiveType());
+      }
       if (i < columns.size() - 1) {
         out.println(",");
       } else {
