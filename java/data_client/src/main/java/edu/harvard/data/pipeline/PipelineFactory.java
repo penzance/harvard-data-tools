@@ -1,12 +1,15 @@
 package edu.harvard.data.pipeline;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
 import com.amazonaws.services.datapipeline.model.PipelineObject;
 import com.amazonaws.services.s3.model.S3ObjectId;
+import com.amazonaws.services.elasticmapreduce.model.Configuration;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -97,6 +100,9 @@ public class PipelineFactory {
       if (config.getEmrTaskBidPrice() != null) {
         obj.set("taskInstanceBidPrice", config.getEmrTaskBidPrice());
       }
+    }
+    if (config.getEmrConfiguration() != null ) {
+      obj.set("configuration", testEmrHiveConfiguration() );
     }
     allObjects.add(obj);
     return obj;
@@ -304,6 +310,67 @@ public class PipelineFactory {
       objects.add(obj.getPipelineObject());
     }
     return objects;
+  }
+  
+  //testing
+  public PipelineObjectBase testEmrConfiguration() {
+	  final PipelineObjectBase obj = new PipelineObjectBase(config, "TestEmrConfiguration", "EmrConfiguration");
+	  obj.set("ref", testEmrHiveConfiguration() );
+	  allObjects.add(obj);
+	  return obj;
+  }
+  
+  public PipelineObjectBase testEmrHiveConfiguration() {
+	  
+	  final PipelineObjectBase obj = new PipelineObjectBase(config, "hivesite", "EmrConfiguration"); 
+
+	  obj.set("classification", "hive-site" );
+	  obj.set("property", testCreateEmrConfigObjects() );
+	  
+	  allObjects.add(obj);
+	  return obj;
+  }
+  
+  public ArrayList<PipelineObjectBase> testCreateEmrConfigObjects() {
+
+	  ArrayList<PipelineObjectBase> listconfigobjects = new ArrayList<PipelineObjectBase>();
+	  
+	  // Create Properties
+	  Map<String, String> hProperties = new HashMap<String,String>();
+	  hProperties.put("hive-support-concurrency", "true");
+	  hProperties.put("hive-enforce-bucketing", "true");
+	  hProperties.put("hive-exec-dynamic-partition-mode", "nonstrict");
+	  hProperties.put("hive-txn-manager", "org.apache.hadoop.hive.ql.lockmgr.DbTxnManager");
+	  hProperties.put("hive-compactor-initiator-on", "true");
+	  hProperties.put("hive-compactor-worker-threads", "2");
+	  for( final String hProperty: hProperties.keySet() ) {
+	  	listconfigobjects.add( testCreateEmrConfigObject(hProperty, hProperties.get( hProperty)));
+	  }	 
+	  return listconfigobjects;
+  }
+
+  public PipelineObjectBase testCreateEmrConfigObject(final String key, final String value ) {
+
+	  final PipelineObjectBase obj = new PipelineObjectBase(config, key, "Property"); 
+  	  obj.set("key", key.replace("-", ".") );
+	  obj.set("value", value);
+	  allObjects.add(obj);
+	  return obj;
+  }
+  
+  public PipelineObjectBase testEmrFsConfiguration() {
+	  
+	  final PipelineObjectBase obj = new PipelineObjectBase(config, "TestEmrFsConfiguration", "EmrConfiguration");
+
+      Map<String,String> emrfsProperties = new HashMap<String,String>();
+        emrfsProperties.put("fs.s3.enableServerSideEncryption","true");
+
+	  Configuration customEmrConfig = new Configuration()
+				.withClassification("emrfs-site")
+				.withProperties(emrfsProperties);
+	  obj.set("classification", customEmrConfig.getClassification());
+	  obj.set("properties", customEmrConfig.getProperties());
+	  return obj;
   }
 
 }
