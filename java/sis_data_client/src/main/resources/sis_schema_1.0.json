@@ -350,7 +350,7 @@
 	},
         {
             "name": "MH_STRM",
-	    "type": "varchar",
+	    "type": "integer",
 	    "length": 255,
 	    "description": ""
 	},
@@ -362,7 +362,7 @@
 	},
         {
             "name": "AT_TERM_ID",
-	    "type": "integer",
+	    "type": "varchar",
 	    "description": ""
 	},
         {
