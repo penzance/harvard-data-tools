@@ -51,7 +51,9 @@ public class FullTextCopyScriptGenerator {
   private void generateTable(final PrintStream out, final String tableName) {
     
 	if (dataIndex.isPartial(tableName)) {
+	    out.println("if ! hadoop fs -test -e " + "/current" + "; then ");	       
     	generateMergeTable(out, tableName, "cur_");
+        out.println("fi");
     	generateMergeTable(out, tableName, "in_");
     	generatePartialTable(out, tableName, "merged_");
     	generateFullTable(out, tableName, "merged_");
@@ -152,12 +154,18 @@ public class FullTextCopyScriptGenerator {
 				    " ELSE " + "merged_" + tableName + "." + column + 
 				    " END )");
 		if (addMetadata) {
+			String timevalue = new String();
+			if (copyFrom.equals("in_")) {
+				timevalue = "current_timestamp";
+			} else {
+				timevalue = copyFrom + tableName + "." + "time_" + column;
+			}
 			listofmeta.add( "    " + "time_" + column + "=" + "( CASE " +
 					" WHEN ( " + "md5( merged_" + tableName + "." + column + " ) != md5( " + copyFrom + tableName + "." + column + " ) ) " +
-				    " THEN " + copyFrom + tableName + "." + "time_" + column + 
+				    " THEN " + timevalue + 
 				    " ELSE " + "merged_" + tableName + "." + "time_" + column + 
 				    " END )");		
-		}	
+		}
 	}
     List<String> orderList = new ArrayList<String>(listofstrings);
     if (addMetadata) orderList.addAll(listofmeta);    	
