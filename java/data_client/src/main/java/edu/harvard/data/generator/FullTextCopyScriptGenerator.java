@@ -93,9 +93,7 @@ public class FullTextCopyScriptGenerator {
 	out.println("  MERGE INTO merged_" + tableName );
 	out.println("  USING " + copyFrom + tableName + " ON merged_" + tableName
 			    + "." + table.getKey() + " = " + copyFrom + tableName + "." + table.getKey() );
-	out.println("  WHEN MATCHED THEN UPDATE" );
-	out.print("    SET ");
-	setFields(out, table, tableName, copyFrom, true );
+	matchFields( out, table, tableName, copyFrom, true);
     out.println("  WHEN NOT MATCHED THEN");
     out.println("  INSERT VALUES (");
 	insertFields(out, table, tableName, copyFrom, true );
@@ -140,6 +138,33 @@ public class FullTextCopyScriptGenerator {
 	out.println(finalstring);
   }
   
+  private void matchFields( final PrintStream out, final FullTextTable table,
+		  final String tableName, final String copyFrom, final boolean addMetadata ) {
+	String finalstring = new String();
+	List<String> listofstrings = new ArrayList<String>();
+	List<String> listofmeta = new ArrayList<String>();
+	String separator = ",\n";
+	out.println("  WHEN MATCHED THEN UPDATE SET ");	
+	for (final String column : table.getColumns() ) {
+		listofstrings.add( "    " + column + "=" + "( CASE " +
+					" WHEN ( " + "md5( merged_" + tableName + "." + column + " ) != md5( " + copyFrom + tableName + "." + column + " ) ) " +
+				    " THEN " + copyFrom + tableName + "." + column + 
+				    " ELSE " + "merged_" + tableName + "." + column + 
+				    " END )");
+		if (addMetadata) {
+			listofmeta.add( "    " + "time_" + column + "=" + "( CASE " +
+					" WHEN ( " + "md5( merged_" + tableName + "." + column + " ) != md5( " + copyFrom + tableName + "." + column + " ) ) " +
+				    " THEN " + copyFrom + tableName + "." + "time_" + column + 
+				    " ELSE " + "merged_" + tableName + "." + "time_" + column + 
+				    " END )");		
+		}	
+	}
+    List<String> orderList = new ArrayList<String>(listofstrings);
+    if (addMetadata) orderList.addAll(listofmeta);    	
+	finalstring = StringUtils.join( orderList, separator );
+	out.println(finalstring);	
+  }
+
   private String addChecksum( final String fulltextfield ) {
 	  return ("md5(" + fulltextfield + ")");
   }
