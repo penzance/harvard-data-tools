@@ -83,7 +83,7 @@ public class FullTextCopyScriptGenerator {
     final FullTextTable table = textSchema.get(tableName);
     out.println("mkdir -p /home/hadoop/full_text/" + tableName + "/fulltable");
     final String filename = config.getFullTextDir() + "/" + tableName + "/fulltable/" + tableName;
-    out.print("sudo hive -S -e \"SELECT " + table.getKey() );
+    out.print("sudo hive -S -e \"SELECT " );
     extractFields(out, table, tableName, outputFrom, true );
     out.println(" FROM " + outputFrom + tableName + ";\" > " + filename);
     out.println("gzip " + filename);
