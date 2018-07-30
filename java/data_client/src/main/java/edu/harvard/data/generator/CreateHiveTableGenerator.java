@@ -17,6 +17,7 @@ import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.schema.DataSchemaColumn;
 import edu.harvard.data.schema.DataSchemaTable;
+import edu.harvard.data.schema.DataSchemaType;
 import edu.harvard.data.schema.TableOwner;
 import edu.harvard.data.schema.fulltext.FullTextSchema;
 import edu.harvard.data.schema.fulltext.FullTextTable;
@@ -58,19 +59,20 @@ public class CreateHiveTableGenerator {
     Collections.sort(tableNames);
     out.println("sudo mkdir -p /var/log/hive/user/hadoop # Workaround for Hive logging bug");
     out.println("sudo chown hive:hive -R /var/log/hive");
-    generatePersistentTables(out, phase, input, "merged_", true, true, logFile );
-    generatePersistentTables(out, phase, input, "cur_", true, false, logFile );    
+    generatePersistentTables(out, phase, input, "merged_", true, true, logFile, true );
+    generatePersistentTables(out, phase, input, "cur_", true, false, logFile, true );    
     generateDropStatements(out, phase, "in_", tableNames, input.getSchema().getTables(), logFile );
     out.println();
     generateDropStatements(out, phase, "out_", tableNames, output.getSchema().getTables(), logFile );
     out.println(); 
-    generateCreateStatements(out, phase, input, "in_", true, logFile );
-    generateCreateStatements(out, phase, output, "out_", false, logFile );
+    generateCreateStatements(out, phase, input, "in_", true, logFile, false );
+    generateCreateStatements(out, phase, output, "out_", false, logFile, false );
     out.println("exit $?");
   }
   
   private void generatePersistentTables(final PrintStream out, final int phase, final SchemaPhase currentPhase, 
-		  final String prefix, final boolean ignoreOwner, final boolean isTransactional, final String logFile ) {
+		  final String prefix, final boolean ignoreOwner, final boolean isTransactional, final String logFile,
+		  final boolean addMetadata ) {
   	  
 	if (currentPhase != null) {
 	  final Map<String, DataSchemaTable> inTables = currentPhase.getSchema().getTables();
@@ -86,11 +88,11 @@ public class CreateHiveTableGenerator {
 	        log.info("List text schema tables " + textSchema.tableNames() + "Current: " + tableName );
 	        if (textSchema.tableNames().contains(table.getTableName() ) ) {
 	            if ( isTransactional ) {
-	                createTableTransactional( out, tableName, table, logFile );
+	                createTableTransactional( out, tableName, table, logFile, addMetadata );
 	            } else {
 	        	    out.println("hadoop fs -mkdir /current" + "/" + table.getTableName() );
 	        	    generateCopyStatement(out, tableName, table );
-	                createTable( out, tableName, table, "/current", logFile );
+	                createTable( out, tableName, table, "/current", logFile, addMetadata );
 	            	out.println();
 	            }
 	        }
@@ -115,7 +117,7 @@ public class CreateHiveTableGenerator {
   }
 
   private void generateCreateStatements(final PrintStream out, final int phase, final SchemaPhase currentPhase,
-      final String prefix, final boolean ignoreOwner, final String logFile ) {
+      final String prefix, final boolean ignoreOwner, final String logFile, final boolean addMetadata ) {
     if (currentPhase != null) {
       final Map<String, DataSchemaTable> inTables = currentPhase.getSchema().getTables();
       final List<String> inTableKeys = new ArrayList<String>(inTables.keySet());
@@ -126,7 +128,7 @@ public class CreateHiveTableGenerator {
         if (!(table.isTemporary() && table.getExpirationPhase() < phase)) {
           if (ignoreOwner || (table.getOwner() != null && table.getOwner().equals(TableOwner.hive))) {
             final String tableName = prefix + table.getTableName();
-            createTable(out, tableName, table, currentPhase.getHDFSDir(), logFile );
+            createTable(out, tableName, table, currentPhase.getHDFSDir(), logFile, addMetadata );
           }
         }
       }
@@ -141,10 +143,10 @@ public class CreateHiveTableGenerator {
   }
 
   private void createTable(final PrintStream out, final String tableName,
-      final DataSchemaTable table, final String locationVar, final String logFile ) {
+      final DataSchemaTable table, final String locationVar, final String logFile, final boolean addMetadata ) {
 	out.println("sudo hive -e \"");
     out.println("  CREATE EXTERNAL TABLE " + tableName + " (");
-    listFields(out, table, table.getListofColumns() );
+    listFields(out, table, table.getListofColumns(), addMetadata );
     out.println("    )");
     out.println("    ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' LINES TERMINATED By '\\n'");
     out.println("    STORED AS TEXTFILE");
@@ -154,13 +156,13 @@ public class CreateHiveTableGenerator {
   }
   
   private void createTableTransactional(final PrintStream out, final String tableName,
-	      final DataSchemaTable table, final String logFile ) {
+	      final DataSchemaTable table, final String logFile, final boolean addMetadata ) {
 	final FullTextTable fulltexttable = textSchema.get( table.getTableName() );
 	final List<String> textfieldsonly = fulltexttable.getColumns();
 	textfieldsonly.add(0, fulltexttable.getKey());
 	out.println("sudo hive -e \"");	
 	out.println("  CREATE TABLE " + tableName + " (");
-	listFields(out, table, textfieldsonly );
+	listFields(out, table, textfieldsonly, addMetadata );
 	out.println("    )");
 	out.println("    COMMENT 'Latest comprehensive output data merging current + historical'");
 	out.println("    CLUSTERED BY (" + fulltexttable.getKey() + ") into 2 buckets stored as orc");
@@ -170,36 +172,52 @@ public class CreateHiveTableGenerator {
   }
 
   private void listFields(final PrintStream out, final DataSchemaTable table, 
-		  final List<String> subsetcolumns ) {
+		  final List<String> subsetcolumns, final boolean addMetadata ) {
+	final FullTextTable fulltexttable = textSchema.get( table.getTableName() );
 	final List<DataSchemaColumn> columns = table.getColumns();
     String concatFields = new String();
     List<String> listofstrings = new ArrayList<String>();
+    List<String> listofmeta = new ArrayList<String>();
     String separator = ",\n";
+	final DataSchemaType timestamptype = (DataSchemaType) DataSchemaType.parse("timestamp");
     for (int i = 0; i < columns.size(); i++) {
       final DataSchemaColumn column = columns.get(i);
       String columnName = column.getName();
+      String newColumnName = new String();
       if (subsetcolumns.contains(columnName)) {
-    	  columnName = checkField( columnName, column, true );
-    	  listofstrings.add(columnName);
+    	  newColumnName = checkField( columnName, column, true );
+    	  listofstrings.add(newColumnName);
+    	  if (addMetadata && !columnName.equals( fulltexttable.getKey()) ) {
+    		  String timestampField = addTimestamp( columnName );
+    		  listofmeta.add( addCheckedField(timestampField, timestamptype.getHiveType(), true ));
+    	  }
       }
     }
-    concatFields = StringUtils.join( listofstrings, separator );
+    List<String> orderList = new ArrayList<String>(listofstrings);
+    if (addMetadata) orderList.addAll(listofmeta);
+    concatFields = StringUtils.join( orderList, separator );
     out.println(concatFields);
+  }
+  
+  private String addTimestamp( final String columnName ) {
+	  return ("time_" + columnName );
   }
   
   private String checkField( final String columnName, final DataSchemaColumn column,
 		  final boolean protectAgainstReservedKeywords ) {
 	String verifiedColumn = new String();
-	String verifiedColumnString = new String();
     if (columnName.contains(".")) verifiedColumn = columnName.substring(columnName.lastIndexOf(".") + 1);  
     else verifiedColumn = columnName;
-    
-    if (protectAgainstReservedKeywords) {
-        verifiedColumnString = ("    " + "\\`" + verifiedColumn + "\\`" + " " + column.getType().getHiveType());
-    } else {
-    	verifiedColumnString = ("    " + verifiedColumn + " " + column.getType().getHiveType());
-    }
-	return verifiedColumnString;
+    return addCheckedField( verifiedColumn, column.getType().getHiveType(), protectAgainstReservedKeywords);
+  }
+  
+  private String addCheckedField( final String columnName, final String columnType,
+		  final boolean protectAgainstReservedKeywords ) {
+	if (protectAgainstReservedKeywords) {
+	        return ("    " + "\\`" + columnName + "\\`" + " " + columnType);
+	} else {
+	    	return ("    " + columnName + " " + columnType);
+	}
   }
   
 }
