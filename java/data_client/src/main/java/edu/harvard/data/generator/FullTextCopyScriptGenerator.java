@@ -68,8 +68,10 @@ public class FullTextCopyScriptGenerator {
     out.println("mkdir -p /home/hadoop/full_text/" + tableName);
     for (final String column : table.getColumns()) {
       final String filename = config.getFullTextDir() + "/" + tableName + "/" + column;
-      out.println("sudo hive -S -e \"select " + table.getKey() + ", " + column + " from " + outputFrom
-          + tableName + ";\" > " + filename);
+      out.print("sudo hive -S -e \"SELECT " + table.getKey() + ", ");
+      extractField( out, column, true );
+      out.print(" FROM " + outputFrom + tableName + ";\" > " + filename);
+      out.println("");
       out.println("gzip " + filename);
     }  
   }
@@ -79,11 +81,9 @@ public class FullTextCopyScriptGenerator {
     final FullTextTable table = textSchema.get(tableName);
     out.println("mkdir -p /home/hadoop/full_text/" + tableName + "/fulltable");
     final String filename = config.getFullTextDir() + "/" + tableName + "/fulltable/" + tableName;
-    out.print("sudo hive -S -e \"select " + table.getKey() );
-    for (final String column : table.getColumns() ) {
-        out.print("," + column);
-    }
-    out.println(" from " + outputFrom + tableName + ";\" > " + filename);
+    out.print("sudo hive -S -e \"SELECT " + table.getKey() );
+    extractFields(out, table, tableName, outputFrom, true );
+    out.println(" FROM " + outputFrom + tableName + ";\" > " + filename);
     out.println("gzip " + filename);
   }
   
@@ -93,40 +93,125 @@ public class FullTextCopyScriptGenerator {
 	out.println("  MERGE INTO merged_" + tableName );
 	out.println("  USING " + copyFrom + tableName + " ON merged_" + tableName
 			    + "." + table.getKey() + " = " + copyFrom + tableName + "." + table.getKey() );
-	out.println("  WHEN MATCHED THEN UPDATE" );
-	out.print("    SET ");
-	setFields(out, table, tableName, copyFrom );
+	matchFields( out, table, tableName, copyFrom, true);
     out.println("  WHEN NOT MATCHED THEN");
     out.println("  INSERT VALUES (");
-	insertFields(out, table, tableName, copyFrom );
+	insertFields(out, table, tableName, copyFrom, true );
 	out.println("    ); ");
 	out.println("");
     out.println("\"");
-
   }
   
+  private void extractFields( final PrintStream out, final FullTextTable table,
+		  final String tableName, final String extractFrom, final boolean addMetadata ) {
+	String finalstring = new String();
+	List<String> listofstrings = new ArrayList<String>();
+	List<String> listofmeta = new ArrayList<String>();
+	String separator = ",\n";
+    listofstrings.add(0, table.getKey());
+	for (final String column : table.getColumns() ) {
+	  listofstrings.add( column );
+	  if ( addMetadata && !column.equals( table.getKey()) ) {
+		  listofmeta.add( addTimestamp( column));
+	  }
+	}
+	List<String> orderList = new ArrayList<String>(listofstrings);
+	if (addMetadata) orderList.addAll(listofmeta);    
+	finalstring = StringUtils.join( orderList, separator );
+	out.println(finalstring);  
+  }
+  
+  private void extractField( final PrintStream out, final String textcolumn, 
+		  final boolean addMetadata ) {
+	String finalstring = new String();
+	List<String> listofstrings = new ArrayList<String>();
+    List<String> listofmeta = new ArrayList<String>();
+	String separator = ", ";
+	listofstrings.add(textcolumn);
+	if (addMetadata) {
+	    listofstrings.add( addChecksum(textcolumn));
+		listofmeta.add( addTimestamp(textcolumn));
+	}
+    List<String> orderList = new ArrayList<String>(listofstrings);
+    if (addMetadata) orderList.addAll(listofmeta);    	
+	finalstring = StringUtils.join( orderList, separator );
+	out.println(finalstring);
+  }
+  
+  private void matchFields( final PrintStream out, final FullTextTable table,
+		  final String tableName, final String copyFrom, final boolean addMetadata ) {
+	String finalstring = new String();
+	List<String> listofstrings = new ArrayList<String>();
+	List<String> listofmeta = new ArrayList<String>();
+	String separator = ",\n";
+	out.println("  WHEN MATCHED THEN UPDATE SET ");	
+	for (final String column : table.getColumns() ) {
+		listofstrings.add( "    " + column + "=" + "( CASE " +
+					" WHEN ( " + "md5( merged_" + tableName + "." + column + " ) != md5( " + copyFrom + tableName + "." + column + " ) ) " +
+				    " THEN " + copyFrom + tableName + "." + column + 
+				    " ELSE " + "merged_" + tableName + "." + column + 
+				    " END )");
+		if (addMetadata) {
+			listofmeta.add( "    " + "time_" + column + "=" + "( CASE " +
+					" WHEN ( " + "md5( merged_" + tableName + "." + column + " ) != md5( " + copyFrom + tableName + "." + column + " ) ) " +
+				    " THEN " + copyFrom + tableName + "." + "time_" + column + 
+				    " ELSE " + "merged_" + tableName + "." + "time_" + column + 
+				    " END )");		
+		}	
+	}
+    List<String> orderList = new ArrayList<String>(listofstrings);
+    if (addMetadata) orderList.addAll(listofmeta);    	
+	finalstring = StringUtils.join( orderList, separator );
+	out.println(finalstring);	
+  }
+
+  private String addChecksum( final String fulltextfield ) {
+	  return ("md5(" + fulltextfield + ")");
+  }
+  
+  private String addTimestamp(final String fulltextfield ) {
+	  return ("time_" + fulltextfield );
+  }
+    
   private void setFields( final PrintStream out, final FullTextTable table, 
-		  final String tableName, final String copyFrom ) {
+		  final String tableName, final String copyFrom, final boolean addMetadata ) {
   	String finalstring = new String();
-    List<String> listofstrings = new ArrayList<String>(); 
+    List<String> listofstrings = new ArrayList<String>();
+    List<String> listofmeta = new ArrayList<String>();
     String separator = ",\n";
     for (final String column : table.getColumns() ) {
       listofstrings.add("    " + column + "=" + copyFrom + tableName + "." + column );
+      
+      if ( addMetadata && !column.equals( table.getKey()) ) {
+    	  listofmeta.add("    " + "time_" + column + "=" + "current_timestamp" );
+      }
     }
-    finalstring = StringUtils.join( listofstrings, separator );
+    List<String> orderList = new ArrayList<String>(listofstrings);
+    if (addMetadata) orderList.addAll(listofmeta);    
+    finalstring = StringUtils.join( orderList, separator );
     out.println(finalstring);
   }
   
   private void insertFields(final PrintStream out, final FullTextTable table,
-		  final String tableName, final String copyFrom ) {
+		  final String tableName, final String copyFrom, final boolean addMetadata ) {
 	String finalstring = new String();
-    List<String> listofstrings = new ArrayList<String>(); 
+    List<String> listofstrings = new ArrayList<String>();
+    List<String> listofmeta = new ArrayList<String>();
     listofstrings.add(0, copyFrom + tableName + "." + table.getKey());
     String separator = ", ";
     for (final String column : table.getColumns() ) {
       listofstrings.add( copyFrom + tableName + "." + column );
+      
+	  if ( addMetadata && !column.equals( table.getKey()) ) {
+		  //String timestampField = addTimestamp( columnName );
+		  //listofmeta.add( addCheckedField(timestampField, timestamptype.getHiveType(), true ));
+		  listofmeta.add( "current_timestamp" );
+	  }
+      
     }
-    finalstring = StringUtils.join( listofstrings, separator );
+    List<String> orderList = new ArrayList<String>(listofstrings);
+    if (addMetadata) orderList.addAll(listofmeta);
+    finalstring = StringUtils.join( orderList, separator );
     out.println(finalstring);
   }  
   
