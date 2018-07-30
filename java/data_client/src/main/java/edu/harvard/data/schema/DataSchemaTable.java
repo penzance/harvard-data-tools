@@ -1,5 +1,6 @@
 package edu.harvard.data.schema;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -21,6 +22,13 @@ public abstract class DataSchemaTable {
 
   public abstract DataSchemaTable copy();
 
+  public List<String> getListofColumns() {
+	  final List<String> listOfColumns = new ArrayList<String>();
+	  for (final DataSchemaColumn column : getColumns()) {
+	      listOfColumns.add(column.getName());
+	  }
+	  return listOfColumns;
+  }
 
   public abstract String getLikeTable();
 
