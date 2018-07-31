@@ -58,8 +58,9 @@ public class FullTextCopyScriptGenerator {
     	generatePartialTable(out, tableName, "merged_");
     	generateFullTable(out, tableName, "merged_");
     } else {
-    	generatePartialTable( out, tableName, "in_" );
-        generateFullTable( out, tableName, "in_" );
+    	generateMergeTable(out, tableName, "in_");
+    	generatePartialTable( out, tableName, "merged_");
+    	generateFullTable(out, tableName, "merged_");
         out.println();
     }
   }
