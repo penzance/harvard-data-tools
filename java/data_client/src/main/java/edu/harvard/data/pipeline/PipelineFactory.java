@@ -337,6 +337,7 @@ public class PipelineFactory {
 	  final PipelineObjectBase obj = new PipelineObjectBase(config, "EBSConfiguration", "EbsConfiguration"); 
 	  obj.set("ebsOptimized", "true");
 	  obj.set("ebsBlockDeviceConfig", testEbsBlockDeviceConfig());
+	  allObjects.add(obj);	  
 	  return obj;
   }
   
