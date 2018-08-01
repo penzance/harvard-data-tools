@@ -104,7 +104,7 @@ public class PipelineFactory {
     if (config.getEmrConfiguration() != null ) {
       obj.set("configuration", testEmrHiveConfiguration() );
       obj.set("masterEbsConfiguration", testMasterEbsConfig() );
-      //obj.set("coreEbsConfiguration", testMasterEbsConfig() );
+      obj.set("coreEbsConfiguration", testMasterEbsConfig() );
     }
     allObjects.add(obj);
     return obj;
@@ -336,7 +336,7 @@ public class PipelineFactory {
   public PipelineObjectBase testMasterEbsConfig() {
 	  final PipelineObjectBase obj = new PipelineObjectBase(config, "EBSConfiguration", "EbsConfiguration"); 
 	  obj.set("ebsBlockDeviceConfig", testEbsBlockDeviceConfig());
-	  allObjects.add(obj);	  
+	  if (!allObjects.contains(obj)) allObjects.add(obj);	  
 	  return obj;
   }
   
@@ -344,7 +344,7 @@ public class PipelineFactory {
 	  final PipelineObjectBase obj = new PipelineObjectBase(config, "EbsBlkDeviceConfig", "EbsBlockDeviceConfig");
 	  obj.set("volumesPerInstance", "1");
 	  obj.set("volumeSpecification", testVolumeSpecConfig() );
-	  allObjects.add(obj);
+	  if (!allObjects.contains(obj)) allObjects.add(obj);	  
 	  return obj;
   }
   
@@ -352,7 +352,7 @@ public class PipelineFactory {
 	  final PipelineObjectBase obj = new PipelineObjectBase(config, "VolSpecification", "VolumeSpecification");
       obj.set("sizeInGB", "500");
       obj.set("volumeType", "standard");
-	  allObjects.add(obj);
+	  if (!allObjects.contains(obj)) allObjects.add(obj);	  
       return obj;
   }
   
