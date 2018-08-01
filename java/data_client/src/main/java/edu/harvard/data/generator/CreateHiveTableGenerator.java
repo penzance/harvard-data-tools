@@ -13,6 +13,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.amazonaws.services.s3.internal.S3DirectSpi;
+import com.amazonaws.services.s3.model.S3ObjectId;
+
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.schema.DataSchemaColumn;
@@ -74,6 +77,7 @@ public class CreateHiveTableGenerator {
 		  final String prefix, final boolean ignoreOwner, final boolean isTransactional, final String logFile,
 		  final boolean addMetadata ) {
   	  
+  	final AwsUtils aws = new AwsUtils();  
 	if (currentPhase != null) {
 	  final Map<String, DataSchemaTable> inTables = currentPhase.getSchema().getTables();
 	  final List<String> inTableKeys = new ArrayList<String>(inTables.keySet());
@@ -90,10 +94,12 @@ public class CreateHiveTableGenerator {
 	            if ( isTransactional ) {
 	                createTableTransactional( out, tableName, table, logFile, addMetadata );
 	            } else {
-	        	    out.println("hadoop fs -mkdir /current" + "/" + table.getTableName() );
-	        	    generateCopyStatement(out, tableName, table );
-	                createTable( out, tableName, table, "/current", logFile, addMetadata );
-	            	out.println();
+	                final S3ObjectId fulltextobj = AwsUtils.key(config.getFullTextLocation(), table.getTableName() + "/fulltable");
+	                if ( aws.keyExists(fulltextobj) ) {
+	                    generateCopyStatement(out, tableName, table );
+	                    createTable( out, tableName, table, "/current", logFile, addMetadata );
+	            	    out.println();
+	                }
 	            }
 	        }
 	      }
@@ -137,9 +143,10 @@ public class CreateHiveTableGenerator {
   
   private void generateCopyStatement( final PrintStream out, final String tableName,
 		  final DataSchemaTable table ) {
-    out.println("s3-dist-cp --src=" + AwsUtils.uri(config.getFullTextLocation())
-    		    + "/" + table.getTableName() + "/fulltable"
-    		    + " --dest=hdfs:///current" + "/" + table.getTableName() );
+	    out.println("hadoop fs -mkdir /current" + "/" + table.getTableName() );    	
+        out.println("s3-dist-cp --src=" + AwsUtils.uri(config.getFullTextLocation())
+    	 	      + "/" + table.getTableName() + "/fulltable"
+    		      + " --dest=hdfs:///current" + "/" + table.getTableName() );
   }
 
   private void createTable(final PrintStream out, final String tableName,
