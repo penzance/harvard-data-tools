@@ -104,7 +104,7 @@ public class PipelineFactory {
     if (config.getEmrConfiguration() != null ) {
       obj.set("configuration", testEmrHiveConfiguration() );
       obj.set("masterEbsConfiguration", testMasterEbsConfig() );
-      obj.set("coreEbsConfiguration", testMasterEbsConfig() );
+      //obj.set("coreEbsConfiguration", testMasterEbsConfig() );
     }
     allObjects.add(obj);
     return obj;
@@ -337,7 +337,6 @@ public class PipelineFactory {
 	  final PipelineObjectBase obj = new PipelineObjectBase(config, "EBSConfiguration", "EbsConfiguration"); 
 	  obj.set("ebsOptimized", "true");
 	  obj.set("ebsBlockDeviceConfig", testEbsBlockDeviceConfig());
-	  allObjects.add(obj);
 	  return obj;
   }
   
