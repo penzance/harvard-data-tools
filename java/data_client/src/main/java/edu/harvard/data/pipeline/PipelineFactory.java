@@ -103,8 +103,9 @@ public class PipelineFactory {
     }
     if (config.getEmrConfiguration() != null ) {
       obj.set("configuration", testEmrHiveConfiguration() );
-      obj.set("masterEbsConfiguration", testMasterEbsConfig() );
-      obj.set("coreEbsConfiguration", testMasterEbsConfig() );
+      obj.set("EbsRootVolumeSize", "500" );
+      //obj.set("masterEbsConfiguration", testMasterEbsConfig() );
+      //obj.set("coreEbsConfiguration", testMasterEbsConfig() );
     }
     allObjects.add(obj);
     return obj;
