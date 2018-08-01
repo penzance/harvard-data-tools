@@ -342,7 +342,7 @@ public class PipelineFactory {
   }
   
   public PipelineObjectBase testEbsBlockDeviceConfig() {
-	  final PipelineObjectBase obj = new PipelineObjectBase(config, "EbsBlockDeviceConfig", "EbsBlockDeviceConfig");
+	  final PipelineObjectBase obj = new PipelineObjectBase(config, "EbsBlkDeviceConfig", "EbsBlockDeviceConfig");
 	  obj.set("volumesPerInstance", "1");
 	  obj.set("volumeSpecification", testVolumeSpecConfig() );
 	  allObjects.add(obj);
@@ -350,7 +350,7 @@ public class PipelineFactory {
   }
   
   public PipelineObjectBase testVolumeSpecConfig() {
-	  final PipelineObjectBase obj = new PipelineObjectBase(config, "VolumeSpecification", "VolumeSpecification");
+	  final PipelineObjectBase obj = new PipelineObjectBase(config, "VolSpecification", "VolumeSpecification");
       obj.set("sizeInGB", "500");
       obj.set("volumeType", "standard");
 	  allObjects.add(obj);
