@@ -45,7 +45,7 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     final Phase0Syllabus syllabus = new Phase0Syllabus(format, values);
     final List<Phase0Syllabus> syllabi = new ArrayList<Phase0Syllabus>();
     syllabi.add(syllabus);
-    tables.put("CourseCatalog", syllabi);
+    tables.put("Syllabus", syllabi);
 
     // SyllabusBody
     final Phase0SyllabusBody syllabusbody = new Phase0SyllabusBody(format, values);
@@ -87,79 +87,94 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
   public void verifyParser(final Map<String, Object> values,
       final Map<String, List<? extends DataTable>> tables) throws VerificationException {
     // Start
-	final List<? extends DataTable> coursecatalogs = tables.get("CourseCatalog");
-	final List<? extends DataTable> classes = tables.get("Classes");
-	final List<? extends DataTable> coursemap = tables.get("CourseMap");
-	final List<? extends DataTable> primecourseenrollments = tables.get("PrimeCourseEnroll");
-	final List<? extends DataTable> courseenrollments = tables.get("CourseEnroll");
+	final List<? extends DataTable> syllabi = tables.get("Syllabus");
+	final List<? extends DataTable> sylbody = tables.get("SyllabusBody");
+	final List<? extends DataTable> syllink = tables.get("SyllabusLink");
+	final List<? extends DataTable> sylnamelookup = tables.get("SyllabusNameLookup");
+	final List<? extends DataTable> syldelta = tables.get("SyllabusDelta");
+	final List<? extends DataTable> sylfiles = tables.get("SyllabusFiles");
 
-	final Map<String, Object> parsedCourseCatalogs = coursecatalogs.get(0).getFieldsAsMap();
-	final Map<String, Object> parsedClasses = classes.get(0).getFieldsAsMap();
-	final Map<String, Object> parsedCourseMap = coursemap.get(0).getFieldsAsMap();
-	final Map<String, Object> parsedPrimeCourseEnrollments = primecourseenrollments.get(0).getFieldsAsMap();
-	final Map<String, Object> parsedCourseEnrollments = courseenrollments.get(0).getFieldsAsMap();
+
+	final Map<String, Object> parsedSyllabi = syllabi.get(0).getFieldsAsMap();
+	final Map<String, Object> parsedSylbody = sylbody.get(0).getFieldsAsMap();
+	final Map<String, Object> parsedSyllink = syllink.get(0).getFieldsAsMap();
+	final Map<String, Object> parsedSylnamelookup = sylnamelookup.get(0).getFieldsAsMap();
+	final Map<String, Object> parsedSyldelta = syldelta.get(0).getFieldsAsMap();
+	final Map<String, Object> parsedSylfiles = sylfiles.get(0).getFieldsAsMap();
+
 	
-	// Course Catalogs
-	if (dataproduct.equals("CourseCatalog")) {
+	// Syllabi
+	if (dataproduct.equals("Syllabus")) {
 		
 	    try {
-		    compareMaps(values, parsedCourseCatalogs);
+		    compareMaps(values, parsedSyllabi);
 	    } catch (final VerificationException e) {
 	        log.error("Failed to verify JSON document. " + e.getMessage());
 	        log.error("Original map: " + values);
-	        log.error("Parsed map:   " + parsedCourseCatalogs);
+	        log.error("Parsed map:   " + parsedSyllabi);
 	        throw e;			
 	    }
 	}
-	// Classes
-	else if (dataproduct.equals("Classes")) {
+	// Syllabus Body
+	else if (dataproduct.equals("SyllabusBody")) {
 		
 		try {	
-			compareMaps(values, parsedClasses);		
+			compareMaps(values, parsedSylbody);		
 		} catch (final VerificationException e) {
 		    log.error("Failed to verify JSON document. " + e.getMessage());
 		    log.error("Original map: " + values);
-		    log.error("Parsed map:   " + parsedClasses);
+		    log.error("Parsed map:   " + parsedSylbody);
 		    throw e;				
 		}
 	}
-	// CourseMap
-	else if (dataproduct.equals("CourseMap")) {
+	// SyllabusLink
+	else if (dataproduct.equals("SyllabusLink")) {
 		
 		try {
-			compareMaps(values, parsedCourseMap);
+			compareMaps(values, parsedSyllink);
 		} catch (final VerificationException e) {
 		    log.error("Failed to verify JSON document. " + e.getMessage());
 		    log.error("Original map: " + values);
-		    log.error("Parsed map:   " + parsedCourseMap);
+		    log.error("Parsed map:   " + parsedSyllink);
 		    throw e;
 		}
 	}
-	// Prime Course Enroll
-	else if (dataproduct.equals("PrimeCourseEnroll")) {
+	// Syllabus Name Lookup
+	else if (dataproduct.equals("SyllabusNameLookup")) {
 
 		try {
-			compareMaps(values, parsedPrimeCourseEnrollments);
+			compareMaps(values, parsedSylnamelookup);
 		} catch (final VerificationException e) {
 		    log.error("Failed to verify JSON document. " + e.getMessage());
 		    log.error("Original map: " + values);
-		    log.error("Parsed map:   " + parsedPrimeCourseEnrollments);
+		    log.error("Parsed map:   " + parsedSylnamelookup);
 		    throw e;			
 		}
 	}
-	// Course Enroll
-	else if (dataproduct.equals("CourseEnroll")) {
+	// Syllabus Delta
+	else if (dataproduct.equals("SyllabusDelta")) {
 
 		try {
-			compareMaps(values, parsedCourseEnrollments);
+			compareMaps(values, parsedSyldelta);
 		} catch (final VerificationException e) {
 		    log.error("Failed to verify JSON document. " + e.getMessage());
 		    log.error("Original map: " + values);
-		    log.error("Parsed map:   " + parsedCourseEnrollments);
+		    log.error("Parsed map:   " + parsedSyldelta);
 		    throw e;			
 		}
 	}	
-	
+	// Syllabus Files
+	else if (dataproduct.equals("SyllabusFiles")) {
+
+		try {
+			compareMaps(values, parsedSylfiles);
+		} catch (final VerificationException e) {
+		    log.error("Failed to verify JSON document. " + e.getMessage());
+		    log.error("Original map: " + values);
+		    log.error("Parsed map:   " + parsedSylfiles);
+		    throw e;			
+		}
+	}	
   }
 
   @SuppressWarnings("unchecked")
