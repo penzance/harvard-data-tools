@@ -67,7 +67,7 @@ public class InputParser {
     this.inputObj = inputObj;
     this.key = inputObj.getKey();
 	this.filename = key.substring(key.lastIndexOf("/") + 1);	  
-    this.dataproductPrefix = "PrepSIS-";
+    this.dataproductPrefix = "PrepCanvasRest-";
     this.dataproductFiletype = ".json.gz";
     this.currentDataProduct = getDataProduct();
     this.syllabusOutputDir = AwsUtils.key(outputLocation, "Syllabus");
@@ -139,10 +139,10 @@ public class InputParser {
     	try (
     	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
     	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
-    	    	TableWriter<Phase0Syllabus> catalogs = new TableWriter<Phase0Syllabus>(Phase0Syllabus.class, outFormat,
+    	    	TableWriter<Phase0Syllabus> syllabi = new TableWriter<Phase0Syllabus>(Phase0Syllabus.class, outFormat,
     	            dataproductFile);) {
     		for (final Map<String, List<? extends DataTable>> tables : in) {
-    	              catalogs.add((Phase0Syllabus) tables.get("Syllabus").get(0));
+    			  syllabi.add((Phase0Syllabus) tables.get("Syllabus").get(0));
     		}
     	}
 	} else if (currentDataProduct.equals("SyllabusBody")) {
@@ -150,10 +150,10 @@ public class InputParser {
     	try (
     	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
     	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
-    	    	TableWriter<Phase0SyllabusBody> classes = new TableWriter<Phase0SyllabusBody>(Phase0SyllabusBody.class, outFormat,
+    	    	TableWriter<Phase0SyllabusBody> sylbody = new TableWriter<Phase0SyllabusBody>(Phase0SyllabusBody.class, outFormat,
     	                dataproductFile);) {
     		for (final Map<String, List<? extends DataTable>> tables : in) {
-    			  classes.add((Phase0SyllabusBody) tables.get("SyllabusBody").get(0));
+    			  sylbody.add((Phase0SyllabusBody) tables.get("SyllabusBody").get(0));
     		}
     	}
 	} else if (currentDataProduct.equals("SyllabusLink")) {
@@ -161,10 +161,10 @@ public class InputParser {
     	try (
     	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
     	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
-    	    	TableWriter<Phase0SyllabusLink> coursemap = new TableWriter<Phase0SyllabusLink>(Phase0SyllabusLink.class, outFormat,
+    	    	TableWriter<Phase0SyllabusLink> syllink = new TableWriter<Phase0SyllabusLink>(Phase0SyllabusLink.class, outFormat,
     	                dataproductFile);) {
     		for (final Map<String, List<? extends DataTable>> tables : in) {
-    			coursemap.add((Phase0SyllabusLink) tables.get("SyllabusLink").get(0));
+    			  syllink.add((Phase0SyllabusLink) tables.get("SyllabusLink").get(0));
     		}
     	}
 	} else if (currentDataProduct.equals("SyllabusNameLookup")) {
@@ -172,10 +172,10 @@ public class InputParser {
     	try (
     	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
     	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
-    	    	TableWriter<Phase0SyllabusNameLookup> primeenroll = new TableWriter<Phase0SyllabusNameLookup>(Phase0SyllabusNameLookup.class, outFormat,
+    	    	TableWriter<Phase0SyllabusNameLookup> sylnamelookup = new TableWriter<Phase0SyllabusNameLookup>(Phase0SyllabusNameLookup.class, outFormat,
     	                dataproductFile);) {
     		for (final Map<String, List<? extends DataTable>> tables : in) {
-    			  primeenroll.add((Phase0SyllabusNameLookup) tables.get("SyllabusNameLookup").get(0));
+    			  sylnamelookup.add((Phase0SyllabusNameLookup) tables.get("SyllabusNameLookup").get(0));
     		}
     	}			
 	} else if (currentDataProduct.equals("SyllabusDelta")) {
@@ -183,10 +183,10 @@ public class InputParser {
     	try (
     	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
     	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
-    	    	TableWriter<Phase0SyllabusDelta> enroll = new TableWriter<Phase0SyllabusDelta>(Phase0SyllabusDelta.class, outFormat,
+    	    	TableWriter<Phase0SyllabusDelta> syldelta = new TableWriter<Phase0SyllabusDelta>(Phase0SyllabusDelta.class, outFormat,
     	                dataproductFile);) {
     		for (final Map<String, List<? extends DataTable>> tables : in) {
-    		      enroll.add((Phase0SyllabusDelta) tables.get("SyllabusDelta").get(0));
+    		      syldelta.add((Phase0SyllabusDelta) tables.get("SyllabusDelta").get(0));
     		}
     	}			
 	} else if (currentDataProduct.equals("SyllabusFiles")) {
@@ -194,10 +194,10 @@ public class InputParser {
     	try (
     	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
     	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
-    	    	TableWriter<Phase0SyllabusFiles> enroll = new TableWriter<Phase0SyllabusFiles>(Phase0SyllabusFiles.class, outFormat,
+    	    	TableWriter<Phase0SyllabusFiles> sylfiles = new TableWriter<Phase0SyllabusFiles>(Phase0SyllabusFiles.class, outFormat,
     	                dataproductFile);) {
     		for (final Map<String, List<? extends DataTable>> tables : in) {
-    		      enroll.add((Phase0SyllabusFiles) tables.get("SyllabusFiles").get(0));
+    		      sylfiles.add((Phase0SyllabusFiles) tables.get("SyllabusFiles").get(0));
     		}
     	}			
 	}
