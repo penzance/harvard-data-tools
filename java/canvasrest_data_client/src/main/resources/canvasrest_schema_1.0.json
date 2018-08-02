@@ -2,13 +2,13 @@
   { "Syllabus": {
       "columns" : [ 
         {
-            "name": "course_id",
+            "name": "course_id_syllabus",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
         },
         {
-            "name": "course_id_canvas",
+            "name": "course_id_canvas_syllabus",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
@@ -54,13 +54,13 @@
     "SyllabusBody": {
       "columns" : [ 
         {
-            "name": "course_id",
+            "name": "course_id_syllabusbody",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
 	},
         {
-            "name": "course_id_canvas",
+            "name": "course_id_canvas_syllabusbody",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
@@ -82,13 +82,13 @@
     "SyllabusLink": {
       "columns" : [ 
         {
-            "name": "course_id",
+            "name": "course_id_syllabuslink",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
         },
         {
-            "name": "course_id_canvas",
+            "name": "course_id_canvas_syllabuslink",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
@@ -134,13 +134,7 @@
     "SyllabusNameLookup": {
       "columns" : [ 
         {
-            "name": "course_id",
-	    "type": "varchar",
-	    "length": 255,
-	    "description": ""
-        },
-        {
-            "name": "course_id_canvas",
+            "name": "course_id_sylnamelookup",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
@@ -186,13 +180,13 @@
     "SyllabusFiles": {
       "columns" : [ 
         {
-            "name": "course_id",
+            "name": "course_id_files",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
         },
         {
-            "name": "course_id_canvas",
+            "name": "course_id_canvas_files",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
@@ -250,13 +244,13 @@
     "SyllabusDelta": {
       "columns" : [ 
         {
-            "name": "course_id",
+            "name": "course_id_syllabusdelta",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
         },
         {
-            "name": "course_id_canvas",
+            "name": "course_id_canvas_syllabusdelta",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
