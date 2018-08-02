@@ -67,7 +67,7 @@ public class InputParser {
     this.inputObj = inputObj;
     this.key = inputObj.getKey();
 	this.filename = key.substring(key.lastIndexOf("/") + 1);	  
-    this.dataproductPrefix = "PrepCanvasRest-";
+    this.dataproductPrefix = "PrepCanvasRest_";
     this.dataproductFiletype = ".json.gz";
     this.currentDataProduct = getDataProduct();
     this.syllabusOutputDir = AwsUtils.key(outputLocation, "Syllabus");
