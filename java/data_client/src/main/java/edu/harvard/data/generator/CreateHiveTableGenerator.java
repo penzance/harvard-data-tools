@@ -51,7 +51,7 @@ public class CreateHiveTableGenerator {
         log.info("Creating Hive " + phaseFile + " file in " + dir);
         
         generateCreateTablesFile(out, i + 1, schemaVersions.getPhase(i), schemaVersions.getPhase(i + 1),
-            "/home/hadoop/" + fileBase + ".out");
+           config.getFullTextDir() + "/" + fileBase + ".out");
       }
     }
   }
