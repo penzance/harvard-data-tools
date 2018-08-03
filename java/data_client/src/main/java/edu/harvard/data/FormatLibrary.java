@@ -100,7 +100,7 @@ public class FormatLibrary {
   private static final CSVFormat INTERNAL_CSV_FORMAT = CSVFormat.TDF.withQuote(null).withEscape('/')
       .withNullString("\\N").withRecordSeparator("\n").withIgnoreSurroundingSpaces(false);
 
-  private static final CSVFormat INTERNAL_SIS_FORMAT = CSVFormat.TDF.withQuote(null).withEscape('/')
+  private static final CSVFormat INTERNAL_SIS_FORMAT = CSVFormat.TDF.withQuote('"').withEscape('/')
 	      .withNullString("null").withRecordSeparator("\n").withIgnoreSurroundingSpaces(false);  
   
   private static final String CANVAS_FILE_ENCODING = "UTF-8";
