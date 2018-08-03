@@ -150,7 +150,7 @@ public class DataConfig {
     this.identityRedshiftSchema = "pii";
     this.emrCodeDir = "/home/hadoop/code";
     this.emrLogDir = "/home/hadoop";
-    this.fullTextDir = "/home/hadoop/full_text";
+    this.fullTextDir = "/tmp/full_text";
     this.hdfsBase = "/phase_";
     this.hdfsVerifyBase = "/verify" + this.hdfsBase;
     this.ec2GitDir = "/home/ec2-user/harvard-data-tools";

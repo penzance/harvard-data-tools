@@ -68,7 +68,7 @@ public class FullTextCopyScriptGenerator {
   private void generatePartialTable( final PrintStream out, final String tableName, 
 		  final String outputFrom ) {
 	final FullTextTable table = textSchema.get(tableName);
-    out.println("mkdir -p " + config.getEmrLogDir() + "/full_text/" + tableName);
+    out.println("mkdir -p " + config.getFullTextDir() + "/" + tableName);
     for (final String column : table.getColumns()) {
       final String filename = config.getFullTextDir() + "/" + tableName + "/" + column;
       out.print("sudo hive -S -e \"SELECT " + table.getKey() + ", ");
@@ -82,7 +82,7 @@ public class FullTextCopyScriptGenerator {
   private void generateFullTable( final PrintStream out, final String tableName, 
 		  final String outputFrom ) {
     final FullTextTable table = textSchema.get(tableName);
-    out.println("mkdir -p " + config.getEmrLogDir() + "/full_text/" + tableName + "/fulltable");
+    out.println("mkdir -p " + config.getFullTextDir() + "/" + tableName + "/fulltable");
     final String filename = config.getFullTextDir() + "/" + tableName + "/fulltable/" + tableName;
     out.print("sudo hive -S -e \"SELECT " );
     extractFields(out, table, tableName, outputFrom, true );
