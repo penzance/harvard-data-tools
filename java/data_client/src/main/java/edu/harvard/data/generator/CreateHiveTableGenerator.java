@@ -51,7 +51,7 @@ public class CreateHiveTableGenerator {
         log.info("Creating Hive " + phaseFile + " file in " + dir);
         
         generateCreateTablesFile(out, i + 1, schemaVersions.getPhase(i), schemaVersions.getPhase(i + 1),
-           config.getFullTextDir() + "/" + fileBase + ".out");
+           config.getEmrLogDir() + "/" + fileBase + ".out");
       }
     }
   }
@@ -99,6 +99,8 @@ public class CreateHiveTableGenerator {
 	                    generateCopyStatement(out, tableName, table );
 	                    createTable( out, tableName, table, "/current", logFile, addMetadata );
 	            	    out.println();
+	                } else {
+	                	out.println("echo \"Full text table for " + table.getTableName() + " does not exist.\"" + logFile + " 2>&1");
 	                }
 	            }
 	        }
