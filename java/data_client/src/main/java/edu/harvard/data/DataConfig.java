@@ -376,6 +376,10 @@ public class DataConfig {
   public String getEmrLogFile(final String stepId) {
     return emrLogDir + "/" + stepId + ".out";
   }
+  
+  public String getEmrLogDir() {
+	return emrLogDir;
+  }
 
   public String getDatasetName() {
     return datasetName;
