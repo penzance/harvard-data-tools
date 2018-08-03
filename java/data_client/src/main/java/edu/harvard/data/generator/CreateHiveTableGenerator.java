@@ -100,7 +100,7 @@ public class CreateHiveTableGenerator {
 	                    createTable( out, tableName, table, "/current", logFile, addMetadata );
 	            	    out.println();
 	                } else {
-	                	out.println("echo \"Full text table for " + table.getTableName() + " does not exist.\"" + logFile + " 2>&1");
+	                	out.println("echo \"Full text table for " + table.getTableName() + " does not exist.\"" + " >> " + logFile + " 2>&1");
 	                }
 	            }
 	        }
