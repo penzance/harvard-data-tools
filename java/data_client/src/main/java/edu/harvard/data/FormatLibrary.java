@@ -98,7 +98,7 @@ public class FormatLibrary {
       .withNullString("\\N").withRecordSeparator("\n").withIgnoreSurroundingSpaces(false);
 
   private static final CSVFormat INTERNAL_CSV_FORMAT = CSVFormat.TDF.withQuote('"').withEscape('/')
-      .withNullString("\\N").withRecordSeparator("\n").withIgnoreSurroundingSpaces(false);
+      .withNullString("\\N").withRecordSeparator("\r\n").withIgnoreSurroundingSpaces(false);
 
   private static final CSVFormat INTERNAL_SIS_FORMAT = CSVFormat.TDF.withQuote('"').withEscape('/')
 	      .withNullString("null").withRecordSeparator("\n").withIgnoreSurroundingSpaces(false);  
