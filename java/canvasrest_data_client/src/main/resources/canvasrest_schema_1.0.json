@@ -140,6 +140,12 @@
 	    "description": ""
         },
         {
+            "name": "course_id_canvas_sylnamelookup",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
             "name": "sylnamelookup_id",
 	    "type": "varchar",
 	    "length": 255,
