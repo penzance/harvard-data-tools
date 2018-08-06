@@ -97,7 +97,7 @@ public class CreateHiveTableGenerator {
 	                final S3ObjectId fulltextobj = AwsUtils.key(config.getFullTextLocation(), table.getTableName() + "/fulltable");
 	                if ( aws.keyExists(fulltextobj) ) {
 	                    generateCopyStatement(out, tableName, table );
-	                    createTable( out, tableName, table, "/current", logFile, addMetadata );
+	                    createTablePartial( out, tableName, table, "/current", logFile, addMetadata );
 	            	    out.println();
 	                } else {
 	                	out.println("echo \"Full text table for " + table.getTableName() + " does not exist.\"" + " >> " + logFile + " 2>&1");
@@ -163,6 +163,22 @@ public class CreateHiveTableGenerator {
     out.println();
     out.println("\" >> " + logFile + " 2>&1");
   }
+
+  private void createTablePartial(final PrintStream out, final String tableName,
+	      final DataSchemaTable table, final String locationVar, final String logFile, final boolean addMetadata ) {
+	final FullTextTable fulltexttable = textSchema.get( table.getTableName() );
+	final List<String> textfieldsonly = fulltexttable.getColumns();
+	textfieldsonly.add(0, fulltexttable.getKey());
+	out.println("sudo hive -e \"");
+	out.println("  CREATE EXTERNAL TABLE " + tableName + " (");
+	listFields(out, table, textfieldsonly, addMetadata );
+	out.println("    )");
+	out.println("    ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' LINES TERMINATED By '\\n'");
+	out.println("    STORED AS TEXTFILE");
+	out.println("    LOCATION '" + locationVar + "/" + table.getTableName() + "/';");
+	out.println();
+	out.println("\" >> " + logFile + " 2>&1");
+  }  
   
   private void createTableTransactional(final PrintStream out, final String tableName,
 	      final DataSchemaTable table, final String logFile, final boolean addMetadata ) {
