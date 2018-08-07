@@ -51,7 +51,7 @@ public class FullTextCopyScriptGenerator {
   private void generateTable(final PrintStream out, final String tableName) {
     
 	if (dataIndex.isPartial(tableName)) {
-	    out.println("if ! hadoop fs -test -e " + "/current" + "; then ");	       
+	    out.println("if hadoop fs -test -e " + "/current" + "; then ");	       
     	generateMergeTable(out, tableName, "cur_");
         out.println("fi");
     	generateMergeTable(out, tableName, "in_");
