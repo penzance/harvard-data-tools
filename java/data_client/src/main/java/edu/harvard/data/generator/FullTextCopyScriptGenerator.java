@@ -37,7 +37,7 @@ public class FullTextCopyScriptGenerator {
       boolean data = false;
       for (final String table : textSchema.tableNames()) {
         if (dataIndex.containsTable(table)) {
-          generateTable(out, table);
+          generateTable(out, table, config.getEmrLogDir() + "/full_text_copy.out");
           data = true;
         }
       }
@@ -48,17 +48,17 @@ public class FullTextCopyScriptGenerator {
     }
   }
 
-  private void generateTable(final PrintStream out, final String tableName) {
+  private void generateTable(final PrintStream out, final String tableName, final String logFile ) {
     
 	if (dataIndex.isPartial(tableName)) {
 	    out.println("if hadoop fs -test -e " + "/current" + "; then ");	       
-    	generateMergeTable(out, tableName, "cur_");
+    	generateMergeTable(out, tableName, "cur_", logFile );
         out.println("fi");
-    	generateMergeTable(out, tableName, "in_");
+    	generateMergeTable(out, tableName, "in_", logFile );
     	generatePartialTable(out, tableName, "merged_");
     	generateFullTable(out, tableName, "merged_");
     } else {
-    	generateMergeTable(out, tableName, "in_");
+    	generateMergeTable(out, tableName, "in_", logFile );
     	generatePartialTable( out, tableName, "merged_");
     	generateFullTable(out, tableName, "merged_");
         out.println();
@@ -90,9 +90,10 @@ public class FullTextCopyScriptGenerator {
     out.println("gzip " + filename);
   }
   
-  private void generateMergeTable( final PrintStream out, final String tableName, final String copyFrom ) {
+  private void generateMergeTable( final PrintStream out, final String tableName, final String copyFrom,
+		  final String logFile ) {
 	final FullTextTable table = textSchema.get(tableName);
-    out.println("sudo hive -S -e \"");
+    out.println("sudo hive -e \"");
 	out.println("  MERGE INTO merged_" + tableName );
 	out.println("  USING " + copyFrom + tableName + " ON merged_" + tableName
 			    + "." + table.getKey() + " = " + copyFrom + tableName + "." + table.getKey() );
@@ -102,7 +103,7 @@ public class FullTextCopyScriptGenerator {
 	insertFields(out, table, tableName, copyFrom, true );
 	out.println("    ); ");
 	out.println("");
-    out.println("\"");
+	out.println("\" >> " + logFile + " 2>&1");    
   }
   
   private void extractFields( final PrintStream out, final FullTextTable table,
