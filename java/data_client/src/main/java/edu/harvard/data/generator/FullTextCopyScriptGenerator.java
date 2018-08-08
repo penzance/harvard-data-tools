@@ -212,9 +212,9 @@ public class FullTextCopyScriptGenerator {
       listofstrings.add( copyFrom + tableName + "." + column );
       
 	  if ( addMetadata && !column.equals( table.getKey()) ) {
-		  //String timestampField = addTimestamp( columnName );
-		  //listofmeta.add( addCheckedField(timestampField, timestamptype.getHiveType(), true ));
-		  listofmeta.add( "current_timestamp" );
+		  if (copyFrom.equals("cur_") ) {
+			  listofmeta.add( copyFrom + tableName + "." + addTimestamp( column) );
+		  } else listofmeta.add( "current_timestamp" );
 	  }
       
     }
