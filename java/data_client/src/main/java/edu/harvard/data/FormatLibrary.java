@@ -95,7 +95,7 @@ public class FormatLibrary {
   public static final String LOCAL_DATE_FORMAT_STRING = "yyyy-MM-dd Z";
   public static final String JSON_DATE_FORMAT_STRING = "yyyy-MM-dd'T'HH:mm:ssZ";
 
-  private static final CSVFormat CANVAS_CSV_FORMAT = CSVFormat.TDF.withQuote(null)
+  private static final CSVFormat CANVAS_CSV_FORMAT = CSVFormat.TDF.withQuote(null).withEscape('/')
       .withNullString("\\N").withRecordSeparator("\n").withIgnoreSurroundingSpaces(false);
 
   private static final CSVFormat INTERNAL_CSV_FORMAT = CSVFormat.TDF.withQuote(null).withEscape('/')
