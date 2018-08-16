@@ -18,6 +18,7 @@ import com.amazonaws.services.s3.model.S3ObjectId;
 
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
+import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.schema.DataSchemaColumn;
 import edu.harvard.data.schema.DataSchemaTable;
 import edu.harvard.data.schema.DataSchemaType;
@@ -153,12 +154,18 @@ public class CreateHiveTableGenerator {
 
   private void createTable(final PrintStream out, final String tableName,
       final DataSchemaTable table, final String locationVar, final String logFile, final boolean addMetadata ) {
+
+      final FormatLibrary formatLibrary = new FormatLibrary();
+      final boolean isQuotedFormat = formatLibrary.getFormat(config.getPipelineFormat())
+						  .getCsvFormat()
+						  .isQuoteCharacterSet();
+	  
 	out.println("sudo hive -e \"");
     out.println("  CREATE EXTERNAL TABLE " + tableName + " (");
     listFields(out, table, table.getListofColumns(), addMetadata );
     out.println("    )");
     //out.println("    ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' LINES TERMINATED By '\\n'");
-    addRowFormat(out, true);
+    addRowFormat(out, isQuotedFormat);
     out.println("    STORED AS TEXTFILE");
     out.println("    LOCATION '" + locationVar + "/" + table.getTableName() + "/';");
     out.println();
@@ -167,6 +174,12 @@ public class CreateHiveTableGenerator {
 
   private void createTablePartial(final PrintStream out, final String tableName,
 	      final DataSchemaTable table, final String locationVar, final String logFile, final boolean addMetadata ) {
+	
+	final FormatLibrary formatLibrary = new FormatLibrary();
+	final boolean isQuotedFormat = formatLibrary.getFormat(config.getPipelineFormat())
+						    .getCsvFormat()
+						    .isQuoteCharacterSet();
+	
 	final FullTextTable fulltexttable = textSchema.get( table.getTableName() );
 	final List<String> textfieldsonly = fulltexttable.getColumns();
 	textfieldsonly.add(0, fulltexttable.getKey());
@@ -175,7 +188,7 @@ public class CreateHiveTableGenerator {
 	listFields(out, table, textfieldsonly, addMetadata );
 	out.println("    )");
 	//out.println("    ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' LINES TERMINATED By '\\n'");
-	addRowFormat(out, true);
+	addRowFormat(out, isQuotedFormat);
 	out.println("    STORED AS TEXTFILE");
 	out.println("    LOCATION '" + locationVar + "/" + table.getTableName() + "/';");
 	out.println();
@@ -248,6 +261,7 @@ public class CreateHiveTableGenerator {
   }
   
   private void addRowFormat( final PrintStream out, final boolean quotedFields ) {
+	  
 	  if (quotedFields) {
 		  out.println("    ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'");
 		  out.println("    WITH SERDEPROPERTIES (");
