@@ -11,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
+import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.pipeline.InputTableIndex;
 import edu.harvard.data.schema.fulltext.FullTextSchema;
 import edu.harvard.data.schema.fulltext.FullTextTable;
@@ -176,7 +177,21 @@ public class FullTextCopyScriptGenerator {
   }
 
   private String addChecksum( final String fulltextfield ) {
-	  return ("md5(" + fulltextfield + ")");
+	final FormatLibrary formatLibrary = new FormatLibrary();
+	final boolean isQuotedFormat = formatLibrary.getFormat(config.getPipelineFormat())
+							    .getCsvFormat()
+							    .isQuoteCharacterSet();	  
+	String checkSumString = new String();
+	
+	if (isQuotedFormat) {
+		// If quoted, then remove quotes and replace escaped double quotes with single quotes
+	    checkSumString = ("md5(substr(regexp_replace(" + fulltextfield + ", '\\" + "\"" + "\\" + "\"" + "', '" + "\\" + "\"" + "'), " +
+	    				  "2, length(regexp_replace(" + fulltextfield + ", '\\" + "\"" + "\\" + "\"" + "', '" + "\\" + "\"" +
+	    		          "')) -2) )");
+	} else {
+	    checkSumString = ("md5(" + fulltextfield + ")");
+	}
+	return checkSumString;
   }
   
   private String addTimestamp(final String fulltextfield ) {
