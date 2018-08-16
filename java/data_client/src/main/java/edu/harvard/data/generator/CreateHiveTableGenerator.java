@@ -157,7 +157,8 @@ public class CreateHiveTableGenerator {
     out.println("  CREATE EXTERNAL TABLE " + tableName + " (");
     listFields(out, table, table.getListofColumns(), addMetadata );
     out.println("    )");
-    out.println("    ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' LINES TERMINATED By '\\n'");
+    //out.println("    ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' LINES TERMINATED By '\\n'");
+    addRowFormat(out, true);
     out.println("    STORED AS TEXTFILE");
     out.println("    LOCATION '" + locationVar + "/" + table.getTableName() + "/';");
     out.println();
@@ -173,7 +174,8 @@ public class CreateHiveTableGenerator {
 	out.println("  CREATE EXTERNAL TABLE " + tableName + " (");
 	listFields(out, table, textfieldsonly, addMetadata );
 	out.println("    )");
-	out.println("    ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' LINES TERMINATED By '\\n'");
+	//out.println("    ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' LINES TERMINATED By '\\n'");
+	addRowFormat(out, true);
 	out.println("    STORED AS TEXTFILE");
 	out.println("    LOCATION '" + locationVar + "/" + table.getTableName() + "/';");
 	out.println();
@@ -243,6 +245,18 @@ public class CreateHiveTableGenerator {
 	} else {
 	    	return ("    " + columnName + " " + columnType);
 	}
+  }
+  
+  private void addRowFormat( final PrintStream out, final boolean quotedFields ) {
+	  if (quotedFields) {
+		  out.println("    ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'");
+		  out.println("    WITH SERDEPROPERTIES (");
+		  out.println("       'separatorChar' = '\\t',");
+		  out.println("       'escapeChars' = '\\'");
+		  out.println("    )");
+	  } else {
+		  out.println("    ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' LINES TERMINATED By '\\n'");
+	  }
   }
   
 }
