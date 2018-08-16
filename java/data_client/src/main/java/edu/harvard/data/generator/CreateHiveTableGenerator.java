@@ -265,8 +265,8 @@ public class CreateHiveTableGenerator {
 	  if (quotedFields) {
 		  out.println("    ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'");
 		  out.println("    WITH SERDEPROPERTIES (");
-		  out.println("       'separatorChar' = '\\t',");
-		  out.println("       'escapeChars' = '\\\\'");
+		  out.println("       'separatorChar' = '\\\\t',");
+		  out.println("       'escapeChar' = '\\\\\\\\'");
 		  out.println("    )");
 	  } else {
 		  out.println("    ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' LINES TERMINATED By '\\n'");
