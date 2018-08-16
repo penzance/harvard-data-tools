@@ -98,7 +98,7 @@ public class FormatLibrary {
   private static final CSVFormat CANVAS_CSV_FORMAT = CSVFormat.TDF.withQuote(null)
       .withNullString("\\N").withRecordSeparator("\n").withIgnoreSurroundingSpaces(false);
 
-  private static final CSVFormat INTERNAL_CSV_FORMAT = CSVFormat.TDF.withQuote('"').withEscape('\\')
+  private static final CSVFormat INTERNAL_CSV_FORMAT = CSVFormat.TDF.withQuote('"')
       .withNullString("\\N").withRecordSeparator("\n").withIgnoreSurroundingSpaces(false);
 
   private static final CSVFormat INTERNAL_SIS_FORMAT = CSVFormat.TDF.withQuote('"').withEscape('/')

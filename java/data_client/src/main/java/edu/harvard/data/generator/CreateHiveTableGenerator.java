@@ -165,7 +165,7 @@ public class CreateHiveTableGenerator {
     listFields(out, table, table.getListofColumns(), addMetadata );
     out.println("    )");
     //out.println("    ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' LINES TERMINATED By '\\n'");
-    addRowFormat(out, isQuotedFormat);
+    addRowFormat(out, false);
     out.println("    STORED AS TEXTFILE");
     out.println("    LOCATION '" + locationVar + "/" + table.getTableName() + "/';");
     out.println();
@@ -188,7 +188,7 @@ public class CreateHiveTableGenerator {
 	listFields(out, table, textfieldsonly, addMetadata );
 	out.println("    )");
 	//out.println("    ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' LINES TERMINATED By '\\n'");
-	addRowFormat(out, isQuotedFormat);
+	addRowFormat(out, false);
 	out.println("    STORED AS TEXTFILE");
 	out.println("    LOCATION '" + locationVar + "/" + table.getTableName() + "/';");
 	out.println();
