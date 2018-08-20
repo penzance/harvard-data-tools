@@ -32,6 +32,7 @@ import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.TableFormat;
+import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.leases.LeaseRenewalException;
 import edu.harvard.data.leases.LeaseRenewalThread;
 import edu.harvard.data.pipeline.InputTableIndex;
@@ -98,7 +99,7 @@ public class IdentityMapHadoopJob {
   private void lookupEppnAndHuid(final IdentifierType mainIdentifier)
       throws SQLException, DataConfigurationException, IOException {
     log.info("Looking up any unknown EPPNs or HUIDs");
-    final TableFormat format = new FormatLibrary().getFormat(config.getPipelineFormat());
+    final TableFormat format = new FormatLibrary().getFormat( Format.DecompressedInternal );
     log.info("Main Identifier is " + mainIdentifier);
     final HuidEppnLookup lookup = new HuidEppnLookup(config, format, mainIdentifier);
 
