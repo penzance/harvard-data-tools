@@ -79,7 +79,7 @@ public class IdentityMapHadoopJob {
     final LeaseRenewalThread leaseThread = LeaseRenewalThread.setup(config.getLeaseDynamoTable(),
         config.getIdentityLease(), runId, config.getIdentityLeaseLengthSeconds());
     final IdentifierType mainIdentifier = config.getMainIdentifier();
-    hadoopConfig.set("format", Format.DecompressedInternal.getLabel() );
+    hadoopConfig.set("format", "decompressed_internal" );
     hadoopConfig.set("mainIdentifier", mainIdentifier.toString());
 
     final Job job = getIdentityMapJob(config);
