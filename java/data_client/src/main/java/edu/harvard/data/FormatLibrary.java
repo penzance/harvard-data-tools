@@ -11,7 +11,7 @@ public class FormatLibrary {
             "matterhorn"), DecompressedMatterhorn("decompressed_matterhorn"), CompressedInternal(
                 "compressed_internal"), DecompressedInternal("decompressed_internal"), Mediasites(
                     "mediasites"), DecompressedMediasites("decompressed_mediasites"), Sis(
-                    		"sis"), DecompressedSis("decompressed_sis");
+                    		"sis"), DecompressedSis("decompressed_sis"), DecompressedRest("decompressed_rest");
 
     private final String label;
 
@@ -49,6 +49,8 @@ public class FormatLibrary {
         return CompressedInternal;
       case "decompressed_internal":
         return DecompressedInternal;
+      case "decompressed_rest":
+          return DecompressedRest;        
       default:
         return Format.valueOf(label);
       }
@@ -81,6 +83,8 @@ public class FormatLibrary {
       return createCompressedInternalFormat();
     case DecompressedInternal:
       return createDecompressedInternalFormat();
+    case DecompressedRest:
+        return createDecompressedRestFormat();
     default:
       throw new RuntimeException("Unknown format " + format);
     }
@@ -102,6 +106,9 @@ public class FormatLibrary {
 
   private static final CSVFormat INTERNAL_SIS_FORMAT = CSVFormat.TDF.withQuote(null).withEscape('/')
 	      .withNullString("null").withRecordSeparator("\n").withIgnoreSurroundingSpaces(false);  
+ 
+  private static final CSVFormat INTERNAL_TDF_FORMAT = CSVFormat.TDF.withQuote('"')
+	      .withNullString("\\N").withRecordSeparator("\n").withIgnoreSurroundingSpaces(false);  
   
   private static final String CANVAS_FILE_ENCODING = "UTF-8";
   private static final String MATTERHORN_FILE_ENCODING = "UTF-8";
@@ -235,4 +242,15 @@ public class FormatLibrary {
     return format;
   }
 
+  private TableFormat createDecompressedRestFormat() {
+	    final TableFormat format = new TableFormat(Format.DecompressedRest);
+	    format.setTimestampFormat(new SimpleDateFormat(CANVAS_TIMESTAMP_FORMAT_STRING));
+	    format.setDateFormat(new SimpleDateFormat(CANVAS_DATE_FORMAT_STRING));
+	    format.setIncludeHeaders(false);
+	    format.setEncoding(CANVAS_FILE_ENCODING);
+	    format.setCsvFormat(INTERNAL_TDF_FORMAT);
+	    format.setCompression(TableFormat.Compression.None);
+	    return format;
+  }  
+  
 }
