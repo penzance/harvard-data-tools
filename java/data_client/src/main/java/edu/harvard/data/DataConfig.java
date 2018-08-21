@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.mortbay.log.Log;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
 
@@ -135,6 +136,8 @@ public class DataConfig {
   protected String codeManagerClass;
 
   private final Properties properties;
+  
+  private static final Logger log = LogManager.getLogger();
 
   public DataConfig(final List<? extends InputStream> streams, final boolean verify)
       throws IOException, DataConfigurationException {
@@ -280,7 +283,7 @@ public class DataConfig {
   protected String getConfigParameter(final String key, final boolean verify)
       throws DataConfigurationException {
     final String param = (String) properties.get(key);
-    Log.info( "Config Param: " + param + "Config Key: " + key + "Config verify: " + verify );
+    log.info( "Config Param: " + param + "Config Key: " + key + "Config verify: " + verify );
     if (verify && param == null) {
       throw new DataConfigurationException("Configuration file missing " + key);
     }
