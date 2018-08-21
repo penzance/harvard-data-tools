@@ -35,6 +35,8 @@ public abstract class HadoopJob {
     }
     this.hadoopConf = new Configuration();
     final TableFormat format = new FormatLibrary().getFormat( Format.fromLabel( Format.DecompressedInternal.getLabel() ) );
+    log.info( "pipeline format: " + config.getPipelineFormat() );
+    log.info( "format: " + Format.fromLabel( Format.DecompressedInternal.getLabel() ));
     hadoopConf.set("format", format.getFormat().toString() );
     hadoopConf.set("config", config.getPaths());
   }
