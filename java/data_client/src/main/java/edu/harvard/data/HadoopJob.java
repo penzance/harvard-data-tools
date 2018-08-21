@@ -35,7 +35,7 @@ public abstract class HadoopJob {
     }
     this.hadoopConf = new Configuration();
     final TableFormat format = new FormatLibrary().getFormat( Format.DecompressedInternal );
-    hadoopConf.set("format", format.getFormat().toString());
+    hadoopConf.set("format", "decompressed_internal");
     hadoopConf.set("config", config.getPaths());
   }
 
