@@ -6,8 +6,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.harvard.data.FormatLibrary.Format;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.logging.log4j.LogManager;
@@ -34,9 +32,7 @@ public abstract class HadoopJob {
       throw new DataConfigurationException(e);
     }
     this.hadoopConf = new Configuration();
-    final TableFormat format = new FormatLibrary().getFormat( Format.fromLabel( Format.DecompressedInternal.getLabel() ) );
-    log.info( "pipeline format: " + config.getPipelineFormat() );
-    log.info( "format: " + Format.fromLabel( Format.DecompressedInternal.getLabel() ));
+    final TableFormat format = new FormatLibrary().getFormat(config.getPipelineFormat());
     hadoopConf.set("format", format.getFormat().toString() );
     hadoopConf.set("config", config.getPaths());
   }

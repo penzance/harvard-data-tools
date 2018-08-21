@@ -21,7 +21,6 @@ import edu.harvard.data.AwsUtils;
 import edu.harvard.data.CodeManager;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.DataConfigurationException;
-import edu.harvard.data.FormatLibrary.Format;
 import edu.harvard.data.HadoopUtilities;
 import edu.harvard.data.NoInputDataException;
 import edu.harvard.data.leases.LeaseRenewalException;
@@ -90,7 +89,7 @@ public class IdentityScrubHadoopJob {
   private Job getJob(final String tableName, final Class<? extends IdentityScrubber<?>> cls)
       throws IOException, NoInputDataException {
     final Configuration hadoopConfig = new Configuration();
-    hadoopConfig.set("format", Format.fromLabel( Format.DecompressedInternal.getLabel() ).toString() );
+    hadoopConfig.set("format", config.getPipelineFormat().toString());
     hadoopConfig.set("config", config.getPaths());
     final Job job = Job.getInstance(hadoopConfig, tableName + "-scrubber");
     job.setJarByClass(IdentityScrubHadoopJob.class);
