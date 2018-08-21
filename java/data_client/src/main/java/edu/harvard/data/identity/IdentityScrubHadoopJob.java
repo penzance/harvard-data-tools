@@ -90,7 +90,7 @@ public class IdentityScrubHadoopJob {
   private Job getJob(final String tableName, final Class<? extends IdentityScrubber<?>> cls)
       throws IOException, NoInputDataException {
     final Configuration hadoopConfig = new Configuration();
-    hadoopConfig.set("format", "decompressed_internal" );
+    hadoopConfig.set("format", Format.fromLabel( Format.DecompressedInternal.getLabel() ).toString() );
     hadoopConfig.set("config", config.getPaths());
     final Job job = Job.getInstance(hadoopConfig, tableName + "-scrubber");
     job.setJarByClass(IdentityScrubHadoopJob.class);

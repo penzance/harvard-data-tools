@@ -34,8 +34,8 @@ public abstract class HadoopJob {
       throw new DataConfigurationException(e);
     }
     this.hadoopConf = new Configuration();
-    final TableFormat format = new FormatLibrary().getFormat( Format.DecompressedInternal );
-    hadoopConf.set("format", "decompressed_internal");
+    final TableFormat format = new FormatLibrary().getFormat( Format.fromLabel( Format.DecompressedInternal.getLabel() ) );
+    hadoopConf.set("format", format.getFormat().toString() );
     hadoopConf.set("config", config.getPaths());
   }
 
