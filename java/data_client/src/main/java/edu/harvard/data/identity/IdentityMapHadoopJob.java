@@ -101,7 +101,7 @@ public class IdentityMapHadoopJob {
   private void lookupEppnAndHuid(final IdentifierType mainIdentifier)
       throws SQLException, DataConfigurationException, IOException {
     log.info("Looking up any unknown EPPNs or HUIDs");
-    final TableFormat format = new FormatLibrary().getFormat( Format.DecompressedInternal );
+    final TableFormat format = new FormatLibrary().getFormat( Format.fromLabel( Format.DecompressedInternal.getLabel() ) );
     log.info("Main Identifier is " + mainIdentifier);
     final HuidEppnLookup lookup = new HuidEppnLookup(config, format, mainIdentifier);
 
