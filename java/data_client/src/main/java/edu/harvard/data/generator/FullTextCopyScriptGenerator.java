@@ -178,7 +178,7 @@ public class FullTextCopyScriptGenerator {
 
   private String addChecksum( final String fulltextfield ) {
 	final FormatLibrary formatLibrary = new FormatLibrary();
-	final boolean isQuotedFormat = formatLibrary.getFormat(config.getPipelineFormat())
+	final boolean isQuotedFormat = formatLibrary.getFormat(config.getFulltextFormat())
 							    .getCsvFormat()
 							    .isQuoteCharacterSet();	  
 	String checkSumString = new String();

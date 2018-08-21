@@ -156,7 +156,7 @@ public class CreateHiveTableGenerator {
       final DataSchemaTable table, final String locationVar, final String logFile, final boolean addMetadata ) {
 
       final FormatLibrary formatLibrary = new FormatLibrary();
-      final boolean isQuotedFormat = formatLibrary.getFormat(config.getPipelineFormat())
+      final boolean isQuotedFormat = formatLibrary.getFormat(config.getFulltextFormat())
 						  .getCsvFormat()
 						  .isQuoteCharacterSet();
 	  
@@ -176,7 +176,7 @@ public class CreateHiveTableGenerator {
 	      final DataSchemaTable table, final String locationVar, final String logFile, final boolean addMetadata ) {
 	
 	final FormatLibrary formatLibrary = new FormatLibrary();
-	final boolean isQuotedFormat = formatLibrary.getFormat(config.getPipelineFormat())
+	final boolean isQuotedFormat = formatLibrary.getFormat(config.getFulltextFormat())
 						    .getCsvFormat()
 						    .isQuoteCharacterSet();
 	
