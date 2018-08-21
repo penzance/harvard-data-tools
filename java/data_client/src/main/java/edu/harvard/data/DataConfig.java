@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.mortbay.log.Log;
+
 import com.amazonaws.services.s3.model.S3ObjectId;
 
 import edu.harvard.data.FormatLibrary.Format;
@@ -278,6 +280,7 @@ public class DataConfig {
   protected String getConfigParameter(final String key, final boolean verify)
       throws DataConfigurationException {
     final String param = (String) properties.get(key);
+    Log.info( "Config Param: " + param + "Config Key: " + key + "Config verify: " + verify );
     if (verify && param == null) {
       throw new DataConfigurationException("Configuration file missing " + key);
     }
