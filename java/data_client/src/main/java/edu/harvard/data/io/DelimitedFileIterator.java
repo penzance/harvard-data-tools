@@ -10,6 +10,8 @@ import java.util.Iterator;
 
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.harvard.data.DataTable;
 import edu.harvard.data.TableFormat;
@@ -52,6 +54,8 @@ public class DelimitedFileIterator<T extends DataTable> implements Iterator<T>, 
   private final File file;
   protected InputStream inStream;
   private int line;
+
+  private static final Logger log = LogManager.getLogger();
 
   /**
    * Create a new iterator.
@@ -144,6 +148,7 @@ public class DelimitedFileIterator<T extends DataTable> implements Iterator<T>, 
       while (cause instanceof InvocationTargetException) {
         cause = cause.getCause();
       }
+      log.info("IterationException on line: " + line );
       throw new IterationException(cause);
     }
   }

@@ -227,13 +227,13 @@ public abstract class CodeGenerator {
       new S3ToHdfsManifestGenerator(codeDir, config, dataIndex).generate();
 
       log.info("Generating Hive table definitions in " + codeDir);
-      new CreateHiveTableGenerator(codeDir, spec).generate();
+      new CreateHiveTableGenerator(codeDir, config, spec, FullTextSchema.read(getFullTextResource() )).generate();
 
       log.info("Generating Hive query manifests in " + codeDir);
       new HiveQueryManifestGenerator(codeDir, spec).generate();
 
       log.info("Generating Redshift copy from S3 script in " + codeDir);
-      new S3ToRedshiftLoaderGenerator(codeDir, spec, config, workingDir, dataIndex, IdentitySchema.read(getIdentifierResource())).generate();
+      new S3ToRedshiftLoaderGenerator(codeDir, spec, config, workingDir, dataIndex, IdentitySchema.read(getIdentifierResource()), FullTextSchema.read(getFullTextResource())).generate();
 
       log.info("Generating move unmodified files script in " + codeDir);
       new MoveUnmodifiedTableGenerator(codeDir, spec).generate();

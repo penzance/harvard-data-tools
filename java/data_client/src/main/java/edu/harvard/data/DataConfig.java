@@ -44,6 +44,7 @@ public class DataConfig {
   private final IdentifierType mainIdentifier;
   private final String serverTimezone;
   private final FormatLibrary.Format pipelineFormat;
+  private final FormatLibrary.Format fulltextFormat;
 
   private final String dataPipelineRole;
   private final String dataPipelineResourceRoleArn;
@@ -101,6 +102,7 @@ public class DataConfig {
   private final String emrTaskBidPrice;
   private final String emrMaximumRetries;
   private final String emrAvailabilityZoneGroup;
+  private final String emrConfiguration;
 
   private final String phase0InstanceType;
   private final String phase0BidPrice;
@@ -149,7 +151,7 @@ public class DataConfig {
     this.identityRedshiftSchema = "pii";
     this.emrCodeDir = "/home/hadoop/code";
     this.emrLogDir = "/home/hadoop";
-    this.fullTextDir = "/home/hadoop/full_text";
+    this.fullTextDir = "/tmp/full_text";
     this.hdfsBase = "/phase_";
     this.hdfsVerifyBase = "/verify" + this.hdfsBase;
     this.ec2GitDir = "/home/ec2-user/harvard-data-tools";
@@ -164,6 +166,7 @@ public class DataConfig {
     this.dataSource = getConfigParameter("data_source", verify);
     this.datasetName = getConfigParameter("dataset_name", verify);
     this.pipelineFormat = Format.fromLabel(getConfigParameter("pipeline_format", verify));
+    this.fulltextFormat = Format.fromLabel(getConfigParameter("fulltext_format", verify));
     this.dataPipelineRole = getConfigParameter("data_pipeline_role", verify);
     this.dataPipelineResourceRoleArn = getConfigParameter("data_pipeline_resource_role_arn",
         verify);
@@ -217,6 +220,7 @@ public class DataConfig {
     this.emrCoreInstanceCount = getConfigParameter("emr_core_instance_count", verify);
     this.emrTaskInstanceCount = getConfigParameter("emr_task_instance_count", verify);
     this.emrAvailabilityZoneGroup = getConfigParameter("emr_availability_zone_group", verify);
+    this.emrConfiguration = getConfigParameter("emr_configuration", verify);
 
     this.phase0InstanceType = getConfigParameter("phase_0_instance_type", verify);
     this.phase0BidPrice = getConfigParameter("phase_0_bid_price", verify);
@@ -373,6 +377,10 @@ public class DataConfig {
 
   public String getEmrLogFile(final String stepId) {
     return emrLogDir + "/" + stepId + ".out";
+  }
+  
+  public String getEmrLogDir() {
+	return emrLogDir;
   }
 
   public String getDatasetName() {
@@ -619,6 +627,10 @@ public class DataConfig {
     return emrAvailabilityZoneGroup;
   }
 
+  public String getEmrConfiguration() {
+	  return emrConfiguration;
+  }
+  
   public String getLeaseDynamoTable() {
     return leaseDynamoTable;
   }
@@ -634,6 +646,10 @@ public class DataConfig {
   public FormatLibrary.Format getPipelineFormat() {
     return pipelineFormat;
   }
+
+  public FormatLibrary.Format getFulltextFormat() {
+	    return fulltextFormat;
+  }  
 
   public String getHdtMonitorUrl() {
     return hdtMonitorUrl;

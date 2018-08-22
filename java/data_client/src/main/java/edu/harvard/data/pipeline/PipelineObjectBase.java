@@ -2,9 +2,11 @@ package edu.harvard.data.pipeline;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.amazonaws.services.datapipeline.model.Field;
 import com.amazonaws.services.datapipeline.model.PipelineObject;
+
 
 import edu.harvard.data.DataConfig;
 
@@ -35,6 +37,28 @@ public class PipelineObjectBase {
     fields.add(new Field().withKey(key).withRefValue(ref.id));
   }
 
+  protected void set(final String key, final ArrayList<PipelineObjectBase> listref) {
+	final List<Field> subfields;
+	subfields = new ArrayList<Field>();
+	for (final PipelineObjectBase obj: listref ) { 
+		subfields.add( new Field().withKey(key).withRefValue(obj.id) ); 
+	}
+    fields.addAll(subfields);
+  }  
+  
+  protected void set(final String key, final Map<String, String> ref) {
+	final List<Field> subfields;
+	subfields = new ArrayList<Field>();
+	for (final String item : ref.keySet()) {
+	    subfields.add(new Field().withKey(item).withStringValue( ref.get(item)));
+	}
+	fields.add(new Field().withKey(key).withStringValue(subfields.toString()));
+  }
+
+  protected void set(final String key, final List<Map<String, String>> ref) {
+	fields.add(new Field().withKey(key).withStringValue(ref.toString()));
+  }
+  
   public void setSuccess(final PipelineObjectBase success) {
     set("onSuccess", success);
   }
