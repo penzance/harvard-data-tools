@@ -3,6 +3,7 @@ package edu.harvard.data;
 import java.text.SimpleDateFormat;
 
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.QuoteMode;
 
 public class FormatLibrary {
   public enum Format {
@@ -104,7 +105,7 @@ public class FormatLibrary {
   private static final CSVFormat INTERNAL_CSV_FORMAT = CSVFormat.TDF.withQuote(null).withEscape('/')
 	      .withNullString("\\N").withRecordSeparator("\n").withIgnoreSurroundingSpaces(false);
 
-  private static final CSVFormat INTERNAL_SIS_FORMAT = CSVFormat.TDF.withQuote(null).withEscape('/')
+  private static final CSVFormat INTERNAL_SIS_FORMAT = CSVFormat.TDF.withQuote('"').withEscape('/')
 	      .withNullString("null").withRecordSeparator("\n").withIgnoreSurroundingSpaces(false);  
  
   private static final CSVFormat INTERNAL_TDF_FORMAT = CSVFormat.TDF.withQuote('"')
