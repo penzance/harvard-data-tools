@@ -14,12 +14,14 @@ import org.apache.commons.lang.StringUtils;
 import com.amazonaws.services.s3.model.S3ObjectId;
 
 import edu.harvard.data.DataConfig;
+import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.identity.IdentifierType;
 import edu.harvard.data.identity.IdentityMap;
 import edu.harvard.data.schema.identity.IdentitySchema;
 import edu.harvard.data.pipeline.InputTableIndex;
 import edu.harvard.data.schema.DataSchemaColumn;
 import edu.harvard.data.schema.DataSchemaTable;
+import edu.harvard.data.schema.fulltext.FullTextSchema;
 
 
 public class S3ToRedshiftLoaderGenerator {
@@ -30,17 +32,19 @@ public class S3ToRedshiftLoaderGenerator {
   private final DataConfig config;
   private final InputTableIndex dataIndex;
   private final IdentitySchema identities;
+  private final FullTextSchema textSchema;
 
 
   public S3ToRedshiftLoaderGenerator(final File dir, final GenerationSpec spec,
       final DataConfig config, final S3ObjectId workingDir, final InputTableIndex dataIndex,
-      final IdentitySchema identities) {
+      final IdentitySchema identities, final FullTextSchema textSchema) {
     this.config = config;
     this.dir = dir;
     this.spec = spec;
     this.workingDir = workingDir;
     this.dataIndex = dataIndex;
     this.identities = identities;
+    this.textSchema = textSchema;
   }
 
   public void generate() throws IOException {
@@ -123,14 +127,26 @@ public class S3ToRedshiftLoaderGenerator {
     final String tableName = redshiftSchema + "." + table.getTableName();
     final String stageTableName = redshiftSchema + "_" + table.getTableName() + "_stage";
 
+    // Get full text output format
+    final FormatLibrary formatLibrary = new FormatLibrary();
+    final boolean isQuotedFormat = formatLibrary.getFormat(config.getFulltextFormat())
+						  					    .getCsvFormat()
+						  					    .isQuoteCharacterSet();
+    
     out.println("------- Table " + tableName + "-------");
     // Create a stage table based on the structure of the real table"
     out.println("DROP TABLE IF EXISTS " + stageTableName + ";");
     out.println("CREATE TEMPORARY TABLE " + stageTableName + " (LIKE " + tableName + ");");
 
     // Copy the final incoming data into final the stage table
-    out.println("COPY " + stageTableName + " " + columnList + " FROM " + s3Location
-        + " CREDENTIALS " + getCredentials() + " DELIMITER '\\t' TRUNCATECOLUMNS GZIP NULL AS '\\0';");
+    if ( isQuotedFormat && textSchema.tableNames().contains(table.getTableName() ) ) {
+    	// If quoted, add null termination protection
+        out.println("COPY " + stageTableName + " " + columnList + " FROM " + s3Location
+            + " CREDENTIALS " + getCredentials() + " DELIMITER '\\t' TRUNCATECOLUMNS GZIP NULL AS '\\0';");
+    } else {
+        out.println("COPY " + stageTableName + " " + columnList + " FROM " + s3Location
+                + " CREDENTIALS " + getCredentials() + " DELIMITER '\\t' TRUNCATECOLUMNS GZIP;");        	
+    }
 
     // Use an inner join with the staging table to delete the rows from the
     // target table that are being updated.
@@ -165,14 +181,26 @@ public class S3ToRedshiftLoaderGenerator {
       final String redshiftSchema, final String columnList) {
     final String tableName = redshiftSchema + "." + table.getTableName();
 
+    // Get output format
+    final FormatLibrary formatLibrary = new FormatLibrary();
+    final boolean isQuotedFormat = formatLibrary.getFormat(config.getFulltextFormat())
+						  					    .getCsvFormat()
+						  					    .isQuoteCharacterSet();    
+    
     out.println("------- Table " + tableName + "-------");
 
     out.println("TRUNCATE " + tableName + ";");
     out.println("VACUUM " + tableName + ";");
     out.println("ANALYZE " + tableName + ";");
-    out.println(
-        "COPY " + tableName + " " + columnList + " FROM " + getLocation(table.getTableName())
-        + " CREDENTIALS " + getCredentials() + " DELIMITER '\\t' TRUNCATECOLUMNS GZIP NULL AS '\\0';");
+    if ( isQuotedFormat && textSchema.tableNames().contains(table.getTableName() ) ) {
+        out.println(
+            "COPY " + tableName + " " + columnList + " FROM " + getLocation(table.getTableName())
+            + " CREDENTIALS " + getCredentials() + " DELIMITER '\\t' TRUNCATECOLUMNS GZIP NULL AS '\\0';");
+    } else {
+        out.println(
+            "COPY " + tableName + " " + columnList + " FROM " + getLocation(table.getTableName())
+            + " CREDENTIALS " + getCredentials() + " DELIMITER '\\t' TRUNCATECOLUMNS GZIP;");
+    }
     out.println("VACUUM " + tableName + ";");
     out.println("ANALYZE " + tableName + ";");
     out.println();
