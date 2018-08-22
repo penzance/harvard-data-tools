@@ -58,6 +58,8 @@ public class SisPhase0 extends Phase0 {
             dataIndex.setPartial(table, true); 	
        } else if ( table.equals("Classes") ) {
            dataIndex.setPartial(table, true); 
+       } else if ( table.equals("CourseMap") ) {
+           dataIndex.setPartial(table, true);
        } else if ( table.equals("PrimeCourseEnroll") ) {
            dataIndex.setPartial(table, true);             
        } else if ( table.equals("CourseEnroll") ) {
