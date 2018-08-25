@@ -84,7 +84,8 @@ public class CreateHiveTableGenerator {
 	  final List<String> inTableKeys = new ArrayList<String>(inTables.keySet());
 	  Collections.sort(inTableKeys);
 
-      out.println("if ! hadoop fs -test -e " + "/current" + "; then ");	       
+      out.println("if ! hadoop fs -test -e " + "/current" + "; then ");
+      out.println("echo \"Creating persistent tables...\"");      
 	  for (final String tableKey : inTableKeys) {
 	    final DataSchemaTable table = inTables.get(tableKey);
 	    if (!(table.isTemporary() && table.getExpirationPhase() < phase)) {
