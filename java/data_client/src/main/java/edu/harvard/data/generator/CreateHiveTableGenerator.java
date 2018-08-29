@@ -19,6 +19,7 @@ import com.amazonaws.services.s3.model.S3ObjectId;
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.FormatLibrary;
+import edu.harvard.data.pipeline.InputTableIndex;
 import edu.harvard.data.schema.DataSchemaColumn;
 import edu.harvard.data.schema.DataSchemaTable;
 import edu.harvard.data.schema.DataSchemaType;
@@ -34,14 +35,17 @@ public class CreateHiveTableGenerator {
   private final File dir;
   private final FullTextSchema textSchema;
   private final DataConfig config;
-
+  private final InputTableIndex dataIndex;
+  
 
   public CreateHiveTableGenerator(final File dir, final DataConfig config, 
-		  final GenerationSpec schemaVersions, final FullTextSchema textSchema ) {
+		  final GenerationSpec schemaVersions, final FullTextSchema textSchema, 
+		  final InputTableIndex dataIndex ) {
 	this.config = config;
     this.dir = dir;
     this.schemaVersions = schemaVersions;
     this.textSchema = textSchema;
+    this.dataIndex = dataIndex;    
   }
 
   public void generate() throws IOException {
@@ -59,12 +63,17 @@ public class CreateHiveTableGenerator {
 
   private void generateCreateTablesFile(final PrintStream out, final int phase, final SchemaPhase input,
       final SchemaPhase output, final String logFile) {
-    final List<String> tableNames = new ArrayList<String>(input.getSchema().getTables().keySet());
-    Collections.sort(tableNames);
+    List<String> tableNames = new ArrayList<String>(input.getSchema().getTables().keySet());
+	Collections.sort(tableNames);
+	log.info("tablenames: " + tableNames );
     out.println("sudo mkdir -p /var/log/hive/user/hadoop # Workaround for Hive logging bug");
     out.println("sudo chown hive:hive -R /var/log/hive");
-    generatePersistentTables(out, phase, input, "merged_", true, true, logFile, true );
-    generatePersistentTables(out, phase, input, "cur_", true, false, logFile, true );    
+    if ( ( dataIndex.getTableNames().size() > 1) ||
+    	 ( dataIndex.containsTable("requests") && !dataIndex.isPartial("requests") ) &&
+    	 ( dataIndex.getTableNames().size() > 1) ) {
+        generatePersistentTables(out, phase, input, "merged_", true, true, logFile, true );
+        generatePersistentTables(out, phase, input, "cur_", true, false, logFile, true );
+    }
     generateDropStatements(out, phase, "in_", tableNames, input.getSchema().getTables(), logFile );
     out.println();
     generateDropStatements(out, phase, "out_", tableNames, output.getSchema().getTables(), logFile );
@@ -91,7 +100,6 @@ public class CreateHiveTableGenerator {
 	    if (!(table.isTemporary() && table.getExpirationPhase() < phase)) {
 	      if (ignoreOwner || (table.getOwner() != null && table.getOwner().equals(TableOwner.hive))) {
 	        final String tableName = prefix + table.getTableName();
-	        log.info("List text schema tables " + textSchema.tableNames() + "Current: " + tableName );
 	        if (textSchema.tableNames().contains(table.getTableName() ) ) {
 	            if ( isTransactional ) {
 	                createTableTransactional( out, tableName, table, logFile, addMetadata );
