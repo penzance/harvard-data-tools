@@ -68,12 +68,8 @@ public class CreateHiveTableGenerator {
 	log.info("tablenames: " + tableNames );
     out.println("sudo mkdir -p /var/log/hive/user/hadoop # Workaround for Hive logging bug");
     out.println("sudo chown hive:hive -R /var/log/hive");
-    if ( ( dataIndex.getTableNames().size() > 1) ||
-    	 ( dataIndex.containsTable("requests") && !dataIndex.isPartial("requests") ) &&
-    	 ( dataIndex.getTableNames().size() > 1) ) {
-        generatePersistentTables(out, phase, input, "merged_", true, true, logFile, true );
-        generatePersistentTables(out, phase, input, "cur_", true, false, logFile, true );
-    }
+    generatePersistentTables(out, phase, input, "merged_", true, true, logFile, true );
+    generatePersistentTables(out, phase, input, "cur_", true, false, logFile, true );
     generateDropStatements(out, phase, "in_", tableNames, input.getSchema().getTables(), logFile );
     out.println();
     generateDropStatements(out, phase, "out_", tableNames, output.getSchema().getTables(), logFile );
@@ -146,7 +142,9 @@ public class CreateHiveTableGenerator {
         if (!(table.isTemporary() && table.getExpirationPhase() < phase)) {
           if (ignoreOwner || (table.getOwner() != null && table.getOwner().equals(TableOwner.hive))) {
             final String tableName = prefix + table.getTableName();
+            out.println("if hadoop fs -test -e " + currentPhase.getHDFSDir() + "/" + table.getTableName() + "; then ");
             createTable(out, tableName, table, currentPhase.getHDFSDir(), logFile, addMetadata );
+            out.println("fi");
           }
         }
       }
