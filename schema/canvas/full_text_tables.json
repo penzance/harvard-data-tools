@@ -14,7 +14,7 @@
         },
         "course_dim": {
             "key": "id",
-            "columns": ["syllabus_body"]
+            "columns": ["syllabus_body", "name"]
         },
         "discussion_entry_dim": {
             "key": "id",
