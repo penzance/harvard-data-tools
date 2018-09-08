@@ -227,7 +227,7 @@ public abstract class CodeGenerator {
       new S3ToHdfsManifestGenerator(codeDir, config, dataIndex).generate();
 
       log.info("Generating Hive table definitions in " + codeDir);
-      new CreateHiveTableGenerator(codeDir, config, spec, FullTextSchema.read(getFullTextResource()), dataIndex).generate();
+      new CreateHiveTableGenerator(codeDir, config, spec, FullTextSchema.read(getFullTextResource()) ).generate();
 
       log.info("Generating Hive query manifests in " + codeDir);
       new HiveQueryManifestGenerator(codeDir, spec).generate();
