@@ -19,7 +19,6 @@ import com.amazonaws.services.s3.model.S3ObjectId;
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.FormatLibrary;
-import edu.harvard.data.pipeline.InputTableIndex;
 import edu.harvard.data.schema.DataSchemaColumn;
 import edu.harvard.data.schema.DataSchemaTable;
 import edu.harvard.data.schema.DataSchemaType;
@@ -35,17 +34,14 @@ public class CreateHiveTableGenerator {
   private final File dir;
   private final FullTextSchema textSchema;
   private final DataConfig config;
-  private final InputTableIndex dataIndex;
   
 
   public CreateHiveTableGenerator(final File dir, final DataConfig config, 
-		  final GenerationSpec schemaVersions, final FullTextSchema textSchema, 
-		  final InputTableIndex dataIndex ) {
+		  final GenerationSpec schemaVersions, final FullTextSchema textSchema ) {
 	this.config = config;
     this.dir = dir;
     this.schemaVersions = schemaVersions;
     this.textSchema = textSchema;
-    this.dataIndex = dataIndex;    
   }
 
   public void generate() throws IOException {
