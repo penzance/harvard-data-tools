@@ -78,9 +78,14 @@ public class PipelineFactory {
 
   public PipelineObjectBase getEmr(final String name) {
     final PipelineObjectBase obj = new PipelineObjectBase(config, name, "EmrCluster");
+    ArrayList<String> applist = new ArrayList<String>();
+    applist.add("hadoop");
+    applist.add("hive");
+    applist.add("spark");    
     obj.set("useOnDemandOnLastAttempt", "true");
     obj.set("keyPair", config.getKeypair());
     obj.set("releaseLabel", config.getEmrReleaseLabel());
+    obj.set("applications", applist.toString());    
     obj.set("terminateAfter", config.getEmrTerminateAfter());
     obj.set("subnetId", config.getSubnetId());
     obj.set("masterInstanceType", config.getEmrMasterInstanceType());
@@ -102,11 +107,6 @@ public class PipelineFactory {
       }
     }
     if (config.getEmrConfiguration() != null ) {
-      ArrayList<String> applist = new ArrayList<String>();
-      applist.add("hadoop");
-      applist.add("hive");
-      applist.add("spark");
-      obj.set("applications", applist.toString());
   	  ArrayList<PipelineObjectBase> listconfigobjects = new ArrayList<PipelineObjectBase>();
       listconfigobjects.add( testEmrHiveConfiguration() );
       listconfigobjects.add( testEmrHadoopConfiguration() );
