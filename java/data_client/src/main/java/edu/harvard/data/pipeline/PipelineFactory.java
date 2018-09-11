@@ -105,6 +105,7 @@ public class PipelineFactory {
   	  ArrayList<PipelineObjectBase> listconfigobjects = new ArrayList<PipelineObjectBase>();
       listconfigobjects.add( testEmrHiveConfiguration() );
       listconfigobjects.add( testEmrHadoopConfiguration() );
+      listconfigobjects.addAll( testEmrSparkConfiguration() );
       obj.set("configuration", listconfigobjects );
       //obj.set("ebsRootVolumeSize", "500" );
       //obj.set("masterEbsConfiguration", testMasterEbsConfig() );
@@ -345,6 +346,36 @@ public class PipelineFactory {
 	  obj.set("configuration", testEmrHadoopExport() );
 	  allObjects.add(obj);
 	  return obj;
+  }
+  
+  public ArrayList<PipelineObjectBase> testEmrSparkConfiguration() {
+	
+	  // List of Spark Config Objects
+	  ArrayList<PipelineObjectBase> listsparkconfig = new ArrayList<PipelineObjectBase>();
+
+	  // Add Spark-Env Object
+	  final PipelineObjectBase obj = new PipelineObjectBase(config, "sparkenv", "EmrConfiguration");
+	  obj.set("classification", "spark-env" );
+	  obj.set("configuration", testEmrHadoopExport() );
+	  
+	  // Add Spark Config Object
+	  final PipelineObjectBase objcfg = new PipelineObjectBase(config, "spark", "EmrConfiguration");
+	  ArrayList<PipelineObjectBase> listconfigobjects = new ArrayList<PipelineObjectBase>();
+	  Map<String, String> sProperties = new HashMap<String,String>();
+	  sProperties.put("maximizeResourceAllocation", "true");
+	  for( final String sProperty: sProperties.keySet() ) {
+		  	listconfigobjects.add( testCreateEmrConfigObject(sProperty, sProperties.get( sProperty)));
+	  }
+	  objcfg.set("classification", "spark" );
+	  objcfg.set("property", listconfigobjects );
+	  
+	  listsparkconfig.add(obj);
+	  listsparkconfig.add(objcfg);
+	  
+	  allObjects.add(obj);
+	  allObjects.add(objcfg);
+
+	  return listsparkconfig;
   }
   
   public PipelineObjectBase testEmrHadoopExport() {
