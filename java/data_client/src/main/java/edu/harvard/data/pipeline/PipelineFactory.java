@@ -423,12 +423,11 @@ public class PipelineFactory {
 
       ArrayList<PipelineObjectBase> listconfigobjects = new ArrayList<PipelineObjectBase>();
 
-      //Create Properties
-	  Map<String, String> hProperties = new HashMap<String,String>();
-	  hProperties.put("JAVA_HOME", "/usr/lib/jvm/java-1.8.0");
-	  for( final String hProperty: hProperties.keySet() ) {
-	  	listconfigobjects.add( testCreateEmrConfigObject(hProperty, hProperties.get( hProperty)));
-	  }	 
+	  final PipelineObjectBase obj = new PipelineObjectBase(config, "SPARK_JAVA_HOME", "Property"); 
+  	  obj.set("key", "JAVA_HOME");
+	  obj.set("value", "/usr/lib/jvm/java-1.8.0");
+	  allObjects.add(obj);
+	  listconfigobjects.add( obj );
 	  return listconfigobjects;  	  
   }
   
