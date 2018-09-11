@@ -356,7 +356,7 @@ public class PipelineFactory {
 	  // Add Spark-Env Object
 	  final PipelineObjectBase obj = new PipelineObjectBase(config, "sparkenv", "EmrConfiguration");
 	  obj.set("classification", "spark-env" );
-	  obj.set("configuration", testEmrHadoopExport() );
+	  obj.set("configuration", testEmrSparkExport() );
 	  
 	  // Add Spark Config Object
 	  final PipelineObjectBase objcfg = new PipelineObjectBase(config, "spark", "EmrConfiguration");
@@ -377,6 +377,15 @@ public class PipelineFactory {
 
 	  return listsparkconfig;
   }
+
+  public PipelineObjectBase testEmrSparkExport() {
+	  final PipelineObjectBase obj = new PipelineObjectBase(config, "spark-java-home", "EmrConfiguration");
+
+	  obj.set("classification", "export");
+	  obj.set("property", testCreateSparkConfigObjects() );
+	  allObjects.add(obj);
+	  return obj;
+  }  
   
   public PipelineObjectBase testEmrHadoopExport() {
 	  final PipelineObjectBase obj = new PipelineObjectBase(config, "export", "EmrConfiguration");
@@ -410,6 +419,19 @@ public class PipelineFactory {
       return obj;
   }
 
+  public ArrayList<PipelineObjectBase> testCreateSparkConfigObjects() {
+
+      ArrayList<PipelineObjectBase> listconfigobjects = new ArrayList<PipelineObjectBase>();
+
+      //Create Properties
+	  Map<String, String> hProperties = new HashMap<String,String>();
+	  hProperties.put("JAVA_HOME", "/usr/lib/jvm/java-1.8.0");
+	  for( final String hProperty: hProperties.keySet() ) {
+	  	listconfigobjects.add( testCreateEmrConfigObject(hProperty, hProperties.get( hProperty)));
+	  }	 
+	  return listconfigobjects;  	  
+  }
+  
   public ArrayList<PipelineObjectBase> testCreateHadoopConfigObjects() {
 
       ArrayList<PipelineObjectBase> listconfigobjects = new ArrayList<PipelineObjectBase>();
