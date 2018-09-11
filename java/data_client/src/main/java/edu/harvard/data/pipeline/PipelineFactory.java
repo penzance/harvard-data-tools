@@ -102,6 +102,11 @@ public class PipelineFactory {
       }
     }
     if (config.getEmrConfiguration() != null ) {
+      ArrayList<String> applist = new ArrayList<String>();
+      applist.add("hadoop");
+      applist.add("hive");
+      applist.add("spark");
+      obj.set("applications", applist.toString());
   	  ArrayList<PipelineObjectBase> listconfigobjects = new ArrayList<PipelineObjectBase>();
       listconfigobjects.add( testEmrHiveConfiguration() );
       listconfigobjects.add( testEmrHadoopConfiguration() );
