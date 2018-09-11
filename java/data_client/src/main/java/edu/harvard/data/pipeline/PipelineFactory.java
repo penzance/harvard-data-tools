@@ -102,7 +102,10 @@ public class PipelineFactory {
       }
     }
     if (config.getEmrConfiguration() != null ) {
-      obj.set("configuration", testEmrHiveConfiguration() );
+  	  ArrayList<PipelineObjectBase> listconfigobjects = new ArrayList<PipelineObjectBase>();
+      listconfigobjects.add( testEmrHiveConfiguration() );
+      listconfigobjects.add( testEmrHadoopConfiguration() );
+      obj.set("configuration", listconfigobjects );
       //obj.set("ebsRootVolumeSize", "500" );
       //obj.set("masterEbsConfiguration", testMasterEbsConfig() );
       //obj.set("coreEbsConfiguration", testMasterEbsConfig() );
@@ -334,6 +337,25 @@ public class PipelineFactory {
 	  return obj;
   }
   
+  public PipelineObjectBase testEmrHadoopConfiguration() {
+	  
+	  final PipelineObjectBase obj = new PipelineObjectBase(config, "hadoopenv", "EmrConfiguration");
+	  
+	  obj.set("classification", "hadoop-env" );
+	  obj.set("configuration", testEmrHadoopExport() );
+	  allObjects.add(obj);
+	  return obj;
+  }
+  
+  public PipelineObjectBase testEmrHadoopExport() {
+	  final PipelineObjectBase obj = new PipelineObjectBase(config, "export", "EmrConfiguration");
+
+	  obj.set("classification", "export");
+	  obj.set("property", testCreateHadoopConfigObjects() );
+	  allObjects.add(obj);
+	  return obj;
+  }
+  
   public PipelineObjectBase testMasterEbsConfig() {
 	  final PipelineObjectBase obj = new PipelineObjectBase(config, "EBSConfiguration", "EbsConfiguration"); 
 	  obj.set("ebsBlockDeviceConfig", testEbsBlockDeviceConfig());
@@ -355,6 +377,19 @@ public class PipelineFactory {
       obj.set("volumeType", "standard");
 	  if (!allObjects.contains(obj)) allObjects.add(obj);	  
       return obj;
+  }
+
+  public ArrayList<PipelineObjectBase> testCreateHadoopConfigObjects() {
+
+      ArrayList<PipelineObjectBase> listconfigobjects = new ArrayList<PipelineObjectBase>();
+
+      //Create Properties
+	  Map<String, String> hProperties = new HashMap<String,String>();
+	  hProperties.put("JAVA_HOME", "/usr/lib/jvm/java-1.8.0");
+	  for( final String hProperty: hProperties.keySet() ) {
+	  	listconfigobjects.add( testCreateEmrConfigObject(hProperty, hProperties.get( hProperty)));
+	  }	 
+	  return listconfigobjects;  	  
   }
   
   public ArrayList<PipelineObjectBase> testCreateEmrConfigObjects() {
