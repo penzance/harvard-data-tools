@@ -85,7 +85,7 @@ public class PipelineFactory {
     obj.set("useOnDemandOnLastAttempt", "true");
     obj.set("keyPair", config.getKeypair());
     obj.set("releaseLabel", config.getEmrReleaseLabel());
-    obj.set("applications", "spark");    
+    obj.set("applications", "spark, zeppelin");    
     obj.set("terminateAfter", config.getEmrTerminateAfter());
     obj.set("subnetId", config.getSubnetId());
     obj.set("masterInstanceType", config.getEmrMasterInstanceType());
