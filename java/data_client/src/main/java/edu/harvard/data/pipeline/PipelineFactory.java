@@ -79,13 +79,12 @@ public class PipelineFactory {
   public PipelineObjectBase getEmr(final String name) {
     final PipelineObjectBase obj = new PipelineObjectBase(config, name, "EmrCluster");
     ArrayList<String> applist = new ArrayList<String>();
-    applist.add("hadoop");
-    applist.add("hive");
-    applist.add("spark");    
+    applist.add("spark");
+    applist.add("zeppelin");
     obj.set("useOnDemandOnLastAttempt", "true");
     obj.set("keyPair", config.getKeypair());
     obj.set("releaseLabel", config.getEmrReleaseLabel());
-    obj.set("applications", "spark,zeppelin");    
+    obj.set("applications", applist.toString() );    
     obj.set("terminateAfter", config.getEmrTerminateAfter());
     obj.set("subnetId", config.getSubnetId());
     obj.set("masterInstanceType", config.getEmrMasterInstanceType());
