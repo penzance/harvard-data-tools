@@ -1,0 +1,12 @@
+{ 
+    "tables": {
+        "ScraperText": {
+            "key": "id",
+            "columns": ["text"]
+        },
+        "ScraperCitations": {
+            "key": "bib_id",
+            "columns": ["abstract", "author", "booktitle", "journal", "keywords", "note", "title", "url" ]
+        }
+    }
+}
