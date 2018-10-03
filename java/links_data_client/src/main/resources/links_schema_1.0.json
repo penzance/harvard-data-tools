@@ -210,6 +210,126 @@
 	    "description": ""
 	}
       ]
+    },
+    "OpenScholarMapping": {
+      "columns" : [ 
+        {
+            "name": "id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "site_title",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "site_owner_email",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "os_install",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "site_owner_huid",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "content_last_updated",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "site_privacy_setting",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "site_url",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	}
+      ]
+    },
+    "OpenScholarBiblioTitles": {
+      "columns" : [ 
+        {
+            "name": "id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "vsite_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "label",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "self",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	}
+      ]
+    },
+    "OpenScholarPages": {
+      "columns" : [ 
+        {
+            "name": "id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "vsite_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "path",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "self",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "label",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "body",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	}
+      ]
     }
   }
 }

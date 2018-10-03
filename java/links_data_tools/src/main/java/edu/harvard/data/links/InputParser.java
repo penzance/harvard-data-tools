@@ -24,6 +24,9 @@ import edu.harvard.data.io.TableWriter;
 import edu.harvard.data.links.LinksDataConfig;
 import edu.harvard.data.links.bindings.phase0.Phase0ScraperText;
 import edu.harvard.data.links.bindings.phase0.Phase0ScraperCitations;
+import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarMapping;
+import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarBiblioTitles;
+import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarPages;
 import edu.harvard.data.pipeline.InputTableIndex;
 
 public class InputParser {
@@ -50,6 +53,9 @@ public class InputParser {
   private final TableFormat outFormat; 
   private final S3ObjectId scraperOutputDir;
   private final S3ObjectId citationOutputDir;
+  private final S3ObjectId ostitlesOutputDir;
+  private final S3ObjectId osmappingOutputDir;
+  private final S3ObjectId ospagesOutputDir;
 
 
   public InputParser(final LinksDataConfig config, final AwsUtils aws,
@@ -64,6 +70,9 @@ public class InputParser {
     this.currentDataProduct = getDataProduct();
     this.scraperOutputDir = AwsUtils.key(outputLocation, "ScraperText");
     this.citationOutputDir = AwsUtils.key(outputLocation, "ScraperCitations");
+    this.osmappingOutputDir = AwsUtils.key(outputLocation, "OpenScholarMapping");
+    this.ostitlesOutputDir = AwsUtils.key(outputLocation, "OpenScholarBiblioTitles");
+    this.ospagesOutputDir = AwsUtils.key(outputLocation, "OpenScholarPages");
     final FormatLibrary formatLibrary = new FormatLibrary();
     this.inFormat = formatLibrary.getFormat(Format.Sis);
     final ObjectMapper jsonMapper = new ObjectMapper();
@@ -105,6 +114,12 @@ public class InputParser {
         dataproductOutputObj = AwsUtils.key(scraperOutputDir, dataproductFilename );  
     } else if ( currentDataProduct.equals("ScraperCitations") ) {
         dataproductOutputObj = AwsUtils.key(citationOutputDir, dataproductFilename);        
+    } else if ( currentDataProduct.equals("OpenScholarMapping") ) {
+        dataproductOutputObj = AwsUtils.key(osmappingOutputDir , dataproductFilename);        
+    } else if ( currentDataProduct.equals("OpenScholarBiblioTitles") ) {
+        dataproductOutputObj = AwsUtils.key(ostitlesOutputDir, dataproductFilename);        
+    } else if ( currentDataProduct.equals("OpenScholarPages") ) {
+        dataproductOutputObj = AwsUtils.key(ospagesOutputDir, dataproductFilename);        
     }
     
     log.info("Parsing " + filename + " to " + dataproductFile);
@@ -136,6 +151,39 @@ public class InputParser {
     			  citations.add((Phase0ScraperCitations) tables.get("ScraperCitations").get(0));
     		}
     	}
+	} else if (currentDataProduct.equals("OpenScholarMapping")) {
+        log.info("Parsing data product " + currentDataProduct);
+    	try (
+    	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
+    	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
+    	    	TableWriter<Phase0OpenScholarMapping> citations = new TableWriter<Phase0OpenScholarMapping>(Phase0OpenScholarMapping.class, outFormat,
+    	                dataproductFile);) {
+    		for (final Map<String, List<? extends DataTable>> tables : in) {
+    			  citations.add((Phase0OpenScholarMapping) tables.get("OpenScholarMapping").get(0));
+    		}
+    	}
+	} else if (currentDataProduct.equals("OpenScholarBiblioTitles")) {
+        log.info("Parsing data product " + currentDataProduct);
+    	try (
+    	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
+    	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
+    	    	TableWriter<Phase0OpenScholarBiblioTitles> citations = new TableWriter<Phase0OpenScholarBiblioTitles>(Phase0OpenScholarBiblioTitles.class, outFormat,
+    	                dataproductFile);) {
+    		for (final Map<String, List<? extends DataTable>> tables : in) {
+    			  citations.add((Phase0OpenScholarBiblioTitles) tables.get("OpenScholarBiblioTitles").get(0));
+    		}
+    	}
+	} else if (currentDataProduct.equals("OpenScholarPages")) {
+        log.info("Parsing data product " + currentDataProduct);
+    	try (
+    	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
+    	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
+    	    	TableWriter<Phase0OpenScholarPages> citations = new TableWriter<Phase0OpenScholarPages>(Phase0OpenScholarPages.class, outFormat,
+    	                dataproductFile);) {
+    		for (final Map<String, List<? extends DataTable>> tables : in) {
+    			  citations.add((Phase0OpenScholarPages) tables.get("OpenScholarPages").get(0));
+    		}
+    	}
 	}
     log.info("Done Parsing file " + originalFile);
   }
@@ -156,6 +204,27 @@ public class InputParser {
 			outFormat, dataproductFile)) {
 		  log.info("Verifying file " + dataproductFile);	
 	      for (final Phase0ScraperCitations i : in ) {
+	      }
+	    }	    
+    } else if (currentDataProduct.equals("OpenScholarMapping")) {
+	    try(FileTableReader<Phase0OpenScholarMapping> in = new FileTableReader<Phase0OpenScholarMapping>(Phase0OpenScholarMapping.class,
+			outFormat, dataproductFile)) {
+		  log.info("Verifying file " + dataproductFile);	
+	      for (final Phase0OpenScholarMapping i : in ) {
+	      }
+	    }	    
+    } else if (currentDataProduct.equals("OpenScholarBiblioTitles")) {
+	    try(FileTableReader<Phase0OpenScholarBiblioTitles> in = new FileTableReader<Phase0OpenScholarBiblioTitles>(Phase0OpenScholarBiblioTitles.class,
+			outFormat, dataproductFile)) {
+		  log.info("Verifying file " + dataproductFile);	
+	      for (final Phase0OpenScholarBiblioTitles i : in ) {
+	      }
+	    }	    
+    } else if (currentDataProduct.equals("OpenScholarPages")) {
+	    try(FileTableReader<Phase0OpenScholarPages> in = new FileTableReader<Phase0OpenScholarPages>(Phase0OpenScholarPages.class,
+			outFormat, dataproductFile)) {
+		  log.info("Verifying file " + dataproductFile);	
+	      for (final Phase0OpenScholarPages i : in ) {
 	      }
 	    }	    
     }
