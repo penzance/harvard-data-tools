@@ -5,8 +5,20 @@
             "columns": ["text"]
         },
         "ScraperCitations": {
-            "key": "bib_id",
+            "key": "citation_id",
             "columns": ["abstract", "author", "booktitle", "journal", "keywords", "note", "title", "url" ]
+        },
+        "OpenScholarMapping": {
+            "key": "id",
+            "columns": ["site_privacy_setting", "site_url"]
+        },
+        "OpenScholarBiblioTitles": {
+            "key": "id",
+            "columns": ["label"]
+        },
+        "OpenScholarPages": {
+            "key": "id",
+            "columns": ["label","body"]
         }
     }
 }

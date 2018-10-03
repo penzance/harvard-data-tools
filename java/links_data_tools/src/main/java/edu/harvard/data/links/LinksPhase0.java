@@ -58,6 +58,12 @@ public class LinksPhase0 extends Phase0 {
             dataIndex.setPartial(table, true); 	
        } else if ( table.equals("ScraperCitations") ) {
            dataIndex.setPartial(table, true); 
+       } else if ( table.equals("OpenScholarPages") ) {
+           dataIndex.setPartial(table, true); 
+       } else if ( table.equals("OpenScholarBiblioTitles") ) {
+           dataIndex.setPartial(table, true); 
+       } else if ( table.equals("OpenScholarMapping") ) {
+           dataIndex.setPartial(table, true); 
        }
     }
     aws.writeJson(config.getIndexFileS3Location(runId), dataIndex );

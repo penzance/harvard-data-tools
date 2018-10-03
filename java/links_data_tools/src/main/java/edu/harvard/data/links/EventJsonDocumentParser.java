@@ -17,6 +17,9 @@ import edu.harvard.data.VerificationException;
 import edu.harvard.data.io.JsonDocumentParser;
 import edu.harvard.data.links.bindings.phase0.Phase0ScraperText;
 import edu.harvard.data.links.bindings.phase0.Phase0ScraperCitations;
+import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarMapping;
+import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarBiblioTitles;
+import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarPages;
 
 public class EventJsonDocumentParser implements JsonDocumentParser {
   private static final Logger log = LogManager.getLogger();
@@ -48,7 +51,25 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     final List<Phase0ScraperCitations> citations = new ArrayList<Phase0ScraperCitations>();
     citations.add(citation);
     tables.put("ScraperCitations", citations);
-
+    
+    // OpenScholarMapping
+    final Phase0OpenScholarMapping osmapping = new Phase0OpenScholarMapping(format, values);
+    final List<Phase0OpenScholarMapping> osmappings = new ArrayList<Phase0OpenScholarMapping>();
+    osmappings.add(osmapping);
+    tables.put("OpenScholarMapping", osmappings );
+    
+    // OpenScholarBiblioTitles
+    final Phase0OpenScholarBiblioTitles ostitle = new Phase0OpenScholarBiblioTitles(format, values);
+    final List<Phase0OpenScholarBiblioTitles> ostitles = new ArrayList<Phase0OpenScholarBiblioTitles>();
+    ostitles.add(ostitle);
+    tables.put("OpenScholarBiblioTitles", ostitles );
+    
+    // OpenScholarPages
+    final Phase0OpenScholarPages ospage = new Phase0OpenScholarPages(format, values);
+    final List<Phase0OpenScholarPages> ospages = new ArrayList<Phase0OpenScholarPages>();
+    ospages.add(ospage);
+    tables.put("OpenScholarPages", ospages );
+    
     // Verification Step (optional)
     if (verify) {
     	verifyParser(values, tables);
@@ -61,10 +82,16 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     // Start
 	final List<? extends DataTable> scraped = tables.get("ScraperText");
 	final List<? extends DataTable> citation = tables.get("ScraperCitations");
+	final List<? extends DataTable> osmapping = tables.get("OpenScholarMapping");
+	final List<? extends DataTable> ostitles = tables.get("OpenScholarBiblioTitles");
+	final List<? extends DataTable> ospages = tables.get("OpenScholarPages");
 
 
 	final Map<String, Object> parsedScraped = scraped.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedCitation = citation.get(0).getFieldsAsMap();
+	final Map<String, Object> parsedOSMapping = osmapping.get(0).getFieldsAsMap();
+	final Map<String, Object> parsedOSTitles= ostitles.get(0).getFieldsAsMap();
+	final Map<String, Object> parsedOSPages= ospages.get(0).getFieldsAsMap();
 
 	
 	// Scraper
@@ -88,6 +115,42 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 		    log.error("Failed to verify JSON document. " + e.getMessage());
 		    log.error("Original map: " + values);
 		    log.error("Parsed map:   " + parsedCitation);
+		    throw e;				
+		}
+	}
+	// Open Scholar Mapping
+	else if (dataproduct.equals("OpenScholarMapping")) {
+		
+		try {	
+			compareMaps(values, parsedOSMapping );		
+		} catch (final VerificationException e) {
+		    log.error("Failed to verify JSON document. " + e.getMessage());
+		    log.error("Original map: " + values);
+		    log.error("Parsed map:   " + parsedOSMapping );
+		    throw e;				
+		}
+	}
+	// Open Scholar Biblio Titles
+	else if (dataproduct.equals("OpenScholarBiblioTitles")) {
+		
+		try {	
+			compareMaps(values, parsedOSTitles);		
+		} catch (final VerificationException e) {
+		    log.error("Failed to verify JSON document. " + e.getMessage());
+		    log.error("Original map: " + values);
+		    log.error("Parsed map:   " + parsedOSTitles );
+		    throw e;				
+		}
+	}
+	// Open Scholar Pages
+	else if (dataproduct.equals("OpenScholarPages")) {
+		
+		try {	
+			compareMaps(values, parsedOSPages );		
+		} catch (final VerificationException e) {
+		    log.error("Failed to verify JSON document. " + e.getMessage());
+		    log.error("Original map: " + values);
+		    log.error("Parsed map:   " + parsedOSPages );
 		    throw e;				
 		}
 	}
