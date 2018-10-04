@@ -4,6 +4,11 @@
 	},
 	"ScraperCitations": {
 		"user_id": ["HUID"]
+	},
+	"OpenScholarMapping": {
+		"site_title": ["Other"],
+		"site_owner_email": ["Other"],
+		"site_owner_huid": ["HUID"]
 	}
 }
 
