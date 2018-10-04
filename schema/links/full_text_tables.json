@@ -6,7 +6,7 @@
         },
         "ScraperCitations": {
             "key": "citation_id",
-            "columns": ["abstract", "author", "booktitle", "journal", "keywords", "note", "title", "url" ]
+            "columns": ["abstract_description", "author", "booktitle", "journal", "keywords", "note", "title", "url" ]
         },
         "OpenScholarMapping": {
             "key": "id",
