@@ -1,0 +1,8 @@
+{ 
+    "tables": {
+        "Appointments": {
+            "key": "empl_id",
+            "columns": ["business_title"]
+        }
+    }
+}

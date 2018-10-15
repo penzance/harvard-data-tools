@@ -1,0 +1,13 @@
+{
+	"Appointments": {
+		"empl_id": ["HUID"],
+		"work_address_1": ["Other"],
+		"work_address_2": ["Other"],
+		"work_address_3": ["Other"],
+		"work_address_4": ["Other"],
+		"work_city": ["Other"],
+		"work_state_cd": ["Other"],
+		"work_postal": ["Other"]
+	}
+}
+
