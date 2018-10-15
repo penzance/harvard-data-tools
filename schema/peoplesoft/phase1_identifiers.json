@@ -7,7 +7,12 @@
 		"work_address_4": ["Other"],
 		"work_city": ["Other"],
 		"work_state_cd": ["Other"],
-		"work_postal": ["Other"]
+		"work_postal": ["Other"],
+		"pri_last_name": ["Other"],
+		"pri_first_name": ["Other"],
+		"hrvd_email_addr": ["EmailAddress"],
+		"scnd_email_addr": ["EmailAddress"],
+		"hms_email_addr": ["EmailAddress"]
 	}
 }
 
