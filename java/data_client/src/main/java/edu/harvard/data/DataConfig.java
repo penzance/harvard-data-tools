@@ -364,6 +364,14 @@ public class DataConfig {
   public String getPhase1NameOutput() {
     return IdentifierType.Name.getFieldName();
   }
+  
+  public String getPhase1NameFirstOutput() {
+    return IdentifierType.NameFirst.getFieldName();
+  }
+  
+  public String getPhase1NameLastOutput() {
+    return IdentifierType.NameLast.getFieldName();
+  }
 
   public String getCreateHiveTables(final int phase) {
     return "phase_" + phase + "_create_tables.sh";

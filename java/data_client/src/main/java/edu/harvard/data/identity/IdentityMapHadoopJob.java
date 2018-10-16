@@ -172,6 +172,10 @@ public class IdentityMapHadoopJob {
         Text.class, NullWritable.class);
     MultipleOutputs.addNamedOutput(job, config.getPhase1NameOutput(), TextOutputFormat.class,
         Text.class, NullWritable.class);
+    MultipleOutputs.addNamedOutput(job, config.getPhase1NameFirstOutput(), TextOutputFormat.class, 
+    	Text.class, NullWritable.class);
+    MultipleOutputs.addNamedOutput(job, config.getPhase1NameLastOutput(), TextOutputFormat.class, 
+    	Text.class, NullWritable.class);
     
     return job;
   }

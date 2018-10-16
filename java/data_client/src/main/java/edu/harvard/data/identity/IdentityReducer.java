@@ -127,6 +127,8 @@ public class IdentityReducer<T> {
     final IdentityMap id;
     final Set<String> emails = new HashSet<String>();
     final Set<String> names = new HashSet<String>();
+    final Set<String> names_first = new HashSet<String>();
+    final Set<String> names_last = new HashSet<String>();
     if (identities.containsKey(mainIdValue)) {
       id = identities.get(mainIdValue);
     } else {
@@ -152,6 +154,18 @@ public class IdentityReducer<T> {
     	  log.info( "Adding id to name output " + value.getIdentityMap().get(IdentifierType.ResearchUUID) );
         names.add(name);
       }
+      
+      final String name_first = (String) value.getIdentityMap().get(IdentifierType.NameFirst);
+      if (name_first != null && !name_first.isEmpty() && name_first.length() > 1) {
+    	  log.info( "Adding id to name first output " + value.getIdentityMap().get(IdentifierType.ResearchUUID) );
+        names_first.add(name_first);
+      }
+      
+      final String name_last = (String) value.getIdentityMap().get(IdentifierType.NameLast);
+      if (name_last != null && !name_last.isEmpty() && name_last.length() > 1) {
+    	  log.info( "Adding id to name last output " + value.getIdentityMap().get(IdentifierType.ResearchUUID) );
+        names_last.add(name_last);
+      }
     }
     outputResult("tempidentitymap", outputs, id.getFieldsAsList(format).toArray());    
     for (final String email : emails) {
@@ -166,6 +180,22 @@ public class IdentityReducer<T> {
              name);
       }
     }
+    
+    for (final String name_first : names_first) {
+      if (name_first != null && !name_first.isEmpty() && name_first.length() > 1) {
+          outputResult(IdentifierType.Name.getFieldName(), outputs, id.get(IdentifierType.ResearchUUID),
+             name_first);
+      }
+    }
+    
+    for (final String name_last : names_last) {
+      if (name_last != null && !name_last.isEmpty() && name_last.length() > 1) {
+          outputResult(IdentifierType.Name.getFieldName(), outputs, id.get(IdentifierType.ResearchUUID),
+             name_last);
+      }
+    }
+    
+    
   }
 
   private void outputResult(final String outputName,
