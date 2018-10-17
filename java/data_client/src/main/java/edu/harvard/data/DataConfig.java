@@ -360,11 +360,11 @@ public class DataConfig {
   }
   
   public String getPhase1NameFirstOutput() {
-    return IdentifierType.NameFirst.getFieldName();
+    return IdentifierType.NameFirst.getFieldName().replace("_","");
   }
   
   public String getPhase1NameLastOutput() {
-    return IdentifierType.NameLast.getFieldName();
+    return IdentifierType.NameLast.getFieldName().replace("_","");
   }
 
   public String getCreateHiveTables(final int phase) {
