@@ -183,14 +183,14 @@ public class IdentityReducer<T> {
     
     for (final String name_first : names_first) {
       if (name_first != null && !name_first.isEmpty() && name_first.length() > 1) {
-          outputResult(IdentifierType.Name.getFieldName(), outputs, id.get(IdentifierType.ResearchUUID),
+          outputResult(IdentifierType.NameFirst.getFieldName(), outputs, id.get(IdentifierType.ResearchUUID),
              name_first);
       }
     }
     
     for (final String name_last : names_last) {
       if (name_last != null && !name_last.isEmpty() && name_last.length() > 1) {
-          outputResult(IdentifierType.Name.getFieldName(), outputs, id.get(IdentifierType.ResearchUUID),
+          outputResult(IdentifierType.NameLast.getFieldName(), outputs, id.get(IdentifierType.ResearchUUID),
              name_last);
       }
     }
