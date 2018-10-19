@@ -8,6 +8,12 @@
 	    "description": ""
         },
         {
+            "name": "fas_division_final",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
             "name": "school_final",
 	    "type": "varchar",
 	    "length": 255,
