@@ -27,6 +27,8 @@ import edu.harvard.data.links.bindings.phase0.Phase0ScraperCitations;
 import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarMapping;
 import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarBiblioTitles;
 import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarPages;
+import edu.harvard.data.links.bindings.phase0.Phase0Gazette;
+import edu.harvard.data.links.bindings.phase0.Phase0Rss;
 import edu.harvard.data.pipeline.InputTableIndex;
 
 public class InputParser {
@@ -56,6 +58,8 @@ public class InputParser {
   private final S3ObjectId ostitlesOutputDir;
   private final S3ObjectId osmappingOutputDir;
   private final S3ObjectId ospagesOutputDir;
+  private final S3ObjectId gazetteOutputDir;
+  private final S3ObjectId rssOutputDir;
 
 
   public InputParser(final LinksDataConfig config, final AwsUtils aws,
@@ -73,6 +77,8 @@ public class InputParser {
     this.osmappingOutputDir = AwsUtils.key(outputLocation, "OpenScholarMapping");
     this.ostitlesOutputDir = AwsUtils.key(outputLocation, "OpenScholarBiblioTitles");
     this.ospagesOutputDir = AwsUtils.key(outputLocation, "OpenScholarPages");
+    this.gazetteOutputDir = AwsUtils.key(outputLocation, "Gazette");
+    this.rssOutputDir = AwsUtils.key(outputLocation, "rssOutputDir");
     final FormatLibrary formatLibrary = new FormatLibrary();
     this.inFormat = formatLibrary.getFormat(Format.Sis);
     final ObjectMapper jsonMapper = new ObjectMapper();
@@ -120,6 +126,10 @@ public class InputParser {
         dataproductOutputObj = AwsUtils.key(ostitlesOutputDir, dataproductFilename);        
     } else if ( currentDataProduct.equals("OpenScholarPages") ) {
         dataproductOutputObj = AwsUtils.key(ospagesOutputDir, dataproductFilename);        
+    } else if ( currentDataProduct.equals("Gazette") ) {
+        dataproductOutputObj = AwsUtils.key(gazetteOutputDir, dataproductFilename);        
+    } else if ( currentDataProduct.equals("Rss") ) {
+        dataproductOutputObj = AwsUtils.key(rssOutputDir, dataproductFilename);        
     }
     
     log.info("Parsing " + filename + " to " + dataproductFile);
@@ -184,6 +194,28 @@ public class InputParser {
     			  citations.add((Phase0OpenScholarPages) tables.get("OpenScholarPages").get(0));
     		}
     	}
+	} else if (currentDataProduct.equals("Gazette")) {
+        log.info("Parsing data product " + currentDataProduct);
+    	try (
+    	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
+    	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
+    	    	TableWriter<Phase0Gazette> articles = new TableWriter<Phase0Gazette>(Phase0Gazette.class, outFormat,
+    	                dataproductFile);) {
+    		for (final Map<String, List<? extends DataTable>> tables : in) {
+    			  articles.add((Phase0Gazette) tables.get("Gazette").get(0));
+    		}
+    	}
+	} else if (currentDataProduct.equals("Rss")) {
+        log.info("Parsing data product " + currentDataProduct);
+    	try (
+    	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
+    	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
+    	    	TableWriter<Phase0Rss> rssfeeds = new TableWriter<Phase0Rss>(Phase0Rss.class, outFormat,
+    	                dataproductFile);) {
+    		for (final Map<String, List<? extends DataTable>> tables : in) {
+    			  rssfeeds.add((Phase0Rss) tables.get("Rss").get(0));
+    		}
+    	}
 	}
     log.info("Done Parsing file " + originalFile);
   }
@@ -225,6 +257,20 @@ public class InputParser {
 			outFormat, dataproductFile)) {
 		  log.info("Verifying file " + dataproductFile);	
 	      for (final Phase0OpenScholarPages i : in ) {
+	      }
+	    }	    
+    } else if (currentDataProduct.equals("Gazette")) {
+	    try(FileTableReader<Phase0Gazette> in = new FileTableReader<Phase0Gazette>(Phase0Gazette.class,
+			outFormat, dataproductFile)) {
+		  log.info("Verifying file " + dataproductFile);	
+	      for (final Phase0Gazette i : in ) {
+	      }
+	    }	    
+    } else if (currentDataProduct.equals("Rss")) {
+	    try(FileTableReader<Phase0Rss> in = new FileTableReader<Phase0Rss>(Phase0Rss.class,
+			outFormat, dataproductFile)) {
+		  log.info("Verifying file " + dataproductFile);	
+	      for (final Phase0Rss i : in ) {
 	      }
 	    }	    
     }

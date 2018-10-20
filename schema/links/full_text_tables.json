@@ -19,6 +19,14 @@
         "OpenScholarPages": {
             "key": "id",
             "columns": ["label","body"]
+        },
+        "Gazette": {
+            "key": "id",
+            "columns": ["categories","content","description","title"]
+        },
+        "Rss": {
+            "key": "id",
+            "columns": ["description","title"]
         }
     }
 }
