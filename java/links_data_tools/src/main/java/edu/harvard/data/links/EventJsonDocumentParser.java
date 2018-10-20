@@ -20,6 +20,8 @@ import edu.harvard.data.links.bindings.phase0.Phase0ScraperCitations;
 import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarMapping;
 import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarBiblioTitles;
 import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarPages;
+import edu.harvard.data.links.bindings.phase0.Phase0Gazette;
+import edu.harvard.data.links.bindings.phase0.Phase0Rss;
 
 public class EventJsonDocumentParser implements JsonDocumentParser {
   private static final Logger log = LogManager.getLogger();
@@ -70,6 +72,19 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     ospages.add(ospage);
     tables.put("OpenScholarPages", ospages );
     
+    // Gazette
+    final Phase0Gazette article = new Phase0Gazette(format, values);
+    final List<Phase0Gazette> articles = new ArrayList<Phase0Gazette>();
+    articles.add(article);
+    tables.put("Gazette", articles );
+
+    // RSS
+    final Phase0Rss rssfeed = new Phase0Rss(format, values);
+    final List<Phase0Rss> rssfeeds = new ArrayList<Phase0Rss>();
+    rssfeeds.add(rssfeed);
+    tables.put("Rss", rssfeeds );
+    
+    
     // Verification Step (optional)
     if (verify) {
     	verifyParser(values, tables);
@@ -85,6 +100,8 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 	final List<? extends DataTable> osmapping = tables.get("OpenScholarMapping");
 	final List<? extends DataTable> ostitles = tables.get("OpenScholarBiblioTitles");
 	final List<? extends DataTable> ospages = tables.get("OpenScholarPages");
+	final List<? extends DataTable> articles = tables.get("Gazette");
+	final List<? extends DataTable> rssfeeds = tables.get("Rss");
 
 
 	final Map<String, Object> parsedScraped = scraped.get(0).getFieldsAsMap();
@@ -92,6 +109,8 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 	final Map<String, Object> parsedOSMapping = osmapping.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedOSTitles= ostitles.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedOSPages= ospages.get(0).getFieldsAsMap();
+	final Map<String, Object> parsedArticles = articles.get(0).getFieldsAsMap();
+	final Map<String, Object> parsedRssfeeds = rssfeeds.get(0).getFieldsAsMap();
 
 	
 	// Scraper
@@ -151,6 +170,30 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 		    log.error("Failed to verify JSON document. " + e.getMessage());
 		    log.error("Original map: " + values);
 		    log.error("Parsed map:   " + parsedOSPages );
+		    throw e;				
+		}
+	}
+	// Gazette
+	else if (dataproduct.equals("Gazette")) {
+		
+		try {	
+			compareMaps(values, parsedArticles );		
+		} catch (final VerificationException e) {
+		    log.error("Failed to verify JSON document. " + e.getMessage());
+		    log.error("Original map: " + values);
+		    log.error("Parsed map:   " + parsedArticles );
+		    throw e;				
+		}
+	}
+	// RSS
+	else if (dataproduct.equals("Rss")) {
+		
+		try {	
+			compareMaps(values, parsedRssfeeds );		
+		} catch (final VerificationException e) {
+		    log.error("Failed to verify JSON document. " + e.getMessage());
+		    log.error("Original map: " + values);
+		    log.error("Parsed map:   " + parsedRssfeeds );
 		    throw e;				
 		}
 	}
