@@ -380,6 +380,12 @@
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
+	},
+        {
+            "name": "title",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
 	}
       ]
     },
