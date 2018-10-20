@@ -78,7 +78,7 @@ public class InputParser {
     this.ostitlesOutputDir = AwsUtils.key(outputLocation, "OpenScholarBiblioTitles");
     this.ospagesOutputDir = AwsUtils.key(outputLocation, "OpenScholarPages");
     this.gazetteOutputDir = AwsUtils.key(outputLocation, "Gazette");
-    this.rssOutputDir = AwsUtils.key(outputLocation, "rssOutputDir");
+    this.rssOutputDir = AwsUtils.key(outputLocation, "Rss");
     final FormatLibrary formatLibrary = new FormatLibrary();
     this.inFormat = formatLibrary.getFormat(Format.Sis);
     final ObjectMapper jsonMapper = new ObjectMapper();
