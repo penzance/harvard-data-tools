@@ -24,6 +24,7 @@ import edu.harvard.data.io.TableWriter;
 import edu.harvard.data.links.LinksDataConfig;
 import edu.harvard.data.links.bindings.phase0.Phase0ScraperText;
 import edu.harvard.data.links.bindings.phase0.Phase0ScraperCitations;
+import edu.harvard.data.links.bindings.phase0.Phase0ScraperCitationsCatalyst;
 import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarMapping;
 import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarBiblioTitles;
 import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarPages;
@@ -55,6 +56,7 @@ public class InputParser {
   private final TableFormat outFormat; 
   private final S3ObjectId scraperOutputDir;
   private final S3ObjectId citationOutputDir;
+  private final S3ObjectId catalystOutputDir;
   private final S3ObjectId ostitlesOutputDir;
   private final S3ObjectId osmappingOutputDir;
   private final S3ObjectId ospagesOutputDir;
@@ -74,6 +76,7 @@ public class InputParser {
     this.currentDataProduct = getDataProduct();
     this.scraperOutputDir = AwsUtils.key(outputLocation, "ScraperText");
     this.citationOutputDir = AwsUtils.key(outputLocation, "ScraperCitations");
+    this.catalystOutputDir = AwsUtils.key(outputLocation, "ScraperCitationsCatalyst");
     this.osmappingOutputDir = AwsUtils.key(outputLocation, "OpenScholarMapping");
     this.ostitlesOutputDir = AwsUtils.key(outputLocation, "OpenScholarBiblioTitles");
     this.ospagesOutputDir = AwsUtils.key(outputLocation, "OpenScholarPages");
@@ -120,6 +123,8 @@ public class InputParser {
         dataproductOutputObj = AwsUtils.key(scraperOutputDir, dataproductFilename );  
     } else if ( currentDataProduct.equals("ScraperCitations") ) {
         dataproductOutputObj = AwsUtils.key(citationOutputDir, dataproductFilename);        
+    } else if ( currentDataProduct.equals("ScraperCitationsCatalyst") ) {
+        dataproductOutputObj = AwsUtils.key(catalystOutputDir, dataproductFilename);        
     } else if ( currentDataProduct.equals("OpenScholarMapping") ) {
         dataproductOutputObj = AwsUtils.key(osmappingOutputDir , dataproductFilename);        
     } else if ( currentDataProduct.equals("OpenScholarBiblioTitles") ) {
@@ -159,6 +164,17 @@ public class InputParser {
     	                dataproductFile);) {
     		for (final Map<String, List<? extends DataTable>> tables : in) {
     			  citations.add((Phase0ScraperCitations) tables.get("ScraperCitations").get(0));
+    		}
+    	}
+	} else if (currentDataProduct.equals("ScraperCitationsCatalyst")) {
+        log.info("Parsing data product " + currentDataProduct);
+    	try (
+    	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
+    	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
+    	    	TableWriter<Phase0ScraperCitationsCatalyst> citations = new TableWriter<Phase0ScraperCitationsCatalyst>(Phase0ScraperCitationsCatalyst.class, outFormat,
+    	                dataproductFile);) {
+    		for (final Map<String, List<? extends DataTable>> tables : in) {
+    			  citations.add((Phase0ScraperCitationsCatalyst) tables.get("ScraperCitationsCatalyst").get(0));
     		}
     	}
 	} else if (currentDataProduct.equals("OpenScholarMapping")) {
@@ -236,6 +252,13 @@ public class InputParser {
 			outFormat, dataproductFile)) {
 		  log.info("Verifying file " + dataproductFile);	
 	      for (final Phase0ScraperCitations i : in ) {
+	      }
+	    }	    
+    } else if (currentDataProduct.equals("ScraperCitationsCatalyst")) {
+	    try(FileTableReader<Phase0ScraperCitationsCatalyst> in = new FileTableReader<Phase0ScraperCitationsCatalyst>(Phase0ScraperCitationsCatalyst.class,
+			outFormat, dataproductFile)) {
+		  log.info("Verifying file " + dataproductFile);	
+	      for (final Phase0ScraperCitationsCatalyst i : in ) {
 	      }
 	    }	    
     } else if (currentDataProduct.equals("OpenScholarMapping")) {

@@ -5,6 +5,9 @@
 	"ScraperCitations": {
 		"user_id": ["HUID"]
 	},
+	"ScraperCitationsCatalyst": {
+		"person_id": ["HUID"]
+	},
 	"OpenScholarMapping": {
 		"site_title": ["Other"],
 		"site_owner_email": ["Other"],
