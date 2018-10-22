@@ -398,6 +398,12 @@
 	    "description": ""
 	},
         {
+            "name": "feed",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
             "name": "link",
 	    "type": "varchar",
 	    "length": 255,
