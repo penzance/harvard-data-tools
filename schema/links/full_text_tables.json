@@ -8,6 +8,10 @@
             "key": "citation_id",
             "columns": ["abstract_description", "author", "booktitle", "journal", "keywords", "note", "title", "url" ]
         },
+        "ScraperCitationsCatalyst": {
+            "key": "catalyst_id",
+            "columns": ["catalyst_authors", "catalyst_title", "catalyst_other", "publications" ]
+        },
         "OpenScholarMapping": {
             "key": "id",
             "columns": ["site_privacy_setting", "site_url"]

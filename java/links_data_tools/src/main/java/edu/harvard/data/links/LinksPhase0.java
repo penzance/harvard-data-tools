@@ -58,6 +58,8 @@ public class LinksPhase0 extends Phase0 {
             dataIndex.setPartial(table, true); 	
        } else if ( table.equals("ScraperCitations") ) {
            dataIndex.setPartial(table, true); 
+       } else if ( table.equals("ScraperCitationsCatalyst") ) {
+           dataIndex.setPartial(table, true); 
        } else if ( table.equals("OpenScholarPages") ) {
            dataIndex.setPartial(table, true); 
        } else if ( table.equals("OpenScholarBiblioTitles") ) {

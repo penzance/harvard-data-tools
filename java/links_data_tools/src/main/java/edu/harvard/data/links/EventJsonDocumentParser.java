@@ -17,6 +17,7 @@ import edu.harvard.data.VerificationException;
 import edu.harvard.data.io.JsonDocumentParser;
 import edu.harvard.data.links.bindings.phase0.Phase0ScraperText;
 import edu.harvard.data.links.bindings.phase0.Phase0ScraperCitations;
+import edu.harvard.data.links.bindings.phase0.Phase0ScraperCitationsCatalyst;
 import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarMapping;
 import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarBiblioTitles;
 import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarPages;
@@ -53,6 +54,12 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     final List<Phase0ScraperCitations> citations = new ArrayList<Phase0ScraperCitations>();
     citations.add(citation);
     tables.put("ScraperCitations", citations);
+    
+    // Catalyst
+    final Phase0ScraperCitationsCatalyst catalyst = new Phase0ScraperCitationsCatalyst(format, values);
+    final List<Phase0ScraperCitationsCatalyst> catalysts = new ArrayList<Phase0ScraperCitationsCatalyst>();
+    catalysts.add(catalyst);
+    tables.put("ScraperCitationsCatalyst", catalysts);
     
     // OpenScholarMapping
     final Phase0OpenScholarMapping osmapping = new Phase0OpenScholarMapping(format, values);
@@ -97,6 +104,7 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     // Start
 	final List<? extends DataTable> scraped = tables.get("ScraperText");
 	final List<? extends DataTable> citation = tables.get("ScraperCitations");
+	final List<? extends DataTable> catalyst = tables.get("ScraperCitationsCatalyst");
 	final List<? extends DataTable> osmapping = tables.get("OpenScholarMapping");
 	final List<? extends DataTable> ostitles = tables.get("OpenScholarBiblioTitles");
 	final List<? extends DataTable> ospages = tables.get("OpenScholarPages");
@@ -106,6 +114,7 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 
 	final Map<String, Object> parsedScraped = scraped.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedCitation = citation.get(0).getFieldsAsMap();
+	final Map<String, Object> parsedCatalyst = catalyst.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedOSMapping = osmapping.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedOSTitles= ostitles.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedOSPages= ospages.get(0).getFieldsAsMap();
@@ -134,6 +143,18 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 		    log.error("Failed to verify JSON document. " + e.getMessage());
 		    log.error("Original map: " + values);
 		    log.error("Parsed map:   " + parsedCitation);
+		    throw e;				
+		}
+	}
+	// Catalyst
+	else if (dataproduct.equals("ScraperCitationsCatalyst")) {
+		
+		try {	
+			compareMaps(values, parsedCatalyst);		
+		} catch (final VerificationException e) {
+		    log.error("Failed to verify JSON document. " + e.getMessage());
+		    log.error("Original map: " + values);
+		    log.error("Parsed map:   " + parsedCatalyst);
 		    throw e;				
 		}
 	}
