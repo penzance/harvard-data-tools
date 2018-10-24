@@ -26,6 +26,12 @@
 	    "description": ""
         },
         {
+            "name": "page_type",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
             "name": "url",
 	    "type": "varchar",
 	    "length": 255,
