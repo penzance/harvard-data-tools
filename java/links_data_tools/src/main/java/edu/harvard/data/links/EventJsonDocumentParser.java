@@ -22,6 +22,7 @@ import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarMapping;
 import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarBiblioTitles;
 import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarPages;
 import edu.harvard.data.links.bindings.phase0.Phase0Gazette;
+import edu.harvard.data.links.bindings.phase0.Phase0GazetteEvents;
 import edu.harvard.data.links.bindings.phase0.Phase0Rss;
 
 public class EventJsonDocumentParser implements JsonDocumentParser {
@@ -85,6 +86,12 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     articles.add(article);
     tables.put("Gazette", articles );
 
+    // Gazette Events
+    final Phase0GazetteEvents gevent = new Phase0GazetteEvents(format, values);
+    final List<Phase0GazetteEvents> gevents = new ArrayList<Phase0GazetteEvents>();
+    gevents.add(gevent);
+    tables.put("GazetteEvents", gevents );
+
     // RSS
     final Phase0Rss rssfeed = new Phase0Rss(format, values);
     final List<Phase0Rss> rssfeeds = new ArrayList<Phase0Rss>();
@@ -109,6 +116,7 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 	final List<? extends DataTable> ostitles = tables.get("OpenScholarBiblioTitles");
 	final List<? extends DataTable> ospages = tables.get("OpenScholarPages");
 	final List<? extends DataTable> articles = tables.get("Gazette");
+	final List<? extends DataTable> gevents = tables.get("GazetteEvents");
 	final List<? extends DataTable> rssfeeds = tables.get("Rss");
 
 
@@ -119,6 +127,7 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 	final Map<String, Object> parsedOSTitles= ostitles.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedOSPages= ospages.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedArticles = articles.get(0).getFieldsAsMap();
+	final Map<String, Object> parsedGevents = gevents.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedRssfeeds = rssfeeds.get(0).getFieldsAsMap();
 
 	
@@ -203,6 +212,18 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 		    log.error("Failed to verify JSON document. " + e.getMessage());
 		    log.error("Original map: " + values);
 		    log.error("Parsed map:   " + parsedArticles );
+		    throw e;				
+		}
+	}
+	// Gazette Events
+	else if (dataproduct.equals("GazetteEvents")) {
+		
+		try {	
+			compareMaps(values, parsedGevents );		
+		} catch (final VerificationException e) {
+		    log.error("Failed to verify JSON document. " + e.getMessage());
+		    log.error("Original map: " + values);
+		    log.error("Parsed map:   " + parsedGevents );
 		    throw e;				
 		}
 	}
