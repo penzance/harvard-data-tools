@@ -29,6 +29,7 @@ import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarMapping;
 import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarBiblioTitles;
 import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarPages;
 import edu.harvard.data.links.bindings.phase0.Phase0Gazette;
+import edu.harvard.data.links.bindings.phase0.Phase0GazetteEvents;
 import edu.harvard.data.links.bindings.phase0.Phase0Rss;
 import edu.harvard.data.pipeline.InputTableIndex;
 
@@ -61,6 +62,7 @@ public class InputParser {
   private final S3ObjectId osmappingOutputDir;
   private final S3ObjectId ospagesOutputDir;
   private final S3ObjectId gazetteOutputDir;
+  private final S3ObjectId geventsOutputDir;
   private final S3ObjectId rssOutputDir;
 
 
@@ -81,6 +83,7 @@ public class InputParser {
     this.ostitlesOutputDir = AwsUtils.key(outputLocation, "OpenScholarBiblioTitles");
     this.ospagesOutputDir = AwsUtils.key(outputLocation, "OpenScholarPages");
     this.gazetteOutputDir = AwsUtils.key(outputLocation, "Gazette");
+    this.geventsOutputDir = AwsUtils.key(outputLocation, "GazetteEvents");
     this.rssOutputDir = AwsUtils.key(outputLocation, "Rss");
     final FormatLibrary formatLibrary = new FormatLibrary();
     this.inFormat = formatLibrary.getFormat(Format.Sis);
@@ -133,6 +136,8 @@ public class InputParser {
         dataproductOutputObj = AwsUtils.key(ospagesOutputDir, dataproductFilename);        
     } else if ( currentDataProduct.equals("Gazette") ) {
         dataproductOutputObj = AwsUtils.key(gazetteOutputDir, dataproductFilename);        
+    } else if ( currentDataProduct.equals("GazetteEvents") ) {
+        dataproductOutputObj = AwsUtils.key(geventsOutputDir, dataproductFilename);        
     } else if ( currentDataProduct.equals("Rss") ) {
         dataproductOutputObj = AwsUtils.key(rssOutputDir, dataproductFilename);        
     }
@@ -221,6 +226,17 @@ public class InputParser {
     			  articles.add((Phase0Gazette) tables.get("Gazette").get(0));
     		}
     	}
+	} else if (currentDataProduct.equals("GazetteEvents")) {
+        log.info("Parsing data product " + currentDataProduct);
+    	try (
+    	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
+    	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
+    	    	TableWriter<Phase0GazetteEvents> gevents = new TableWriter<Phase0GazetteEvents>(Phase0GazetteEvents.class, outFormat,
+    	                dataproductFile);) {
+    		for (final Map<String, List<? extends DataTable>> tables : in) {
+    			  gevents.add((Phase0GazetteEvents) tables.get("GazetteEvents").get(0));
+    		}
+    	}
 	} else if (currentDataProduct.equals("Rss")) {
         log.info("Parsing data product " + currentDataProduct);
     	try (
@@ -287,6 +303,13 @@ public class InputParser {
 			outFormat, dataproductFile)) {
 		  log.info("Verifying file " + dataproductFile);	
 	      for (final Phase0Gazette i : in ) {
+	      }
+	    }	    
+    } else if (currentDataProduct.equals("GazetteEvents")) {
+	    try(FileTableReader<Phase0GazetteEvents> in = new FileTableReader<Phase0GazetteEvents>(Phase0GazetteEvents.class,
+			outFormat, dataproductFile)) {
+		  log.info("Verifying file " + dataproductFile);	
+	      for (final Phase0GazetteEvents i : in ) {
 	      }
 	    }	    
     } else if (currentDataProduct.equals("Rss")) {

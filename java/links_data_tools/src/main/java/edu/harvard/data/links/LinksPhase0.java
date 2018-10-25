@@ -68,6 +68,8 @@ public class LinksPhase0 extends Phase0 {
            dataIndex.setPartial(table, true); 
        } else if ( table.equals("Gazette") ) {
            dataIndex.setPartial(table, true); 
+       } else if ( table.equals("GazetteEvents") ) {
+           dataIndex.setPartial(table, true); 
        } else if ( table.equals("Rss") ) {
            dataIndex.setPartial(table, true); 
        }
