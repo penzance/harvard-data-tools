@@ -2,6 +2,11 @@
   { "CourseCatalog": {
       "columns" : [ 
         {
+            "name": "ODS_ID",
+	    "type": "integer",
+	    "description": "Uniquely constructed identifier"
+        },
+        {
             "name": "ODS_CATALOG_ID",
 	    "type": "integer",
 	    "description": "Uniquely constructed identifier using concatenation of class number and term code"
