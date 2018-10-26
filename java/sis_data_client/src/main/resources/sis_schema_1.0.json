@@ -3,7 +3,8 @@
       "columns" : [ 
         {
             "name": "ODS_ID",
-	    "type": "integer",
+	    "type": "varchar",
+	    "length": 256,
 	    "description": "Uniquely constructed identifier"
         },
         {
