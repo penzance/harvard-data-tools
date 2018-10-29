@@ -30,7 +30,7 @@
         },
         "GazetteEvents": {
             "key": "eventID",
-            "columns": ["title","location","description","eventImage","permaLinkUrl","webLink","customFields"]
+            "columns": ["title","location","eventImage", "permaLinkUrl", "webLink", "customFields", "description"]
         },
         "Rss": {
             "key": "id",
