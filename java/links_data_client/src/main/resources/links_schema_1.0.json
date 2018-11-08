@@ -674,6 +674,18 @@
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
+	},
+        {
+            "name": "feed",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "feedlabel",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
 	}
       ]
     }
