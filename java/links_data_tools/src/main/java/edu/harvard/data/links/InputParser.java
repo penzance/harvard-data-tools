@@ -31,6 +31,7 @@ import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarPages;
 import edu.harvard.data.links.bindings.phase0.Phase0Gazette;
 import edu.harvard.data.links.bindings.phase0.Phase0GazetteEvents;
 import edu.harvard.data.links.bindings.phase0.Phase0Rss;
+import edu.harvard.data.links.bindings.phase0.Phase0HiltIntoPractice;
 import edu.harvard.data.pipeline.InputTableIndex;
 
 public class InputParser {
@@ -64,6 +65,7 @@ public class InputParser {
   private final S3ObjectId gazetteOutputDir;
   private final S3ObjectId geventsOutputDir;
   private final S3ObjectId rssOutputDir;
+  private final S3ObjectId hiltipOutputDir;
 
 
   public InputParser(final LinksDataConfig config, final AwsUtils aws,
@@ -85,6 +87,7 @@ public class InputParser {
     this.gazetteOutputDir = AwsUtils.key(outputLocation, "Gazette");
     this.geventsOutputDir = AwsUtils.key(outputLocation, "GazetteEvents");
     this.rssOutputDir = AwsUtils.key(outputLocation, "Rss");
+    this.hiltipOutputDir = AwsUtils.key(outputLocation, "HiltIntoPractice");
     final FormatLibrary formatLibrary = new FormatLibrary();
     this.inFormat = formatLibrary.getFormat(Format.Sis);
     final ObjectMapper jsonMapper = new ObjectMapper();
@@ -140,6 +143,8 @@ public class InputParser {
         dataproductOutputObj = AwsUtils.key(geventsOutputDir, dataproductFilename);        
     } else if ( currentDataProduct.equals("Rss") ) {
         dataproductOutputObj = AwsUtils.key(rssOutputDir, dataproductFilename);        
+    } else if ( currentDataProduct.equals("HiltIntoPractice") ) {
+        dataproductOutputObj = AwsUtils.key(hiltipOutputDir, dataproductFilename);        
     }
     
     log.info("Parsing " + filename + " to " + dataproductFile);
@@ -248,6 +253,17 @@ public class InputParser {
     			  rssfeeds.add((Phase0Rss) tables.get("Rss").get(0));
     		}
     	}
+	} else if (currentDataProduct.equals("HiltIntoPractice")) {
+        log.info("Parsing data product " + currentDataProduct);
+    	try (
+    	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
+    	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
+    	    	TableWriter<Phase0HiltIntoPractice> hiltips = new TableWriter<Phase0HiltIntoPractice>(Phase0HiltIntoPractice.class, outFormat,
+    	                dataproductFile);) {
+    		for (final Map<String, List<? extends DataTable>> tables : in) {
+    			  hiltips.add((Phase0HiltIntoPractice) tables.get("HiltIntoPractice").get(0));
+    		}
+    	}
 	}
     log.info("Done Parsing file " + originalFile);
   }
@@ -317,6 +333,13 @@ public class InputParser {
 			outFormat, dataproductFile)) {
 		  log.info("Verifying file " + dataproductFile);	
 	      for (final Phase0Rss i : in ) {
+	      }
+	    }	    
+    } else if (currentDataProduct.equals("HiltIntoPractice")) {
+	    try(FileTableReader<Phase0HiltIntoPractice> in = new FileTableReader<Phase0HiltIntoPractice>(Phase0HiltIntoPractice.class,
+			outFormat, dataproductFile)) {
+		  log.info("Verifying file " + dataproductFile);	
+	      for (final Phase0HiltIntoPractice i : in ) {
 	      }
 	    }	    
     }

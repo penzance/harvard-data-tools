@@ -24,6 +24,7 @@ import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarPages;
 import edu.harvard.data.links.bindings.phase0.Phase0Gazette;
 import edu.harvard.data.links.bindings.phase0.Phase0GazetteEvents;
 import edu.harvard.data.links.bindings.phase0.Phase0Rss;
+import edu.harvard.data.links.bindings.phase0.Phase0HiltIntoPractice;
 
 public class EventJsonDocumentParser implements JsonDocumentParser {
   private static final Logger log = LogManager.getLogger();
@@ -98,6 +99,11 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     rssfeeds.add(rssfeed);
     tables.put("Rss", rssfeeds );
     
+    // HILT Into Practice
+    final Phase0HiltIntoPractice hiltip = new Phase0HiltIntoPractice(format, values);
+    final List<Phase0HiltIntoPractice> hiltips = new ArrayList<Phase0HiltIntoPractice>();
+    hiltips.add(hiltip);
+    tables.put("HiltIntoPractice", hiltips);
     
     // Verification Step (optional)
     if (verify) {
@@ -118,6 +124,7 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 	final List<? extends DataTable> articles = tables.get("Gazette");
 	final List<? extends DataTable> gevents = tables.get("GazetteEvents");
 	final List<? extends DataTable> rssfeeds = tables.get("Rss");
+	final List<? extends DataTable> hiltips = tables.get("HiltIntoPractice");
 
 
 	final Map<String, Object> parsedScraped = scraped.get(0).getFieldsAsMap();
@@ -129,6 +136,7 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 	final Map<String, Object> parsedArticles = articles.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedGevents = gevents.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedRssfeeds = rssfeeds.get(0).getFieldsAsMap();
+	final Map<String, Object> parsedHiltIp = hiltips.get(0).getFieldsAsMap();
 
 	
 	// Scraper
@@ -236,6 +244,18 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 		    log.error("Failed to verify JSON document. " + e.getMessage());
 		    log.error("Original map: " + values);
 		    log.error("Parsed map:   " + parsedRssfeeds );
+		    throw e;				
+		}
+	}
+	// HILT Into Practice
+	else if (dataproduct.equals("HiltIntoPractice")) {
+		
+		try {	
+			compareMaps(values, parsedHiltIp );		
+		} catch (final VerificationException e) {
+		    log.error("Failed to verify JSON document. " + e.getMessage());
+		    log.error("Original map: " + values);
+		    log.error("Parsed map:   " + parsedHiltIp );
 		    throw e;				
 		}
 	}

@@ -35,6 +35,10 @@
         "Rss": {
             "key": "id",
             "columns": ["description","title"]
+        },
+        "HiltIntoPractice": {
+            "key": "id",
+            "columns": ["link","content"]
         }
     }
 }
