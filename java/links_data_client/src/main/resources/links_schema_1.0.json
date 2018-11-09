@@ -688,6 +688,40 @@
 	    "description": ""
 	}
       ]
+    },
+    "HiltIntoPractice": {
+      "columns" : [ 
+        {
+            "name": "id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "link",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "content",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "pubdate",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "pubtime",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	}
+      ]
     }
   }
 }
