@@ -416,6 +416,12 @@
     "Gazette": {
       "columns" : [ 
         {
+            "name": "news_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
             "name": "id",
 	    "type": "varchar",
 	    "length": 255,
@@ -465,6 +471,18 @@
 	},
         {
             "name": "title",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "feed",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "feedlabel",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
