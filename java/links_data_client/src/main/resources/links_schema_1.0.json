@@ -538,6 +538,12 @@
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
+	},
+        {
+            "name": "image_url",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
 	}
       ]
     },
