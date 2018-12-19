@@ -32,6 +32,22 @@
             "key": "id",
             "columns": ["display_name"]
         },
+        "learning_outcome_dim": {
+            "key": "id",
+            "columns": ["short_description", "description", "display_name"]
+        },
+        "learning_outcome_group_dim": {
+            "key": "id",
+            "columns": ["title","description"]
+        },
+        "learning_outcome_question_result_dim": {
+            "key": "id",
+            "columns": ["title"]
+        },
+        "learning_outcome_rubric_criterion_dim": {
+            "key": "id",
+            "columns": ["description"]
+        },
         "quiz_dim": {
             "key": "id",
             "columns": ["description", "name"]
