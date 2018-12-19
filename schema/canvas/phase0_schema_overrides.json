@@ -45,7 +45,7 @@
         {
           "name" : "workflow_state",
           "type": "enum",
-          "description" : "Possible values are 'active’ and 'deleted'."
+          "description" : "Possible values are 'active' and 'deleted'."
         },
         {
           "name" : "calculation_method",
