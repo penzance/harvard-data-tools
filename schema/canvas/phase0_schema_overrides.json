@@ -40,6 +40,29 @@
         }
       ]
     },
+    "learning_outcome_dim": {
+      "columns" : [
+        {
+          "name" : "workflow_state",
+          "type": "enum",
+          "description" : "Possible values are 'active’ and 'deleted'."
+        },
+        {
+          "name" : "calculation_method",
+          "type": "enum",
+          "description" : "Possible values are 'decaying_average', 'highest', 'latest', and 'n_mastery'."
+        }
+      ]
+    },
+    "learning_outcome_group_dim": {
+      "columns" : [
+        {
+          "name" : "workflow_state",
+          "type": "enum",
+          "description" : "Possible values are 'active' and 'deleted'."
+        }
+      ]
+    },
     "module_dim": {
       "columns" : [
         {
