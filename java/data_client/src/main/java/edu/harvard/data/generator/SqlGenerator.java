@@ -23,7 +23,7 @@ public class SqlGenerator {
         columnName = columnName.substring(columnName.lastIndexOf(".") + 1);
       }
       final String redshiftType = column.getType().getRedshiftType(column.getLength());
-      s += "    " + columnName + " " + redshiftType;
+      s += "    \"" + columnName + "\" " + redshiftType;
       if (i < columns.size() - 1) {
         s += ",\n";
       } else {
