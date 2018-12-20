@@ -115,7 +115,7 @@ public class S3ToRedshiftLoaderGenerator {
       if (i > 0) {
         columnList += ",";
       }
-      columnList += columnName;
+      columnList += "\"" + columnName + "\"";
     }
     columnList += ")";
     return columnList;
