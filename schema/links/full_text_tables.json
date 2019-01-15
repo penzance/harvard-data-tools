@@ -25,7 +25,7 @@
             "columns": ["label","body"]
         },
         "Gazette": {
-            "key": "id",
+            "key": "news_id",
             "columns": ["categories","content","description","title"]
         },
         "GazetteEvents": {
