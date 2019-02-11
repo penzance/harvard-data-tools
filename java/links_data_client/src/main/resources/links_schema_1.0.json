@@ -550,6 +550,12 @@
     "GazetteEvents": {
       "columns" : [ 
         {
+            "name": "id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
             "name": "eventID",
 	    "type": "integer",
 	    "description": ""
