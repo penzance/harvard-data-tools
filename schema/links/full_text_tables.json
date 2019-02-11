@@ -29,7 +29,7 @@
             "columns": ["categories","content","description","title"]
         },
         "GazetteEvents": {
-            "key": "eventID",
+            "key": "id",
 	    "columns": ["title","location","customFields","description","eventImage","permaLinkUrl","webLink"]
         },
         "Rss": {
