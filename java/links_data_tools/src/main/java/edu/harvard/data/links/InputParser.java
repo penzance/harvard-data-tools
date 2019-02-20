@@ -23,6 +23,7 @@ import edu.harvard.data.io.JsonFileReader;
 import edu.harvard.data.io.TableWriter;
 import edu.harvard.data.links.LinksDataConfig;
 import edu.harvard.data.links.bindings.phase0.Phase0ScraperText;
+import edu.harvard.data.links.bindings.phase0.Phase0ScraperTextEntity;
 import edu.harvard.data.links.bindings.phase0.Phase0ScraperCitations;
 import edu.harvard.data.links.bindings.phase0.Phase0ScraperCitationsCatalyst;
 import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarMapping;
@@ -57,6 +58,7 @@ public class InputParser {
   private final TableFormat inFormat;
   private final TableFormat outFormat; 
   private final S3ObjectId scraperOutputDir;
+  private final S3ObjectId entityOutputDir;
   private final S3ObjectId citationOutputDir;
   private final S3ObjectId catalystOutputDir;
   private final S3ObjectId ostitlesOutputDir;
@@ -79,6 +81,7 @@ public class InputParser {
     this.dataproductFiletype = ".json.gz";
     this.currentDataProduct = getDataProduct();
     this.scraperOutputDir = AwsUtils.key(outputLocation, "ScraperText");
+    this.entityOutputDir = AwsUtils.key(outputLocation, "ScraperTextEntity");
     this.citationOutputDir = AwsUtils.key(outputLocation, "ScraperCitations");
     this.catalystOutputDir = AwsUtils.key(outputLocation, "ScraperCitationsCatalyst");
     this.osmappingOutputDir = AwsUtils.key(outputLocation, "OpenScholarMapping");
@@ -127,6 +130,8 @@ public class InputParser {
     
     if (currentDataProduct.equals("ScraperText") ) {
         dataproductOutputObj = AwsUtils.key(scraperOutputDir, dataproductFilename );  
+    } else if ( currentDataProduct.equals("ScraperTextEntity") ) {
+        dataproductOutputObj = AwsUtils.key(entityOutputDir, dataproductFilename);        
     } else if ( currentDataProduct.equals("ScraperCitations") ) {
         dataproductOutputObj = AwsUtils.key(citationOutputDir, dataproductFilename);        
     } else if ( currentDataProduct.equals("ScraperCitationsCatalyst") ) {
@@ -163,6 +168,17 @@ public class InputParser {
     	            dataproductFile);) {
     		for (final Map<String, List<? extends DataTable>> tables : in) {
     			  scraped.add((Phase0ScraperText) tables.get("ScraperText").get(0));
+    		}
+    	}
+	} else if (currentDataProduct.equals("ScraperTextEntity")) {
+        log.info("Parsing data product " + currentDataProduct);
+    	try (
+    	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
+    	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
+    	    	TableWriter<Phase0ScraperTextEntity> entities = new TableWriter<Phase0ScraperTextEntity>(Phase0ScraperTextEntity.class, outFormat,
+    	                dataproductFile);) {
+    		for (final Map<String, List<? extends DataTable>> tables : in) {
+    			  entities.add((Phase0ScraperTextEntity) tables.get("ScraperTextEntity").get(0));
     		}
     	}
 	} else if (currentDataProduct.equals("ScraperCitations")) {
@@ -277,6 +293,14 @@ public class InputParser {
 		    outFormat, dataproductFile)) {
 	      log.info("Verifying file " + dataproductFile);	
 	      for (final Phase0ScraperText i : in ) {
+	      }
+	    }
+    } else if (currentDataProduct.equals("ScraperTextEntity")) {
+
+	    try(FileTableReader<Phase0ScraperTextEntity> in = new FileTableReader<Phase0ScraperTextEntity>(Phase0ScraperTextEntity.class,
+		    outFormat, dataproductFile)) {
+	      log.info("Verifying file " + dataproductFile);	
+	      for (final Phase0ScraperTextEntity i : in ) {
 	      }
 	    }
     } else if (currentDataProduct.equals("ScraperCitations")) {

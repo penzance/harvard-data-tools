@@ -39,6 +39,10 @@
         "HiltIntoPractice": {
             "key": "id",
             "columns": ["link","content"]
+        },        
+	"ScraperTextEntity": {
+            "key": "id",
+            "columns": ["text"]
         }
     }
 }
