@@ -752,6 +752,52 @@
 	    "description": ""
 	}
       ]
+    },
+    "ScraperTextEntity": {
+      "columns" : [ 
+        {
+            "name": "id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "entity_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "checksum",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "content_type",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "page_type",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "url",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "text",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        }
+      ]
     }
   }
 }

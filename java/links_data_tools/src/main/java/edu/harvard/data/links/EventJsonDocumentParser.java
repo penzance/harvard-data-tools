@@ -16,6 +16,7 @@ import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.io.JsonDocumentParser;
 import edu.harvard.data.links.bindings.phase0.Phase0ScraperText;
+import edu.harvard.data.links.bindings.phase0.Phase0ScraperTextEntity;
 import edu.harvard.data.links.bindings.phase0.Phase0ScraperCitations;
 import edu.harvard.data.links.bindings.phase0.Phase0ScraperCitationsCatalyst;
 import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarMapping;
@@ -105,6 +106,13 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     hiltips.add(hiltip);
     tables.put("HiltIntoPractice", hiltips);
     
+    // Scraper Entity
+    final Phase0ScraperTextEntity entity = new Phase0ScraperTextEntity(format, values);
+    final List<Phase0ScraperTextEntity> entities = new ArrayList<Phase0ScraperTextEntity>();
+    entities.add(entity);
+    tables.put("ScraperTextEntity", entities);
+    
+    
     // Verification Step (optional)
     if (verify) {
     	verifyParser(values, tables);
@@ -116,6 +124,7 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
       final Map<String, List<? extends DataTable>> tables) throws VerificationException {
     // Start
 	final List<? extends DataTable> scraped = tables.get("ScraperText");
+	final List<? extends DataTable> entities = tables.get("ScraperTextEntity");
 	final List<? extends DataTable> citation = tables.get("ScraperCitations");
 	final List<? extends DataTable> catalyst = tables.get("ScraperCitationsCatalyst");
 	final List<? extends DataTable> osmapping = tables.get("OpenScholarMapping");
@@ -128,6 +137,7 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 
 
 	final Map<String, Object> parsedScraped = scraped.get(0).getFieldsAsMap();
+	final Map<String, Object> parsedEntities = entities.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedCitation = citation.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedCatalyst = catalyst.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedOSMapping = osmapping.get(0).getFieldsAsMap();
@@ -148,6 +158,18 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 	        log.error("Failed to verify JSON document. " + e.getMessage());
 	        log.error("Original map: " + values);
 	        log.error("Parsed map:   " + parsedScraped );
+	        throw e;			
+	    }
+	}
+	// Scraper Entities
+	if (dataproduct.equals("ScraperTextEntity")) {
+		
+	    try {
+		    compareMaps(values, parsedEntities );
+	    } catch (final VerificationException e) {
+	        log.error("Failed to verify JSON document. " + e.getMessage());
+	        log.error("Original map: " + values);
+	        log.error("Parsed map:   " + parsedEntities );
 	        throw e;			
 	    }
 	}
