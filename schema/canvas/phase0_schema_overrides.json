@@ -40,6 +40,29 @@
         }
       ]
     },
+    "catalog_enrollment_dim": {
+      "columns" : [
+        {
+          "name" : "status",
+          "type": "enum",
+          "description" : "Possible values are 'active' and 'dropped'."
+        }
+      ]
+    },
+    "catalog_product_dim": {
+      "columns" : [
+        {
+          "name" : "product_type",
+          "type": "enum",
+          "description" : "Possible values are 'Program' and 'Course'."
+        },
+        {
+          "name" : "visibility",
+          "type": "enum",
+          "description" : "Possible values are 'listed', 'unlisted', and 'hidden'."
+        }
+      ]
+    },
     "learning_outcome_dim": {
       "columns" : [
         {
