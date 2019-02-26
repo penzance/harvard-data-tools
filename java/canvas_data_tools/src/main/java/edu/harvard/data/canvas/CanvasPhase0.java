@@ -188,6 +188,7 @@ public class CanvasPhase0 extends Phase0 {
 
   private void checkSchema() throws VerificationException {
     final Set<String> validSchemas = new HashSet<String>();
+    validSchemas.add("4.2.2");
     validSchemas.add("4.2.1");
     validSchemas.add("4.2.0");
     validSchemas.add("4.1.0");

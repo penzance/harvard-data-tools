@@ -8,6 +8,14 @@
             "key": "id",
             "columns": ["default_assignment_name"]
         },
+        "catalog_dim": {
+            "key": "id",
+            "columns": ["name", "currency", "country", "time_zone"]
+        },
+        "catalog_product_dim": {
+            "key": "id",
+            "columns": ["title"]
+        },
         "conference_dim": {
             "key": "id",
             "columns": ["title", "conference_type"]
