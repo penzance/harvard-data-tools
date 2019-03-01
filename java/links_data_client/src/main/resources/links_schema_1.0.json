@@ -544,6 +544,24 @@
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
+	},
+        {
+            "name": "parsed_date",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "parsed_time_start",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "parsed_time_end",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
 	}
       ]
     },
