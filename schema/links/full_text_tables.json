@@ -34,7 +34,7 @@
         },
         "Rss": {
             "key": "id",
-            "columns": ["description","title"]
+            "columns": ["description","title","locations","categories"]
         },
         "HiltIntoPractice": {
             "key": "id",
