@@ -42,7 +42,7 @@
         },        
 	"ScraperTextEntity": {
             "key": "id",
-            "columns": ["text","url"]
+            "columns": ["url", "text"]
         }
     }
 }
