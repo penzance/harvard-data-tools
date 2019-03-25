@@ -26,6 +26,7 @@ public class GenerationSpec {
   private File hiveScriptDir;
   private DataConfig config;
   private final String schemaVersion;
+  private String bootstrapRapidConfig;
 
   public GenerationSpec(final int transformationPhaseCount, final String schemaVersion) {
     this.schemaVersion = schemaVersion;
@@ -100,6 +101,14 @@ public class GenerationSpec {
 
   public void setConfig(final DataConfig config) {
     this.config = config;
+  }
+  
+  public void setBootstrapRapidConfig(final String bootstrapRapidConfig) {
+	this.bootstrapRapidConfig = bootstrapRapidConfig;
+  }
+  
+  public String getBootstrapRapidConfig() {
+	return bootstrapRapidConfig;
   }
 
   public DataConfig getConfig() {

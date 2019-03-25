@@ -154,6 +154,20 @@ public class PipelineFactory {
     setStdOut(obj, id);
     return obj;
   }
+  
+  public PipelineObjectBase getPythonShellActivity( final String id, final S3ObjectId script, 
+		  final List<String> args,
+	final PipelineObjectBase infrastructure) {
+	final PipelineObjectBase obj = new PipelineObjectBase(config, id, "ShellCommandActivity");
+	setupActivity(id, obj, infrastructure);
+	final String params = StringUtils.join(args, " ");
+	//final String cmd = "python /home/hadoop/code/rapid-code/runtime/main.py " + params;
+	final String cmd = "python " + params;
+	obj.set("command", cmd);
+	obj.set("retryDelay", "2 Minutes");
+	setStdOut(obj, id);
+	return obj;
+  }
 
   public PipelineObjectBase getS3CopyActivity(final String id, final S3ObjectId src,
       final String dest, final PipelineObjectBase infrastructure) {
