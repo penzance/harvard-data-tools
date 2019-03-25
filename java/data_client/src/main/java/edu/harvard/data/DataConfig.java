@@ -128,6 +128,10 @@ public class DataConfig {
   private final String redshiftStagingDir;
   private final String hdfsBase;
   private final String hdfsVerifyBase;
+  private final String rapidRuntime;
+  private final String rapidConfigFile;
+  private final String rapidRequestsDir;
+  private final String rapidCodeDir;
 
   protected String codeGeneratorScript;
   protected String phase0Class;
@@ -147,6 +151,10 @@ public class DataConfig {
     this.redshiftLoadScript = "s3_to_redshift_loader.sql";
     this.s3ToHdfsManifestFile = "s3_to_hdfs_manifest.gz";
     this.fullTextScriptFile = "full_text_copy.sh";
+    this.rapidRuntime = "/runtime/main.py";
+    this.rapidConfigFile = "rapid_config.py";
+    this.rapidCodeDir = "/home/hadoop/code/rapid-code";
+    this.rapidRequestsDir = "/home/hadoop/code/rapid-requests";
     this.redshiftStagingDir = "redshift_staging";
     this.identityRedshiftSchema = "pii";
     this.emrCodeDir = "/home/hadoop/code";
@@ -565,6 +573,23 @@ public class DataConfig {
 
   public String getRedshiftStagingDir() {
     return redshiftStagingDir;
+  }
+  
+  public String getRapidRuntime() {
+	return rapidRuntime;
+	  
+  }
+  
+  public String getRapidConfigFile() {
+	return rapidConfigFile;
+  }
+
+  public String getRapidCodeDir() {
+    return rapidCodeDir;
+  }
+  
+  public String getRapidRequestsDir() {
+	return rapidRequestsDir;
   }
 
   public String getPaths() {

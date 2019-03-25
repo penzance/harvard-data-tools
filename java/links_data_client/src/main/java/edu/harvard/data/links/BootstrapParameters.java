@@ -3,6 +3,7 @@ package edu.harvard.data.links;
 public class BootstrapParameters {
   private String configPathString;
   private boolean downloadOnly;
+  private String rapidConfigString;
   private String message;
 
   public String getConfigPathString() {
@@ -19,6 +20,15 @@ public class BootstrapParameters {
 
   public void setDownloadOnly(final boolean downloadOnly) {
     this.downloadOnly = downloadOnly;
+  }
+  
+  public void setRapidConfigString( final String rapidConfigString) {
+	 this.rapidConfigString = rapidConfigString;
+  }
+  
+  public String getRapidConfig() {
+	return rapidConfigString;
+	  
   }
 
   public String getMessage() {
