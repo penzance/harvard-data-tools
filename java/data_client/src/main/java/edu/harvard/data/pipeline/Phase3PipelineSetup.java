@@ -56,7 +56,7 @@ public class Phase3PipelineSetup {
     return copy;
   }
   
-  private PipelineObjectBase transformData( final PipelineObjectBase previousStep ) {
+  private PipelineObjectBase transformDataTest( final PipelineObjectBase previousStep ) {
 	final S3ObjectId script = AwsUtils.key(workingDir, "code", config.getRapidConfigFile());
     final List<String> args = new ArrayList<String>();
     
@@ -68,6 +68,13 @@ public class Phase3PipelineSetup {
 	final PipelineObjectBase transform = factory.getPythonShellActivity("TransformDataProducts", script, 
 		args, pipeline.getEmr());
 	return transform;
+  }
+  
+  private PipelineObjectBase transformData(final PipelineObjectBase previousStep) {
+	final String cmd = "bash " + config.getRapidCodeDir() + "/" + config.getRapidScriptFile();
+	final PipelineObjectBase copy = factory.getShellActivity("TransformDataProducts", cmd, pipeline.getEmr());
+	copy.addDependency(previousStep);
+	return copy;
   }
 
   private PipelineObjectBase loadData(final PipelineObjectBase previousStep) {
