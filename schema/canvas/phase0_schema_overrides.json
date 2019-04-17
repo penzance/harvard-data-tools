@@ -41,7 +41,7 @@
         {
           "name" : "usage_type",
           "type": "enum",
-          "description" : "Possible values 'unlimited', 'once-per-user'."
+          "description" : "Possible values 'unlimited', 'once_per_user'."
         }
       ]
     },
