@@ -13,6 +13,38 @@
         }
       ]
     },
+    "catalog_applicant_dim": {
+      "columns" : [
+        {
+          "name" : "status",
+          "type": "enum",
+          "description" : "Possible values are 'waitlist', 'accepted', 'declined', 'expired', and 'error'."
+        }
+      ]
+    },
+    "catalog_payment_dim": {
+      "columns" : [
+        {
+          "name" : "status",
+          "type": "enum",
+          "description" : "Possible values 'success', 'pending', and 'error'."
+        }
+      ]
+    },
+    "catalog_promotion_dim": {
+      "columns" : [
+        {
+          "name" : "discount_type",
+          "type": "enum",
+          "description" : "Possible values 'flat', 'percent'."
+        },
+        {
+          "name" : "usage_type",
+          "type": "enum",
+          "description" : "Possible values 'unlimited', 'once-per-user'."
+        }
+      ]
+    },
     "conference_participant_dim": {
       "columns" : [
         {

@@ -8,7 +8,16 @@
    "assignment_override_user_rollup_fact": {
         "user_id": ["CanvasDataID"]   	
    },
+   "catalog_applicant_dim": {
+        "user_id": ["CanvasDataID"]   	
+   },
    "catalog_enrollment_dim": {
+        "user_id": ["CanvasDataID"]   	
+   },
+   "catalog_order_dim": {
+        "user_id": ["CanvasDataID"]   	
+   },
+   "catalog_order_fact": {
         "user_id": ["CanvasDataID"]   	
    },
    "catalog_user_registration_dim": {
