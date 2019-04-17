@@ -8,6 +8,10 @@
             "key": "id",
             "columns": ["default_assignment_name"]
         },
+        "catalog_applicant_dim": {
+            "key": "id",
+            "columns": ["status"]
+        },
         "catalog_dim": {
             "key": "id",
             "columns": ["name", "currency", "country", "time_zone"]
@@ -15,6 +19,22 @@
         "catalog_product_dim": {
             "key": "id",
             "columns": ["title"]
+        },
+        "catalog_order_dim": {
+            "key": "id",
+            "columns": ["full_id","currency"]
+        },
+        "catalog_payment_dim": {
+            "key": "id",
+            "columns": ["status","reference_id"]
+        },
+        "catalog_promotion_dim": {
+            "key": "id",
+            "columns": ["discount_type","code","name","usage_type"]
+        },
+        "catalog_tag_dim": {
+            "key": "id",
+            "columns": ["name"]
         },
         "conference_dim": {
             "key": "id",
