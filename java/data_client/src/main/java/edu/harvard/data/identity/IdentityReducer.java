@@ -152,13 +152,11 @@ public class IdentityReducer<T> {
       
       final String name_first = (String) value.getIdentityMap().get(IdentifierType.NameFirst);
       if (name_first != null && !name_first.isEmpty() && name_first.length() > 1) {
-    	  log.info( "Adding id to name first output " + value.getIdentityMap().get(IdentifierType.ResearchUUID) );
         names_first.add(name_first);
       }
       
       final String name_last = (String) value.getIdentityMap().get(IdentifierType.NameLast);
       if (name_last != null && !name_last.isEmpty() && name_last.length() > 1) {
-    	  log.info( "Adding id to name last output " + value.getIdentityMap().get(IdentifierType.ResearchUUID) );
         names_last.add(name_last);
       }
     }
