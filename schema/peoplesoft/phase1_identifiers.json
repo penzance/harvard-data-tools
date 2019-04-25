@@ -1,0 +1,18 @@
+{
+	"Appointments": {
+		"empl_id": ["HUID"],
+		"work_address_1": ["Other"],
+		"work_address_2": ["Other"],
+		"work_address_3": ["Other"],
+		"work_address_4": ["Other"],
+		"work_city": ["Other"],
+		"work_state_cd": ["Other"],
+		"work_postal": ["Other"],
+		"pri_last_name": ["NameLast"],
+		"pri_first_name": ["NameFirst"],
+		"hrvd_email_addr": ["EmailAddress"],
+		"scnd_email_addr": ["EmailAddress"],
+		"hms_email_addr": ["EmailAddress"]
+	}
+}
+
