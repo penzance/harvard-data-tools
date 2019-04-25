@@ -50,6 +50,10 @@ public enum IdentifierType {
 
   Name("name", ".*", String.class),
 
+  NameFirst("name_first", ".*", String.class),
+
+  NameLast("name_last", ".*", String.class),
+
   Other("other", ".*", Void.class);
 
   private String fieldName;
