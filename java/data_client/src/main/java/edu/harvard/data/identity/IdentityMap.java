@@ -36,6 +36,16 @@ import edu.harvard.data.schema.extension.ExtensionSchemaTable;
 //     research_id VARCHAR(255),
 //     email VARCHAR(255)
 // );
+//
+// CREATE TABLE pii.name_first (
+//     research_id VARCHAR(255),
+//     name_first VARCHAR(255)
+//  );
+//
+// CREATE TABLE pii.name_last (
+//     research_id VARCHAR(255),
+//     name_last VARCHAR(255)
+//  );
 
 /**
  * This class represents an entry in the environment-scoped
@@ -114,7 +124,17 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     columns.add(new ExtensionSchemaColumn("research_id", "", "varchar", 255));
     columns.add(new ExtensionSchemaColumn("email", "", "varchar", 255));
     tables.put("email", new ExtensionSchemaTable("email", columns));
-
+    
+    columns = new ArrayList<DataSchemaColumn>();
+    columns.add(new ExtensionSchemaColumn("research_id", "", "varchar", 255));
+    columns.add(new ExtensionSchemaColumn("name_first", "", "varchar", 255));
+    tables.put("name_first", new ExtensionSchemaTable("name_first", columns));
+    
+    columns = new ArrayList<DataSchemaColumn>();
+    columns.add(new ExtensionSchemaColumn("research_id", "", "varchar", 255));
+    columns.add(new ExtensionSchemaColumn("name_last", "", "varchar", 255));
+    tables.put("name_last", new ExtensionSchemaTable("name_last", columns));
+    
     return tables;
   }
 
@@ -131,6 +151,14 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     case "email":
       keys.add("research_id");
       keys.add("email");
+      break;
+    case "name_first":
+      keys.add("research_id");
+      keys.add("name_first");
+      break;
+    case "name_last":
+      keys.add("research_id");
+      keys.add("name_last");
       break;
     default:
       throw new RuntimeException("Unknown identity table " + tableName);
