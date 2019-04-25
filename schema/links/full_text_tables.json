@@ -1,0 +1,48 @@
+{ 
+    "tables": {
+        "ScraperText": {
+            "key": "id",
+            "columns": ["text"]
+        },
+        "ScraperCitations": {
+            "key": "citation_id",
+            "columns": ["abstract_description", "author", "booktitle", "journal", "keywords", "note", "title", "url" ]
+        },
+        "ScraperCitationsCatalyst": {
+            "key": "catalyst_id",
+            "columns": ["catalyst_authors", "catalyst_title", "catalyst_other", "publications" ]
+        },
+        "OpenScholarMapping": {
+            "key": "id",
+            "columns": ["site_privacy_setting", "site_url"]
+        },
+        "OpenScholarBiblioTitles": {
+            "key": "id",
+            "columns": ["label"]
+        },
+        "OpenScholarPages": {
+            "key": "id",
+            "columns": ["label","body"]
+        },
+        "Gazette": {
+            "key": "news_id",
+            "columns": ["categories","content","description","title"]
+        },
+        "GazetteEvents": {
+            "key": "id",
+	    "columns": ["title","location","customFields","description","eventImage","permaLinkUrl","webLink"]
+        },
+        "Rss": {
+            "key": "id",
+            "columns": ["description","title","locations","categories"]
+        },
+        "HiltIntoPractice": {
+            "key": "id",
+            "columns": ["link","content"]
+        },        
+	"ScraperTextEntity": {
+            "key": "id",
+            "columns": ["text"]
+        }
+    }
+}
