@@ -123,6 +123,8 @@ public class IdentityReducer<T> {
     final IdentityMap id;
     final Set<String> emails = new HashSet<String>();
     final Set<String> names = new HashSet<String>();
+    final Set<String> names_first = new HashSet<String>();
+    final Set<String> names_last = new HashSet<String>();
     if (identities.containsKey(mainIdValue)) {
       id = identities.get(mainIdValue);
     } else {
@@ -147,6 +149,16 @@ public class IdentityReducer<T> {
       if (name != null && !name.isEmpty() && name.length() > 1) {
           names.add(name);
       }
+      
+      final String name_first = (String) value.getIdentityMap().get(IdentifierType.NameFirst);
+      if (name_first != null && !name_first.isEmpty() && name_first.length() > 1) {
+        names_first.add(name_first);
+      }
+      
+      final String name_last = (String) value.getIdentityMap().get(IdentifierType.NameLast);
+      if (name_last != null && !name_last.isEmpty() && name_last.length() > 1) {
+        names_last.add(name_last);
+      }
     }
     outputResult("tempidentitymap", outputs, id.getFieldsAsList(format).toArray());
     for (final String email : emails) {
@@ -161,6 +173,22 @@ public class IdentityReducer<T> {
              name);
       }
     }
+    
+    for (final String name_first : names_first) {
+      if (name_first != null && !name_first.isEmpty() && name_first.length() > 1) {
+          outputResult(IdentifierType.NameFirst.getFieldName().replace("_", ""), outputs, id.get(IdentifierType.ResearchUUID),
+             name_first);
+      }
+    }
+    
+    for (final String name_last : names_last) {
+      if (name_last != null && !name_last.isEmpty() && name_last.length() > 1) {
+          outputResult(IdentifierType.NameLast.getFieldName().replace("_", ""), outputs, id.get(IdentifierType.ResearchUUID),
+             name_last);
+      }
+    }
+    
+    
   }
 
   private void outputResult(final String outputName,
