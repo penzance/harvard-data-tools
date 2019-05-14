@@ -57,7 +57,7 @@ public class PeoplesoftPhase0 extends Phase0 {
     dataIndex.setSchemaVersion("1.0");
     for (final String table : dataIndex.getTableNames()) {
        if ( table.equals("Appointments") ) {
-            dataIndex.setPartial(table, false); 	
+            dataIndex.setPartial(table, true); 	
        }
     }
     aws.writeJson(config.getIndexFileS3Location(runId), dataIndex );
