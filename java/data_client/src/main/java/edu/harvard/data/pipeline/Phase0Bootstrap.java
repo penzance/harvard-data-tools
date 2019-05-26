@@ -106,6 +106,7 @@ public abstract class Phase0Bootstrap {
     final AmazonEC2Client ec2client = new AmazonEC2Client();
 
     final LaunchSpecification spec = new LaunchSpecification();
+    log.info("Subnet ID: " + config.getSubnetId());
     spec.setImageId(config.getPhase0Ami());
     spec.setInstanceType(config.getPhase0InstanceType());
     spec.setKeyName(config.getKeypair());
