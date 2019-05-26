@@ -115,12 +115,14 @@ public abstract class Phase0Bootstrap {
     final IamInstanceProfileSpecification instanceProfile = new IamInstanceProfileSpecification();
     instanceProfile.setArn(config.getDataPipelineCreatorRoleArn());
     spec.setIamInstanceProfile(instanceProfile);
+    log.info("Get Subnet ID: " + spec.getSubnetId());
 
     final RequestSpotInstancesRequest request = new RequestSpotInstancesRequest();
     request.setSpotPrice(config.getPhase0BidPrice());
     // request.setAvailabilityZoneGroup(config.getPhase0AvailabilityZoneGroup());
     request.setInstanceCount(1);
     request.setLaunchSpecification(spec);
+    log.info("Get Launch Spec Subnet ID: " + request.getLaunchSpecification().getSubnetId());
 
     final RequestSpotInstancesResult result = ec2client.requestSpotInstances(request);
     final String requestId = result.getSpotInstanceRequests().get(0).getSpotInstanceRequestId();
