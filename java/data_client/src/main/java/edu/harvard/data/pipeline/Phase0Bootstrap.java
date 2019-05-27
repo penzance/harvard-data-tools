@@ -127,6 +127,7 @@ public abstract class Phase0Bootstrap {
     final List<String> securityGroups = new ArrayList<>();
     securityGroups.add(config.getPhase0SecurityGroup());
     network.setGroups(securityGroups);
+    network.setDeviceIndex(0);
     final List<InstanceNetworkInterfaceSpecification> networkList = new ArrayList<>();
     networkList.add(network);
     spec.setNetworkInterfaces(networkList);
