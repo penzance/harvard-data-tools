@@ -20,7 +20,6 @@ import com.amazonaws.services.ec2.model.IamInstanceProfileSpecification;
 import com.amazonaws.services.ec2.model.LaunchSpecification;
 import com.amazonaws.services.ec2.model.RequestSpotInstancesRequest;
 import com.amazonaws.services.ec2.model.RequestSpotInstancesResult;
-import com.amazonaws.services.ec2.model.NetworkInterface;
 import com.amazonaws.services.ec2.model.InstanceNetworkInterfaceSpecification;
 
 
