@@ -129,6 +129,7 @@ public abstract class Phase0Bootstrap {
     network.setGroups(securityGroups);
     final List<InstanceNetworkInterfaceSpecification> networkList = new ArrayList<>();
     spec.setNetworkInterfaces(networkList);
+    log.info("Get Network Interfaces: " + spec.getNetworkInterfaces());
 
     final RequestSpotInstancesRequest request = new RequestSpotInstancesRequest();
     request.setSpotPrice(config.getPhase0BidPrice());
