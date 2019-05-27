@@ -20,6 +20,9 @@ import com.amazonaws.services.ec2.model.IamInstanceProfileSpecification;
 import com.amazonaws.services.ec2.model.LaunchSpecification;
 import com.amazonaws.services.ec2.model.RequestSpotInstancesRequest;
 import com.amazonaws.services.ec2.model.RequestSpotInstancesResult;
+import com.amazonaws.services.ec2.model.InstanceNetworkInterfaceSpecification;
+
+
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.s3.model.S3ObjectId;
 import com.amazonaws.services.sns.AmazonSNSClient;
@@ -109,11 +112,23 @@ public abstract class Phase0Bootstrap {
     spec.setImageId(config.getPhase0Ami());
     spec.setInstanceType(config.getPhase0InstanceType());
     spec.setKeyName(config.getKeypair());
-    spec.setSubnetId(config.getSubnetId());
     spec.setUserData(getUserData(config));
     final IamInstanceProfileSpecification instanceProfile = new IamInstanceProfileSpecification();
     instanceProfile.setArn(config.getDataPipelineCreatorRoleArn());
     spec.setIamInstanceProfile(instanceProfile);
+    
+    // set subnet id within network interface
+    // subnet id defined at instance level no longer works as expected
+    InstanceNetworkInterfaceSpecification network = new InstanceNetworkInterfaceSpecification();
+    network.setSubnetId(config.getSubnetId());
+    final List<String> securityGroups = new ArrayList<>();
+    securityGroups.add(config.getPhase0SecurityGroup());
+    network.setGroups(securityGroups);
+    network.setDeviceIndex(0);
+    final List<InstanceNetworkInterfaceSpecification> networkList = new ArrayList<>();
+    networkList.add(network);
+    spec.setNetworkInterfaces(networkList);
+    log.info("Get Network Interfaces: " + spec.getNetworkInterfaces());
 
     final RequestSpotInstancesRequest request = new RequestSpotInstancesRequest();
     request.setSpotPrice(config.getPhase0BidPrice());
