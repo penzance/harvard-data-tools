@@ -114,12 +114,12 @@ public abstract class Phase0Bootstrap {
     spec.setImageId(config.getPhase0Ami());
     spec.setInstanceType(config.getPhase0InstanceType());
     spec.setKeyName(config.getKeypair());
-    spec.setSubnetId(config.getSubnetId());
+    //spec.setSubnetId(config.getSubnetId());
     spec.setUserData(getUserData(config));
     final IamInstanceProfileSpecification instanceProfile = new IamInstanceProfileSpecification();
     instanceProfile.setArn(config.getDataPipelineCreatorRoleArn());
     spec.setIamInstanceProfile(instanceProfile);
-    log.info("Get Subnet ID: " + spec.getSubnetId());
+    //log.info("Get Subnet ID: " + spec.getSubnetId());
     
     // set network interface
     InstanceNetworkInterfaceSpecification network = new InstanceNetworkInterfaceSpecification();
@@ -137,7 +137,7 @@ public abstract class Phase0Bootstrap {
     // request.setAvailabilityZoneGroup(config.getPhase0AvailabilityZoneGroup());
     request.setInstanceCount(1);
     request.setLaunchSpecification(spec);
-    log.info("Get Launch Spec Subnet ID: " + request.getLaunchSpecification().getSubnetId());
+    //log.info("Get Launch Spec Subnet ID: " + request.getLaunchSpecification().getSubnetId());
 
     final RequestSpotInstancesResult result = ec2client.requestSpotInstances(request);
     final String requestId = result.getSpotInstanceRequests().get(0).getSpotInstanceRequestId();
