@@ -110,18 +110,16 @@ public abstract class Phase0Bootstrap {
     final AmazonEC2Client ec2client = new AmazonEC2Client();
 
     final LaunchSpecification spec = new LaunchSpecification();
-    log.info("Subnet ID: " + config.getSubnetId());
     spec.setImageId(config.getPhase0Ami());
     spec.setInstanceType(config.getPhase0InstanceType());
     spec.setKeyName(config.getKeypair());
-    //spec.setSubnetId(config.getSubnetId());
     spec.setUserData(getUserData(config));
     final IamInstanceProfileSpecification instanceProfile = new IamInstanceProfileSpecification();
     instanceProfile.setArn(config.getDataPipelineCreatorRoleArn());
     spec.setIamInstanceProfile(instanceProfile);
-    //log.info("Get Subnet ID: " + spec.getSubnetId());
     
-    // set network interface
+    // set subnet id within network interface
+    // subnet id defined at instance level no longer works as expected
     InstanceNetworkInterfaceSpecification network = new InstanceNetworkInterfaceSpecification();
     network.setSubnetId(config.getSubnetId());
     final List<String> securityGroups = new ArrayList<>();
@@ -138,7 +136,6 @@ public abstract class Phase0Bootstrap {
     // request.setAvailabilityZoneGroup(config.getPhase0AvailabilityZoneGroup());
     request.setInstanceCount(1);
     request.setLaunchSpecification(spec);
-    //log.info("Get Launch Spec Subnet ID: " + request.getLaunchSpecification().getSubnetId());
 
     final RequestSpotInstancesResult result = ec2client.requestSpotInstances(request);
     final String requestId = result.getSpotInstanceRequests().get(0).getSpotInstanceRequestId();
