@@ -20,6 +20,10 @@ import com.amazonaws.services.ec2.model.IamInstanceProfileSpecification;
 import com.amazonaws.services.ec2.model.LaunchSpecification;
 import com.amazonaws.services.ec2.model.RequestSpotInstancesRequest;
 import com.amazonaws.services.ec2.model.RequestSpotInstancesResult;
+import com.amazonaws.services.ec2.model.NetworkInterface;
+import com.amazonaws.services.ec2.model.InstanceNetworkInterfaceSpecification;
+
+
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.s3.model.S3ObjectId;
 import com.amazonaws.services.sns.AmazonSNSClient;
@@ -116,6 +120,15 @@ public abstract class Phase0Bootstrap {
     instanceProfile.setArn(config.getDataPipelineCreatorRoleArn());
     spec.setIamInstanceProfile(instanceProfile);
     log.info("Get Subnet ID: " + spec.getSubnetId());
+    
+    // set network interface
+    InstanceNetworkInterfaceSpecification network = new InstanceNetworkInterfaceSpecification();
+    network.setSubnetId(config.getSubnetId());
+    final List<String> securityGroups = new ArrayList<>();
+    securityGroups.add(config.getPhase0SecurityGroup());
+    network.setGroups(securityGroups);
+    final List<InstanceNetworkInterfaceSpecification> networkList = new ArrayList<>();
+    spec.setNetworkInterfaces(networkList);
 
     final RequestSpotInstancesRequest request = new RequestSpotInstancesRequest();
     request.setSpotPrice(config.getPhase0BidPrice());
