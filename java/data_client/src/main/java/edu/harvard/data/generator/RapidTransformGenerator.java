@@ -169,7 +169,7 @@ public class RapidTransformGenerator {
 
 		  // Requests dictionary
 		  out.println("RUNTIME_DICT = OrderedDict()");
-		  out.println("RUNTIME_DICT['PERSON-LINKS-EVENTS'] = make_request('Apps/Apps-Faculty-Links/Person-Links-Events-Prod-EMR.json')");
+		  out.println("RUNTIME_DICT['PERSON-LINKS-EVENTS'] = make_request('Apps/Apps-Faculty-Links/Person-Links-Events-Dev-EMR.json')");
 	  }
 	  
 }
