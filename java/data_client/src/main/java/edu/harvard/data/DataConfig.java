@@ -131,6 +131,34 @@ public class DataConfig {
   private final String redshiftStagingDir;
   private final String hdfsBase;
   private final String hdfsVerifyBase;
+  private final String rapidScriptFile;
+  private final String rapidRuntime;
+  private final String rapidConfigFile;
+  private final String rapidRequestsDir;
+  private final String rapidCodeDir;
+  
+ 
+  //RAPID Optional Configuration START
+  private final String rapidGoogleCreds;
+  private final String rapidGoogleDir;
+  private final String rapidOutputDir;
+  private final String rapidAwsDefaultRegion;
+  private final String rapidGithubTokenName;
+  private final String rapidGithubBranch;
+  private final String rapidGithubUrl;
+  private final String rapidGithubRequestUrl;
+  private final String rapidGithubRequestBranch;
+  private final String rapidRsConfigKey;
+  private final String rapidRsConfigRegion;
+  private final String rapidRsConfigBucket;
+  private final String rapidCanvasConfigKey;
+  private final String rapidCanvasConfigRegion;
+  private final String rapidCanvasConfigBucket;
+  private final String rapidAwsDefaultAccessKeyUsername;
+  private final String rapidAwsDefaultAccessSecretKey;
+  private final String rapidAwsAssumeRoleArn;
+  private final String rapidAwsAssumeRoleSessionName;
+  //RAPID Optional Configuration END
 
   protected String codeGeneratorScript;
   protected String phase0Class;
@@ -152,6 +180,11 @@ public class DataConfig {
     this.redshiftLoadScript = "s3_to_redshift_loader.sql";
     this.s3ToHdfsManifestFile = "s3_to_hdfs_manifest.gz";
     this.fullTextScriptFile = "full_text_copy.sh";
+    this.rapidScriptFile = "phase_3_rapid.sh";
+    this.rapidRuntime = "/runtime/main.py";
+    this.rapidConfigFile = "rapid_config.py";
+    this.rapidCodeDir = "/home/hadoop/rapid-code";
+    this.rapidRequestsDir = "/home/hadoop/rapid-requests";
     this.redshiftStagingDir = "redshift_staging";
     this.identityRedshiftSchema = "pii";
     this.emrCodeDir = "/home/hadoop/code";
@@ -236,6 +269,28 @@ public class DataConfig {
     this.phase0SecurityGroup = getConfigParameter("phase_0_security_group", verify);
     this.phase0AvailabilityZoneGroup = getConfigParameter("phase_0_availability_zone_group",
         verify);
+    
+    //RAPID Optional Configuration START
+    this.rapidGoogleCreds = getConfigParameter("rapid_google_creds", false);
+    this.rapidGoogleDir = getConfigParameter("rapid_google_dir", false);
+    this.rapidOutputDir = getConfigParameter("rapid_output_dir", false);
+    this.rapidAwsDefaultRegion = getConfigParameter("rapid_aws_default_region", false);
+    this.rapidGithubTokenName = getConfigParameter("rapid_github_token_name", false);
+    this.rapidGithubBranch = getConfigParameter("rapid_github_branch", false);
+    this.rapidGithubUrl = getConfigParameter("rapid_github_url", false);
+    this.rapidGithubRequestUrl = getConfigParameter("rapid_github_request_url", false);
+    this.rapidGithubRequestBranch = getConfigParameter("rapid_github_request_branch", false);
+    this.rapidRsConfigKey = getConfigParameter("rapid_rs_config_key", false);
+    this.rapidRsConfigRegion = getConfigParameter("rapid_rs_config_region", false);
+    this.rapidRsConfigBucket = getConfigParameter("rapid_rs_config_bucket", false);
+    this.rapidCanvasConfigKey = getConfigParameter("rapid_canvas_config_key", false);
+    this.rapidCanvasConfigRegion = getConfigParameter("rapid_canvas_config_region", false);
+    this.rapidCanvasConfigBucket = getConfigParameter("rapid_canvas_config_bucket", false);
+    this.rapidAwsDefaultAccessKeyUsername = getConfigParameter("rapid_aws_default_access_key_username", false);
+    this.rapidAwsDefaultAccessSecretKey = getConfigParameter("rapid_aws_default_access_secrect_key", false);
+    this.rapidAwsAssumeRoleArn = getConfigParameter("rapid_aws_assume_role_arn", false);
+    this.rapidAwsAssumeRoleSessionName = getConfigParameter("rapid_aws_assume_role_session_name", false);
+    //RAPID Optional Configuration END
   }
 
   public static <T extends DataConfig> T parseInputFiles(final Class<T> cls,
@@ -567,6 +622,107 @@ public class DataConfig {
 
   public String getRedshiftStagingDir() {
     return redshiftStagingDir;
+  }
+  
+  public String getRapidScriptFile() {
+	return rapidScriptFile;
+  }
+  
+  public String getRapidRuntime() {
+	return rapidRuntime;
+	  
+  }
+  
+  public String getRapidConfigFile() {
+	return rapidConfigFile;
+  }
+
+  public String getRapidCodeDir() {
+    return rapidCodeDir;
+  }
+  
+  public String getRapidRequestsDir() {
+	return rapidRequestsDir;
+  }
+  
+  public String getRapidGoogleCreds() {
+	return rapidGoogleCreds;
+  }
+  
+  public String getRapidGoogleDir() {
+	return rapidGoogleDir;
+  }
+  
+  public String getRapidOutputDir() {
+	return rapidOutputDir;
+  }
+  
+  public String getRapidAwsDefaultRegion() {
+	return rapidAwsDefaultRegion;
+  }
+
+  public String getRapidGithubTokenName() {
+	return rapidGithubTokenName;
+  }
+
+  public String rapidGithubBranch() {
+	return rapidGithubBranch;
+  }
+
+  public String getRapidGithubBranch() {
+	return rapidGithubBranch;
+  }
+
+  public String getRapidGithubUrl() {
+	return rapidGithubUrl;
+  }
+
+  public String getRapidGithubRequestUrl() {
+	return rapidGithubRequestUrl;
+  }
+
+  public String getRapidGithubRequestBranch() {
+	return rapidGithubRequestBranch;
+  }
+
+  public String getRapidRsConfigKey() {
+	return rapidRsConfigKey;
+  }
+  
+  public String getRapidRsConfigRegion() {
+	return rapidRsConfigRegion;
+  }
+
+  public String getRapidRsConfigBucket() {
+	return rapidRsConfigBucket;
+  }
+  
+  public String getRapidCanvasConfigKey() {
+	return rapidCanvasConfigKey;
+  }
+  
+  public String getRapidCanvasConfigRegion() {
+	return rapidCanvasConfigRegion;
+  }
+  
+  public String getRapidCanvasConfigBucket() {
+	return rapidCanvasConfigBucket;
+  }
+  
+  public String getRapidAwsDefaultAccessKeyUsername() {
+	return rapidAwsDefaultAccessKeyUsername;
+  }
+  
+  public String getRapidAwsDefaultAccessSecretKey() {
+	return rapidAwsDefaultAccessSecretKey;
+  }
+  
+  public String getRapidAwsAssumeRoleArn() {
+	return rapidAwsAssumeRoleArn;
+  }
+  
+  public String getRapidAwsAssumeRoleSessionName() {
+    return rapidAwsAssumeRoleSessionName;
   }
 
   public String getPaths() {

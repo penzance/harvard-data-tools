@@ -8,6 +8,9 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -25,6 +28,8 @@ import edu.harvard.data.schema.extension.ExtensionSchema;
 import edu.harvard.data.schema.extension.ExtensionSchemaTable;
 
 public class LinksCodeGenerator extends CodeGenerator {
+
+  private static final Logger log = LogManager.getLogger();
 
   private static final int TRANFORMATION_PHASES = 2;
 
@@ -44,9 +49,10 @@ public class LinksCodeGenerator extends CodeGenerator {
   private final File gitDir;
 
   private final LinksDataConfig config;
+  private final BootstrapParameters bootstrapParams;
 
   public LinksCodeGenerator(final String schemaVersion, final File gitDir, final File codeDir,
-      final LinksDataConfig config, final String runId) throws FileNotFoundException {
+      final LinksDataConfig config, final String runId, BootstrapParameters bootstrapParams) throws FileNotFoundException {
     super(config, codeDir, runId);
     this.config = config;
     if (!gitDir.exists() && gitDir.isDirectory()) {
@@ -54,6 +60,7 @@ public class LinksCodeGenerator extends CodeGenerator {
     }
     this.gitDir = gitDir;
     this.schemaVersion = schemaVersion;
+    this.bootstrapParams = bootstrapParams;
   }
 
   public static void main(final String[] args) throws IOException, DataConfigurationException,
@@ -72,7 +79,12 @@ public class LinksCodeGenerator extends CodeGenerator {
     }
     final LinksDataConfig config = LinksDataConfig
         .parseInputFiles(LinksDataConfig.class, configFiles, false);
-    new LinksCodeGenerator(schemaVersion, gitDir, dir, config, runId).generate();
+    log.info(args[1]);
+    //final String test = "{\"configPathString\":\"s3://hdt-code/dev/links.properties|s3://hdt-code/dev/secure.properties\"}";
+    final String test = "{\"rapidConfigString\":\"s3://hdt-code/dev/links.properties|s3://hdt-code/dev/secure.properties\"}";
+    final BootstrapParameters bootstrapParams = new ObjectMapper().readValue(test,
+	        BootstrapParameters.class);
+    new LinksCodeGenerator( schemaVersion, gitDir, dir, config, runId, bootstrapParams ).generate();
   }
 
   @Override
@@ -91,6 +103,9 @@ public class LinksCodeGenerator extends CodeGenerator {
     spec.setMainIdentifier(IdentifierType.HUID);
     spec.setHiveScriptDir(new File(gitDir, "hive/links"));
     spec.setConfig(config);
+    
+    // Set string for Bootstrap Rapid Code JSON requests
+    spec.setBootstrapRapidConfig(bootstrapParams.getRapidConfig());
 
     // Set the four schema versions in the spec.
     final DataSchema schema0 = readSchema(schemaVersion);
