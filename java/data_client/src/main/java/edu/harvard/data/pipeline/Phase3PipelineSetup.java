@@ -71,7 +71,7 @@ public class Phase3PipelineSetup {
   }
   
   private PipelineObjectBase transformData(final PipelineObjectBase previousStep) {
-	final String cmd = "bash " + config.getRapidCodeDir() + "/" + config.getRapidScriptFile();
+	final String cmd = "bash " + config.getEmrCodeDir() + "/" + config.getRapidScriptFile();
 	final PipelineObjectBase copy = factory.getShellActivity("TransformDataProducts", cmd, pipeline.getEmr());
 	copy.addDependency(previousStep);
 	return copy;
