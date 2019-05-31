@@ -48,7 +48,7 @@ public class RapidTransformGenerator {
 		   * Generate phase_3_rapid.sh bash script to run RAPID Transformations
 		   */
 		  
-		  out.println("!/bin/bash");
+		  out.println("#!/bin/bash");
 		  out.println();
 	      
 	      // Clean Env Vars
@@ -107,8 +107,8 @@ public class RapidTransformGenerator {
 		  out.println();
 		  out.println("# Set to VPAL Apps Creds on main AWS Account\n"
 			        + "echo \"[default]\" >> .aws/credentials\n"
-			        + "echo \"aws_access_key_id=$AWS_ID\" >> .aws/credentials\n"
-			        + "echo \"aws_secret_access_key=$AWS_KEY\" >> .aws/credentials\n");
+			        + "echo \"aws_access_key_id=$AWS_ID\" >> ~/.aws/credentials\n"
+			        + "echo \"aws_secret_access_key=$AWS_KEY\" >> ~/.aws/credentials\n");
 
 		  
 		  // Write Cross account info to Environment
