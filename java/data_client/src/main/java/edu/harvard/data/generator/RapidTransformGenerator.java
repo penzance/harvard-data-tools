@@ -106,7 +106,7 @@ public class RapidTransformGenerator {
 		  // Write Creds
 		  out.println();
 		  out.println("# Set to VPAL Apps Creds on main AWS Account\n"
-			        + "echo \"[default]\" >> .aws/credentials\n"
+			        + "echo \"[default]\" >> ~/.aws/credentials\n"
 			        + "echo \"aws_access_key_id=$AWS_ID\" >> ~/.aws/credentials\n"
 			        + "echo \"aws_secret_access_key=$AWS_KEY\" >> ~/.aws/credentials\n");
 
@@ -124,7 +124,14 @@ public class RapidTransformGenerator {
 				    + "export AWS_SESSION_TOKEN=\"$AWS_SESSION_TOKEN\"\n"
 				    + "env\n");
 		  
+		  // Copy runtime generated data request
+		  out.println();
+		  out.println("# Update datarequest config with Runtime generated code");
+		  out.println("cp " + config.getEmrCodeDir() + "/"
+				  	+ config.getRapidConfigFile() + " " + config.getRapidCodeDir() + "/runtime/datarequest_config.py");
+		  
 		  // Run Rapid Code
+		  out.println();
 		  out.println("#Run RAPID Code\n"
 				    + "cd $RAPID_CODE_BASE\n"
 				    + "python runtime/main.py --data-requests --runtime >& runtime/test.log\n");
