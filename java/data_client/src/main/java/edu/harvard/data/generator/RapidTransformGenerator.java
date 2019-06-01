@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Map;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
 
@@ -153,7 +154,7 @@ public class RapidTransformGenerator {
 
 		  RUNTIME_DICT['Recs'] = make_request('Apps/Apps-Faculty-Links/Person-Links-Recommendations.json')
 		  */
-		  final String rapidConfig = spec.getBootstrapRapidConfig();
+		  final Map<String,String> rapidConfigDict = spec.getBootstrapRapidConfig();
 		  final String rapidRequestDir = config.getRapidRequestsDir();
 		  final String rapidCodeDir = config.getRapidCodeDir();
 		  
@@ -174,9 +175,13 @@ public class RapidTransformGenerator {
 		  out.println("    return DRM.loadRequest(os.path.join(tdr_path, filename))");
 		  out.println("");
 
-		  // Requests dictionary
+		  // Generate Requests dictionary from Bootstrap Rapid Configuration Dictionary
 		  out.println("RUNTIME_DICT = OrderedDict()");
-		  out.println("RUNTIME_DICT['PERSON-LINKS-EVENTS'] = make_request('Apps/Apps-Faculty-Links/Person-Links-Events-Dev-EMR.json')");
+	      for (Map.Entry<String, String> entry : rapidConfigDict.entrySet()) {
+	          String requestname = entry.getKey();
+	          String requestjson = entry.getValue();
+		      out.println("RUNTIME_DICT['" + requestname + "'] = make_request('" + requestjson + "')");
+	      }
 	  }
 	  
 }

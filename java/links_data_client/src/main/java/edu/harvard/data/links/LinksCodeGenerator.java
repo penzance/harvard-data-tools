@@ -79,11 +79,11 @@ public class LinksCodeGenerator extends CodeGenerator {
     }
     final LinksDataConfig config = LinksDataConfig
         .parseInputFiles(LinksDataConfig.class, configFiles, false);
-    log.info(args[1]);
-    //final String test = "{\"configPathString\":\"s3://hdt-code/dev/links.properties|s3://hdt-code/dev/secure.properties\"}";
-    final String test = "{\"rapidConfigString\":\"s3://hdt-code/dev/links.properties|s3://hdt-code/dev/secure.properties\"}";
-    final BootstrapParameters bootstrapParams = new ObjectMapper().readValue(test,
+    log.info(args[5]);
+    final BootstrapParameters bootstrapParams = new ObjectMapper().readValue(args[5],
 	        BootstrapParameters.class);
+    log.info(bootstrapParams.getConfigPathString());
+    log.info(bootstrapParams.getRapidConfigDict());
     new LinksCodeGenerator( schemaVersion, gitDir, dir, config, runId, bootstrapParams ).generate();
   }
 
@@ -105,7 +105,7 @@ public class LinksCodeGenerator extends CodeGenerator {
     spec.setConfig(config);
     
     // Set string for Bootstrap Rapid Code JSON requests
-    spec.setBootstrapRapidConfig(bootstrapParams.getRapidConfig());
+    spec.setBootstrapRapidConfig(bootstrapParams.getRapidConfigDict());
 
     // Set the four schema versions in the spec.
     final DataSchema schema0 = readSchema(schemaVersion);

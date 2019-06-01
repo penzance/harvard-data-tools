@@ -3,6 +3,7 @@ package edu.harvard.data.generator;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.identity.IdentifierType;
@@ -26,7 +27,7 @@ public class GenerationSpec {
   private File hiveScriptDir;
   private DataConfig config;
   private final String schemaVersion;
-  private String bootstrapRapidConfig;
+  private Map<String,String> bootstrapRapidConfig;
 
   public GenerationSpec(final int transformationPhaseCount, final String schemaVersion) {
     this.schemaVersion = schemaVersion;
@@ -103,11 +104,11 @@ public class GenerationSpec {
     this.config = config;
   }
   
-  public void setBootstrapRapidConfig(final String bootstrapRapidConfig) {
+  public void setBootstrapRapidConfig(final Map<String,String> bootstrapRapidConfig) {
 	this.bootstrapRapidConfig = bootstrapRapidConfig;
   }
   
-  public String getBootstrapRapidConfig() {
+  public Map<String,String> getBootstrapRapidConfig() {
 	return bootstrapRapidConfig;
   }
 
