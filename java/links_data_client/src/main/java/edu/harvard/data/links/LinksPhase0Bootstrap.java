@@ -26,8 +26,8 @@ implements RequestHandler<BootstrapParameters, String> {
   // Main method for testing
   public static void main(final String[] args) 
 		      throws JsonParseException, JsonMappingException, IOException {
-	System.out.println(args[0]);
-	final BootstrapParameters params = new ObjectMapper().readValue(args[0],
+	System.out.println(args.toString());
+	final BootstrapParameters params = new ObjectMapper().readValue(args.toString(),
 		        BootstrapParameters.class);
 	System.out.println(new LinksPhase0Bootstrap().handleRequest(params, null));
   }	
