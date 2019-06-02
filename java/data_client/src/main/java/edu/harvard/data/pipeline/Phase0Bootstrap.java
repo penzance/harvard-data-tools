@@ -46,8 +46,7 @@ public abstract class Phase0Bootstrap {
   protected String runId;
   private boolean createPipeline;
   private boolean rapidTransform;
-  private Map<String, String> rapidConfig;
-  private String requestjson;
+  protected String requestjson;
   protected AwsUtils aws;
   private PipelineExecutionRecord executionRecord;
 
