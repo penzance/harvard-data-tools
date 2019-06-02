@@ -3,8 +3,8 @@ import java.util.Map;
 
 public class BootstrapParameters {
 	  private String configPathString;
-	  private boolean downloadOnly;
 	  private Map<String,String> rapidConfigDict;
+	  private boolean downloadOnly;
 	  private String message;
 
 	  public String getConfigPathString() {
@@ -37,6 +37,11 @@ public class BootstrapParameters {
 
 	  public void setMessage(final String message) {
 	    this.message = message;
+	  }
+	  
+	  public BootstrapParameters( String configPathString, Map<String, String> rapidConfigDict ) {
+		this.configPathString = configPathString;
+		this.rapidConfigDict = rapidConfigDict;
 	  }
 
 	  @Override
