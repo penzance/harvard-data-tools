@@ -39,11 +39,6 @@ public class BootstrapParameters {
 	    this.message = message;
 	  }
 	  
-	  public BootstrapParameters( String configPathString, Map<String, String> rapidConfigDict ) {
-		this.configPathString = configPathString;
-		this.rapidConfigDict = rapidConfigDict;
-	  }
-
 	  @Override
 	  public String toString() {
 	    return "BootstrapParams\n  ConfigPath: " + configPathString + "\n  message: "
