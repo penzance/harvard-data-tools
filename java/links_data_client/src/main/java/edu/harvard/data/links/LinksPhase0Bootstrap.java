@@ -41,6 +41,7 @@ implements RequestHandler<BootstrapParameters, String> {
   @Override
   public String handleRequest(final BootstrapParameters params, final Context context) {
 	try {
+		  log.info("Params: " + params.toString());
 	      super.init(params.getConfigPathString(), LinksDataConfig.class, true, params.getRapidConfigDict());
 	      super.run(context);
 	} catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
