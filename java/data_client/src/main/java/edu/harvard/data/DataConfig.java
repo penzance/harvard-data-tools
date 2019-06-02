@@ -9,6 +9,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
@@ -37,6 +38,7 @@ import edu.harvard.data.identity.IdentifierType;
 public class DataConfig {
 
   protected String paths;
+  protected Map<String, String> rapidConfig;
 
   private final String gitTagOrBranch;
   private final String datasetName;
@@ -322,6 +324,43 @@ public class DataConfig {
       }
     }
   }
+
+  public static <T extends DataConfig> T parseInputFiles(final Class<T> cls,
+	      final String configPathString, final boolean verify, final Map<String, String> rapidConfig)
+	          throws IOException, DataConfigurationException {
+	    final AwsUtils aws = new AwsUtils();
+	    final List<InputStream> streams = new ArrayList<InputStream>();
+	    try {
+	      for (final String file : configPathString.split("\\|")) {
+	        if (file.toLowerCase().startsWith("s3://")) {
+	          final S3ObjectId awsFile = AwsUtils.key(file);
+	          if (!aws.isFile(awsFile)) {
+	            throw new FileNotFoundException("Can't find configuration S3 key " + file);
+	          }
+	          streams.add(aws.getInputStream(awsFile, false));
+	        } else {
+	          final File f = new File(file);
+	          if (!f.exists() || f.isDirectory()) {
+	            throw new FileNotFoundException("Can't find configuration file " + f);
+	          }
+	          streams.add(new FileInputStream(file));
+	        }
+	      }
+	      final Constructor<T> constructor = cls.getConstructor(List.class, boolean.class);
+	      final T config = constructor.newInstance(streams, verify);
+	      config.paths = configPathString;
+	      config.rapidConfig = rapidConfig;
+	      return config;
+	    } catch (NoSuchMethodException | SecurityException | InstantiationException
+	        | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+	      throw new DataConfigurationException(e);
+	    } finally {
+	      for (final InputStream in : streams) {
+	        in.close();
+	      }
+	    }
+  }
+  
 
   protected Integer getIntConfigParameter(final String key, final boolean verify)
       throws DataConfigurationException {
@@ -633,6 +672,10 @@ public class DataConfig {
   
   public String getRapidConfigFile() {
 	return rapidConfigFile;
+  }
+  
+  public Map<String, String> getRapidConfig() {
+	return rapidConfig;
   }
 
   public String getRapidCodeDir() {
