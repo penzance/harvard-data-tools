@@ -75,6 +75,7 @@ implements RequestStreamHandler {
     final Map<String, String> env = new HashMap<String, String>();
     env.put("DATA_SET_ID", runId);
     env.put("DATA_SCHEMA_VERSION", "1.0");
+    env.put("RAPID_CONFIG", requestjson );
     return env;
   }
 
