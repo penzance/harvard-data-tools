@@ -39,6 +39,7 @@ public class DataConfig {
 
   protected String paths;
   protected Map<String, String> rapidConfig;
+  protected String requestjson;
 
   private final String gitTagOrBranch;
   private final String datasetName;
@@ -326,7 +327,7 @@ public class DataConfig {
   }
 
   public static <T extends DataConfig> T parseInputFiles(final Class<T> cls,
-	      final String configPathString, final boolean verify, final Map<String, String> rapidConfig)
+	      final String configPathString, final boolean verify, final String requestjson)
 	          throws IOException, DataConfigurationException {
 	    final AwsUtils aws = new AwsUtils();
 	    final List<InputStream> streams = new ArrayList<InputStream>();
@@ -349,7 +350,7 @@ public class DataConfig {
 	      final Constructor<T> constructor = cls.getConstructor(List.class, boolean.class);
 	      final T config = constructor.newInstance(streams, verify);
 	      config.paths = configPathString;
-	      config.rapidConfig = rapidConfig;
+	      config.requestjson = requestjson;
 	      return config;
 	    } catch (NoSuchMethodException | SecurityException | InstantiationException
 	        | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
@@ -676,6 +677,10 @@ public class DataConfig {
   
   public Map<String, String> getRapidConfig() {
 	return rapidConfig;
+  }
+  
+  public String getRequestJson() {
+	return requestjson;
   }
 
   public String getRapidCodeDir() {

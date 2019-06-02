@@ -47,6 +47,7 @@ public abstract class Phase0Bootstrap {
   private boolean createPipeline;
   private boolean rapidTransform;
   private Map<String, String> rapidConfig;
+  private String requestjson;
   protected AwsUtils aws;
   private PipelineExecutionRecord executionRecord;
 
@@ -73,17 +74,17 @@ public abstract class Phase0Bootstrap {
     this.runId = getRunId();
     this.aws = new AwsUtils();
   }
-  
+
   protected void init(final String configPathString, final Class<? extends DataConfig> configClass,
-	      final boolean createPipeline, final Map<String, String> rapidConfig) throws IOException, DataConfigurationException {
+	      final boolean createPipeline, final String requestjson ) throws IOException, DataConfigurationException {
 	log.info("Configuration path: " + configPathString);
-	log.info("Rapid Configuration: " + rapidConfig);
+	log.info("Request JSON: " + requestjson);
 	this.configPathString = configPathString;
 	this.configClass = configClass;
 	this.createPipeline = createPipeline;
 	this.rapidTransform = true;
-	this.rapidConfig = rapidConfig;
-	this.config = DataConfig.parseInputFiles(configClass, configPathString, false, rapidConfig );
+	this.requestjson = requestjson;
+	this.config = DataConfig.parseInputFiles(configClass, configPathString, false, requestjson );
 	this.runId = getRunId();
 	this.aws = new AwsUtils();
    }
@@ -98,7 +99,7 @@ public abstract class Phase0Bootstrap {
     for (final S3ObjectId path : getInfrastructureConfigPaths()) {
       configPathString += "|" + AwsUtils.uri(path);
     }
-    this.config = DataConfig.parseInputFiles(configClass, configPathString, false, rapidConfig);
+    this.config = DataConfig.parseInputFiles(configClass, configPathString, false, requestjson );
 
     PipelineExecutionRecord.init(config.getPipelineDynamoTable());
     DatasetInfo.init(config.getDatasetsDynamoTable());
@@ -200,7 +201,7 @@ public abstract class Phase0Bootstrap {
     env.put("GENERATOR", config.getCodeGeneratorScript());
     env.put("CONFIG_PATHS", config.getPaths());
     env.put("RAPID_TRANSFORM", rapidTransform ? "1": "0");
-    env.put("RAPID_CONFIG", config.getRapidConfig().toString());
+    env.put("RAPID_CONFIG", requestjson );
     env.put("HARVARD_DATA_GENERATED_OUTPUT", config.getEc2CodeDir());
     env.put("PHASE_0_THREADS", config.getPhase0Threads());
     env.put("PHASE_0_HEAP_SIZE", config.getPhase0HeapSize());
