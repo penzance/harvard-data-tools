@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.s3.model.S3ObjectId;
@@ -22,10 +25,13 @@ import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class LinksPhase0Bootstrap extends Phase0Bootstrap
 implements RequestHandler<BootstrapParameters, String> {
+	
+  private static final Logger log = LogManager.getLogger();
 	   
   // Main method for testing
   public static void main(final String[] args) 
 		      throws JsonParseException, JsonMappingException, IOException {
+	log.info("Args: " + args.toString());
 	System.out.println(args.toString());
 	final BootstrapParameters params = new ObjectMapper().readValue(args.toString(),
 		        BootstrapParameters.class);
