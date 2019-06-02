@@ -98,7 +98,7 @@ public abstract class Phase0Bootstrap {
     for (final S3ObjectId path : getInfrastructureConfigPaths()) {
       configPathString += "|" + AwsUtils.uri(path);
     }
-    this.config = DataConfig.parseInputFiles(configClass, configPathString, false);
+    this.config = DataConfig.parseInputFiles(configClass, configPathString, false, rapidConfig);
 
     PipelineExecutionRecord.init(config.getPipelineDynamoTable());
     DatasetInfo.init(config.getDatasetsDynamoTable());
