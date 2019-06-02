@@ -65,6 +65,7 @@ public class LinksCodeGenerator extends CodeGenerator {
 
   public static void main(final String[] args) throws IOException, DataConfigurationException,
   UnexpectedApiResponseException, SQLException, VerificationException {
+	log.info(args);
     if (args.length != 5) {
       System.err.println(
           "Usage: schema_version /path/to/config1|/path/to/config2 /path/to/harvard-data-tools /path/to/output/directory, run_id");
@@ -74,13 +75,14 @@ public class LinksCodeGenerator extends CodeGenerator {
     final File gitDir = new File(args[2]);
     final File dir = new File(args[3]);
     final String runId = args[4];
+    final String bootstrapParamsString = args[5];
     if (!(gitDir.exists() && gitDir.isDirectory())) {
       throw new FileNotFoundException(gitDir.toString());
     }
     final LinksDataConfig config = LinksDataConfig
-        .parseInputFiles(LinksDataConfig.class, configFiles, false);
+        .parseInputFiles(LinksDataConfig.class, configFiles, false, bootstrapParamsString );
     log.info(args[5]);
-    final BootstrapParameters bootstrapParams = new ObjectMapper().readValue(args[5],
+    final BootstrapParameters bootstrapParams = new ObjectMapper().readValue(bootstrapParamsString,
 	        BootstrapParameters.class);
     log.info(bootstrapParams.getConfigPathString());
     log.info(bootstrapParams.getRapidConfigDict());

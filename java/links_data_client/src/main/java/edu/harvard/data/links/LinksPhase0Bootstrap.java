@@ -54,7 +54,7 @@ implements RequestStreamHandler {
           log.info(bootstrapParams.getConfigPathString());
           log.info(bootstrapParams.getRapidConfigDict());
 	      super.init(bootstrapParams.getConfigPathString(), 
-	    		     LinksDataConfig.class, true, bootstrapParams.getRapidConfigDict());
+	    		     LinksDataConfig.class, true, requestjson);
 	      super.run(context);
 	} catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
 	      log.info("Error: " + e.getMessage());
