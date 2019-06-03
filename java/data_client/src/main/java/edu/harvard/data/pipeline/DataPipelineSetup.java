@@ -32,6 +32,7 @@ public class DataPipelineSetup {
   private final String runId;
   private final InputTableIndex dataIndex;
   private String pipelineId;
+  private final String requestjson;
 
   public static void main(final String[] args) throws IOException, DataConfigurationException,
   UnexpectedApiResponseException, VerificationException, ClassNotFoundException,
@@ -39,10 +40,12 @@ public class DataPipelineSetup {
     final String configPath = args[0];
     final String runId = args[1];
     final String codeManagerClassName = args[2];
+    final String requestjson = args[3];
 
     log.info("Config path: " + configPath);
     log.info("Run ID: " + runId);
     log.info("Code Manager class: " + codeManagerClassName);
+    log.info("Request JSON: " + requestjson);
 
     final CodeManager codeManager = CodeManager.getCodeManager(codeManagerClassName);
     final DataConfig config = codeManager.getDataConfig(configPath, true);
@@ -50,16 +53,17 @@ public class DataPipelineSetup {
     PipelineExecutionRecord.init(config.getPipelineDynamoTable());
     final InputTableIndex dataIndex = aws.readJson(config.getIndexFileS3Location(runId),
         InputTableIndex.class);
-    final DataPipelineSetup pipeline = new DataPipelineSetup(config, dataIndex, codeManager, runId);
+    final DataPipelineSetup pipeline = new DataPipelineSetup(config, dataIndex, codeManager, runId, requestjson);
     pipeline.generate();
   }
 
   public DataPipelineSetup(final DataConfig config, final InputTableIndex dataIndex,
-      final CodeManager codeManager, final String runId) {
+      final CodeManager codeManager, final String runId, final String requestjson) {
     this.config = config;
     this.dataIndex = dataIndex;
     this.codeManager = codeManager;
     this.runId = runId;
+    this.requestjson = requestjson;
   }
 
   public void generate() throws DataConfigurationException, IOException {
@@ -109,7 +113,7 @@ public class DataPipelineSetup {
   private Pipeline populatePipeline() throws DataConfigurationException, JsonProcessingException {
     final PipelineFactory factory = new PipelineFactory(config, pipelineId, runId);
     final Pipeline pipeline = new Pipeline(runId, config, pipelineId, factory,
-        dataIndex.getSchemaVersion(), runId);
+        dataIndex.getSchemaVersion(), runId, requestjson );
     final EmrStartupPipelineSetup setup = new EmrStartupPipelineSetup(pipeline, factory, runId);
     final Phase1PipelineSetup phase1 = new Phase1PipelineSetup(pipeline, factory, codeManager,
         runId, dataIndex);
