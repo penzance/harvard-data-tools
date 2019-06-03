@@ -79,6 +79,7 @@ public class Pipeline {
     bootstrapParams.add(runId);
     bootstrapParams.add(config.getEmrCodeDir());
     bootstrapParams.add(requestjson.replaceAll("\\s+","").replace("\"", "\\\""));
+    log.info("bootstrap params: " + bootstrapParams);
     return StringUtils.join(bootstrapParams, ",");
   }
 
