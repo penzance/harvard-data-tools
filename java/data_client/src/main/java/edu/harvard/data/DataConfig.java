@@ -340,7 +340,6 @@ public class DataConfig {
   protected String getConfigParameter(final String key, final boolean verify)
       throws DataConfigurationException {
     final String param = (String) properties.get(key);
-    log.info( "Config Param: " + param + "Config Key: " + key + "Config verify: " + verify );
     if (verify && param == null) {
       throw new DataConfigurationException("Configuration file missing " + key);
     }

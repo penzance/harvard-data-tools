@@ -125,10 +125,17 @@ public class RapidTransformGenerator {
 				    + "env\n");
 		  
 		  // Copy runtime generated data request
+		  // TODO: Disable for now until dynamically generated Lambda json , and use dataconfig_g
 		  out.println();
 		  out.println("# Update datarequest config with Runtime generated code");
 		  out.println("cp " + config.getEmrCodeDir() + "/"
 				  	+ config.getRapidConfigFile() + " " + config.getRapidCodeDir() + "/runtime/datarequest_config.py");
+		  
+		  // EMR specific 
+		  out.println();
+		  out.println("# Remove Maven Repo dependencies (by renaming) to avoid pyspark config download conflicts");
+		  out.println("mv .ivy2/ .rmivy2");
+		  out.println("mv .m2/ .rmm2");
 		  
 		  // Run Rapid Code
 		  out.println();
