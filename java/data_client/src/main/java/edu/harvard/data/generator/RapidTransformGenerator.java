@@ -126,10 +126,10 @@ public class RapidTransformGenerator {
 		  
 		  // Copy runtime generated data request
 		  // TODO: Disable for now until dynamically generated Lambda json , and use dataconfig_g
-		  out.println();
-		  out.println("# Update datarequest config with Runtime generated code");
-		  out.println("cp " + config.getEmrCodeDir() + "/"
-				  	+ config.getRapidConfigFile() + " " + config.getRapidCodeDir() + "/runtime/datarequest_config.py");
+		  //out.println();
+		  //out.println("# Update datarequest config with Runtime generated code");
+		  //out.println("cp " + config.getEmrCodeDir() + "/"
+			//	  	+ config.getRapidConfigFile() + " " + config.getRapidCodeDir() + "/runtime/datarequest_config.py");
 		  
 		  // EMR specific 
 		  out.println();
