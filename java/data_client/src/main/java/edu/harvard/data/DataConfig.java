@@ -158,6 +158,7 @@ public class DataConfig {
   private final String rapidAwsDefaultAccessSecretKey;
   private final String rapidAwsAssumeRoleArn;
   private final String rapidAwsAssumeRoleSessionName;
+  private final String rapidAwsAssumeRoleDuration;
   //RAPID Optional Configuration END
 
   protected String codeGeneratorScript;
@@ -288,6 +289,7 @@ public class DataConfig {
     this.rapidAwsDefaultAccessSecretKey = getConfigParameter("rapid_aws_default_access_secrect_key", false);
     this.rapidAwsAssumeRoleArn = getConfigParameter("rapid_aws_assume_role_arn", false);
     this.rapidAwsAssumeRoleSessionName = getConfigParameter("rapid_aws_assume_role_session_name", false);
+    this.rapidAwsAssumeRoleDuration = getConfigParameter("rapid_aws_assume_role_duration", false);
     //RAPID Optional Configuration END
   }
 
@@ -769,6 +771,10 @@ public class DataConfig {
   
   public String getRapidAwsAssumeRoleSessionName() {
     return rapidAwsAssumeRoleSessionName;
+  }
+
+  public String getRapidAwsAssumeRoleDuration() {
+	return rapidAwsAssumeRoleDuration;
   }
 
   public String getPaths() {

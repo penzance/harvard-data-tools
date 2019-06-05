@@ -116,7 +116,8 @@ public class RapidTransformGenerator {
 		  out.println();
 		  out.println("# NEW: Get across account data\n"
 				    + "AWS_TEMP=`aws sts assume-role --role-arn \"" + config.getRapidAwsAssumeRoleArn()
-				    + "\" --role-session-name \"" + config.getRapidAwsAssumeRoleSessionName() + "\"`\n"
+				    + "\" --role-session-name \"" + config.getRapidAwsAssumeRoleSessionName() + "\""
+				    + " --duration-seconds " + config.getRapidAwsAssumeRoleDuration() + "`\n"
 				    + "AWS_ACCESS_KEY_ID=`echo $AWS_TEMP | jq -r '.Credentials.AccessKeyId'`\n"
 				    + "AWS_SECRET_ACCESS_KEY=`echo $AWS_TEMP | jq -r '.Credentials.SecretAccessKey'`\n"
 				    + "AWS_SESSION_TOKEN=`echo $AWS_TEMP | jq -r '.Credentials.SessionToken'`\n"
