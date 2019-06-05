@@ -134,8 +134,8 @@ public class RapidTransformGenerator {
 		  // EMR specific 
 		  out.println();
 		  out.println("# Remove Maven Repo dependencies (by renaming) to avoid pyspark config download conflicts");
-		  out.println("mv .ivy2/ .rmivy2");
-		  out.println("mv .m2/ .rmm2");
+		  out.println("mv /home/hadoop/.ivy2/ /home/hadoop/.rmivy2");
+		  out.println("mv /home/hadoop/.m2/ /home/hadoop/.rmm2");
 		  
 		  // Run Rapid Code
 		  out.println();
