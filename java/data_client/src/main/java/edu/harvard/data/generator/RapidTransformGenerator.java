@@ -67,7 +67,8 @@ public class RapidTransformGenerator {
           // CONFIG
 		  out.println();
           out.println("aws s3 cp " + config.getRapidGoogleCreds() + " " + config.getRapidGoogleDir() + "\n"
-    	 	        + "mkdir /tmp/OUTPUT\n");
+    	 	        + "mkdir /tmp/OUTPUT\n"
+        		    + "mkdir /tmp/LOGS\n");
 
           // GITHUB API TOKEN
 		  out.println();
@@ -136,8 +137,9 @@ public class RapidTransformGenerator {
 		  // EMR specific 
 		  out.println();
 		  out.println("# Remove Maven Repo dependencies (by renaming) to avoid pyspark config download conflicts");
-		  out.println("mv /home/hadoop/.ivy2/ /home/hadoop/.rmivy2");
 		  out.println("mv /home/hadoop/.m2/ /home/hadoop/.rmm2");
+		  out.println("export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HADOOP_HOME/lib/native");
+
 		  
 		  // Run Rapid Code
 		  out.println();
