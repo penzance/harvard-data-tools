@@ -465,16 +465,25 @@ public class PipelineFactory {
   public ArrayList<PipelineObjectBase> testCreateSparkConfigObjects() {
 
       ArrayList<PipelineObjectBase> listconfigobjects = new ArrayList<PipelineObjectBase>();
-
-	  // Create Properties
-	  Map<String, String> hProperties = new HashMap<String,String>();
-	  hProperties.put("JAVA_HOME", "/usr/lib/jvm/java-1.8.0");
-	  hProperties.put("SPARK_LIBRARY_PATH", "$SPARK_LIBRARY_PATH:/usr/lib/hadoop-lzo/lib/native");
-	  hProperties.put("SPARK_CLASSPATH", "$SPARK_CLASSPATH:/usr/lib/hadoop-lzo/lib/hadoop-lzo-0.4.19.jar");
-	  for( final String hProperty: hProperties.keySet() ) {
-	  	listconfigobjects.add( testCreateEmrConfigObject(hProperty, hProperties.get( hProperty)));
-	  }	 
       
+      final PipelineObjectBase obj = new PipelineObjectBase(config, "SPARK_JAVA_HOME","Property");
+      obj.set("key", "JAVA_HOME");
+      obj.set("value", "/usr/lib/jvm/java-1.8.0");
+      allObjects.add(obj);
+      listconfigobjects.add( obj );
+
+      final PipelineObjectBase obj2 = new PipelineObjectBase(config, "SPARK_LIBRARY_PATH","Property");
+      obj2.set("key", "SPARK_LIBRARY_PATH");
+      obj2.set("value", "$SPARK_LIBRARY_PATH:/usr/lib/hadoop-lzo/lib/native");
+      allObjects.add(obj2);
+      listconfigobjects.add( obj2 );
+
+      final PipelineObjectBase obj3 = new PipelineObjectBase(config, "SPARK_CLASSPATH","Property");
+      obj3.set("key", "SPARK_CLASSPATH");
+      obj3.set("value", "$SPARK_CLASSPATH:/usr/lib/hadoop-lzo/lib/hadoop-lzo-0.4.19.jar");
+      allObjects.add(obj3);
+      listconfigobjects.add( obj3 );
+
 	  return listconfigobjects;  	  
   }
   
