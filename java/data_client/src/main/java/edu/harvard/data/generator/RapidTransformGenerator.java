@@ -140,6 +140,14 @@ public class RapidTransformGenerator {
 		  out.println("mv /home/hadoop/.m2/ /home/hadoop/.rmm2");
 		  out.println("export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HADOOP_HOME/lib/native:/usr/lib/hadoop-lzo/lib/native");
 
+		  // DEBUG
+		  out.println("");
+		  out.println("#Debug env vars");
+		  out.println("env >> /var/log/rapid-transform.out");
+		  out.println("echo $SPARK_CLASSPATH >> /var/log/rapid-transform.out");
+		  out.println("echo $SPARK_LIBRARY_PATH >> /var/log/rapid-transform.out");
+		  
+
 		  
 		  // Run Rapid Code
 		  out.println();
