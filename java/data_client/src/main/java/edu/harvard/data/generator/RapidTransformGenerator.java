@@ -145,7 +145,7 @@ public class RapidTransformGenerator {
 		  out.println();
 		  out.println("#Run RAPID Code\n"
 				    + "cd $RAPID_CODE_BASE\n"
-				    + "sudo python runtime/main.py --data-requests --runtime &> /var/log/rapid-transform.out\n");
+				    + "python runtime/main.py --data-requests --runtime &> /var/log/rapid-transform.out\n");
 		  out.println();
 		  
 	  }
