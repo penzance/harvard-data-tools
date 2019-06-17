@@ -66,7 +66,7 @@ implements RequestStreamHandler {
     final List<S3ObjectId> paths = new ArrayList<S3ObjectId>();
     final S3ObjectId configPath = AwsUtils.key(config.getCodeBucket(), "infrastructure");
     paths.add(AwsUtils.key(configPath, "tiny_phase_0.properties"));
-    paths.add(AwsUtils.key(configPath, "tiny_emr.properties"));
+    paths.add(AwsUtils.key(configPath, "tiny_emr_rapid.properties"));
     return paths;
   }
 
