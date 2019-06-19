@@ -56,6 +56,11 @@ public class RapidTransformGenerator {
           out.println("unset AWS_ACCESS_KEY_ID\n"
     	 	        + "unset AWS_SECRET_ACCESS_KEY\n"
     		        + "unset AWS_SESSION_TOKEN\n");
+
+		  // DEBUG
+		  out.println("");
+		  out.println("# Debug env vars");
+		  out.println("env >> /var/log/rapid-transform.out");
           
           // Export Vars
 		  out.println();
@@ -142,7 +147,6 @@ public class RapidTransformGenerator {
 		  // DEBUG
 		  out.println("");
 		  out.println("#Debug env vars");
-		  out.println("env >> /var/log/rapid-transform.out");
 		  out.println("echo $SPARK_CLASSPATH >> /var/log/rapid-transform.out");
 		  out.println("echo $SPARK_LIBRARY_PATH >> /var/log/rapid-transform.out");
 		  
