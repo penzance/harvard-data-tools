@@ -2,7 +2,7 @@
     "tables": {
         "Appointments": {
             "key": "empl_id",
-            "columns": ["business_title"]
+            "columns": ["department_final","job_desc","business_title"]
         }
     }
 }
