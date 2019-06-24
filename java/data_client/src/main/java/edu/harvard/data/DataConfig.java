@@ -107,6 +107,7 @@ public class DataConfig {
   private final String emrAvailabilityZoneGroup;
   private final String emrConfiguration;
 
+  private final String phase0BootstrapScript;
   private final String phase0InstanceType;
   private final String phase0BidPrice;
   private final String phase0TerminateAfter;
@@ -261,6 +262,7 @@ public class DataConfig {
     this.emrAvailabilityZoneGroup = getConfigParameter("emr_availability_zone_group", verify);
     this.emrConfiguration = getConfigParameter("emr_configuration", verify);
 
+    this.phase0BootstrapScript = getConfigParameter("phase_0_boostrap_script", false);  // set to false for testing
     this.phase0InstanceType = getConfigParameter("phase_0_instance_type", verify);
     this.phase0BidPrice = getConfigParameter("phase_0_bid_price", verify);
     this.phase0TerminateAfter = getConfigParameter("phase_0_terminate_after", verify);
@@ -382,7 +384,11 @@ public class DataConfig {
   }
 
   public S3ObjectId getPhase0BootstrapScript() {
-    return AwsUtils.key(getCodeLocation(), "phase-0-bootstrap.sh");
+	if( phase0BootstrapScript != null) {
+      return AwsUtils.key(getCodeLocation(), phase0BootstrapScript );
+	} else {
+      return AwsUtils.key(getCodeLocation(), "phase-0-bootstrap.sh" );
+	}
   }
 
   public S3ObjectId getIndexFileS3Location(final String runId) {
