@@ -1,7 +1,7 @@
 { 
     "tables": {
         "Appointments": {
-            "key": "empl_id",
+            "key": "appt_id",
             "columns": ["job_desc","business_title"]
         }
     }
