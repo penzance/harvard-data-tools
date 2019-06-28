@@ -2,7 +2,7 @@
   { "Appointments": {
       "columns" : [ 
         {
-            "name": "appt_id",
+            "name": "appt_uuid",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
