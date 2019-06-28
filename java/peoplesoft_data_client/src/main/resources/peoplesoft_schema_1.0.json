@@ -2,6 +2,12 @@
   { "Appointments": {
       "columns" : [ 
         {
+            "name": "appt_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
             "name": "empl_id",
 	    "type": "varchar",
 	    "length": 255,
