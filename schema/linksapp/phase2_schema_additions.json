@@ -1,0 +1,9 @@
+{ "tables": { 
+    "video": {
+        "owner": "java"
+    },
+    "geo_ip": {
+        "owner": "java"
+    }
+}
+}

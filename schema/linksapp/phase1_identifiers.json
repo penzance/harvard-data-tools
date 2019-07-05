@@ -1,0 +1,17 @@
+{
+	"ScraperText": {
+		"user_id": ["HUID"]
+	},
+	"ScraperCitations": {
+		"user_id": ["HUID"]
+	},
+	"ScraperCitationsCatalyst": {
+		"person_id": ["HUID"]
+	},
+	"OpenScholarMapping": {
+		"site_title": ["Other"],
+		"site_owner_email": ["Other"],
+		"site_owner_huid": ["HUID"]
+	}
+}
+
