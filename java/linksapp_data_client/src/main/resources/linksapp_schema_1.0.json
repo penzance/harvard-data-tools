@@ -1,307 +1,838 @@
 { "tables": 
-  { "event": {
+  { "ScraperText": {
       "columns" : [ 
         {
-          "name" : "action_id",
-          "description" : "Action identifier.",
-          "type" : "bigint"
+            "name": "id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
         },
         {
-          "name" : "mpid",
-          "description" : "Video identifer. Foreign key relation with videos.id.",
-          "type" : "varchar",
-          "length" : 255
+            "name": "user_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
         },
         {
-          "name" : "created",
-          "description" : "Timestamp for when this event occurred.",
-          "type" : "datetime"
+            "name": "checksum",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
         },
         {
-          "name" : "@version",
-          "description" : "",
-          "type" : "varchar",
-          "length" : 16
+            "name": "content_type",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
         },
         {
-          "name" : "@timestamp",
-          "description" : "",
-          "type" : "timestamp"
+            "name": "page_type",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
         },
         {
-          "name" : "ip",
-          "description" : "Originating IP address for this event.",
-          "type" : "varchar",
-          "length" : 255
+            "name": "url",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
         },
         {
-          "name" : "host",
-          "description" : "",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "port",
-          "description" : "",
-          "type" : "integer"
-        },
-        {
-          "name" : "hostname",
-          "description" : "",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "huid",
-          "description" : "Harvard ID of the user who initiated this event, or 'anonymous'.",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "proxy1",
-          "description" : "",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "proxy2",
-          "description" : "",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "proxy3",
-          "description" : "",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "session_id",
-          "description" : "Tracking identifier for a per-user session.",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "is_live",
-          "description" : "True if the user is watching a live video, false if the video is recorded.",
-          "type" : "boolean"
-        },
-        {
-          "name" : "action.inpoint",
-          "description" : "Timestamp within the video when the event occurred.",
-          "type" : "integer"
-        },
-        {
-          "name" : "action.type",
-          "description" : "Type of event.",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "action.length",
-          "description" : "",
-          "type" : "integer"
-        },
-        {
-          "name" : "action.outpoint",
-          "description" : "Timestamp within the video when the event occurred.",
-          "type" : "integer"
-        },
-        {
-          "name" : "action.is_playing",
-          "description" : "True if the video is currently playing, false if not.",
-          "type" : "boolean"
-        },
-        {
-          "name" : "ua.name",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "ua.os",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "ua.os_name",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "ua.os_major",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "ua.os_minor",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "ua.device",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "ua.major",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "ua.minor",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "ua.patch",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "ua.build",
-          "type" : "varchar",
-          "length" : 255
+            "name": "text",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
         }
       ]
     },
-    "video": {
+    "ScraperCitations": {
       "columns" : [ 
         {
-          "name" : "id",
-          "description" : "Video identifer.",
-          "type" : "varchar",
-          "length" : 255
-        },
+            "name": "citation_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
         {
-          "name" : "series",
-          "description" : "",
-          "type" : "varchar",
-          "length" : 255
-        },
+            "name": "user_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
         {
-          "name" : "course",
-          "description" : "Title of the course in which the video is embedded.",
-          "type" : "varchar",
-          "length" : 255
-        },
+            "name": "url_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
         {
-          "name" : "type",
-          "description" : "",
-          "type" : "varchar",
-          "length" : 255
-        },
+            "name": "entrytype",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
         {
-          "name" : "duration",
-          "description" : "",
-          "type" : "bigint"
-        },
+            "name": "abstract_description",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
         {
-          "name" : "start",
-          "description" : "",
-          "type" : "Timestamp"
-        },
+            "name": "address",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
         {
-          "name" : "title",
-          "description" : "Video title.",
-          "type" : "varchar",
-          "length" : 255
-        },
+            "name": "author",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
         {
-          "name" : "year",
-          "description" : "",
-          "type" : "varchar",
-          "length" : 255
-        },
+            "name": "booktitle",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
         {
-          "name" : "term",
-          "description" : "",
-          "type" : "varchar",
-          "length" : 255
-        },
+            "name": "chapter",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
         {
-          "name" : "description",
-          "description" : "",
-          "type" : "varchar",
-          "length" : 255
-        },
+            "name": "edition",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
         {
-          "name" : "cdn",
-          "description" : "",
-          "type" : "varchar",
-          "length" : 255
-        }
+            "name": "editor",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "institution",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "isbn",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "issn",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "journal",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "keywords",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "month",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "note",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "number",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "organization",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "pages",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "publisher",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "series",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "title",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "type",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "url",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "volume",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "year",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	}
       ]
     },
-    "geo_ip": {
-      "columns": [
+    "ScraperCitationsCatalyst": {
+      "columns" : [ 
         {
-          "name" : "ip",
-          "type" : "varchar",
-          "length" : 255
+            "name": "catalyst_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "catalyst_pmid",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "catalyst_authors",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "catalyst_title",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "catalyst_other",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "publications",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "checksum",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "content_type",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "url_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "page_type",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "person_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "url",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	}
+      ]
+    },
+    "OpenScholarMapping": {
+      "columns" : [ 
+        {
+            "name": "id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "site_title",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "site_owner_email",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "os_install",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "site_owner_huid",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "content_last_updated",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "site_privacy_setting",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "site_url",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	}
+      ]
+    },
+    "OpenScholarBiblioTitles": {
+      "columns" : [ 
+        {
+            "name": "id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "vsite_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "label",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "self",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	}
+      ]
+    },
+    "OpenScholarPages": {
+      "columns" : [ 
+        {
+            "name": "id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "vsite_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "path",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "self",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "label",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "body",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	}
+      ]
+    },
+    "Gazette": {
+      "columns" : [ 
+        {
+            "name": "news_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "categories",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "content",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "description",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "guid",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "link",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "pubdate",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "pubtime",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "title",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "feed",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "feedlabel",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	}
+      ]
+    },
+    "Rss": {
+      "columns" : [ 
+        {
+            "name": "id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "feed",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "feedlabel",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "link",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "description",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "title",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "pubdate",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "pubtime",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "image_url",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "parsed_date",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "parsed_time_start",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "parsed_time_end",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "locations",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "categories",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "all_day",
+	    "type": "boolean",
+	    "description": ""
+	}
+      ]
+    },
+    "GazetteEvents": {
+      "columns" : [ 
+        {
+            "name": "id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "eventID",
+	    "type": "integer",
+	    "description": ""
+	},
+        {
+            "name": "canceled",
+	    "type": "boolean",
+	    "description": ""
+	},
+        {
+            "name": "waitingListAvailable",
+	    "type": "boolean",
+	    "description": ""
+	},
+        {
+            "name": "requiresPayment",
+	    "type": "boolean",
+	    "description": ""
+	},
+        {
+            "name": "pastDeadline",
+	    "type": "boolean",
+	    "description": ""
+	},
+        {
+            "name": "signUpUrl",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "title",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "reservationFull",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "openSignUp",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "location",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "template",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "eventActionUrl",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "refundsAllowed",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "customFields",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "description",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "eventImage",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "startTimeZoneOffset",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "dateTimeFormatted",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "allDay",
+	    "type": "boolean",
+	    "description": ""
+	},
+        {
+            "name": "endTimeZoneOffset",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "permaLinkUrl",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "endDateTime",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "webLink",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "startDateTime",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "detailImage",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "categoryCalendar",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "feed",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "feedlabel",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	}
+      ]
+    },
+    "HiltIntoPractice": {
+      "columns" : [ 
+        {
+            "name": "id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "link",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "content",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "pubdate",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "pubtime",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	}
+      ]
+    },
+    "ScraperTextEntity": {
+      "columns" : [ 
+        {
+            "name": "id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
         },
         {
-          "name" : "country_code2",
-          "type" : "varchar",
-          "length" : 255
+            "name": "entity_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
         },
         {
-          "name" : "country_code3",
-          "type" : "varchar",
-          "length" : 255
+            "name": "checksum",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
         },
         {
-          "name" : "country_name",
-          "type" : "varchar",
-          "length" : 255
+            "name": "content_type",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
         },
         {
-          "name" : "continent_code",
-          "type" : "varchar",
-          "length" : 255
+            "name": "page_type",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
         },
         {
-          "name" : "region_name",
-          "type" : "varchar",
-          "length" : 255
+            "name": "url",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
         },
         {
-          "name" : "city_name",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "postal_code",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "latitude",
-          "type" : "double precision"
-        },
-        {
-          "name" : "longitude",
-          "type" : "double precision"
-        },
-        {
-          "name" : "dma_code",
-          "type" : "integer"
-        },
-        {
-          "name" : "area_code",
-          "type" : "integer"
-        },
-        {
-          "name" : "timezone",
-          "type" : "varchar",
-          "length" : 255
-        },
-        {
-          "name" : "real_region_name",
-          "type" : "varchar",
-          "length" : 255
+            "name": "text",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
         }
-        ]
-      }
+      ]
     }
   }
 }
