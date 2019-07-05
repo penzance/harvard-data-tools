@@ -2,7 +2,7 @@ package edu.harvard.data.linksapp;
 
 public class BootstrapParameters {
   private String configPathString;
-  private boolean createPipeline=true;
+  private boolean createPipeline=false;
   private String message;
 
   public String getConfigPathString() {
