@@ -22,7 +22,6 @@ import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class LinksPhase0Bootstrap extends Phase0Bootstrap
 implements RequestHandler<BootstrapParameters, String> {
-	   
   // Main method for testing
   public static void main(final String[] args) 
 		      throws JsonParseException, JsonMappingException, IOException {
@@ -35,7 +34,7 @@ implements RequestHandler<BootstrapParameters, String> {
   @Override
   public String handleRequest(final BootstrapParameters params, final Context context) {
 	try {
-	      super.init(params.getConfigPathString(), LinksDataConfig.class, true);
+	      super.init(params.getConfigPathString(), LinksDataConfig.class, params.getCreatePipeline());
 	      super.run(context);
 	} catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
 	      return "Error: " + e.getMessage();
