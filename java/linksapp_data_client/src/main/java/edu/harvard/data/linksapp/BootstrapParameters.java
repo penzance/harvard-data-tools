@@ -2,7 +2,7 @@ package edu.harvard.data.linksapp;
 
 public class BootstrapParameters {
   private String configPathString;
-  private boolean downloadOnly;
+  private boolean createPipeline=true;
   private String message;
 
   public String getConfigPathString() {
@@ -13,12 +13,12 @@ public class BootstrapParameters {
     this.configPathString = configPathString;
   }
 
-  public boolean getDownloadOnly() {
-    return downloadOnly;
+  public boolean getCreatePipeline() {
+    return createPipeline;
   }
 
-  public void setDownloadOnly(final boolean downloadOnly) {
-    this.downloadOnly = downloadOnly;
+  public void setCreatePipeline(final boolean createPipeline) {
+    this.createPipeline = createPipeline;
   }
 
   public String getMessage() {
@@ -32,7 +32,7 @@ public class BootstrapParameters {
   @Override
   public String toString() {
     return "BootstrapParams\n  ConfigPath: " + configPathString + "\n  message: "
-        + message + "\n  downloadOnly: " + downloadOnly;
+        + message + "\n  createPipeline: " + createPipeline;
   }
 
 }
