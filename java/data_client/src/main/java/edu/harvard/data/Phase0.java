@@ -8,6 +8,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
@@ -24,6 +27,10 @@ import edu.harvard.data.pipeline.PipelineExecutionRecord.Status;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public abstract class Phase0 {
+	
+	private static boolean createPipeline;
+	private static final Logger log = LogManager.getLogger();
+
 
   public static void main(final String[] args) throws ClassNotFoundException,
   InstantiationException, IllegalAccessException, IOException, DataConfigurationException {
@@ -32,6 +39,17 @@ public abstract class Phase0 {
     final String datasetId = args[2];
     final int threads = Integer.parseInt(args[3]);
     final String codeManagerClassName = args[4];
+
+    // if exists then get value
+    // if fail, then assign to true
+    // argument for createPipeline converted to 0 or 1 (from Lambda JSON boolean) in Phase0Bootstrap
+    createPipeline = true;
+    try {
+      createPipeline = (args[5] == "1");
+      log.info("CreatePipeline specified as: " + createPipeline);
+    } catch (final ArrayIndexOutOfBoundsException e) {
+      log.info("CreatePipeline not specified. Default to true.");
+    }
 
     final CodeManager codeManager = CodeManager.getCodeManager(codeManagerClassName);
     final DataConfig config = codeManager.getDataConfig(configPathString, true);
@@ -55,7 +73,12 @@ public abstract class Phase0 {
       final Phase0 phase0 = codeManager.getPhase0(configPathString, datasetId, runId, exec);
       status = phase0.run();
       record.setPhase0Success(true);
-      record.setStatus(Status.CreatingPipeline.toString());
+      if (createPipeline) {
+        record.setStatus(Status.CreatingPipeline.toString()); }
+      else {
+        record.setStatus(Status.Success.toString());
+        record.save();
+      }
     } catch (final IOException e) {
       cleanup(config, record, e);
       status = ReturnStatus.IO_ERROR;
