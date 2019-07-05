@@ -21,7 +21,7 @@ implements RequestHandler<BootstrapParameters, String> {
   @Override
   public String handleRequest(final BootstrapParameters params, final Context context) {
     try {
-      super.init(params.getConfigPathString(), LinksappDataConfig.class, false);
+      super.init(params.getConfigPathString(), LinksappDataConfig.class, params.getCreatePipeline() );
       super.run(context);
     } catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
       return "Error: " + e.getMessage();
