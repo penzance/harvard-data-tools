@@ -9,14 +9,27 @@ import java.util.Map;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.s3.model.S3ObjectId;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfigurationException;
+import edu.harvard.data.linksapp.BootstrapParameters;
+import edu.harvard.data.linksapp.LinksappPhase0Bootstrap;
 import edu.harvard.data.pipeline.Phase0Bootstrap;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class LinksappPhase0Bootstrap extends Phase0Bootstrap
 implements RequestHandler<BootstrapParameters, String> {
+  // Main method for testing
+  public static void main(final String[] args) 
+			      throws JsonParseException, JsonMappingException, IOException {
+		System.out.println(args[0]);
+		final BootstrapParameters params = new ObjectMapper().readValue(args[0],
+			        BootstrapParameters.class);
+		System.out.println(new LinksappPhase0Bootstrap().handleRequest(params, null));
+  }	
 
   @Override
   public String handleRequest(final BootstrapParameters params, final Context context) {
