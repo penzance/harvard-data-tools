@@ -107,6 +107,7 @@ public class DataConfig {
   private final String emrAvailabilityZoneGroup;
   private final String emrConfiguration;
 
+  private final String phase0HomeDir;
   private final String phase0BootstrapScript;
   private final String phase0InstanceType;
   private final String phase0BidPrice;
@@ -192,8 +193,8 @@ public class DataConfig {
     this.fullTextDir = "/tmp/full_text";
     this.hdfsBase = "/phase_";
     this.hdfsVerifyBase = "/verify" + this.hdfsBase;
-    this.ec2GitDir = "/home/ec2-user/harvard-data-tools";
-    this.ec2CodeDir = "/home/ec2-user/code";
+    this.ec2GitDir = "/home/" + getPhase0HomeDir() + "/harvard-data-tools";
+    this.ec2CodeDir = "/home/" + getPhase0HomeDir() + "/code";
     this.phase0Class = Phase0.class.getCanonicalName();
 
     this.scratchDir = getConfigParameter("scratch_dir", verify);
@@ -260,6 +261,7 @@ public class DataConfig {
     this.emrAvailabilityZoneGroup = getConfigParameter("emr_availability_zone_group", verify);
     this.emrConfiguration = getConfigParameter("emr_configuration", verify);
 
+    this.phase0HomeDir=getConfigParameter("phase_0_home_dir", false);
     this.phase0BootstrapScript = getConfigParameter("phase_0_boostrap_script", false);  // set to false for testing
     this.phase0InstanceType = getConfigParameter("phase_0_instance_type", verify);
     this.phase0BidPrice = getConfigParameter("phase_0_bid_price", verify);
@@ -416,6 +418,11 @@ public class DataConfig {
 
   public S3ObjectId getFullTextLocation() {
     return AwsUtils.key(fullTextBucket, datasetName);
+  }
+  
+  public String getPhase0HomeDir() {
+	if ( phase0HomeDir != null ) return phase0HomeDir;
+	else return "ec2-user";
   }
 
   public S3ObjectId getPhase0BootstrapScript() {
