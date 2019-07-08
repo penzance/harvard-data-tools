@@ -195,8 +195,6 @@ public class DataConfig {
     this.fullTextDir = "/tmp/full_text";
     this.hdfsBase = "/phase_";
     this.hdfsVerifyBase = "/verify" + this.hdfsBase;
-    this.ec2GitDir = "/home/" + getPhase0HomeDir() + "/harvard-data-tools";
-    this.ec2CodeDir = "/home/" + getPhase0HomeDir() + "/code";
     this.phase0Class = Phase0.class.getCanonicalName();
 
     this.scratchDir = getConfigParameter("scratch_dir", verify);
@@ -274,6 +272,9 @@ public class DataConfig {
     this.phase0SecurityGroup = getConfigParameter("phase_0_security_group", verify);
     this.phase0AvailabilityZoneGroup = getConfigParameter("phase_0_availability_zone_group",
         verify);
+    this.ec2GitDir = "/home/" + getPhase0HomeDir() + "/harvard-data-tools";
+    this.ec2CodeDir = "/home/" + getPhase0HomeDir() + "/code";
+    log.info("gitdir: " + this.ec2GitDir);
     
     //RAPID Optional Configuration START
     this.rapidGoogleCreds = getConfigParameter("rapid_google_creds", false);
@@ -386,7 +387,7 @@ public class DataConfig {
   }
   
   public String getPhase0HomeDir() {
-	if ( phase0HomeDir != null ) return phase0HomeDir;
+	if ( this.phase0HomeDir != null ) return phase0HomeDir;
 	else return "ec2-user";
   }
 
