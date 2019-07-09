@@ -21,25 +21,25 @@ import edu.harvard.data.TableFormat.Compression;
 import edu.harvard.data.io.FileTableReader;
 import edu.harvard.data.io.JsonFileReader;
 import edu.harvard.data.io.TableWriter;
-import edu.harvard.data.links.LinksDataConfig;
-import edu.harvard.data.links.bindings.phase0.Phase0ScraperText;
-import edu.harvard.data.links.bindings.phase0.Phase0ScraperTextEntity;
-import edu.harvard.data.links.bindings.phase0.Phase0ScraperCitations;
-import edu.harvard.data.links.bindings.phase0.Phase0ScraperCitationsCatalyst;
-import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarMapping;
-import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarBiblioTitles;
-import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarPages;
-import edu.harvard.data.links.bindings.phase0.Phase0Gazette;
-import edu.harvard.data.links.bindings.phase0.Phase0GazetteEvents;
-import edu.harvard.data.links.bindings.phase0.Phase0Rss;
-import edu.harvard.data.links.bindings.phase0.Phase0HiltIntoPractice;
+import edu.harvard.data.linksapp.LinksappDataConfig;
+import edu.harvard.data.linksapp.bindings.phase0.Phase0ScraperText;
+import edu.harvard.data.linksapp.bindings.phase0.Phase0ScraperTextEntity;
+import edu.harvard.data.linksapp.bindings.phase0.Phase0ScraperCitations;
+import edu.harvard.data.linksapp.bindings.phase0.Phase0ScraperCitationsCatalyst;
+import edu.harvard.data.linksapp.bindings.phase0.Phase0OpenScholarMapping;
+import edu.harvard.data.linksapp.bindings.phase0.Phase0OpenScholarBiblioTitles;
+import edu.harvard.data.linksapp.bindings.phase0.Phase0OpenScholarPages;
+import edu.harvard.data.linksapp.bindings.phase0.Phase0Gazette;
+import edu.harvard.data.linksapp.bindings.phase0.Phase0GazetteEvents;
+import edu.harvard.data.linksapp.bindings.phase0.Phase0Rss;
+import edu.harvard.data.linksapp.bindings.phase0.Phase0HiltIntoPractice;
 import edu.harvard.data.pipeline.InputTableIndex;
 
 public class InputParser {
 
   private static final Logger log = LogManager.getLogger();
 
-  private final LinksDataConfig config;
+  private final LinksappDataConfig config;
   private final AwsUtils aws;
   private final S3ObjectId inputObj;
   
@@ -70,7 +70,7 @@ public class InputParser {
   private final S3ObjectId hiltipOutputDir;
 
 
-  public InputParser(final LinksDataConfig config, final AwsUtils aws,
+  public InputParser(final LinksappDataConfig config, final AwsUtils aws,
       final S3ObjectId inputObj, final S3ObjectId outputLocation) {
     this.config = config;
     this.aws = aws;

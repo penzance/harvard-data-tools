@@ -3,8 +3,8 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>edu.harvard</groupId>
-	<artifactId>links_data_tools</artifactId>
-	<name>links_data_tools</name>
+	<artifactId>linksapp_data_tools</artifactId>
+	<name>linksapp_data_tools</name>
 	<packaging>jar</packaging>
 	<version>1.0.0</version>
 	<dependencies>
@@ -16,12 +16,12 @@
     </dependency>
      <dependency>
       <groupId>edu.harvard</groupId>
-      <artifactId>links_data_client</artifactId>
+      <artifactId>linksapp_data_client</artifactId>
       <version>1.0.0</version>
     </dependency>
      <dependency>
       <groupId>edu.harvard</groupId>
-      <artifactId>links_generated_code</artifactId>
+      <artifactId>linksapp_generated_code</artifactId>
       <version>1.0.0</version>
       <optional>true</optional>
     </dependency>
