@@ -17,17 +17,17 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.Phase0;
 import edu.harvard.data.ReturnStatus;
-import edu.harvard.data.links.LinksDataConfig;
+import edu.harvard.data.linksapp.LinksappDataConfig;
 import edu.harvard.data.pipeline.InputTableIndex;
 
 public class LinksappPhase0 extends Phase0 {
 
   private static final Logger log = LogManager.getLogger();
-  private final LinksDataConfig config;
+  private final LinksappDataConfig config;
   private final String runId;
   private final ExecutorService exec;
 
-  public LinksappPhase0(final LinksDataConfig config, final String runId,
+  public LinksappPhase0(final LinksappDataConfig config, final String runId,
       final ExecutorService exec) {
     this.config = config;
     this.runId = runId;
@@ -44,7 +44,7 @@ public class LinksappPhase0 extends Phase0 {
     for (final S3ObjectSummary obj : aws.listKeys(config.getDropboxBucket())) {
         if (obj.getKey().endsWith(".gz")) {
             final S3ObjectId outputLocation = AwsUtils.key(config.getS3WorkingLocation(runId));
-            final LinksSingleFileParser parser = new LinksSingleFileParser(obj,
+            final LinksappSingleFileParser parser = new LinksappSingleFileParser(obj,
             	outputLocation, config);
             jobs.add(exec.submit(parser));
             log.info("Queuing file " + obj.getBucketName() + "/" + obj.getKey());
@@ -86,16 +86,16 @@ public class LinksappPhase0 extends Phase0 {
   }
 }
 
-class LinksSingleFileParser implements Callable<InputTableIndex> {
+class LinksappSingleFileParser implements Callable<InputTableIndex> {
 	  private static final Logger log = LogManager.getLogger();
 
 	  private final S3ObjectSummary inputObj;
-	  private final LinksDataConfig config;
+	  private final LinksappDataConfig config;
 	  private final S3ObjectId outputLocation;
 	  private final AwsUtils aws;
 
-	  public LinksSingleFileParser(final S3ObjectSummary inputObj, final S3ObjectId outputLocation,
-	      final LinksDataConfig config) {
+	  public LinksappSingleFileParser(final S3ObjectSummary inputObj, final S3ObjectId outputLocation,
+	      final LinksappDataConfig config) {
 	    this.inputObj = inputObj;
 	    this.outputLocation = outputLocation;
 	    this.config = config;

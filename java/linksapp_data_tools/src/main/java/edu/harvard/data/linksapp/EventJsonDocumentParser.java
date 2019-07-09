@@ -15,17 +15,17 @@ import edu.harvard.data.DataTable;
 import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.io.JsonDocumentParser;
-import edu.harvard.data.links.bindings.phase0.Phase0ScraperText;
-import edu.harvard.data.links.bindings.phase0.Phase0ScraperTextEntity;
-import edu.harvard.data.links.bindings.phase0.Phase0ScraperCitations;
-import edu.harvard.data.links.bindings.phase0.Phase0ScraperCitationsCatalyst;
-import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarMapping;
-import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarBiblioTitles;
-import edu.harvard.data.links.bindings.phase0.Phase0OpenScholarPages;
-import edu.harvard.data.links.bindings.phase0.Phase0Gazette;
-import edu.harvard.data.links.bindings.phase0.Phase0GazetteEvents;
-import edu.harvard.data.links.bindings.phase0.Phase0Rss;
-import edu.harvard.data.links.bindings.phase0.Phase0HiltIntoPractice;
+import edu.harvard.data.linksapp.bindings.phase0.Phase0ScraperText;
+import edu.harvard.data.linksapp.bindings.phase0.Phase0ScraperTextEntity;
+import edu.harvard.data.linksapp.bindings.phase0.Phase0ScraperCitations;
+import edu.harvard.data.linksapp.bindings.phase0.Phase0ScraperCitationsCatalyst;
+import edu.harvard.data.linksapp.bindings.phase0.Phase0OpenScholarMapping;
+import edu.harvard.data.linksapp.bindings.phase0.Phase0OpenScholarBiblioTitles;
+import edu.harvard.data.linksapp.bindings.phase0.Phase0OpenScholarPages;
+import edu.harvard.data.linksapp.bindings.phase0.Phase0Gazette;
+import edu.harvard.data.linksapp.bindings.phase0.Phase0GazetteEvents;
+import edu.harvard.data.linksapp.bindings.phase0.Phase0Rss;
+import edu.harvard.data.linksapp.bindings.phase0.Phase0HiltIntoPractice;
 
 public class EventJsonDocumentParser implements JsonDocumentParser {
   private static final Logger log = LogManager.getLogger();

@@ -15,15 +15,15 @@ import edu.harvard.data.HadoopJob;
 import edu.harvard.data.Phase0;
 import edu.harvard.data.identity.HadoopIdentityKey;
 import edu.harvard.data.identity.IdentityScrubber;
-import edu.harvard.data.links.LinksDataConfig;
-import edu.harvard.data.links.identity.LinksIdentityHadoopManager;
+import edu.harvard.data.linksapp.LinksappDataConfig;
+import edu.harvard.data.linksapp.identity.LinksappIdentityHadoopManager;
 
 public class LinksappCodeManager extends CodeManager {
 
-  private final LinksIdentityHadoopManager identity;
+  private final LinksappIdentityHadoopManager identity;
 
   public LinksappCodeManager() {
-    this.identity = new LinksIdentityHadoopManager();
+    this.identity = new LinksappIdentityHadoopManager();
   }
 
   @Override
@@ -59,15 +59,15 @@ public class LinksappCodeManager extends CodeManager {
   @Override
   public DataConfig getDataConfig(final String configPathString, final boolean verify)
       throws IOException, DataConfigurationException {
-    return LinksDataConfig.parseInputFiles(LinksDataConfig.class, configPathString,
+    return LinksappDataConfig.parseInputFiles(LinksappDataConfig.class, configPathString,
         verify);
   }
 
   @Override
   public Phase0 getPhase0(final String configPathString, final String datasetId, final String runId,
       final ExecutorService exec) throws IOException, DataConfigurationException {
-    final LinksDataConfig config = LinksDataConfig
-        .parseInputFiles(LinksDataConfig.class, configPathString, false);
+    final LinksappDataConfig config = LinksappDataConfig
+        .parseInputFiles(LinksappDataConfig.class, configPathString, false);
     return new LinksappPhase0(config, runId, exec);
   }
 
