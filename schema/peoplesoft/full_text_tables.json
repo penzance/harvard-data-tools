@@ -3,6 +3,10 @@
         "Appointments": {
             "key": "appt_uuid",
             "columns": ["job_desc","business_title"]
+        },
+        "CurrentActive": {
+            "key": "appt_uuid",
+            "columns": ["job_desc","business_title"]
         }
     }
 }
