@@ -6,7 +6,7 @@
         },
         "CurrentActive": {
             "key": "appt_uuid",
-            "columns": ["job_desc","business_title"]
+            "columns": ["job_desc","empl_class_desc","fas_division_final","school_final","department_final","business_title","title_cd","rank","emeritus_flag","tenure_trk_cd","tenure_trk_desc","orcid","dept_desc","dept_type_desc","dept_scrty_desc","ctr_sub_affil_desc","ctr_major_affil_desc","union_desc","job_function_cd","job_family_desc","acad_rank_desc","discipline_desc","division_desc","descrshort"]
         }
     }
 }
