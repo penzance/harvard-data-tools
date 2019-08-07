@@ -162,6 +162,18 @@
 	    "description": ""
         },
         {
+            "name": "start_date_per_job",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "end_date_per_job",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
             "name": "latest_eff_date",
 	    "type": "varchar",
 	    "length": 255,
@@ -175,6 +187,12 @@
         },
         {
             "name": "end_eff_date",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "eff_date",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
