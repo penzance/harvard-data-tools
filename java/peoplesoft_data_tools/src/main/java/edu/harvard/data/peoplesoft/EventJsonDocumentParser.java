@@ -16,6 +16,8 @@ import edu.harvard.data.TableFormat;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.io.JsonDocumentParser;
 import edu.harvard.data.peoplesoft.bindings.phase0.Phase0Appointments;
+import edu.harvard.data.peoplesoft.bindings.phase0.Phase0CurrentActive;
+import edu.harvard.data.peoplesoft.bindings.phase0.Phase0HistoricActive;
 
 public class EventJsonDocumentParser implements JsonDocumentParser {
   private static final Logger log = LogManager.getLogger();
@@ -41,6 +43,19 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     final List<Phase0Appointments> appointments = new ArrayList<Phase0Appointments>();
     appointments.add(appointment);
     tables.put("Appointments", appointments );
+    
+    // Current Active 
+    final Phase0CurrentActive currentactive = new Phase0CurrentActive(format, values);
+    final List<Phase0CurrentActive> currentactives = new ArrayList<Phase0CurrentActive>();
+    currentactives.add(currentactive);
+    tables.put("CurrentActive", currentactives );
+    
+    // Historic Active 
+    final Phase0HistoricActive historicactive = new Phase0HistoricActive(format, values);
+    final List<Phase0HistoricActive> historicactives = new ArrayList<Phase0HistoricActive>();
+    historicactives.add(historicactive);
+    tables.put("HistoricActive", historicactives );
+    
 
     // Verification Step (optional)
     if (verify) {

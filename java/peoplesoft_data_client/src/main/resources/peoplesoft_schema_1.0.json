@@ -146,6 +146,698 @@
 	    "description": ""
         }
       ]
+    },
+    "CurrentActive": {
+      "columns" : [ 
+        {
+            "name": "appt_uuid",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "empl_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "start_date_per_job",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "end_date_per_job",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "latest_eff_date",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "orig_hire_date",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "end_eff_date",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "eff_date",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "job_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "empl_class_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "fas_division_final",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "school_final",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "department_final",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "hms_location",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "business_title",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "display_last_name",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "display_first_name",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "work_address_1",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "work_address_2",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "work_address_3",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "work_address_4",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "work_city",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "work_state_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "work_postal",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "hrvd_email_addr",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "scnd_email_addr",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "hms_email_addr",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "title_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "rank",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "emeritus_flag",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "tenure_trk_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "tenure_trk_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "orcid",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "dept_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "dept_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "dept_type_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "dept_type_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "dept_scrty_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "ctr_sub_affil_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "ctr_sub_affil_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "ctr_major_affil_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "ctr_major_affil_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "union_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "union_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "union_flag",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "job_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "job_function_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "job_family_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "job_family_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "acad_rank_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "acad_rank_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "hms_faculty_member_flag",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "discipline_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "discipline_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "division_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "division_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "descrshort",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        }
+      ]
+    },
+    "HistoricActive": {
+      "columns" : [ 
+        {
+            "name": "appt_uuid",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "empl_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "start_date_per_job",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "end_date_per_job",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "latest_eff_date",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "orig_hire_date",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "end_eff_date",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "eff_date",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "job_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "empl_class_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "fas_division_final",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "school_final",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "department_final",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "hms_location",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "business_title",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "display_last_name",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "display_first_name",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "work_address_1",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "work_address_2",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "work_address_3",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "work_address_4",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "work_city",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "work_state_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "work_postal",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "hrvd_email_addr",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "scnd_email_addr",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "hms_email_addr",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "title_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "rank",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "emeritus_flag",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "tenure_trk_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "tenure_trk_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "orcid",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "dept_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "dept_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "dept_type_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "dept_type_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "dept_scrty_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "ctr_sub_affil_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "ctr_sub_affil_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "ctr_major_affil_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "ctr_major_affil_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "union_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "union_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "union_flag",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "job_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "job_function_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "job_family_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "job_family_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "acad_rank_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "acad_rank_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "hms_faculty_member_flag",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "discipline_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "discipline_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "division_cd",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "division_desc",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "descrshort",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        }
+      ]
     }
   }
 }

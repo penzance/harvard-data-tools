@@ -23,6 +23,8 @@ import edu.harvard.data.io.JsonFileReader;
 import edu.harvard.data.io.TableWriter;
 import edu.harvard.data.peoplesoft.PeoplesoftDataConfig;
 import edu.harvard.data.peoplesoft.bindings.phase0.Phase0Appointments;
+import edu.harvard.data.peoplesoft.bindings.phase0.Phase0CurrentActive;
+import edu.harvard.data.peoplesoft.bindings.phase0.Phase0HistoricActive;
 import edu.harvard.data.pipeline.InputTableIndex;
 
 public class InputParser {
@@ -48,6 +50,8 @@ public class InputParser {
   private final TableFormat inFormat;
   private final TableFormat outFormat; 
   private final S3ObjectId appointmentOutputDir;
+  private final S3ObjectId currentActiveOutputDir;
+  private final S3ObjectId historicActiveOutputDir;
 
 
   public InputParser(final PeoplesoftDataConfig config, final AwsUtils aws,
@@ -61,6 +65,8 @@ public class InputParser {
     this.dataproductFiletype = ".json.gz";
     this.currentDataProduct = getDataProduct();
     this.appointmentOutputDir = AwsUtils.key(outputLocation, "Appointments");
+    this.currentActiveOutputDir = AwsUtils.key(outputLocation, "CurrentActive");
+    this.historicActiveOutputDir = AwsUtils.key(outputLocation, "HistoricActive");
     final FormatLibrary formatLibrary = new FormatLibrary();
     this.inFormat = formatLibrary.getFormat(Format.Sis);
     final ObjectMapper jsonMapper = new ObjectMapper();
@@ -100,7 +106,11 @@ public class InputParser {
     
     if (currentDataProduct.equals("Appointments") ) {
         dataproductOutputObj = AwsUtils.key(appointmentOutputDir, dataproductFilename );  
-    } 
+    } else if (currentDataProduct.equals("CurrentActive") ) {
+        dataproductOutputObj = AwsUtils.key(currentActiveOutputDir, dataproductFilename );  
+    } else if (currentDataProduct.equals("HistoricActive") ) {
+        dataproductOutputObj = AwsUtils.key(historicActiveOutputDir, dataproductFilename );  
+    }
     
     log.info("Parsing " + filename + " to " + dataproductFile);
     log.info("DataProduct Key: " + dataproductOutputObj );
@@ -120,6 +130,28 @@ public class InputParser {
     			  appointments.add((Phase0Appointments) tables.get("Appointments").get(0));
     		}
     	}
+	} else if (currentDataProduct.equals("CurrentActive")) {
+        log.info("Parsing data product " + currentDataProduct);
+    	try (
+    	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
+    	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
+    	    	TableWriter<Phase0CurrentActive> currentactive = new TableWriter<Phase0CurrentActive>(Phase0CurrentActive.class, outFormat,
+    	            dataproductFile);) {
+    		for (final Map<String, List<? extends DataTable>> tables : in) {
+    			  currentactive.add((Phase0CurrentActive) tables.get("CurrentActive").get(0));
+    		}
+    	}
+	} else if (currentDataProduct.equals("HistoricActive")) {
+        log.info("Parsing data product " + currentDataProduct);
+    	try (
+    	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
+    	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
+    	    	TableWriter<Phase0HistoricActive> currentactive = new TableWriter<Phase0HistoricActive>(Phase0HistoricActive.class, outFormat,
+    	            dataproductFile);) {
+    		for (final Map<String, List<? extends DataTable>> tables : in) {
+    			  currentactive.add((Phase0HistoricActive) tables.get("HistoricActive").get(0));
+    		}
+    	}
 	}
     log.info("Done Parsing file " + originalFile);
   }
@@ -135,8 +167,23 @@ public class InputParser {
 	      for (final Phase0Appointments i : in ) {
 	      }
 	    }
+    } else if (currentDataProduct.equals("CurrentActive")) {
+
+	    try(FileTableReader<Phase0CurrentActive> in = new FileTableReader<Phase0CurrentActive>(Phase0CurrentActive.class,
+		    outFormat, dataproductFile)) {
+	      log.info("Verifying file " + dataproductFile);	
+	      for (final Phase0CurrentActive i : in ) {
+	      }
+	    }
+    } else if (currentDataProduct.equals("HistoricActive")) {
+
+	    try(FileTableReader<Phase0HistoricActive> in = new FileTableReader<Phase0HistoricActive>(Phase0HistoricActive.class,
+		    outFormat, dataproductFile)) {
+	      log.info("Verifying file " + dataproductFile);	
+	      for (final Phase0HistoricActive i : in ) {
+	      }
+	    }
     }
-    
   }
 
   private void cleanup() {
