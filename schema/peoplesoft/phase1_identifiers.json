@@ -28,6 +28,21 @@
 		"hrvd_email_addr": ["EmailAddress"],
 		"scnd_email_addr": ["EmailAddress"],
 		"hms_email_addr": ["EmailAddress"]
+	},
+	"HistoricActive": {
+		"empl_id": ["HUID"],
+		"work_address_1": ["Other"],
+		"work_address_2": ["Other"],
+		"work_address_3": ["Other"],
+		"work_address_4": ["Other"],
+		"work_city": ["Other"],
+		"work_state_cd": ["Other"],
+		"work_postal": ["Other"],
+		"display_last_name": ["Other"],
+		"display_first_name": ["Other"],
+		"hrvd_email_addr": ["EmailAddress"],
+		"scnd_email_addr": ["EmailAddress"],
+		"hms_email_addr": ["EmailAddress"]
 	}
 }
 
