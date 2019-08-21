@@ -356,7 +356,7 @@ public class DataConfig {
   }
   
   public String getPhase1EmailPrimaryOutput() {
-    return IdentifierType.EmailAddressPrimary.getFieldName();
+    return IdentifierType.EmailAddressPrimary.getFieldName().replace("_","");
   }
 
   public String getPhase1NameOutput() {
