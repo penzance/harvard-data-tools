@@ -25,7 +25,7 @@
 		"work_postal": ["Other"],
 		"display_last_name": ["NameLast"],
 		"display_first_name": ["NameFirst"],
-		"hrvd_email_addr": ["EmailAddress"],
+		"hrvd_email_addr": ["EmailAddressPrimary"],
 		"scnd_email_addr": ["EmailAddress"],
 		"hms_email_addr": ["EmailAddress"]
 	},
@@ -40,7 +40,7 @@
 		"work_postal": ["Other"],
 		"display_last_name": ["Other"],
 		"display_first_name": ["Other"],
-		"hrvd_email_addr": ["EmailAddress"],
+		"hrvd_email_addr": ["EmailAddressPrimary"],
 		"scnd_email_addr": ["EmailAddress"],
 		"hms_email_addr": ["EmailAddress"]
 	}
