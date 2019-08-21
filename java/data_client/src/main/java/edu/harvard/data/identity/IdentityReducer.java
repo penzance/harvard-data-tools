@@ -122,6 +122,7 @@ public class IdentityReducer<T> {
       final MultipleOutputs<Text, NullWritable> outputs) throws IOException, InterruptedException {
     final IdentityMap id;
     final Set<String> emails = new HashSet<String>();
+    final Set<String> emails_primary = new HashSet<String>();
     final Set<String> names = new HashSet<String>();
     final Set<String> names_first = new HashSet<String>();
     final Set<String> names_last = new HashSet<String>();
@@ -145,6 +146,10 @@ public class IdentityReducer<T> {
       if (email != null && !email.isEmpty()) {
           emails.add(email);
       }
+      final String email_primary = (String) value.getIdentityMap().get(IdentifierType.EmailAddressPrimary);
+      if (email_primary != null && !email_primary.isEmpty()) {
+        emails_primary.add(email_primary);
+      }
       final String name = (String) value.getIdentityMap().get(IdentifierType.Name);
       if (name != null && !name.isEmpty() && name.length() > 1) {
           names.add(name);
@@ -165,6 +170,12 @@ public class IdentityReducer<T> {
       if (email != null && !email.isEmpty()) {	
     	  outputResult(IdentifierType.EmailAddress.getFieldName(), outputs,
     	     id.get(IdentifierType.ResearchUUID), email);
+      }
+    }
+    for (final String email_primary : emails_primary) {
+      if (email_primary != null && !email_primary.isEmpty()) {	
+    	  outputResult(IdentifierType.EmailAddressPrimary.getFieldName(), outputs,
+    	     id.get(IdentifierType.ResearchUUID), email_primary);
       }
     }
     for (final String name : names) {

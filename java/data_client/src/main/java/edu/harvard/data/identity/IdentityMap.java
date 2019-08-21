@@ -37,6 +37,11 @@ import edu.harvard.data.schema.extension.ExtensionSchemaTable;
 //     email VARCHAR(255)
 // );
 //
+// CREATE TABLE pii.email_primary (
+//     research_id VARCHAR(255),
+//     email_primary VARCHAR(255)
+// );
+//
 // CREATE TABLE pii.name_first (
 //     research_id VARCHAR(255),
 //     name_first VARCHAR(255)
@@ -127,6 +132,11 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     
     columns = new ArrayList<DataSchemaColumn>();
     columns.add(new ExtensionSchemaColumn("research_id", "", "varchar", 255));
+    columns.add(new ExtensionSchemaColumn("email_primary", "", "varchar", 255));
+    tables.put("email_primary", new ExtensionSchemaTable("email_primary", columns));
+    
+    columns = new ArrayList<DataSchemaColumn>();
+    columns.add(new ExtensionSchemaColumn("research_id", "", "varchar", 255));
     columns.add(new ExtensionSchemaColumn("name_first", "", "varchar", 255));
     tables.put("name_first", new ExtensionSchemaTable("name_first", columns));
     
@@ -151,6 +161,9 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
     case "email":
       keys.add("research_id");
       keys.add("email");
+      break;
+    case "email_primary":
+      keys.add("research_id");
       break;
     case "name_first":
       keys.add("research_id");

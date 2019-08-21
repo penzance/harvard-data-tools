@@ -48,6 +48,10 @@ public enum IdentifierType {
       "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$",
       String.class),
 
+  EmailAddressPrimary("email_primary",
+      "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$",
+      String.class),
+
   Name("name", ".*", String.class),
 
   NameFirst("name_first", ".*", String.class),
