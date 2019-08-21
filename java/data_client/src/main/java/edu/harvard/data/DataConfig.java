@@ -430,6 +430,10 @@ public class DataConfig {
   public String getPhase1EmailOutput() {
     return IdentifierType.EmailAddress.getFieldName();
   }
+  
+  public String getPhase1EmailPrimaryOutput() {
+    return IdentifierType.EmailAddressPrimary.getFieldName();
+  }
 
   public String getPhase1NameOutput() {
     return IdentifierType.Name.getFieldName();
