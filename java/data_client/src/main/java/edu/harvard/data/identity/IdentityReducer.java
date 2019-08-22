@@ -181,7 +181,7 @@ public class IdentityReducer<T> {
     }
     for (final String email_primary : emails_primary) {
       if (email_primary != null && !email_primary.isEmpty()) {	
-    	  outputResult(IdentifierType.EmailAddressPrimary.getFieldName(), outputs,
+    	  outputResult(IdentifierType.EmailAddressPrimary.getFieldName().replace("_", ""), outputs,
     	     id.get(IdentifierType.ResearchUUID), email_primary);
       }
     }
