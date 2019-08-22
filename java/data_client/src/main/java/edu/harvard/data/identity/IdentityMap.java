@@ -167,11 +167,9 @@ public class IdentityMap implements DataTable, Comparable<IdentityMap> {
       break;
     case "name_first":
       keys.add("research_id");
-      keys.add("name_first");
       break;
     case "name_last":
       keys.add("research_id");
-      keys.add("name_last");
       break;
     default:
       throw new RuntimeException("Unknown identity table " + tableName);
