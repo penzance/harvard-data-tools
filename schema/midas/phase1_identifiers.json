@@ -1,0 +1,10 @@
+{
+	"PrimaryRoles": {
+		"huid": ["HUID"],
+		"name_first": ["Other"],
+		"name_middle": ["Other"],
+		"name_last": ["Other"],
+		"email_address": ["Other"]
+	}
+}
+
