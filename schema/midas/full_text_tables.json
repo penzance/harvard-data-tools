@@ -1,0 +1,8 @@
+{ 
+    "tables": {
+        "PrimaryRoles": {
+            "key": "uuid",
+            "columns": ["role_title","faculty_cd_desc"]
+        }
+    }
+}
