@@ -26,6 +26,12 @@
 	    "description": ""
         },
         {
+            "name": "name_suffix",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
             "name": "name_last",
 	    "type": "varchar",
 	    "length": 255,
