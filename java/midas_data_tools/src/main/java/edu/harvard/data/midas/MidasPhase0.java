@@ -57,7 +57,7 @@ public class MidasPhase0 extends Phase0 {
     dataIndex.setSchemaVersion("1.0");
     for (final String table : dataIndex.getTableNames()) {
        if ( table.equals("PrimaryRoles") ) {
-            dataIndex.setPartial(table, true); 	
+            dataIndex.setPartial(table, false); 	
        } 
     }
     aws.writeJson(config.getIndexFileS3Location(runId), dataIndex );
