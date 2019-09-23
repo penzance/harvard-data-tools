@@ -46,11 +46,10 @@ implements RequestStreamHandler {
   @Override
   public void handleRequest(InputStream inputStream, OutputStream outputStream, final Context context) {
 	try {
-		  final String requestjson = IOUtils.toString(inputStream, "UTF-8");
-		  log.info("Params: " + requestjson);
-          final BootstrapParameters bootstrapParams = new ObjectMapper()
-        		  							.readValue(requestjson,
-        		  									   BootstrapParameters.class);
+	      super.init(params.getConfigPathString(), LinksDataConfig.class, params.getCreatePipeline());
+	  final String requestjson = IOUtils.toString(inputStream, "UTF-8");
+	  log.info("Params: " + requestjson);
+          final BootstrapParameters bootstrapParams = new ObjectMapper().readValue(requestjson, BootstrapParameters.class);
           log.info(bootstrapParams.getConfigPathString());
           log.info(bootstrapParams.getRapidConfigDict());
 	      super.init(bootstrapParams.getConfigPathString(), 
