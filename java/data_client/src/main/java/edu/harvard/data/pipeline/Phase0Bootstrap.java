@@ -45,6 +45,8 @@ public abstract class Phase0Bootstrap {
   private Class<? extends DataConfig> configClass;
   protected String runId;
   private boolean createPipeline;
+  private boolean rapidTransform;
+  protected String requestjson;
   protected AwsUtils aws;
   private PipelineExecutionRecord executionRecord;
 
@@ -66,10 +68,25 @@ public abstract class Phase0Bootstrap {
     this.configPathString = configPathString;
     this.configClass = configClass;
     this.createPipeline = createPipeline;
+	this.rapidTransform = false;
     this.config = DataConfig.parseInputFiles(configClass, configPathString, false);
     this.runId = getRunId();
     this.aws = new AwsUtils();
   }
+
+  protected void init(final String configPathString, final Class<? extends DataConfig> configClass,
+	      final boolean createPipeline, final String requestjson ) throws IOException, DataConfigurationException {
+	log.info("Configuration path: " + configPathString);
+	log.info("Request JSON: " + requestjson);
+	this.configPathString = configPathString;
+	this.configClass = configClass;
+	this.createPipeline = createPipeline;
+	this.rapidTransform = true;
+	this.requestjson = requestjson;
+	this.config = DataConfig.parseInputFiles(configClass, configPathString, false, requestjson );
+	this.runId = getRunId();
+	this.aws = new AwsUtils();
+   }
 
   protected void run(final Context context)
       throws IOException, DataConfigurationException, UnexpectedApiResponseException {
@@ -81,7 +98,7 @@ public abstract class Phase0Bootstrap {
     for (final S3ObjectId path : getInfrastructureConfigPaths()) {
       configPathString += "|" + AwsUtils.uri(path);
     }
-    this.config = DataConfig.parseInputFiles(configClass, configPathString, false);
+    this.config = DataConfig.parseInputFiles(configClass, configPathString, false, requestjson );
 
     PipelineExecutionRecord.init(config.getPipelineDynamoTable());
     DatasetInfo.init(config.getDatasetsDynamoTable());
@@ -182,6 +199,7 @@ public abstract class Phase0Bootstrap {
     env.put("HARVARD_DATA_TOOLS_BASE", config.getEc2GitDir());
     env.put("GENERATOR", config.getCodeGeneratorScript());
     env.put("CONFIG_PATHS", config.getPaths());
+    env.put("RAPID_TRANSFORM", rapidTransform ? "1": "0");
     env.put("HARVARD_DATA_GENERATED_OUTPUT", config.getEc2CodeDir());
     env.put("PHASE_0_THREADS", config.getPhase0Threads());
     env.put("PHASE_0_HEAP_SIZE", config.getPhase0HeapSize());

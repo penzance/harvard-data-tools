@@ -1,13 +1,21 @@
 package edu.harvard.data.links;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.io.IOUtils;
 
-import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.RequestHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.amazonaws.services.lambda.runtime.*;
+//import com.amazonaws.services.lambda.runtime.Context;
+//import com.amazonaws.services.lambda.runtime.RequestHandler;
+//import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.services.s3.model.S3ObjectId;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -21,25 +29,35 @@ import edu.harvard.data.pipeline.Phase0Bootstrap;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class LinksPhase0Bootstrap extends Phase0Bootstrap
-implements RequestHandler<BootstrapParameters, String> {
+implements RequestStreamHandler {
+	
+  private static final Logger log = LogManager.getLogger();
+	   
   // Main method for testing
   public static void main(final String[] args) 
 		      throws JsonParseException, JsonMappingException, IOException {
-	System.out.println(args[0]);
-	final BootstrapParameters params = new ObjectMapper().readValue(args[0],
+	log.info("Args: " + args.toString());
+	System.out.println(args.toString());
+	final BootstrapParameters params = new ObjectMapper().readValue(args.toString(),
 		        BootstrapParameters.class);
-	System.out.println(new LinksPhase0Bootstrap().handleRequest(params, null));
+	//System.out.println(new LinksPhase0Bootstrap().handleRequest(params, null));
   }	
 		
   @Override
-  public String handleRequest(final BootstrapParameters params, final Context context) {
+  public void handleRequest(InputStream inputStream, OutputStream outputStream, final Context context) {
 	try {
 	      super.init(params.getConfigPathString(), LinksDataConfig.class, params.getCreatePipeline());
+	  final String requestjson = IOUtils.toString(inputStream, "UTF-8");
+	  log.info("Params: " + requestjson);
+          final BootstrapParameters bootstrapParams = new ObjectMapper().readValue(requestjson, BootstrapParameters.class);
+          log.info(bootstrapParams.getConfigPathString());
+          log.info(bootstrapParams.getRapidConfigDict());
+	      super.init(bootstrapParams.getConfigPathString(), 
+	    		     LinksDataConfig.class, true, requestjson);
 	      super.run(context);
 	} catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
-	      return "Error: " + e.getMessage();
+	      log.info("Error: " + e.getMessage());
 	}
-	    return "";
   }
   
   @Override
@@ -54,8 +72,10 @@ implements RequestHandler<BootstrapParameters, String> {
   @Override
   protected Map<String, String> getCustomEc2Environment() {
     final Map<String, String> env = new HashMap<String, String>();
+    log.info("Export rapid config: " + requestjson.replaceAll("\\s+","").replace("\"", "\\\""));
     env.put("DATA_SET_ID", runId);
     env.put("DATA_SCHEMA_VERSION", "1.0");
+    env.put("RAPID_CONFIG", requestjson.replaceAll("\\s+","").replace("\"", "\\\""));
     return env;
   }
 
