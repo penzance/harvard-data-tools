@@ -46,7 +46,6 @@ implements RequestStreamHandler {
   @Override
   public void handleRequest(InputStream inputStream, OutputStream outputStream, final Context context) {
 	try {
-	      super.init(params.getConfigPathString(), LinksDataConfig.class, params.getCreatePipeline());
 	  final String requestjson = IOUtils.toString(inputStream, "UTF-8");
 	  log.info("Params: " + requestjson);
           final BootstrapParameters bootstrapParams = new ObjectMapper().readValue(requestjson, BootstrapParameters.class);
