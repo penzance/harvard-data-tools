@@ -71,10 +71,11 @@ implements RequestStreamHandler {
   @Override
   protected Map<String, String> getCustomEc2Environment() {
     final Map<String, String> env = new HashMap<String, String>();
-    log.info("Export rapid config: " + requestjson.replaceAll("\\s+","").replace("\"", "\\\""));
+    final String rapidjsondict_string = "\"" + requestjson.replaceAll("\\s+","").replace("\"", "\\\"") + "\"";
+    log.info("Export rapid config: " + rapidjsondict_string );
     env.put("DATA_SET_ID", runId);
     env.put("DATA_SCHEMA_VERSION", "1.0");
-    env.put("RAPID_CONFIG", requestjson.replaceAll("\\s+","").replace("\"", "\\\""));
+    env.put("RAPID_CONFIG", rapidjsondict_string);
     return env;
   }
 
