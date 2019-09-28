@@ -70,6 +70,7 @@ public class Pipeline {
   private String emrBootstrapAction() {
     final S3ObjectId script = AwsUtils.key(config.getCodeBucket(), config.getGitTagOrBranch(),
         "emr_bootstrap.sh");
+    final String rapidjsondict_string = "\"" + requestjson.replaceAll("\\s+","").replace("\"", "\\\"") + "\"";
     final List<String> bootstrapParams = new ArrayList<String>();
     bootstrapParams.add(AwsUtils.uri(script));
     bootstrapParams.add(schemaVersion);
@@ -78,7 +79,7 @@ public class Pipeline {
     bootstrapParams.add(config.getPaths());
     bootstrapParams.add(runId);
     bootstrapParams.add(config.getEmrCodeDir());
-    bootstrapParams.add(requestjson.replaceAll("\\s+","").replace("\"", "\\\""));
+    bootstrapParams.add(rapidjsondict_string);
     log.info("bootstrap params: " + bootstrapParams);
     return StringUtils.join(bootstrapParams, ",");
   }
