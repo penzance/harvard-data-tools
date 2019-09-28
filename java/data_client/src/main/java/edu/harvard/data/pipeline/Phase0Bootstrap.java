@@ -200,6 +200,7 @@ public abstract class Phase0Bootstrap {
     env.put("GENERATOR", config.getCodeGeneratorScript());
     env.put("CONFIG_PATHS", config.getPaths());
     env.put("RAPID_TRANSFORM", rapidTransform ? "1": "0");
+    env.put("RAPID_CONFIG", requestjson.replaceAll("\\s+","").replace("\"", "\\\""));
     env.put("HARVARD_DATA_GENERATED_OUTPUT", config.getEc2CodeDir());
     env.put("PHASE_0_THREADS", config.getPhase0Threads());
     env.put("PHASE_0_HEAP_SIZE", config.getPhase0HeapSize());
