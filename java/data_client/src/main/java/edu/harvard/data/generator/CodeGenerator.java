@@ -243,10 +243,10 @@ public abstract class CodeGenerator {
           dataIndex).generate();
       
       // If RAPID is specified, do this
-      //if ( spec.getBootstrapRapidConfig() != null ) {
-	  log.info("Generating Rapid ");
-      new RapidTransformGenerator(codeDir, spec, config, workingDir ).generate();
-      //}
+      if ( spec.getBootstrapRapidConfig() != null ) {
+	      log.info("Generating Rapid ");
+          new RapidTransformGenerator(codeDir, spec, config, workingDir ).generate();
+      }
 
     } else {
       log.info("No data index at " + AwsUtils.uri(dataIndexLocation)
