@@ -180,7 +180,6 @@ public class RapidTransformGenerator {
 		  */
 		  final Map<String,String> rapidConfigDict = spec.getBootstrapRapidConfig();
 		  final String rapidRequestDir = config.getRapidRequestsDir();
-		  final String rapidCodeDir = config.getRapidCodeDir();
 		  
 		  /*
 		   * Things to parse
@@ -204,7 +203,9 @@ public class RapidTransformGenerator {
 	      for (Map.Entry<String, String> entry : rapidConfigDict.entrySet()) {
 	          String requestname = entry.getKey();
 	          String requestjson = entry.getValue();
-		      out.println("RUNTIME_DICT['" + requestname + "'] = make_request('" + requestjson + "')");
+	          if (requestjson.startsWith("Apps")) {
+		          out.println("RUNTIME_DICT['" + requestname + "'] = make_request('" + requestjson + "')");
+	          }
 	      }
 	  }
 	  
