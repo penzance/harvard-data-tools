@@ -19,6 +19,7 @@ import edu.harvard.data.VerificationException;
 import edu.harvard.data.generator.CodeGenerator;
 import edu.harvard.data.generator.GenerationSpec;
 import edu.harvard.data.identity.IdentifierType;
+import edu.harvard.data.peoplesoft.BootstrapParameters;
 import edu.harvard.data.schema.DataSchema;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 import edu.harvard.data.schema.extension.ExtensionSchema;
@@ -44,9 +45,10 @@ public class PeoplesoftCodeGenerator extends CodeGenerator {
   private final File gitDir;
 
   private final PeoplesoftDataConfig config;
+  private final BootstrapParameters bootstrapParams;
 
   public PeoplesoftCodeGenerator(final String schemaVersion, final File gitDir, final File codeDir,
-      final PeoplesoftDataConfig config, final String runId) throws FileNotFoundException {
+      final PeoplesoftDataConfig config, final String runId, BootstrapParameters bootstrapParams) throws FileNotFoundException {
     super(config, codeDir, runId);
     this.config = config;
     if (!gitDir.exists() && gitDir.isDirectory()) {
@@ -54,6 +56,7 @@ public class PeoplesoftCodeGenerator extends CodeGenerator {
     }
     this.gitDir = gitDir;
     this.schemaVersion = schemaVersion;
+    this.bootstrapParams = bootstrapParams;
   }
 
   public static void main(final String[] args) throws IOException, DataConfigurationException,
@@ -67,12 +70,15 @@ public class PeoplesoftCodeGenerator extends CodeGenerator {
     final File gitDir = new File(args[2]);
     final File dir = new File(args[3]);
     final String runId = args[4];
+    final String bootstrapParamsString = args[5];
     if (!(gitDir.exists() && gitDir.isDirectory())) {
       throw new FileNotFoundException(gitDir.toString());
     }
     final PeoplesoftDataConfig config = PeoplesoftDataConfig
-        .parseInputFiles(PeoplesoftDataConfig.class, configFiles, false);
-    new PeoplesoftCodeGenerator(schemaVersion, gitDir, dir, config, runId).generate();
+        .parseInputFiles(PeoplesoftDataConfig.class, configFiles, false, bootstrapParamsString );
+    final BootstrapParameters bootstrapParams = new ObjectMapper().readValue(bootstrapParamsString,
+	        BootstrapParameters.class);
+    new PeoplesoftCodeGenerator(schemaVersion, gitDir, dir, config, runId, bootstrapParams ).generate();
   }
 
   @Override
@@ -91,6 +97,9 @@ public class PeoplesoftCodeGenerator extends CodeGenerator {
     spec.setMainIdentifier(IdentifierType.HUID);
     spec.setHiveScriptDir(new File(gitDir, "hive/peoplesoft"));
     spec.setConfig(config);
+    
+    // Set string for Bootstrap Rapid Code JSON requests
+    spec.setBootstrapRapidConfig(bootstrapParams.getRapidConfigDict());    
 
     // Set the four schema versions in the spec.
     final DataSchema schema0 = readSchema(schemaVersion);
