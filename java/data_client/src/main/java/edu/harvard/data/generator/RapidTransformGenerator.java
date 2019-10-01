@@ -203,7 +203,7 @@ public class RapidTransformGenerator {
 	      for (Map.Entry<String, String> entry : rapidConfigDict.entrySet()) {
 	          String requestname = entry.getKey();
 	          String requestjson = entry.getValue();
-	          if (requestjson.startsWith("Apps")) {
+	          if (!requestjson.startsWith("Prepare")) {
 		          out.println("RUNTIME_DICT['" + requestname + "'] = make_request('" + requestjson + "')");
 	          }
 	      }
