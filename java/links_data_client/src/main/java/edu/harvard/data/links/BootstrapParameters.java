@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 public class BootstrapParameters {
 	  private String configPathString;
 	  private boolean downloadOnly;
+	  private boolean createPipeline;
 	  private Map<String,String> rapidConfigDict;
 	  private String message;
 
@@ -27,9 +28,17 @@ public class BootstrapParameters {
 	  public boolean getDownloadOnly() {
 	    return downloadOnly;
 	  }
+	  
+	  public boolean getCreatePipeline() {
+	    return createPipeline;
+	  }
 
 	  public void setDownloadOnly(final boolean downloadOnly) {
 	    this.downloadOnly = downloadOnly;
+	  }
+	  
+	  public void setCreatePipeline(final boolean createPipeline) {
+		this.createPipeline = createPipeline;
 	  }
 	  
 	  public void setRapidDictString( final Map<String,String> rapidConfigDict) {
@@ -79,6 +88,7 @@ public class BootstrapParameters {
 	  @Override
 	  public String toString() {
 	    return "BootstrapParams\n  ConfigPath: " + configPathString + "\n  message: "
+			+ "\n  createPipeline: " + createPipeline
 			+ message + "\n  downloadOnly: " + downloadOnly + "\n  rapidConfigDict: "
 			+ rapidConfigDict.toString();
 	  }
