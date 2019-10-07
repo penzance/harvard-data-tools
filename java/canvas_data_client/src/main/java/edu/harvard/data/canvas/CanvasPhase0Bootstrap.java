@@ -68,7 +68,7 @@ implements RequestStreamHandler, RequestHandler<BootstrapParameters, String> {
     try {
       final String requestjson = IOUtils.toString(inputStream, "UTF-8");
 	  log.info("Params: " + requestjson);
-      final BootstrapParameters params = new ObjectMapper().readValue(requestjson, BootstrapParameters.class);
+      this.params = new ObjectMapper().readValue(requestjson, BootstrapParameters.class);
       params.setCreatePipeline();
       log.info(params.getConfigPathString());
       log.info(params.getRapidConfigDict());
