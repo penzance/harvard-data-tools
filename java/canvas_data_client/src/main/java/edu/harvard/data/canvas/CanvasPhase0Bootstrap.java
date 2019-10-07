@@ -1,6 +1,8 @@
 package edu.harvard.data.canvas;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -8,9 +10,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.amazonaws.services.lambda.runtime.*;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.s3.model.S3ObjectId;
@@ -23,11 +27,12 @@ import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.DumpInfo;
 import edu.harvard.data.canvas.data_api.ApiClient;
 import edu.harvard.data.canvas.data_api.DataDump;
+import edu.harvard.data.canvas.BootstrapParameters;
 import edu.harvard.data.pipeline.Phase0Bootstrap;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class CanvasPhase0Bootstrap extends Phase0Bootstrap
-implements RequestHandler<BootstrapParameters, String> {
+implements RequestStreamHandler, RequestHandler<BootstrapParameters, String> {
 
   private DataDump dump;
   private BootstrapParameters params;
@@ -44,7 +49,7 @@ implements RequestHandler<BootstrapParameters, String> {
         BootstrapParameters.class);
     System.out.println(new CanvasPhase0Bootstrap().handleRequest(params, null));
   }
-
+  
   @Override
   public String handleRequest(final BootstrapParameters params, final Context context) {
     try {
@@ -56,6 +61,23 @@ implements RequestHandler<BootstrapParameters, String> {
       return "Error: " + e.getMessage();
     }
     return "";
+  }
+
+  @Override
+  public void handleRequest(InputStream inputStream, OutputStream outputStream, final Context context) {
+    try {
+      final String requestjson = IOUtils.toString(inputStream, "UTF-8");
+	  log.info("Params: " + requestjson);
+      final BootstrapParameters bootstrapParams = new ObjectMapper().readValue(requestjson, BootstrapParameters.class);
+      bootstrapParams.setCreatePipeline();
+      log.info(bootstrapParams.getConfigPathString());
+      log.info(bootstrapParams.getRapidConfigDict());
+      log.info(bootstrapParams.getCreatePipeline());
+      super.init(bootstrapParams.getConfigPathString(), CanvasDataConfig.class, bootstrapParams.getCreatePipeline(), requestjson );
+      super.run(context);
+	} catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
+	      log.info("Error: " + e.getMessage());
+    }
   }
 
   @Override
