@@ -68,12 +68,12 @@ implements RequestStreamHandler, RequestHandler<BootstrapParameters, String> {
     try {
       final String requestjson = IOUtils.toString(inputStream, "UTF-8");
 	  log.info("Params: " + requestjson);
-      final BootstrapParameters bootstrapParams = new ObjectMapper().readValue(requestjson, BootstrapParameters.class);
-      bootstrapParams.setCreatePipeline();
-      log.info(bootstrapParams.getConfigPathString());
-      log.info(bootstrapParams.getRapidConfigDict());
-      log.info(bootstrapParams.getCreatePipeline());
-      super.init(bootstrapParams.getConfigPathString(), CanvasDataConfig.class, bootstrapParams.getCreatePipeline(), requestjson );
+      final BootstrapParameters params = new ObjectMapper().readValue(requestjson, BootstrapParameters.class);
+      params.setCreatePipeline();
+      log.info(params.getConfigPathString());
+      log.info(params.getRapidConfigDict());
+      log.info(params.getCreatePipeline());
+      super.init(params.getConfigPathString(), CanvasDataConfig.class, params.getCreatePipeline(), requestjson );
       super.run(context);
 	} catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
 	      log.info("Error: " + e.getMessage());
