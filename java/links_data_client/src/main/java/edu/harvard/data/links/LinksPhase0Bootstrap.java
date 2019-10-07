@@ -51,8 +51,9 @@ implements RequestStreamHandler {
           final BootstrapParameters bootstrapParams = new ObjectMapper().readValue(requestjson, BootstrapParameters.class);
           log.info(bootstrapParams.getConfigPathString());
           log.info(bootstrapParams.getRapidConfigDict());
+          log.info(bootstrapParams.getCreatePipeline());
 	      super.init(bootstrapParams.getConfigPathString(), 
-	    		     LinksDataConfig.class, true, requestjson);
+	    		     LinksDataConfig.class, bootstrapParams.getCreatePipeline(), requestjson);
 	      super.run(context);
 	} catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
 	      log.info("Error: " + e.getMessage());
