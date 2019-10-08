@@ -1,5 +1,6 @@
 package edu.harvard.data.canvas;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -41,9 +42,13 @@ public class BootstrapParameters {
   }
   
   public boolean getCreatePipeline() {
-	if (this.getRapidConfigDict().containsKey("createPipeline")) {
-		return Boolean.parseBoolean(this.getRapidConfigDict().get("createPipeline"));
-	} else return true; // Set Default Pipeline setting here
+    try {
+	  if (this.getRapidConfigDict().containsKey("createPipeline")) {
+		 return Boolean.parseBoolean(this.getRapidConfigDict().get("createPipeline"));
+	  } else return true; // Set Default Pipeline setting here
+    } catch (NullPointerException e) {
+      return true;
+    }
   }
 
   public void setDownloadOnly(final boolean downloadOnly) {
