@@ -28,17 +28,19 @@ public class BootstrapParameters {
 	  public boolean getDownloadOnly() {
 	    return downloadOnly;
 	  }
-	  
-	  public boolean getCreatePipeline() {
-	    return createPipeline;
-	  }
 
+	  public boolean getCreatePipeline() {
+		if (this.getRapidConfigDict().containsKey("createPipeline")) {
+			return Boolean.parseBoolean(this.getRapidConfigDict().get("createPipeline"));
+		} else return true; // Set Default Pipeline setting here
+	  }
+	  
 	  public void setDownloadOnly(final boolean downloadOnly) {
 	    this.downloadOnly = downloadOnly;
 	  }
 	  
-	  public void setCreatePipeline(final boolean createPipeline) {
-		this.createPipeline = createPipeline;
+	  public void setCreatePipeline() {
+		this.createPipeline = getCreatePipeline();
 	  }
 	  
 	  public void setRapidDictString( final Map<String,String> rapidConfigDict) {
@@ -87,10 +89,11 @@ public class BootstrapParameters {
 
 	  @Override
 	  public String toString() {
-	    return "BootstrapParams\n  ConfigPath: " + configPathString + "\n  message: "
+	    return "BootstrapParams\n  ConfigPath: " + configPathString
+	    	+ "\n  message: " + message
 			+ "\n  createPipeline: " + createPipeline
-			+ message + "\n  downloadOnly: " + downloadOnly + "\n  rapidConfigDict: "
-			+ rapidConfigDict.toString();
+			+ "\n  downloadOnly: " + downloadOnly 
+			+ "\n  rapidConfigDict: " + rapidConfigDict.toString();
 	  }
 	  
 	  public String getRequestString() {
