@@ -117,13 +117,15 @@ public class GenerationSpec {
   public boolean isRapidTransformExists() {
 	  boolean rapidTransformApps=false;
       Pattern rapidTransform = Pattern.compile("(^Apps/.*|^Reports/.*)");
-      for( String v : getBootstrapRapidConfig().values() ) {
-      	Matcher m = rapidTransform.matcher(v);
-      	if (m.find()) {
-      		rapidTransformApps=true;
-      		break;
-      	}
-      }  
+      if ( getBootstrapRapidConfig() != null ) {
+        for( String v : getBootstrapRapidConfig().values() ) {
+      	  Matcher m = rapidTransform.matcher(v);
+      	  if (m.find()) {
+      		  rapidTransformApps=true;
+      		  break;
+      	  }
+        }
+      }
       return rapidTransformApps;
   }
 
