@@ -65,9 +65,13 @@ public class BootstrapParameters {
   
   public String getRapidConfigDictString() {
 	  
-	final String key = "\"rapidConfigDict\":";
-	final String value = mapToString(getRapidConfigDict());
-    return key.concat(value);
+	try {
+	  final String key = "\"rapidConfigDict\":";
+	  final String value = mapToString(getRapidConfigDict());
+      return key.concat(value);
+    } catch (NullPointerException e) {
+      return "null";
+    }
   }
   
   public String mapToString(final Map<String, String> mapDict) {
@@ -96,11 +100,11 @@ public class BootstrapParameters {
 
   @Override
   public String toString() {
-    return "BootstrapParams\n  ConfigPath: " + configPathString
-		+ "\n  dumpSequence: " + dumpSequence
-		+ "\n  createPipeline: " + createPipeline
-		+ "\n  downloadOnly: " + downloadOnly 
-		+ "\n  rapidConfigDict: " + rapidConfigDict.toString();
+    return "BootstrapParams\n  ConfigPath: " + getConfigPathString()
+		+ "\n  dumpSequence: " + getDumpSequence()
+		+ "\n  createPipeline: " + getCreatePipeline()
+		+ "\n  downloadOnly: " + getDownloadOnly()
+		+ "\n  rapidConfigDict: " + getRapidConfigDictString();
   }
 
 }
