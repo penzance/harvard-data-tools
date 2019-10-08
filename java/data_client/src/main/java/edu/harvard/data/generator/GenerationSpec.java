@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.identity.IdentifierType;
@@ -110,6 +112,19 @@ public class GenerationSpec {
   
   public Map<String,String> getBootstrapRapidConfig() {
 	return bootstrapRapidConfig;
+  }
+  
+  public boolean isRapidTransformExists() {
+	  boolean rapidTransformApps=false;
+      Pattern rapidTransform = Pattern.compile("(^Apps/.*|^Reports/.*)");
+      for( String v : getBootstrapRapidConfig().values() ) {
+      	Matcher m = rapidTransform.matcher(v);
+      	if (m.find()) {
+      		rapidTransformApps=true;
+      		break;
+      	}
+      }  
+      return rapidTransformApps;
   }
 
   public DataConfig getConfig() {
