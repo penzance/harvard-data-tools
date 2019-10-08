@@ -243,7 +243,7 @@ public abstract class CodeGenerator {
           dataIndex).generate();
       
       // If RAPID is specified, do this
-      if ( spec.getBootstrapRapidConfig() != null ) {
+      if (spec.isRapidTransformExists()) {
 	      log.info("Generating Rapid ");
           new RapidTransformGenerator(codeDir, spec, config, workingDir ).generate();
       }
