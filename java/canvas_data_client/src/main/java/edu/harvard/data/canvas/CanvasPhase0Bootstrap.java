@@ -87,7 +87,7 @@ implements RequestStreamHandler, RequestHandler<BootstrapParameters, String> {
     final ApiClient api = new ApiClient(canvasConfig.getCanvasDataHost(),
         canvasConfig.getCanvasApiKey(), canvasConfig.getCanvasApiSecret());
     final List<String> args = new ArrayList<String>();
-    log.info(params);
+    log.info(params.toString());
     if (params.getDumpSequence() != null) {
       dump = api.getDump(params.getDumpSequence());
       args.add("DUMP:" + dump.getDumpId());
