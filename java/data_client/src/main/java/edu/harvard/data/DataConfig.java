@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
 
@@ -693,6 +695,21 @@ public class DataConfig {
   
   public Map<String, String> getRapidConfig() {
 	return rapidConfig;
+  }
+  
+  public boolean isRapidTransformExists() {
+	boolean rapidTransformApps=false;
+    Pattern rapidTransform = Pattern.compile("(^Apps/.*|^Reports/.*)");
+    if ( getRapidConfig() != null ) {
+      for( String v : getRapidConfig().values() ) {
+    	Matcher m = rapidTransform.matcher(v);
+      	if (m.find()) {
+      	  rapidTransformApps=true;
+      	  break;
+      	}
+      }
+    }
+    return rapidTransformApps;
   }
   
   public String getRequestJson() {
