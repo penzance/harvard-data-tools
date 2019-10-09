@@ -15,6 +15,8 @@ import com.amazonaws.services.datapipeline.model.PutPipelineDefinitionRequest;
 import com.amazonaws.services.datapipeline.model.PutPipelineDefinitionResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.CodeManager;
@@ -58,12 +60,16 @@ public class DataPipelineSetup {
   }
 
   public DataPipelineSetup(final DataConfig config, final InputTableIndex dataIndex,
-      final CodeManager codeManager, final String runId, final String requestjson) {
+      final CodeManager codeManager, final String runId, final String requestjson)
+		  throws JsonParseException, JsonMappingException, IOException {
     this.config = config;
     this.dataIndex = dataIndex;
     this.codeManager = codeManager;
     this.runId = runId;
     this.requestjson = requestjson;
+    
+    // map requestjson to rapid config dict
+    this.config.setRapidConfig(requestjson);
   }
 
   public void generate() throws DataConfigurationException, IOException {
