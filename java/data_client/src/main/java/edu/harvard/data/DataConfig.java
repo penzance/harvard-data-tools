@@ -13,6 +13,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -700,6 +704,12 @@ public class DataConfig {
   
   public Map<String, String> getRapidConfig() {
 	return rapidConfig;
+  }
+  
+  @SuppressWarnings("unchecked")
+  public void setRapidConfig( final String rapidConfigDict) 
+		  throws JsonParseException, JsonMappingException, IOException {
+     this.rapidConfig = new ObjectMapper().readValue(rapidConfigDict, Map.class);
   }
   
   public boolean isRapidTransformExists() {
