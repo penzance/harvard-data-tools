@@ -44,7 +44,7 @@ public class Phase3PipelineSetup {
     // Move data from incoming bucket to archive
     
     // Transform Data
-    previousStep = transformData(previousStep);
+    if (config.isRapidTransformExists()) previousStep = transformData(previousStep);
 
     return previousStep;
   }
