@@ -709,7 +709,8 @@ public class DataConfig {
   @SuppressWarnings("unchecked")
   public void setRapidConfig( final String rapidConfigDict) 
 		  throws JsonParseException, JsonMappingException, IOException {
-     this.rapidConfig = new ObjectMapper().readValue(rapidConfigDict, Map.class);
+     Map<String, Map<String, String>> request = new ObjectMapper().readValue(rapidConfigDict, Map.class);
+     this.rapidConfig = request.get("rapidConfigDict");
   }
   
   public boolean isRapidTransformExists() {
