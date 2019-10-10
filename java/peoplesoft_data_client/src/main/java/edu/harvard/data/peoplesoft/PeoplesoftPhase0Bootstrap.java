@@ -13,7 +13,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.amazonaws.services.lambda.runtime.*;
-import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.s3.model.S3ObjectId;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -27,9 +26,10 @@ import edu.harvard.data.pipeline.Phase0Bootstrap;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class PeoplesoftPhase0Bootstrap extends Phase0Bootstrap
-implements RequestStreamHandler {
+implements RequestStreamHandler, RequestHandler<BootstrapParameters, String> {
 	
   private static final Logger log = LogManager.getLogger();
+  private BootstrapParameters params;
 	   
   // Main method for testing
   public static void main(final String[] args) 
@@ -37,21 +37,35 @@ implements RequestStreamHandler {
 	System.out.println(args[0]);
 	final BootstrapParameters params = new ObjectMapper().readValue(args[0],
 		        BootstrapParameters.class);
-	//System.out.println(new PeoplesoftPhase0Bootstrap().handleRequest(params, null));
+	System.out.println(new PeoplesoftPhase0Bootstrap().handleRequest(params, null));
   }	
-		
+
+  @Override
+  public String handleRequest(final BootstrapParameters params, final Context context) {
+	try {
+	      super.init(params.getConfigPathString(), PeoplesoftDataConfig.class, params.getCreatePipeline());
+	      super.run(context);
+	} catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
+	      return "Error: " + e.getMessage();
+	}
+	    return "";
+  }	
+  
   @Override
   public void handleRequest(InputStream inputStream, OutputStream outputStream, final Context context) {
 	try {
-		final String requestjson = IOUtils.toString(inputStream, "UTF-8");
-		log.info("Params: " + requestjson);
-		final BootstrapParameters bootstrapParams = new ObjectMapper().readValue(requestjson, BootstrapParameters.class);
-        log.info(bootstrapParams.getConfigPathString());
-        log.info(bootstrapParams.getRapidConfigDict());
-	      super.init(bootstrapParams.getConfigPathString(), PeoplesoftDataConfig.class, true, requestjson );
-	      super.run(context);
+	  final String requestjson = IOUtils.toString(inputStream, "UTF-8");
+	  log.info("Params: " + requestjson);
+      this.params = new ObjectMapper().readValue(requestjson, BootstrapParameters.class);
+      params.setCreatePipeline();
+      log.info(params.getConfigPathString());
+      log.info(params.getRapidConfigDict());
+      log.info(params.getCreatePipeline());
+	  super.init(params.getConfigPathString(), 
+	    		 PeoplesoftDataConfig.class, params.getCreatePipeline(), requestjson);
+	  super.run(context);
 	} catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
-		log.info("Error: " + e.getMessage());
+	      log.info("Error: " + e.getMessage());
 	}
   }
   

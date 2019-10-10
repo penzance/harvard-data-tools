@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 public class BootstrapParameters {
 	  private String configPathString;
 	  private boolean downloadOnly;
+	  private boolean createPipeline;
 	  private Map<String,String> rapidConfigDict;
 	  private String message;
 
@@ -28,8 +29,22 @@ public class BootstrapParameters {
 	    return downloadOnly;
 	  }
 
+	  public boolean getCreatePipeline() {
+	    try {
+		  if (this.getRapidConfigDict().containsKey("createPipeline")) {
+			 return Boolean.parseBoolean(this.getRapidConfigDict().get("createPipeline"));
+		  } else return true; // Set Default Pipeline setting here
+	    } catch (NullPointerException e) {
+	      return true;
+	    }
+	  }
+
 	  public void setDownloadOnly(final boolean downloadOnly) {
 	    this.downloadOnly = downloadOnly;
+	  }
+	  
+	  public void setCreatePipeline() {
+		this.createPipeline = getCreatePipeline();
 	  }
 	  
 	  public void setRapidDictString( final Map<String,String> rapidConfigDict) {
@@ -37,10 +52,13 @@ public class BootstrapParameters {
 	  }
 	  
 	  public String getRapidConfigDictString() {
-		  
-		final String key = "\"rapidConfigDict\":";
-		final String value = mapToString(getRapidConfigDict());
-	    return key.concat(value);
+		try {
+		  final String key = "\"rapidConfigDict\":";
+		  final String value = mapToString(getRapidConfigDict());
+	      return key.concat(value);
+	    } catch (NullPointerException e) {
+	      return "null";
+	    }
 	  }
 	  
 	  public String mapToString(final Map<String, String> mapDict) {
@@ -76,13 +94,15 @@ public class BootstrapParameters {
 	    this.message = message;
 	  }
 
+
 	  @Override
 	  public String toString() {
-	    return "BootstrapParams\n  ConfigPath: " + configPathString + "\n  message: "
-			+ message + "\n  downloadOnly: " + downloadOnly + "\n  rapidConfigDict: "
-			+ rapidConfigDict.toString();
+	    return "BootstrapParams\n  ConfigPath: " + getConfigPathString()
+		+ "\n  createPipeline: " + getCreatePipeline()
+		+ "\n  downloadOnly: " + getDownloadOnly()
+		+ "\n  rapidConfigDict: " + getRapidConfigDictString();
 	  }
-	  
+
 	  public String getRequestString() {
 		  final String start = "{";
 		  final String end= "}";
@@ -94,4 +114,3 @@ public class BootstrapParameters {
 	  }
 
 }
-
