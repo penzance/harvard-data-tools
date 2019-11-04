@@ -47,6 +47,7 @@ implements RequestStreamHandler, RequestHandler<BootstrapParameters, String> {
   @Override
   public String handleRequest(final BootstrapParameters params, final Context context) {
 	try {
+		  log.info(params.getCreatePipeline());
 	      super.init(params.getConfigPathString(), LinksDataConfig.class, params.getCreatePipeline());
 	      super.run(context);
 	} catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
@@ -61,7 +62,7 @@ implements RequestStreamHandler, RequestHandler<BootstrapParameters, String> {
 	  final String requestjson = IOUtils.toString(inputStream, "UTF-8");
 	  log.info("Params: " + requestjson);
       this.params = new ObjectMapper().readValue(requestjson, BootstrapParameters.class);
-      params.setCreatePipeline();
+      params.setCreatePipeline(true); // set default
       log.info(params.getConfigPathString());
       log.info(params.getRapidConfigDict());
       log.info(params.getCreatePipeline());
