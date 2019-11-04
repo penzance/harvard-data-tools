@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 public class BootstrapParameters {
 	  private String configPathString;
 	  private boolean downloadOnly;
-	  private boolean createPipeline;
+	  private boolean createPipeline=true;
 	  private Map<String,String> rapidConfigDict;
 	  private String message;
 
