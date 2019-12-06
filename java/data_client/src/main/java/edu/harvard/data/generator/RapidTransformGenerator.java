@@ -143,7 +143,7 @@ public class RapidTransformGenerator {
 		  out.println();
 		  out.println("# Remove Maven Repo dependencies (by renaming) to avoid pyspark config download conflicts");
 		  out.println("mv /home/hadoop/.m2/ /home/hadoop/.rmm2");
-		  out.println("export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HADOOP_HOME/lib/native:/usr/lib/hadoop-lzo/lib/native:/tmp/oracle");
+		  out.println("export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HADOOP_HOME/lib/native:/usr/lib/hadoop-lzo/lib/native");
 
 		  // DEBUG
 		  out.println("");
