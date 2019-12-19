@@ -1,0 +1,339 @@
+{ "tables": 
+  { "Syllabus": {
+      "columns" : [ 
+        {
+            "name": "course_id_syllabus",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "course_id_canvas_syllabus",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "syllabus_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "syllabus_filekey",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "syllabus_refreshed_date",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "syllabus_processed_time",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "syllabus_modified_time",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "syllabus_text",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        }
+      ]
+    },
+    "SyllabusBody": {
+      "columns" : [ 
+        {
+            "name": "course_id_syllabusbody",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "course_id_canvas_syllabusbody",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "sylbody_filekey",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "sylbody_text",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	}
+      ]
+    },
+    "SyllabusLink": {
+      "columns" : [ 
+        {
+            "name": "course_id_syllabuslink",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "course_id_canvas_syllabuslink",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "syllink_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "syllink_filekey",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "syllink_refreshed_date",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "syllink_processed_time",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "syllink_modified_time",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "syllink_text",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        }
+      ]
+    },
+    "SyllabusNameLookup": {
+      "columns" : [ 
+        {
+            "name": "course_id_sylnamelookup",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "course_id_canvas_sylnamelookup",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "sylnamelookup_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "sylnamelookup_filekey",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "sylnamelookup_refreshed_date",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "sylnamelookup_processed_time",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "sylnamelookup_modified_time",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "sylnamelookup_text",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        }
+      ]
+    },
+    "SyllabusFiles": {
+      "columns" : [ 
+        {
+            "name": "course_id_files",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "course_id_canvas_files",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "file_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "file_canvas_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "latest_syllabus",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "content_type",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "display_name",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "created_at",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "updated_at",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "unlock_at",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        }
+      ]
+    },
+    "SyllabusDelta": {
+      "columns" : [ 
+        {
+            "name": "course_id_syllabusdelta",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "course_id_canvas_syllabusdelta",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "sis_source_id_course_syllabusdelta",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "file_canvas_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "latest_syllabus",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "content_type",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "display_name",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "created_at",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "updated_at",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "unlock_at",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "recent_syllabus_created",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "recent_syllabus_updated",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "recent_syllabus",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "recent_syllabus_days_back",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        }
+      ]
+    }
+  }
+}
