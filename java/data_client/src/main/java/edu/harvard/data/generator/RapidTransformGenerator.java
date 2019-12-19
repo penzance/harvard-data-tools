@@ -160,7 +160,7 @@ public class RapidTransformGenerator {
 				    + "python runtime/main.py --metadata --runtime >> /var/log/rapid-transform.out\n"
 				    + "python runtime/main.py --data-requests --runtime >> /var/log/rapid-transform.out\n"
 				    + "python runtime/main.py --alert --runtime >> /var/log/rapid-transform.out\n"
-				    + "python testing/main.py --test --data-requests --staging >> /var/log/rapid-transform.out\n");
+				    + "python testing/main.py --test --data-requests --env staging >> /var/log/rapid-transform.out\n");
 		  out.println();
 		  
 	  }
