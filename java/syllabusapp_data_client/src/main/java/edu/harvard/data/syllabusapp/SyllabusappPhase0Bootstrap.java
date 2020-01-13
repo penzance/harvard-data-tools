@@ -1,13 +1,20 @@
 package edu.harvard.data.syllabusapp;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.services.s3.model.S3ObjectId;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -21,7 +28,11 @@ import edu.harvard.data.syllabusapp.BootstrapParameters;
 import edu.harvard.data.syllabusapp.SyllabusappPhase0Bootstrap;
 
 public class SyllabusappPhase0Bootstrap extends Phase0Bootstrap
-implements RequestHandler<BootstrapParameters, String> {
+	implements RequestStreamHandler, RequestHandler<BootstrapParameters, String> {
+
+  private static final Logger log = LogManager.getLogger();
+  private BootstrapParameters params;
+	
   // Main method for testing
   public static void main(final String[] args) 
 			      throws JsonParseException, JsonMappingException, IOException {
@@ -40,6 +51,23 @@ implements RequestHandler<BootstrapParameters, String> {
       return "Error: " + e.getMessage();
     }
     return "";
+  }
+
+  @Override
+  public void handleRequest(InputStream inputStream, OutputStream outputStream, final Context context) {
+	try {
+	  final String requestjson = IOUtils.toString(inputStream, "UTF-8");
+	  log.info("Params: " + requestjson);
+      this.params = new ObjectMapper().readValue(requestjson, BootstrapParameters.class);
+      log.info(params.getConfigPathString());
+      log.info(params.getRapidConfigDict());
+      log.info(params.getCreatePipeline());
+	  super.init(params.getConfigPathString(), 
+	    		 SyllabusappDataConfig.class, params.getCreatePipeline(), requestjson);
+	  super.run(context);
+	} catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
+	      log.info("Error: " + e.getMessage());
+	}
   }
 
   @Override
