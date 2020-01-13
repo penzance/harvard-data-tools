@@ -1,0 +1,28 @@
+{ 
+    "tables": {
+        "Syllabus": {
+            "key": "course_id_syllabus",
+            "columns": ["syllabus_text"]
+        },
+        "SyllabusBody": {
+            "key": "course_id_syllabusbody",
+            "columns": ["sylbody_text"]
+        },
+        "SyllabusLink": {
+            "key": "course_id_syllabuslink",
+            "columns": ["syllink_text"]
+        },
+        "SyllabusNameLookup": {
+            "key": "course_id_sylnamelookup",
+            "columns": ["sylnamelookup_text"]
+        },
+        "SyllabusFiles": {
+            "key": "course_id_files",
+            "columns": ["display_name"]
+        },
+        "SyllabusDelta": {
+            "key": "course_id_syllabusdelta",
+            "columns": ["display_name"]
+        }
+    }
+}
