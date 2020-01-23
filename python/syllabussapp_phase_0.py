@@ -9,7 +9,7 @@ GIT_BASE = os.environ['HARVARD_DATA_TOOLS_BASE']
 DUMP_ID = os.environ.get('SYLLABUSAPP_DATA_DUMP_ID', None)
 THREAD_COUNT = os.environ.get('DATA_THREAD_COUNT', 1)
 
-MAIN_CLASS = 'edu.harvard.data.linksapp.cli.SyllabusappDataCli'
+MAIN_CLASS = 'edu.harvard.data.syllabusapp.cli.SyllabusappDataCli'
 CLASSPATH = "{0}/data_tools.jar:{1}".format(
     GENERATED_CODE_DIR,
     "{0}/schema".format(GIT_BASE)
