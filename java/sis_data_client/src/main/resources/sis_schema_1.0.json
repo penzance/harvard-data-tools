@@ -841,6 +841,18 @@
 	    "type": "varchar",
 	    "length": 255,
 	    "description": "NULL for Historical Dataset. Last time any part of the class was changed. Note: The session_code and class_section fields MAY change on a class even after students have enrolled. The course_id, course_offer_number, and term_code will NOT change."
+        },
+        {
+            "name": "YEAR_IN_SCHOOL",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "NULL for Historical Dataset. Year in school code. NOTE: each school defines their own values. HGSE uses 1.1, 1.2, 2.1, etc.. HCOL uses FR,SO,JR,SR, etc.."
+        },
+        {
+            "name": "YEAR_IN_SCHOOL_DESCR",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "NULL for historical dataset."
         }
       ]
     }
