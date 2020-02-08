@@ -149,7 +149,7 @@ public abstract class Phase0Bootstrap {
 
     final RequestSpotInstancesRequest request = new RequestSpotInstancesRequest();
     request.setSpotPrice(config.getPhase0BidPrice());
-    // request.setAvailabilityZoneGroup(config.getPhase0AvailabilityZoneGroup());
+    request.setAvailabilityZoneGroup(config.getPhase0AvailabilityZoneGroup());
     request.setInstanceCount(1);
     request.setLaunchSpecification(spec);
 
