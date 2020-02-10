@@ -103,6 +103,7 @@ public class DataConfig {
   private final String completionSnsArn;
 
   private final String emrReleaseLabel;
+  private final String emrCustomAmi;
   private final String emrTerminateAfter;
   private final String emrMasterInstanceType;
   private final String emrMasterBidPrice;
@@ -258,6 +259,7 @@ public class DataConfig {
 
     this.emrMaximumRetries = getConfigParameter("emr_maximum_retries", verify);
     this.emrReleaseLabel = getConfigParameter("emr_release_label", verify);
+    this.emrCustomAmi = getConfigParameter("emr_custom_ami", false);
     this.emrTerminateAfter = getConfigParameter("emr_terminate_after", verify);
     this.emrMasterInstanceType = getConfigParameter("emr_master_instance_type", verify);
     this.emrCoreInstanceType = getConfigParameter("emr_core_instance_type", verify);
@@ -543,6 +545,10 @@ public class DataConfig {
 
   public String getEmrReleaseLabel() {
     return emrReleaseLabel;
+  }
+  
+  public String getEmrCustomAmi() {
+	return emrCustomAmi;
   }
 
   public String getEmrTerminateAfter() {
