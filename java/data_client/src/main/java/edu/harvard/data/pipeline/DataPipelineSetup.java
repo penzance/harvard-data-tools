@@ -7,7 +7,9 @@ import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.amazonaws.services.datapipeline.DataPipelineClient;
+// import com.amazonaws.services.datapipeline.DataPipelineClient; // Deprecated
+import com.amazonaws.services.datapipeline.DataPipelineClientBuilder;
+import com.amazonaws.services.datapipeline.DataPipeline;
 import com.amazonaws.services.datapipeline.model.ActivatePipelineRequest;
 import com.amazonaws.services.datapipeline.model.CreatePipelineRequest;
 import com.amazonaws.services.datapipeline.model.CreatePipelineResult;
@@ -75,7 +77,7 @@ public class DataPipelineSetup {
   public void generate() throws DataConfigurationException, IOException {
     log.info("Data at " + dataIndex);
     final PipelineExecutionRecord record = PipelineExecutionRecord.find(runId);
-    final DataPipelineClient client = new DataPipelineClient();
+    final DataPipeline client = DataPipelineClientBuilder.defaultClient();
     final CreatePipelineRequest create = getCreateRequest();
 
     try {

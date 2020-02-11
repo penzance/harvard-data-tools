@@ -13,12 +13,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.amazonaws.services.s3.internal.S3DirectSpi;
 import com.amazonaws.services.s3.model.S3ObjectId;
 
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfig;
-import edu.harvard.data.FormatLibrary;
 import edu.harvard.data.schema.DataSchemaColumn;
 import edu.harvard.data.schema.DataSchemaTable;
 import edu.harvard.data.schema.DataSchemaType;
@@ -158,11 +156,6 @@ public class CreateHiveTableGenerator {
   private void createTable(final PrintStream out, final String tableName,
       final DataSchemaTable table, final String locationVar, final String logFile, final boolean addMetadata ) {
 
-      final FormatLibrary formatLibrary = new FormatLibrary();
-      final boolean isQuotedFormat = formatLibrary.getFormat(config.getFulltextFormat())
-						  .getCsvFormat()
-						  .isQuoteCharacterSet();
-	  
 	out.println("sudo hive -e \"");
     out.println("  CREATE EXTERNAL TABLE " + tableName + " (");
     listFields(out, table, table.getListofColumns(), addMetadata );
@@ -177,11 +170,6 @@ public class CreateHiveTableGenerator {
 
   private void createTablePartial(final PrintStream out, final String tableName,
 	      final DataSchemaTable table, final String locationVar, final String logFile, final boolean addMetadata ) {
-	
-	final FormatLibrary formatLibrary = new FormatLibrary();
-	final boolean isQuotedFormat = formatLibrary.getFormat(config.getFulltextFormat())
-						    .getCsvFormat()
-						    .isQuoteCharacterSet();
 	
 	final FullTextTable fulltexttable = textSchema.get( table.getTableName() );
 	final List<String> textfieldsonly = fulltexttable.getColumns();

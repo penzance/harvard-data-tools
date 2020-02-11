@@ -1,8 +1,5 @@
 package edu.harvard.data.pipeline;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.amazonaws.services.s3.model.S3ObjectId;
 
 import edu.harvard.data.AwsUtils;
@@ -54,20 +51,6 @@ public class Phase3PipelineSetup {
         config.getHdfsDir(getLastPhase()), redshiftStagingS3, pipeline.getEmr());
     copy.addDependency(previousStep);
     return copy;
-  }
-  
-  private PipelineObjectBase transformDataTest( final PipelineObjectBase previousStep ) {
-	final S3ObjectId script = AwsUtils.key(workingDir, "code", config.getRapidConfigFile());
-    final List<String> args = new ArrayList<String>();
-    
-    args.add( config.getRapidCodeDir() + config.getRapidRuntime() );
-    args.add("--data-requests"); // args[0] in main class
-    args.add("--runtime"); // args[1] in main class
-    // <rapidCodeDir><rapidRuntime> --data-requests --runtime
-    
-	final PipelineObjectBase transform = factory.getPythonShellActivity("TransformDataProducts", script, 
-		args, pipeline.getEmr());
-	return transform;
   }
   
   private PipelineObjectBase transformData(final PipelineObjectBase previousStep) {

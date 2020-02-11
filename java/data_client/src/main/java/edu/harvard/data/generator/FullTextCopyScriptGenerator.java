@@ -198,25 +198,6 @@ public class FullTextCopyScriptGenerator {
 	  return ("time_" + fulltextfield );
   }
     
-  private void setFields( final PrintStream out, final FullTextTable table, 
-		  final String tableName, final String copyFrom, final boolean addMetadata ) {
-  	String finalstring = new String();
-    List<String> listofstrings = new ArrayList<String>();
-    List<String> listofmeta = new ArrayList<String>();
-    String separator = ",\n";
-    for (final String column : table.getColumns() ) {
-      listofstrings.add("    " + column + "=" + copyFrom + tableName + "." + column );
-      
-      if ( addMetadata && !column.equals( table.getKey()) ) {
-    	  listofmeta.add("    " + "time_" + column + "=" + "current_timestamp" );
-      }
-    }
-    List<String> orderList = new ArrayList<String>(listofstrings);
-    if (addMetadata) orderList.addAll(listofmeta);    
-    finalstring = StringUtils.join( orderList, separator );
-    out.println(finalstring);
-  }
-  
   private void insertFields(final PrintStream out, final FullTextTable table,
 		  final String tableName, final String copyFrom, final boolean addMetadata ) {
 	String finalstring = new String();

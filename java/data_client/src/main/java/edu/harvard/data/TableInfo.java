@@ -3,11 +3,13 @@ package edu.harvard.data;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
+//import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient; // Deprecated
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
+//import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig; // Deprectated
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.TableNameOverride;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
@@ -18,12 +20,15 @@ public class TableInfo {
 
   private static DynamoDBMapper mapper;
   private static String tableName;
+  private static DynamoDBMapperConfig.Builder mapperBuilder;
   private static DynamoDBMapperConfig mapperConfig;
 
   public static void init(final String table) {
-    mapper = new DynamoDBMapper(new AmazonDynamoDBClient());
+    mapper = new DynamoDBMapper(AmazonDynamoDBClientBuilder.defaultClient());
     tableName = table;
-    mapperConfig = new DynamoDBMapperConfig(new TableNameOverride(tableName));
+    mapperBuilder = new DynamoDBMapperConfig.Builder();
+    mapperConfig = mapperBuilder.build();
+    mapperBuilder.setTableNameOverride(new TableNameOverride(tableName));
   }
 
   @DynamoDBHashKey(attributeName = "name")

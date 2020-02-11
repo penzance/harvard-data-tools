@@ -3,7 +3,9 @@ package edu.harvard.data.pipeline;
 import java.util.Date;
 import java.util.List;
 
-import com.amazonaws.services.datapipeline.DataPipelineClient;
+//import com.amazonaws.services.datapipeline.DataPipelineClient; // deprecated
+import com.amazonaws.services.datapipeline.DataPipelineClientBuilder;
+import com.amazonaws.services.datapipeline.DataPipeline;
 import com.amazonaws.services.datapipeline.model.DescribeObjectsRequest;
 import com.amazonaws.services.datapipeline.model.DescribeObjectsResult;
 import com.amazonaws.services.datapipeline.model.Field;
@@ -11,7 +13,9 @@ import com.amazonaws.services.datapipeline.model.PipelineObject;
 import com.amazonaws.services.datapipeline.model.Query;
 import com.amazonaws.services.datapipeline.model.QueryObjectsRequest;
 import com.amazonaws.services.datapipeline.model.QueryObjectsResult;
-import com.amazonaws.services.elasticmapreduce.AmazonElasticMapReduceClient;
+//import com.amazonaws.services.elasticmapreduce.AmazonElasticMapReduceClient; // deprecated
+import com.amazonaws.services.elasticmapreduce.AmazonElasticMapReduceClientBuilder;
+import com.amazonaws.services.elasticmapreduce.AmazonElasticMapReduce;
 import com.amazonaws.services.elasticmapreduce.model.DescribeClusterRequest;
 import com.amazonaws.services.elasticmapreduce.model.DescribeClusterResult;
 import com.amazonaws.services.elasticmapreduce.model.Instance;
@@ -39,7 +43,7 @@ public class PipelineStartup {
   }
 
   private static String getEmrId(final String pipelineId) {
-    final DataPipelineClient client = new DataPipelineClient();
+    final DataPipeline client = DataPipelineClientBuilder.defaultClient();
     final QueryObjectsResult objects = client.queryObjects(new QueryObjectsRequest()
         .withQuery(new Query()).withPipelineId(pipelineId).withSphere("INSTANCE"));
     final DescribeObjectsResult descriptions = client.describeObjects(
@@ -53,7 +57,7 @@ public class PipelineStartup {
   }
 
   private static String getEmrMasterIp(final String emrId) {
-    final AmazonElasticMapReduceClient client = new AmazonElasticMapReduceClient();
+    final AmazonElasticMapReduce client = AmazonElasticMapReduceClientBuilder.defaultClient();
     final DescribeClusterResult cluster = client.describeCluster(new DescribeClusterRequest().withClusterId(emrId));
     final ListInstancesResult instances = client.listInstances(new ListInstancesRequest().withClusterId(emrId));
 
