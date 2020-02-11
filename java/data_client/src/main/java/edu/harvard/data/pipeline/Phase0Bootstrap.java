@@ -13,9 +13,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-//import com.amazonaws.services.ec2.AmazonEC2Client; // Deprecated
-import com.amazonaws.services.ec2.AmazonEC2;
-import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
+import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.DescribeSpotInstanceRequestsRequest;
 import com.amazonaws.services.ec2.model.DescribeSpotInstanceRequestsResult;
 import com.amazonaws.services.ec2.model.IamInstanceProfileSpecification;
@@ -27,9 +25,7 @@ import com.amazonaws.services.ec2.model.InstanceNetworkInterfaceSpecification;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.s3.model.S3ObjectId;
-//import com.amazonaws.services.sns.AmazonSNSClient; // Deprecated
-import com.amazonaws.services.sns.AmazonSNSClientBuilder;
-import com.amazonaws.services.sns.AmazonSNS;
+import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.PublishRequest;
 import com.amazonaws.util.Base64;
 
@@ -127,7 +123,7 @@ public abstract class Phase0Bootstrap {
 
   private void createPhase0()
       throws IOException, DataConfigurationException, UnexpectedApiResponseException {
-    final AmazonEC2 ec2client = AmazonEC2ClientBuilder.defaultClient();
+    final AmazonEC2Client ec2client = new AmazonEC2Client();
 
     final LaunchSpecification spec = new LaunchSpecification();
     spec.setImageId(config.getPhase0Ami());
@@ -173,7 +169,7 @@ public abstract class Phase0Bootstrap {
   }
 
   protected void sendSnsNotification(final String subject, final String msg, final String arn) {
-    final AmazonSNS sns = AmazonSNSClientBuilder.defaultClient();
+    final AmazonSNSClient sns = new AmazonSNSClient();
     final PublishRequest publishRequest = new PublishRequest(arn, msg, subject);
     sns.publish(publishRequest);
   }

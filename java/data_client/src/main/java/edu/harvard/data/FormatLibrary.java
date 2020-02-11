@@ -3,6 +3,7 @@ package edu.harvard.data;
 import java.text.SimpleDateFormat;
 
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.QuoteMode;
 
 public class FormatLibrary {
   public enum Format {

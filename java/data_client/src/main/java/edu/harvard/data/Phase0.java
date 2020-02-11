@@ -11,16 +11,12 @@ import java.util.concurrent.Executors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-//import com.amazonaws.services.ec2.AmazonEC2Client; // Deprecated
-import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
-import com.amazonaws.services.ec2.AmazonEC2;
+import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
 import com.amazonaws.services.ec2.model.DescribeSpotInstanceRequestsRequest;
 import com.amazonaws.services.ec2.model.DescribeSpotInstanceRequestsResult;
-//import com.amazonaws.services.sns.AmazonSNSClient; // Deprecated
-import com.amazonaws.services.sns.AmazonSNSClientBuilder;
-import com.amazonaws.services.sns.AmazonSNS;
+import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.PublishRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -118,7 +114,7 @@ public abstract class Phase0 {
   }
 
   private static String getPhase0InstanceId(final PipelineExecutionRecord record) {
-    final AmazonEC2 ec2client = AmazonEC2ClientBuilder.defaultClient();
+    final AmazonEC2Client ec2client = new AmazonEC2Client();
     final String requestId = record.getPhase0RequestId();
     final List<String> requestIds = new ArrayList<String>();
     requestIds.add(requestId);
@@ -130,7 +126,7 @@ public abstract class Phase0 {
   }
 
   private static String getPhase0IpAddress(final String instanceId) {
-    final AmazonEC2 ec2client = AmazonEC2ClientBuilder.defaultClient();
+    final AmazonEC2Client ec2client = new AmazonEC2Client();
     final DescribeInstancesRequest request = new DescribeInstancesRequest().withInstanceIds(instanceId);
     final DescribeInstancesResult instances = ec2client.describeInstances(request);
     return instances.getReservations().get(0).getInstances().get(0).getPrivateIpAddress();
@@ -145,7 +141,7 @@ public abstract class Phase0 {
     final PipelineCompletionMessage failure = new PipelineCompletionMessage(null, record.getRunId(),
         config.getReportBucket(), config.getFailureSnsArn(), config.getPipelineDynamoTable(), null);
     final String msg = new ObjectMapper().writeValueAsString(failure);
-    final AmazonSNS sns = AmazonSNSClientBuilder.defaultClient();
+    final AmazonSNSClient sns = new AmazonSNSClient();
     final String topicArn = config.getCompletionSnsArn();
     final PublishRequest publishRequest = new PublishRequest(topicArn, msg);
     sns.publish(publishRequest);
