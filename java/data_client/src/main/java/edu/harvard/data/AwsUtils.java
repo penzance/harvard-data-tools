@@ -47,7 +47,8 @@ public class AwsUtils {
   private final ObjectMapper jsonMapper;
 
   public AwsUtils() {
-    this.client = AmazonS3ClientBuilder.defaultClient();
+	AmazonS3ClientBuilder builder = AmazonS3ClientBuilder.standard();
+	this.client = builder.build();
     this.jsonMapper = new ObjectMapper();
     this.jsonMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"));
     this.jsonMapper.enable(SerializationFeature.INDENT_OUTPUT);
