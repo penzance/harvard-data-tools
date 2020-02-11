@@ -23,7 +23,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
+//import com.amazonaws.services.s3.AmazonS3Client; // Deprecated
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CopyObjectRequest;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.GetObjectRequest;
@@ -42,11 +43,11 @@ public class AwsUtils {
 
   private static final Logger log = LogManager.getLogger();
 
-  private final AmazonS3Client client;
+  private final AmazonS3 client;
   private final ObjectMapper jsonMapper;
 
   public AwsUtils() {
-    this.client = new AmazonS3Client();
+    this.client = AmazonS3ClientBuilder.defaultClient();
     this.jsonMapper = new ObjectMapper();
     this.jsonMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"));
     this.jsonMapper.enable(SerializationFeature.INDENT_OUTPUT);

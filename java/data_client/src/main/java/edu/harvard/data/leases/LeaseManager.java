@@ -6,7 +6,8 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
+//import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient; // Deprecated
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.Builder;
@@ -32,7 +33,7 @@ public class LeaseManager {
 
   public LeaseManager(final String tableName) {
     this.tableName = tableName;
-    mapper = new DynamoDBMapper(new AmazonDynamoDBClient());
+    mapper = new DynamoDBMapper(AmazonDynamoDBClientBuilder.defaultClient());
     final Builder builder = new DynamoDBMapperConfig.Builder();
     builder.setTableNameOverride(new TableNameOverride(tableName));
     builder.setConsistentReads(ConsistentReads.CONSISTENT);

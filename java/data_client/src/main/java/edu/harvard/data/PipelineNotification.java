@@ -8,7 +8,9 @@ import java.util.List;
 
 import com.amazonaws.services.s3.model.S3ObjectId;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
-import com.amazonaws.services.sns.AmazonSNSClient;
+//import com.amazonaws.services.sns.AmazonSNSClient; // Deprecated
+import com.amazonaws.services.sns.AmazonSNSClientBuilder;
+import com.amazonaws.services.sns.AmazonSNS;
 import com.amazonaws.services.sns.model.PublishRequest;
 import com.amazonaws.services.sns.model.PublishResult;
 
@@ -30,7 +32,7 @@ public class PipelineNotification {
 
     // XXX Strip out access tokens
 
-    final AmazonSNSClient client = new AmazonSNSClient();
+    final AmazonSNS client = AmazonSNSClientBuilder.defaultClient();
     final String subject = "Message published by Java.";
     final String topicArn = "arn:aws:sns:us-east-1:364469542718:hdtdevcanvas-SuccessSNS-8HQ4921XICVD";
     final PublishRequest publishRequest = new PublishRequest(topicArn, message, subject);

@@ -8,7 +8,8 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+//import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient; // Deprecated
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
@@ -28,16 +29,19 @@ public class DumpInfo {
 
   private static DynamoDBMapper mapper;
   private static String tableName;
+  private static DynamoDBMapperConfig.Builder mapperBuilder;
   private static DynamoDBMapperConfig mapperConfig;
 
   public static void init(final String table) throws DataConfigurationException {
     log.info("Initializing dump info table as " + table);
-    mapper = new DynamoDBMapper(new AmazonDynamoDBClient());
+    mapper = new DynamoDBMapper( AmazonDynamoDBClientBuilder.defaultClient());
     if (table == null) {
       throw new DataConfigurationException("Dump Info table name can't be null");
     }
     tableName = table;
-    mapperConfig = new DynamoDBMapperConfig(new TableNameOverride(tableName));
+    mapperBuilder = new DynamoDBMapperConfig.Builder();
+    mapperConfig = mapperBuilder.build();
+    mapperBuilder.setTableNameOverride(new TableNameOverride(tableName));
   }
 
   @DynamoDBHashKey(attributeName = "id")
