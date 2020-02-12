@@ -1,0 +1,860 @@
+{ "tables": 
+  { "CourseCatalog": {
+      "columns" : [ 
+        {
+            "name": "ODS_ID",
+	    "type": "varchar",
+	    "length": 256,
+	    "description": "Uniquely constructed identifier"
+        },
+        {
+            "name": "ODS_CATALOG_ID",
+	    "type": "integer",
+	    "description": "Uniquely constructed identifier using concatenation of class number and term code"
+        },
+        {
+            "name": "ODS_CATALOG_NUMBER",
+	    "type": "varchar",
+	    "length": 256,
+	    "description": "The course catalog number assigned by the school."
+        },
+        {
+            "name": "ODS_CATALOG_NUMBER_INT",
+	    "type": "varchar",
+	    "length": 256,
+	    "description": "The varchar portion of the course catalog number (i.e. '100' for French 100A, '0' for French A)"
+        },
+        {
+            "name": "ODS_CATALOG_NUMBER_CHAR",
+	    "type": "varchar",
+	    "length": 80,
+	    "description": "The character portion of the course catalog number (i.e. 'A' for French 100A)"
+        },
+        {
+            "name": "ODS_CATALOG_NUMBER_SORT",
+	    "type": "varchar",
+	    "length": 256,
+	    "description": "The entire catalog number converted to a long string with leading zeros, to be used to ensure an accurate sorting of courses by mixed catalog numbers. "
+        },
+        {
+            "name": "ODS_CLASS_NUMBER",
+	    "type": "varchar",
+	    "length": 6,
+	    "description": "A 6 digit number assigned to each class by my.harvard that is unique by term (across all Academic Careers).  Class Number and Term Code can often be used as an Alternate Key in retrieving data about class."
+        },
+        {
+            "name": "ODS_INSTRUCTOR_LAST_FIRST",
+	    "type": "varchar",
+	    "length": 256,
+	    "description": "Sortaable name constructed by Last Name, First Name"
+        },
+        {
+            "name": "ODS_COURSE_DESCRLONG",
+	    "type": "varchar",
+	    "length": 256,
+	    "description": "Long Course description"
+        },
+        {
+            "name": "ODS_TERM_CODE",
+	    "type": "varchar",
+	    "length": 256,
+	    "description": "Long Course description"
+        },
+        {
+            "name": "ODS_SUBJECT",
+	    "type": "varchar",
+	    "length": 8,
+	    "description": "The subject of the class.  Defaulted from the course at class creation, but can be overridden on a specific class."
+        },
+        {
+            "name": "ODS_SUBJECT_DESCR",
+	    "type": "varchar",
+	    "length": 50,
+	    "description": "The description of the subject."
+        },
+        {
+            "name": "ODS_ACADEMIC_YEAR",
+	    "type": "varchar",
+	    "length": 4,
+	    "description": "The academic year of the term."
+        },
+        {
+            "name": "ODS_COURSE_TITLE_LONG",
+	    "type": "varchar",
+	    "length": 100,
+	    "description": "The Course title effective as of the start date of the term this class is offered."
+        },
+        {
+            "name": "ODS_COMPONENT_CODE",
+	    "type": "varchar",
+	    "length": 3,
+	    "description": "The class component such as Lecture, Discussion, Lab."
+        },
+        {
+            "name": "ODS_COMPONENT_DESCR",
+	    "type": "varchar",
+	    "length": 30,
+	    "description": "The description of the component."
+        },
+        {
+            "name": "ODS_CLASS_ACAD_ORG",
+	    "type": "varchar",
+	    "length": 10,
+	    "description": "Generally the department that owns the class. However, academic orgs are arrayed in a tree of School -> Division -> Department,  and a class may be associated with any part of the tree.  For example, a  class may be associated with the FAS academic org.  Additionally, class academic org defaults from the course catalog at class creation, but may be overridden at the class level."
+        },
+        {
+            "name": "ODS_CLASS_ACAD_ORG_DESCR",
+	    "type": "varchar",
+	    "length": 50,
+	    "description": "Description of the Class's academic org."
+        },
+        {
+            "name": "ODS_SUBJECT_ACAD_ORG",
+	    "type": "varchar",
+	    "length": 10,
+	    "description": "The department that owns the subject code.  The subject's academic org may differ from class's academic org for multiple reasons.  One example is in the case of SEAS classes.  We indicate which classes are owned by SEAS with the Class Academic Org.  However, if you want to know the specific SEAS department, look at the Subject's Academic Org."
+        },
+        {
+            "name": "ODS_SUBJECT_ACAD_ORG_DESCR",
+	    "type": "varchar",
+	    "length": 50,
+	    "description": "Description of the Subject's academic org."
+        },
+        {
+            "name": "ODS_GRADING_BASIS",
+	    "type": "varchar",
+	    "length": 3,
+	    "description": "The grading basis for this class.  The grading basis code will either represent a single grade basis, such as Letter Graded or Audit, or a code that gives students an option to choose from a pre-defined list of grading bases at enrollment time.  Different programs can make different grading bases available to catalog coordinators based on grading scheme."
+        },
+        {
+            "name": "ODS_GRADING_BASIS_DESCR",
+	    "type": "varchar",
+	    "length": 50,
+	    "description": "The descripton of the grading basis."
+        },
+        {
+            "name": "ODS_CLASS_TYPE",
+	    "type": "varchar",
+	    "length": 1,
+	    "description": "The indicator of whether this class is an Enrollment section or not.  Enrollment sections are the ones that will be assigned grades."
+        },
+        {
+            "name": "ODS_CLASS_TYPE_DESCR",
+	    "type": "varchar",
+	    "length": 30,
+	    "description": "The description of the Class Type code."
+        },
+        {
+            "name": "ODS_COURSE_DESCR",
+	    "type": "varchar",
+	    "length": 30,
+	    "description": "Short course description"
+        },
+        {
+            "name": "ODS_ENROLLMENT_COUNT",
+	    "type": "integer",
+	    "description": "Total Enrollment Count by Term, Class and Class Section"
+        },
+        {
+            "name": "ODS_FINAL_EXAM",
+	    "type": "varchar",
+	    "length": 1,
+	    "description": "Y/N flag that indicates if the course has a final exam"
+        },
+        {
+            "name": "ODS_CLASS_START_DATE",
+	    "type": "varchar",
+	    "length": 256,
+	    "description": "Date on which the class starts"
+        },
+        {
+            "name": "ODS_CLASS_END_DATE",
+	    "type": "varchar",
+	    "length": 256,
+	    "description": "Date on which the class ends"
+        },
+        {
+            "name": "ODS_UNITS_MAXIMUM",
+	    "type": "integer",
+	    "description": "The maximum number of units for a class."
+        },
+        {
+            "name": "ODS_UNITS_MINIMUM",
+	    "type": "integer",
+	    "description": "The minimum number of units for a class."
+        },
+        {
+            "name": "ODS_I_COURSE_ID",
+	    "type": "varchar",
+	    "length": 256,
+	    "description": "The unique 6-digit number assigned to each course by my.harvard (from a sequence)"
+        },
+        {
+            "name": "ODS_I_COURSE_OFFER_NUMBER",
+	    "type": "varchar",
+	    "length": 256,
+	    "description": "An individual course course be offered simultaneously by different careers or under different catalog numbers"
+        },
+        {
+            "name": "ODS_I_TERM",
+	    "type": "varchar",
+	    "length": 4,
+	    "description": "The term that a course offering will be held"
+        },
+        {
+            "name": "ODS_I_TERM_DESCRIPTION",
+	    "type": "varchar",
+	    "length": 30,
+	    "description": "The description of the term code above"
+        },
+        {
+            "name": "ODS_I_SESSION_CODE",
+	    "type": "varchar",
+	    "length": 2,
+	    "description": "Sessions are time frames defined within a term"
+        },
+        {
+            "name": "ODS_I_CLASS_SECTION",
+	    "type": "varchar",
+	    "length": 2,
+	    "description": "A text field to identify different sections of a class within a term and session"
+        },
+        {
+            "name": "ODS_I_CLASS_MEETING_NUMBER",
+	    "type": "varchar",
+	    "length": 256,
+	    "description": "The number representing the unique class meeting pattern"
+        },
+        {
+            "name": "ODS_I_INSTRUCTOR_SEQUENCE",
+	    "type": "integer",
+	    "description": "A number generated to unique identify the instructors per class meeting."
+        },
+        {
+            "name": "ODS_I_INSTRUCTOR_ID",
+	    "type": "varchar",
+	    "length": 20,
+	    "description": "The HUID of the instructor."
+        },
+        {
+            "name": "ODS_I_INSTRUCTOR_ROLE",
+	    "type": "varchar",
+	    "length": 4,
+	    "description": "The instructors role code.  Roles include instructors, Teaching Assistants, Teaching Fellows, Course Coordinators, etc."
+        },
+        {
+            "name": "ODS_I_INSTRUCTOR_ROLE_DESCR",
+	    "type": "varchar",
+	    "length": 30,
+	    "description": "The description of the instructor's role code."
+        },
+        {
+            "name": "ODS_I_PRINT_INSTRUCTOR_FLAG",
+	    "type": "varchar",
+	    "length": 256,
+	    "description": ""
+        },
+        {
+            "name": "ODS_I_INSTRUCTOR_NAME",
+	    "type": "varchar",
+	    "length": 50,
+	    "description": "The preferred name of the Instructor, if defined.  If not, the Primary Name."
+        },
+        {
+            "name": "ODS_I_INSTRUCTOR_FIRST_NAME",
+	    "type": "varchar",
+	    "length": 50,
+	    "description": ""
+        },
+        {
+            "name": "ODS_I_INSTRUCTOR_MIDDLE_NAME",
+	    "type": "varchar",
+	    "length": 50,
+	    "description": ""
+        },
+        {
+            "name": "ODS_I_INSTRUCTOR_LAST_NAME",
+	    "type": "varchar",
+	    "length": 50,
+	    "description": ""
+        },
+        {
+            "name": "ODS_I_INSTRUCTOR_NAME_PREFIX",
+	    "type": "varchar",
+	    "length": 256,
+	    "description": ""
+        },
+        {
+            "name": "ODS_I_INSTRUCTOR_NAME_SUFFIX",
+	    "type": "varchar",
+	    "length": 256,
+	    "description": ""
+        },
+        {
+            "name": "ODS_I_INSTRUCTOR_EMAIL",
+	    "type": "varchar",
+	    "length": 256,
+	    "description": ""
+        },
+        {
+            "name": "ODS_I_ACADEMIC_CAREER",
+	    "type": "varchar",
+	    "length": 4,
+	    "description": "The class's Academic Career."
+        },
+        {
+            "name": "ODS_I_BRACKETED_FLAG",
+	    "type": "varchar",
+	    "length": 1,
+	    "description": "FAS Specific field:  Y if this course is not scheduled for the term, but is likely to be scheduled.  N otherwise. Bracketed courses returned are only those effective as of start date of the FAS current term."
+        },
+        {
+            "name": "ODS_I_HEAD_INSTRUCTOR_FLAG",
+	    "type": "varchar",
+	    "length": 1,
+	    "description": ""
+        }
+      ]
+    },
+    "CourseMap": {
+      "columns" : [ 
+        {
+            "name": "CID",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "CID_COURSE",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "CANVAS_COURSE_ID_FROM_URL",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "MATCH",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "MH_COURSE_ID",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "MH_CLASS_NUMBER",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "MH_STRM",
+	    "type": "integer",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "MH_SESSION",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "AT_TERM_ID",
+	    "type": "varchar",
+	    "description": ""
+	},
+        {
+            "name": "AT_COURSE_INSTANCE_ID",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "CANVAS_COURSE_ID",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	},
+        {
+            "name": "CANVAS_SITE_URL",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+	}
+      ]
+    },
+    "Classes": {
+      "columns" : [ 
+        {
+            "name": "CID",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "CID_COURSE",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "ACADEMIC_YEAR",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "TERM_CODE",
+	    "type": "integer",
+	    "description": "BOTH. sterm instead of term and term num."
+        },
+        {
+            "name": "CLASS_ACAD_ORG",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "CLASS_ACAD_ORG_DESCRIPTION",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "SUBJECT",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "SUBJECT_DESCRIPTION",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "BOTH. Subject description as of the term's start date."
+        },
+        {
+            "name": "CATALOG_NUMBER",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "BOTH. Just the catalog number portion."
+        },
+        {
+            "name": "CATALOG_NUMBER_INT",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "BOTH. The leading integers of the catalog number. For 50A, this would be 50. For '1.34', this would be 1."
+        },
+        {
+            "name": "CATALOG_NUMBER_CHAR",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "BOTH. Everything from the first non-number character to the right. For 50A, this would be A. For '1.34', this would be '.34'"
+        },
+        {
+            "name": "CLASS_SHORT_NAME",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "BOTH. In my.harvard this is subject + catalog number."
+        },
+        {
+            "name": "COURSE_ID",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "BOTH. Course ID"
+        },
+        {
+            "name": "COMPONENT_CODE",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "component code in my.harvard"
+        },
+        {
+            "name": "COMPONENT_DESCRIPTION",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "course type"
+        },
+        {
+            "name": "COURSE_LEVEL_CODE",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "COURSE_LEVEL_DESCR",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "Both. Course Level Description"
+        },
+        {
+            "name": "COURSE_TITLE_LONG",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "Both. Course Title"
+        },
+        {
+            "name": "ENROLLMENT_COUNT",
+	    "type": "integer",
+	    "description": ""
+        },
+        {
+            "name": "CLASS_NUMBER",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "NULL for Historical Dataset. In my.harvard ODS data, class_number + term_code + EMPLID + academic_career (excluded) will be unique. In historic data, course_id + term_code + emplid will be unique."
+        },
+        {
+            "name": "CLASS_TYPE",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "NULL for Historical Dataset. E = enrollment section, N = non enrollment section. All historic data is 'E' data only."
+        },
+        {
+            "name": "CLASS_TYPE_DESCRIPTION",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "SESSION_CODE",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "NULL for Historical Dataset. The portion of the term a class is held. 1 = Full Term. As of now, all FAS classes are scheduled for the full term."
+        },
+        {
+            "name": "CLASS_SECTION",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "NULL for Historical Dataset. A string to uniquely identify each section."
+        },
+        {
+            "name": "CLASS_STATUS",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "CLASS_STATUS_DESCRIPTION",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "ACADEMIC_CAREER",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        }
+      ]
+    },
+    "PrimeCourseEnroll": {
+      "columns" : [ 
+        {
+            "name": "EMPLID",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "ACAD_YEAR",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "TERM_CODE",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "TERM_DESCRIPTION",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "COURSE_ID",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "SUBJECT",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "SUBJECT_DESCRIPTION",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "CATALOG_NUMBER",
+	    "type": "varchar",
+	    "length": 10,
+	    "description": ""
+        },
+        {
+            "name": "CATALOG_NUMBER_INT",
+	    "type": "varchar",
+	    "length": 10,
+	    "description": ""
+        },
+        {
+            "name": "CATALOG_NUMBER_CHAR",
+	    "type": "varchar",
+	    "length": 10,
+	    "description": ""
+        },
+        {
+            "name": "CLASS_SHORT_NAME",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "STDNT_ENRL_STATUS",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "INSTITUTION",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "CLASS_NUMBER",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "COURSE_CAREER",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "COURSE_OFFER_NUMBER",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "SESSION_CODE",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "CLASS_SECTION",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "CLASS_TYPE",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "ENRL_LAST_UPDATE_DT",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "CLASS_LAST_UPDATE_DT",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        }
+      ]
+    },
+    "CourseEnroll": {
+      "columns" : [ 
+        {
+            "name": "EID",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "Unique Key long = Research UUID + Term ID + Class Number. To be used for updating my.harvard data"
+        },
+        {
+            "name": "EID_COURSE",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "Unique Key = Research UUID + Term ID + Course ID. To be used for updating historic data"
+        },
+        {
+            "name": "EID_LONG",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "Unique Key long = Research UUID + Academic Career + Institution + Term ID + Class Number. To be used for updating my.harvard data"
+        },
+        {
+            "name": "CID",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "Course Key = Term ID + Class No. To be used for updating my.harvard data"
+        },
+        {
+            "name": "CID_COURSE",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "Course Key = Term ID + Course ID. To be used for updating historic data"
+        },
+        {
+            "name": "UUID",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "Research ID"
+        },
+        {
+            "name": "ACAD_YEAR",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "BOTH. Set based on course's term."
+        },
+        {
+            "name": "TERM_CODE",
+	    "type": "integer",
+	    "description": "BOTH. sterm instead of term and term num."
+        },
+        {
+            "name": "TERM_DESCRIPTION",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "BOTH. provide it if you have it."
+        },
+        {
+            "name": "COURSE_ID",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "BOTH. Course ID"
+        },
+        {
+            "name": "SUBJECT",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "SUBJECT_DESCRIPTION",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "BOTH. Subject description as of the term's start date."
+        },
+        {
+            "name": "CATALOG_NUMBER",
+	    "type": "varchar",
+	    "length": 10,
+	    "description": "BOTH. Just the catalog number portion."
+        },
+        {
+            "name": "CATALOG_NUMBER_INT",
+	    "type": "varchar",
+	    "length": 10,
+	    "description": "BOTH. The leading integers of the catalog number. For 50A, this would be 50. For '1.34', this would be 1."
+        },
+        {
+            "name": "CATALOG_NUMBER_CHAR",
+	    "type": "varchar",
+	    "length": 10,
+	    "description": "BOTH. Everything from the first non-number character to the right. For 50A, this would be A. For '1.34', this would be '.34'"
+        },
+        {
+            "name": "CLASS_SHORT_NAME",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "BOTH. In my.harvard this is subject + catalog number."
+        },
+        {
+            "name": "STDNT_ENRL_STATUS",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "BOTH. In historical, this is named 'Withdrawn'. In my.harvard, this is named STDNT_ENRL_STATS. Rename in data request."
+        },
+        {
+            "name": "INSTITUTION",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "NULL for Historical Dataset. Always 'HRVRD'. It's part of the key, so providing it."
+        },
+        {
+            "name": "CLASS_NUMBER",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "NULL for Historical Dataset. In my.harvard ODS data, class_number + term_code + EMPLID + academic_career (excluded) will be unique. In historic data, course_id + term_code + emplid will be unique."
+        },
+        {
+            "name": "COURSE_CAREER",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "NULL for Historical Dataset. The course's school. All records returned in the view today are FAS Records."
+        },
+        {
+            "name": "COURSE_OFFER_NUMBER",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "NULL for Historical Dataset. If a course could be scheduled under 2 different catalog numbers, each will be given a different course_off_number."
+        },
+        {
+            "name": "SESSION_CODE",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "NULL for Historical Dataset. The portion of the term a class is held. 1 = Full Term. As of now, all FAS classes are scheduled for the full term."
+        },
+        {
+            "name": "CLASS_SECTION",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "NULL for Historical Dataset. A string to uniquely identify each section."
+        },
+        {
+            "name": "CLASS_TYPE",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "NULL for Historical Dataset. E = enrollment section, N = non enrollment section. All historic data is 'E' data only."
+        },
+        {
+            "name": "ENRL_LAST_UPDATE_DT",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "NULL for Historical Dataset. Last time any part of the enrollment record was changed."
+        },
+        {
+            "name": "CLASS_LAST_UPDATE_DT",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "NULL for Historical Dataset. Last time any part of the class was changed. Note: The session_code and class_section fields MAY change on a class even after students have enrolled. The course_id, course_offer_number, and term_code will NOT change."
+        },
+        {
+            "name": "YEAR_IN_SCHOOL",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "NULL for Historical Dataset. Year in school code. NOTE: each school defines their own values. HGSE uses 1.1, 1.2, 2.1, etc.. HCOL uses FR,SO,JR,SR, etc.."
+        },
+        {
+            "name": "YEAR_IN_SCHOOL_DESCR",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "NULL for historical dataset."
+        }
+      ]
+    }
+  }
+}

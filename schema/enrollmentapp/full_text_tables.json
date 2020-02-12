@@ -1,0 +1,12 @@
+{ 
+    "tables": {
+        "CourseCatalog": {
+            "key": "ODS_ID",
+            "columns": ["ODS_COURSE_DESCRLONG", "ODS_SUBJECT_DESCR", "ODS_COURSE_TITLE_LONG", "ODS_COMPONENT_DESCR"]
+        },
+        "Classes": {
+            "key": "CID",
+            "columns": ["CLASS_ACAD_ORG_DESCRIPTION", "SUBJECT_DESCRIPTION", "COMPONENT_DESCRIPTION", "COURSE_LEVEL_DESCR", "COURSE_TITLE_LONG", "CLASS_TYPE_DESCRIPTION", "CLASS_STATUS_DESCRIPTION"]
+        }
+    }
+}
