@@ -20,13 +20,13 @@
 	    "description": ""
         },
         {
-            "name": "klaviyo_utc_runtime",
+            "name": "utc_runtime",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
         },
         {
-            "name": "klaviyo_email",
+            "name": "email",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
@@ -38,55 +38,55 @@
 	    "description": ""
         },
         {
-            "name": "klaviyo_full_name",
+            "name": "full_name",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
         },
         {
-            "name": "klaviyo_unq_event_id",
+            "name": "long_event_id",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
         },
         {
-            "name": "klaviyo_event_id",
+            "name": "short_event_id",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
         },
         {
-            "name": "klaviyo_event_name",
+            "name": "event_name",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
         },
         {
-            "name": "klaviyo_url",
+            "name": "url",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
         },
         {
-            "name": "klaviyo_flow",
+            "name": "flow_id",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
         },
         {
-            "name": "klaviyo_message",
+            "name": "message_id",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
         },
         {
-            "name": "klaviyo_campaign_name",
+            "name": "campaign_name",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
         },
         {
-            "name": "klaviyo_subject",
+            "name": "subject",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
@@ -98,7 +98,7 @@
 	    "description": ""
         },
         {
-            "name": "klaviyo_statistic_id",
+            "name": "statistic_id",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
