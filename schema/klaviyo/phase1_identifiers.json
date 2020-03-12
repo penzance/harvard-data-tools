@@ -1,6 +1,7 @@
 {
 	"Activities": {
-		"email": ["EmailAddress"]
+		"huid": ["HUID"],
+		"email": ["EmailAddress"],
+		"full_name": ["Other"]
 	}
 }
-
