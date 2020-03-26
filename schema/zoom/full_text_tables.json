@@ -1,0 +1,8 @@
+{ 
+    "tables": {
+        "Meetings": {
+            "key": "row_id",
+            "columns": ["topic"]
+        }
+    }
+}
