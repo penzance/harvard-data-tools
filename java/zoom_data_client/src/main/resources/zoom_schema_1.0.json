@@ -69,43 +69,43 @@
         },
         {
             "name": "has_3rd_party_audio",
-	    "type": "varchar",
+	    "type": "boolean",
 	    "length": 255,
 	    "description": ""
         },
         {
             "name": "has_pstn",
-	    "type": "varchar",
+	    "type": "boolean",
 	    "length": 255,
 	    "description": ""
         },
         {
             "name": "has_recording",
-	    "type": "varchar",
+	    "type": "boolean",
 	    "length": 255,
 	    "description": ""
         },
         {
             "name": "has_screen_share",
-	    "type": "varchar",
+	    "type": "boolean",
 	    "length": 255,
 	    "description": ""
         },
         {
             "name": "has_sip",
-	    "type": "varchar",
+	    "type": "boolean",
 	    "length": 255,
 	    "description": ""
         },
         {
             "name": "has_video",
-	    "type": "varchar",
+	    "type": "boolean",
 	    "length": 255,
 	    "description": ""
         },
         {
             "name": "has_voip",
-	    "type": "varchar",
+	    "type": "boolean",
 	    "length": 255,
 	    "description": ""
         }
