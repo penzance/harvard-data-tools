@@ -24,6 +24,7 @@ import edu.harvard.data.io.TableWriter;
 import edu.harvard.data.zoom.EventJsonDocumentParser;
 import edu.harvard.data.zoom.bindings.phase0.Phase0Meetings;
 import edu.harvard.data.zoom.bindings.phase0.Phase0Activities;
+import edu.harvard.data.zoom.bindings.phase0.Phase0Participants;
 import edu.harvard.data.pipeline.InputTableIndex;
 import edu.harvard.data.zoom.ZoomDataConfig;
 
