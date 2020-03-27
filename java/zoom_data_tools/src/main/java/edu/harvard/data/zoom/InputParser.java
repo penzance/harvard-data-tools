@@ -51,6 +51,7 @@ public class InputParser {
   private final TableFormat outFormat; 
   private final S3ObjectId zoomMeetingsOutputDir;
   private final S3ObjectId zoomActivitiesOutputDir;
+  private final S3ObjectId zoomParticipantsOutputDir;
 
 
   public InputParser(final ZoomDataConfig config, final AwsUtils aws,
@@ -65,6 +66,7 @@ public class InputParser {
     this.currentDataProduct = getDataProduct();
     this.zoomMeetingsOutputDir = AwsUtils.key(outputLocation, "Meetings");
     this.zoomActivitiesOutputDir= AwsUtils.key(outputLocation, "Activities");
+    this.zoomParticipantsOutputDir= AwsUtils.key(outputLocation, "Participants");
     final FormatLibrary formatLibrary = new FormatLibrary();
     this.inFormat = formatLibrary.getFormat(Format.Sis);
     final ObjectMapper jsonMapper = new ObjectMapper();
@@ -108,6 +110,9 @@ public class InputParser {
     else if (currentDataProduct.equals("Activities") ) {
         dataproductOutputObj = AwsUtils.key(zoomActivitiesOutputDir, dataproductFilename );  
     }
+    else if (currentDataProduct.equals("Participants") ) {
+        dataproductOutputObj = AwsUtils.key(zoomParticipantsOutputDir, dataproductFilename );  
+    }
     
     log.info("Parsing " + filename + " to " + dataproductFile);
     log.info("DataProduct Key: " + dataproductOutputObj );
@@ -138,6 +143,17 @@ public class InputParser {
     			  activities.add((Phase0Activities) tables.get("Activities").get(0));
     		}
     	}
+	} else if (currentDataProduct.equals("Participants")) {
+        log.info("Parsing data product " + currentDataProduct);
+    	try (
+    	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
+    	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
+    	    	TableWriter<Phase0Participants> participants = new TableWriter<Phase0Participants>(Phase0Participants.class, outFormat,
+    	                dataproductFile);) {
+    		for (final Map<String, List<? extends DataTable>> tables : in) {
+    			  participants.add((Phase0Participants) tables.get("Participants").get(0));
+    		}
+    	}
 	}
     log.info("Done Parsing file " + originalFile);
   }
@@ -159,6 +175,14 @@ public class InputParser {
 		    outFormat, dataproductFile)) {
 	      log.info("Verifying file " + dataproductFile);	
 	      for (final Phase0Activities i : in ) {
+	      }
+	    }
+    } else if (currentDataProduct.equals("Participants")) {
+
+	    try(FileTableReader<Phase0Participants> in = new FileTableReader<Phase0Participants>(Phase0Participants.class,
+		    outFormat, dataproductFile)) {
+	      log.info("Verifying file " + dataproductFile);	
+	      for (final Phase0Participants i : in ) {
 	      }
 	    }
     }
