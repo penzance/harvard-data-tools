@@ -190,12 +190,6 @@
 	    "description": ""
         },
         {
-            "name": "leave_reason",
-	    "type": "varchar",
-	    "length": 255,
-	    "description": ""
-        },
-        {
             "name": "leave_time",
 	    "type": "varchar",
 	    "length": 255,
@@ -226,25 +220,7 @@
 	    "description": ""
         },
         {
-            "name": "domain",
-	    "type": "varchar",
-	    "length": 255,
-	    "description": ""
-        },
-        {
-            "name": "harddisk_id",
-	    "type": "varchar",
-	    "length": 255,
-	    "description": ""
-        },
-        {
             "name": "location",
-	    "type": "varchar",
-	    "length": 255,
-	    "description": ""
-        },
-        {
-            "name": "mac_addr",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
@@ -257,12 +233,6 @@
         },
         {
             "name": "network_type",
-	    "type": "varchar",
-	    "length": 255,
-	    "description": ""
-        },
-        {
-            "name": "pc_name",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
