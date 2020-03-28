@@ -6,6 +6,11 @@
 		"huid": ["HUID"]
 	},
 	"Participants": {
-		"huid": ["HUID"]
+		"huid": ["HUID"],
+		"leave_reason": ["Other"],
+		"domain": ["Other"],
+		"harddisk_id": ["Other"],
+		"mac_addr": ["Other"],
+		"pc_name": ["Other"]
 	}
 }
