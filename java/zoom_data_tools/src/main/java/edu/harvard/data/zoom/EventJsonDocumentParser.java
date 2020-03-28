@@ -17,6 +17,8 @@ import edu.harvard.data.VerificationException;
 import edu.harvard.data.io.JsonDocumentParser;
 import edu.harvard.data.zoom.bindings.phase0.Phase0Meetings;
 import edu.harvard.data.zoom.bindings.phase0.Phase0Activities;
+import edu.harvard.data.zoom.bindings.phase0.Phase0Participants;
+
 
 public class EventJsonDocumentParser implements JsonDocumentParser {
   private static final Logger log = LogManager.getLogger();
@@ -50,6 +52,12 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     final List<Phase0Activities> activities = new ArrayList<Phase0Activities>();
     activities.add(activity);
     tables.put("Activities", activities );
+    
+    // Participants
+    final Phase0Participants participant = new Phase0Participants(format, values);
+    final List<Phase0Participants> participants = new ArrayList<Phase0Participants>();
+    participants.add(participant);
+    tables.put("Participants", participants );
 
     // Verification Step (optional)
     if (verify) {
@@ -63,10 +71,12 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     // Start
 	final List<? extends DataTable> meetings = tables.get("Meetings");
 	final List<? extends DataTable> activities = tables.get("Activities");
+	final List<? extends DataTable> participants = tables.get("Participants");
 
 
 	final Map<String, Object> parsedMeetings = meetings.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedActivities = activities.get(0).getFieldsAsMap();
+	final Map<String, Object> parsedParticipants = participants.get(0).getFieldsAsMap();
 	
 	// Meetings
 	if (dataproduct.equals("Meetings")) {
@@ -88,6 +98,17 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 	        log.error("Failed to verify JSON document. " + e.getMessage());
 	        log.error("Original map: " + values);
 	        log.error("Parsed map:   " + parsedActivities );
+	        throw e;			
+	    }
+	}
+	else if (dataproduct.equals("Participants")) {
+		
+	    try {
+		    compareMaps(values, parsedParticipants );
+	    } catch (final VerificationException e) {
+	        log.error("Failed to verify JSON document. " + e.getMessage());
+	        log.error("Original map: " + values);
+	        log.error("Parsed map:   " + parsedParticipants );
 	        throw e;			
 	    }
 	}
