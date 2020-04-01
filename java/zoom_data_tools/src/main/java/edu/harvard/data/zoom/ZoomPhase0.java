@@ -61,6 +61,8 @@ public class ZoomPhase0 extends Phase0 {
             dataIndex.setPartial(table, true);
        } else if ( table.equals("Participants") ) {
             dataIndex.setPartial(table, true);
+       } else if ( table.equals("Quality") ) {
+            dataIndex.setPartial(table, true);
        }
     }
     aws.writeJson(config.getIndexFileS3Location(runId), dataIndex );

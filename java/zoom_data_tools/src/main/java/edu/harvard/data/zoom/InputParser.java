@@ -25,6 +25,7 @@ import edu.harvard.data.zoom.EventJsonDocumentParser;
 import edu.harvard.data.zoom.bindings.phase0.Phase0Meetings;
 import edu.harvard.data.zoom.bindings.phase0.Phase0Activities;
 import edu.harvard.data.zoom.bindings.phase0.Phase0Participants;
+import edu.harvard.data.zoom.bindings.phase0.Phase0Quality;
 import edu.harvard.data.pipeline.InputTableIndex;
 import edu.harvard.data.zoom.ZoomDataConfig;
 
@@ -53,6 +54,7 @@ public class InputParser {
   private final S3ObjectId zoomMeetingsOutputDir;
   private final S3ObjectId zoomActivitiesOutputDir;
   private final S3ObjectId zoomParticipantsOutputDir;
+  private final S3ObjectId zoomQualitiesOutputDir;
 
 
   public InputParser(final ZoomDataConfig config, final AwsUtils aws,
@@ -68,6 +70,7 @@ public class InputParser {
     this.zoomMeetingsOutputDir = AwsUtils.key(outputLocation, "Meetings");
     this.zoomActivitiesOutputDir= AwsUtils.key(outputLocation, "Activities");
     this.zoomParticipantsOutputDir= AwsUtils.key(outputLocation, "Participants");
+    this.zoomQualitiesOutputDir= AwsUtils.key(outputLocation, "Quality");
     final FormatLibrary formatLibrary = new FormatLibrary();
     this.inFormat = formatLibrary.getFormat(Format.Sis);
     final ObjectMapper jsonMapper = new ObjectMapper();
@@ -114,6 +117,9 @@ public class InputParser {
     else if (currentDataProduct.equals("Participants") ) {
         dataproductOutputObj = AwsUtils.key(zoomParticipantsOutputDir, dataproductFilename );  
     }
+    else if (currentDataProduct.equals("Quality") ) {
+        dataproductOutputObj = AwsUtils.key(zoomQualitiesOutputDir, dataproductFilename );  
+    }
     
     log.info("Parsing " + filename + " to " + dataproductFile);
     log.info("DataProduct Key: " + dataproductOutputObj );
@@ -155,6 +161,17 @@ public class InputParser {
     			  participants.add((Phase0Participants) tables.get("Participants").get(0));
     		}
     	}
+	} else if (currentDataProduct.equals("Quality")) {
+        log.info("Parsing data product " + currentDataProduct);
+    	try (
+    	        final JsonFileReader in = new JsonFileReader(inFormat, originalFile,
+    	            new EventJsonDocumentParser(inFormat, true, currentDataProduct));
+    	    	TableWriter<Phase0Quality> participants = new TableWriter<Phase0Quality>(Phase0Quality.class, outFormat,
+    	                dataproductFile);) {
+    		for (final Map<String, List<? extends DataTable>> tables : in) {
+    			  participants.add((Phase0Quality) tables.get("Quality").get(0));
+    		}
+    	}
 	}
     log.info("Done Parsing file " + originalFile);
   }
@@ -184,6 +201,14 @@ public class InputParser {
 		    outFormat, dataproductFile)) {
 	      log.info("Verifying file " + dataproductFile);	
 	      for (final Phase0Participants i : in ) {
+	      }
+	    }
+    } else if (currentDataProduct.equals("Quality")) {
+
+	    try(FileTableReader<Phase0Quality> in = new FileTableReader<Phase0Quality>(Phase0Quality.class,
+		    outFormat, dataproductFile)) {
+	      log.info("Verifying file " + dataproductFile);	
+	      for (final Phase0Quality i : in ) {
 	      }
 	    }
     }

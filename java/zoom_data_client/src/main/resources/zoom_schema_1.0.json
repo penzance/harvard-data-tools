@@ -304,6 +304,46 @@
 	    "description": ""
         }
       ]
+    },
+    "Quality": {
+      "columns" : [ 
+        {
+            "name": "row_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "huid",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "meetingId",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "ip_address",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "join_time",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "user_qos",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        }
+      ]
     }
   }
 }
