@@ -12,5 +12,8 @@
 		"harddisk_id": ["Other"],
 		"mac_addr": ["Other"],
 		"pc_name": ["Other"]
+	},
+	"Quality": {
+		"huid": ["HUID"]
 	}
 }
