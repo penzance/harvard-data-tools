@@ -3,6 +3,10 @@
         "Meetings": {
             "key": "row_id",
             "columns": ["topic"]
+        },
+        "Quality": {
+            "key": "row_id",
+            "columns": ["user_qos"]
         }
     }
 }
