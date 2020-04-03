@@ -64,6 +64,7 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     final Phase0Quality quality = new Phase0Quality(format, values);
     final List<Phase0Quality> qualities = new ArrayList<Phase0Quality>();
     qualities.add(quality);
+    tables.put("Quality", qualities );
 
     // Verification Step (optional)
     if (verify) {
