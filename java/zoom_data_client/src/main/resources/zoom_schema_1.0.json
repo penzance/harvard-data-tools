@@ -336,12 +336,6 @@
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
-        },
-        {
-            "name": "user_qos",
-	    "type": "varchar",
-	    "length": 255,
-	    "description": ""
         }
       ]
     }
