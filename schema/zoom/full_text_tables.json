@@ -7,6 +7,10 @@
         "Quality": {
             "key": "row_id",
             "columns": ["user_qos"]
+        },
+        "Users": {
+            "key": "row_id",
+            "columns": ["group_ids","im_group_ids"]
         }
     }
 }

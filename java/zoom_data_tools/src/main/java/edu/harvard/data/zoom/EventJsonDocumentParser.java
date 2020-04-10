@@ -19,6 +19,7 @@ import edu.harvard.data.zoom.bindings.phase0.Phase0Meetings;
 import edu.harvard.data.zoom.bindings.phase0.Phase0Activities;
 import edu.harvard.data.zoom.bindings.phase0.Phase0Participants;
 import edu.harvard.data.zoom.bindings.phase0.Phase0Quality;
+import edu.harvard.data.zoom.bindings.phase0.Phase0Users;
 
 
 public class EventJsonDocumentParser implements JsonDocumentParser {
@@ -65,6 +66,13 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     final List<Phase0Quality> qualities = new ArrayList<Phase0Quality>();
     qualities.add(quality);
     tables.put("Quality", qualities );
+    
+    // Users
+    final Phase0Users user = new Phase0Users(format, values);
+    final List<Phase0Users> users = new ArrayList<Phase0Users>();
+    users.add(user);
+    tables.put("Quality", users);
+    
 
     // Verification Step (optional)
     if (verify) {
@@ -80,12 +88,14 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 	final List<? extends DataTable> activities = tables.get("Activities");
 	final List<? extends DataTable> participants = tables.get("Participants");
 	final List<? extends DataTable> qualities = tables.get("Quality");
+	final List<? extends DataTable> users = tables.get("Users");
 
 
 	final Map<String, Object> parsedMeetings = meetings.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedActivities = activities.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedParticipants = participants.get(0).getFieldsAsMap();
 	final Map<String, Object> parsedQualities = qualities.get(0).getFieldsAsMap();
+	final Map<String, Object> parsedUsers = users.get(0).getFieldsAsMap();
 	
 	// Meetings
 	if (dataproduct.equals("Meetings")) {
@@ -129,6 +139,17 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
 	        log.error("Failed to verify JSON document. " + e.getMessage());
 	        log.error("Original map: " + values);
 	        log.error("Parsed map:   " + parsedQualities );
+	        throw e;			
+	    }
+	}
+	else if (dataproduct.equals("Users")) {
+		
+	    try {
+		    compareMaps(values, parsedUsers );
+	    } catch (final VerificationException e) {
+	        log.error("Failed to verify JSON document. " + e.getMessage());
+	        log.error("Original map: " + values);
+	        log.error("Parsed map:   " + parsedUsers );
 	        throw e;			
 	    }
 	}
