@@ -15,5 +15,16 @@
 	},
 	"Quality": {
 		"huid": ["HUID"]
+	},
+	"Users": {
+		"huid": ["HUID"],
+		"pic_url": ["Other"],
+		"email": ["Other"],
+		"first_name": ["Other"],
+		"last_name": ["Other"],
+		"phone_number": ["Other"],
+		"timezone": ["Other"],
+		"pmi": ["Other"],
+		"language": ["Other"]
 	}
 }
