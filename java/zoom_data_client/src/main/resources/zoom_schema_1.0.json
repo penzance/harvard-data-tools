@@ -314,6 +314,12 @@
 	    "description": ""
         },
         {
+            "name": "row_id_group",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
             "name": "huid",
 	    "type": "varchar",
 	    "length": 255,
