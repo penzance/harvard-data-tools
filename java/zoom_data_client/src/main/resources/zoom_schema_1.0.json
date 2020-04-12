@@ -344,9 +344,15 @@
 	    "description": ""
         },
         {
-            "name": "user_qos",
+            "name": "join_time_date",
 	    "type": "varchar",
 	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "user_qos",
+	    "type": "varchar",
+	    "length": 65535,
 	    "description": ""
         }
       ]
