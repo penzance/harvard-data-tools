@@ -172,6 +172,7 @@ public class DataConfig {
   private final String rapidAwsAssumeRoleSessionName;
   private final String rapidAwsAssumeRoleDuration;
   private final String rapidTestingEnv;
+  private final String rapidInfraEmr;
   //RAPID Optional Configuration END
 
   protected String codeGeneratorScript;
@@ -310,6 +311,7 @@ public class DataConfig {
     this.rapidAwsAssumeRoleSessionName = getConfigParameter("rapid_aws_assume_role_session_name", false);
     this.rapidAwsAssumeRoleDuration = getConfigParameter("rapid_aws_assume_role_duration", false);
     this.rapidTestingEnv = getConfigParameter("rapid_testing_env", false);
+    this.rapidInfraEmr = getConfigParameter("rapid_infra_emr_config", false);
     //RAPID Optional Configuration END
   }
 
@@ -833,6 +835,10 @@ public class DataConfig {
   }
   public String getRapidTestingEnv() {
     return rapidTestingEnv;
+  }
+  
+  public String getRapidInfraConfig() {
+	return rapidInfraEmr;
   }
 
   public String getPaths() {
