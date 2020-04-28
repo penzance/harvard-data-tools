@@ -74,7 +74,7 @@ public class RemoteappPhase0Bootstrap extends Phase0Bootstrap
   protected List<S3ObjectId> getInfrastructureConfigPaths() {
     final List<S3ObjectId> paths = new ArrayList<S3ObjectId>();
     final S3ObjectId configPath = AwsUtils.key(config.getCodeBucket(), "infrastructure");
-    paths.add(AwsUtils.key(configPath, "app_phase_0_2xn.properties"));
+    paths.add(AwsUtils.key(configPath, config.getRapidInfraEc2Config()));
     paths.add(AwsUtils.key(configPath, "app_emr.properties"));
     return paths;
   }
