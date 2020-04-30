@@ -71,7 +71,7 @@ public class EventJsonDocumentParser implements JsonDocumentParser {
     final Phase0Users user = new Phase0Users(format, values);
     final List<Phase0Users> users = new ArrayList<Phase0Users>();
     users.add(user);
-    tables.put("Quality", users);
+    tables.put("Users", users);
     
 
     // Verification Step (optional)
