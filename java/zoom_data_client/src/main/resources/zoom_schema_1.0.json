@@ -108,6 +108,12 @@
 	    "type": "boolean",
 	    "length": 255,
 	    "description": ""
+        },
+        {
+            "name": "account_number",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
         }
       ]
     },
@@ -151,6 +157,12 @@
         },
         {
             "name": "version",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "account_number",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
@@ -302,6 +314,12 @@
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
+        },
+        {
+            "name": "account_number",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
         }
       ]
     },
@@ -354,6 +372,12 @@
 	    "type": "varchar",
 	    "length": 65535,
 	    "description": ""
+        },
+        {
+            "name": "account_number",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
         }
       ]
     },
@@ -373,6 +397,12 @@
         },
         {
             "name": "id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "account_number",
 	    "type": "varchar",
 	    "length": 255,
 	    "description": ""
