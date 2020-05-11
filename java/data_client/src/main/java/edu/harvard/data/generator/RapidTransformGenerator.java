@@ -103,19 +103,21 @@ public class RapidTransformGenerator {
 		  out.println("chmod 755 $RAPID_CODE_BASE/config_init.py\n");
 			
 		  // Set Default AWS creds 
-		  out.println();
-		  out.println("# Set RAPID Code Env vars\n"
+		  boolean setAwsCreds=false;
+		  if (setAwsCreds) {
+			  out.println();
+			  out.println("# Set RAPID Code Env vars\n"
 		            + "aws configure set default.region '" + config.getRapidAwsDefaultRegion() + "'\n"
 		            + "AWS_ID=`aws iam list-access-keys --user-name " + config.getRapidAwsDefaultAccessKeyUsername() + " | jq -r '.AccessKeyMetadata[0].AccessKeyId'`\n"
 		            + "AWS_KEY=`aws ssm get-parameter --name " + config.getRapidAwsDefaultAccessSecretKey() + " | jq -r '.Parameter.Value'`\n");
-		            
 		  
-		  // Write Creds
-		  out.println();
-		  out.println("# Set to VPAL Apps Creds on main AWS Account\n"
+			  // Write Creds
+			  out.println();
+			  out.println("# Set to VPAL Apps Creds on main AWS Account\n"
 			        + "echo \"[default]\" >> ~/.aws/credentials\n"
 			        + "echo \"aws_access_key_id=$AWS_ID\" >> ~/.aws/credentials\n"
 			        + "echo \"aws_secret_access_key=$AWS_KEY\" >> ~/.aws/credentials\n");
+		  }
 
 		  
 		  // Write Cross account info to Environment
