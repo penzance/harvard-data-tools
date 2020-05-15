@@ -29,7 +29,7 @@ import edu.harvard.data.zoom.BootstrapParameters;
 import edu.harvard.data.zoom.ZoomPhase0Bootstrap;
 
 public class ZoomPhase0Bootstrap extends Phase0Bootstrap
-implements RequestStreamHandler, RequestHandler<BootstrapParameters, String> {
+implements RequestHandler<BootstrapParameters, String> {
 	
   private static final Logger log = LogManager.getLogger();
   private BootstrapParameters params;
@@ -55,30 +55,13 @@ implements RequestStreamHandler, RequestHandler<BootstrapParameters, String> {
 	}
 	    return "";
   }	
-
-  @Override
-  public void handleRequest(InputStream inputStream, OutputStream outputStream, final Context context) {
-	try {
-	  final String requestjson = IOUtils.toString(inputStream, "UTF-8");
-	  log.info("Params: " + requestjson);
-      this.params = new ObjectMapper().readValue(requestjson, BootstrapParameters.class);
-      log.info(params.getConfigPathString());
-      log.info(params.getRapidConfigDict());
-      log.info(params.getCreatePipeline());
-	  super.init(params.getConfigPathString(), 
-	    		 ZoomDataConfig.class, params.getCreatePipeline(), requestjson);
-	  super.run(context);
-	} catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
-	      log.info("Error: " + e.getMessage());
-	}
-  }
   
   @Override
   protected List<S3ObjectId> getInfrastructureConfigPaths() {
     final List<S3ObjectId> paths = new ArrayList<S3ObjectId>();
     final S3ObjectId configPath = AwsUtils.key(config.getCodeBucket(), "infrastructure");
     paths.add(AwsUtils.key(configPath, "tiny_phase_0.properties"));
-    paths.add(AwsUtils.key(configPath, config.getRapidInfraEmrConfig()) );
+    paths.add(AwsUtils.key(configPath, "tiny_emr_rapid.properties"));
     return paths;
   }
 

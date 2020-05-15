@@ -80,7 +80,8 @@ public class ZoomCodeGenerator extends CodeGenerator {
       throw new FileNotFoundException(gitDir.toString());
     }
     final ZoomDataConfig config = ZoomDataConfig
-        .parseInputFiles(ZoomDataConfig.class, configFiles, false, bootstrapParamsString );
+        //.parseInputFiles(ZoomDataConfig.class, configFiles, false, bootstrapParamsString ); // RAPID Config
+        .parseInputFiles(ZoomDataConfig.class, configFiles, false );
     log.info(args[5]);
     final BootstrapParameters bootstrapParams = new ObjectMapper().readValue(bootstrapParamsString,
 	        BootstrapParameters.class);
@@ -107,7 +108,7 @@ public class ZoomCodeGenerator extends CodeGenerator {
     spec.setConfig(config);
     
     // Set string for Bootstrap Rapid Code JSON requests
-    spec.setBootstrapRapidConfig(bootstrapParams.getRapidConfigDict());
+    // spec.setBootstrapRapidConfig(bootstrapParams.getRapidConfigDict());
 
     // Set the four schema versions in the spec.
     final DataSchema schema0 = readSchema(schemaVersion);
