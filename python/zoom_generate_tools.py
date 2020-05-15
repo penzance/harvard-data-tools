@@ -17,7 +17,6 @@ GENERATED_CODE_DIR = os.environ['HARVARD_DATA_GENERATED_OUTPUT']
 CURRENT_SCHEMA = os.environ['DATA_SCHEMA_VERSION']
 CONFIG_PATHS = os.environ['CONFIG_PATHS']
 RUN_ID = os.environ['RUN_ID']
-RAPID_CONFIG = os.environ['RAPID_CONFIG']
 
 PIPELINE_COMPLETE_DIR = "{0}/java/pipeline_complete_lambda".format(GIT_BASE)
 DATA_CLIENT_DIR = "{0}/java/data_client".format(GIT_BASE)
@@ -59,8 +58,7 @@ def run_generator():
         CONFIG_PATHS,
         GIT_BASE,
         GENERATED_CODE_DIR,
-        RUN_ID,
-        RAPID_CONFIG
+        RUN_ID
     ]
     print "Running {0} in {1}".format(command, GENERATED_CODE_DIR)
     process = subprocess.Popen(command)
