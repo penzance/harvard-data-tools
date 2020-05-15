@@ -82,7 +82,7 @@ public class ZoomCodeGenerator extends CodeGenerator {
     final ZoomDataConfig config = ZoomDataConfig
         //.parseInputFiles(ZoomDataConfig.class, configFiles, false, bootstrapParamsString ); // RAPID Config
         .parseInputFiles(ZoomDataConfig.class, configFiles, false );
-    log.info(args[5]);
+    //log.info(args[5]);
     //final BootstrapParameters bootstrapParams = new ObjectMapper().readValue(bootstrapParamsString, // RAPID Config
 	//        BootstrapParameters.class);
     //log.info(bootstrapParams.getConfigPathString());
