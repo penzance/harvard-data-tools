@@ -49,10 +49,10 @@ public class ZoomCodeGenerator extends CodeGenerator {
   private final File gitDir;
 
   private final ZoomDataConfig config;
-  private final BootstrapParameters bootstrapParams;
+  //private final BootstrapParameters bootstrapParams; // RAPID Config
 
   public ZoomCodeGenerator(final String schemaVersion, final File gitDir, final File codeDir,
-      final ZoomDataConfig config, final String runId, BootstrapParameters bootstrapParams) throws FileNotFoundException {
+      final ZoomDataConfig config, final String runId ) throws FileNotFoundException { // RAPID Config mod
     super(config, codeDir, runId);
     this.config = config;
     if (!gitDir.exists() && gitDir.isDirectory()) {
@@ -60,7 +60,7 @@ public class ZoomCodeGenerator extends CodeGenerator {
     }
     this.gitDir = gitDir;
     this.schemaVersion = schemaVersion;
-    this.bootstrapParams = bootstrapParams;
+    // this.bootstrapParams = bootstrapParams; // RAPID Config
   }
 
   public static void main(final String[] args) throws IOException, DataConfigurationException,
@@ -75,7 +75,7 @@ public class ZoomCodeGenerator extends CodeGenerator {
     final File gitDir = new File(args[2]);
     final File dir = new File(args[3]);
     final String runId = args[4];
-    final String bootstrapParamsString = args[5];
+    //final String bootstrapParamsString = args[5]; // RAPID Config
     if (!(gitDir.exists() && gitDir.isDirectory())) {
       throw new FileNotFoundException(gitDir.toString());
     }
@@ -83,11 +83,12 @@ public class ZoomCodeGenerator extends CodeGenerator {
         //.parseInputFiles(ZoomDataConfig.class, configFiles, false, bootstrapParamsString ); // RAPID Config
         .parseInputFiles(ZoomDataConfig.class, configFiles, false );
     log.info(args[5]);
-    final BootstrapParameters bootstrapParams = new ObjectMapper().readValue(bootstrapParamsString,
-	        BootstrapParameters.class);
-    log.info(bootstrapParams.getConfigPathString());
-    log.info(bootstrapParams.getRapidConfigDict());
-    new ZoomCodeGenerator( schemaVersion, gitDir, dir, config, runId, bootstrapParams ).generate();
+    //final BootstrapParameters bootstrapParams = new ObjectMapper().readValue(bootstrapParamsString, // RAPID Config
+	//        BootstrapParameters.class);
+    //log.info(bootstrapParams.getConfigPathString());
+    //log.info(bootstrapParams.getRapidConfigDict());
+    //new ZoomCodeGenerator( schemaVersion, gitDir, dir, config, runId, bootstrapParams ).generate();
+    new ZoomCodeGenerator( schemaVersion, gitDir, dir, config, runId).generate();
   }
 
   @Override
