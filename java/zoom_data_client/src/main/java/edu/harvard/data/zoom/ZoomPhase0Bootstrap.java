@@ -77,7 +77,7 @@ implements RequestStreamHandler, RequestHandler<BootstrapParameters, String> {
   protected List<S3ObjectId> getInfrastructureConfigPaths() {
     final List<S3ObjectId> paths = new ArrayList<S3ObjectId>();
     final S3ObjectId configPath = AwsUtils.key(config.getCodeBucket(), "infrastructure");
-    paths.add(AwsUtils.key(configPath, "tiny_phase_0.properties"));
+    paths.add(AwsUtils.key(configPath, config.getRapidInfraEc2Config()) );
     paths.add(AwsUtils.key(configPath, config.getRapidInfraEmrConfig()) );
     return paths;
   }
