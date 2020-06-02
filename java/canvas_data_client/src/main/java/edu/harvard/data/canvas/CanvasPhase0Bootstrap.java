@@ -27,6 +27,7 @@ import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.DumpInfo;
 import edu.harvard.data.canvas.data_api.ApiClient;
 import edu.harvard.data.canvas.data_api.DataDump;
+import edu.harvard.data.canvas.CanvasDataConfig;
 import edu.harvard.data.canvas.BootstrapParameters;
 import edu.harvard.data.pipeline.Phase0Bootstrap;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
@@ -65,19 +66,19 @@ implements RequestStreamHandler, RequestHandler<BootstrapParameters, String> {
 
   @Override
   public void handleRequest(InputStream inputStream, OutputStream outputStream, final Context context) {
-    try {
-      final String requestjson = IOUtils.toString(inputStream, "UTF-8");
+	try {
+	  final String requestjson = IOUtils.toString(inputStream, "UTF-8");
 	  log.info("Params: " + requestjson);
       this.params = new ObjectMapper().readValue(requestjson, BootstrapParameters.class);
-      params.setCreatePipeline();
       log.info(params.getConfigPathString());
       log.info(params.getRapidConfigDict());
       log.info(params.getCreatePipeline());
-      super.init(params.getConfigPathString(), CanvasDataConfig.class, params.getCreatePipeline(), requestjson );
-      super.run(context);
+	  super.init(params.getConfigPathString(), 
+	    		 CanvasDataConfig.class, params.getCreatePipeline(), requestjson);
+	  super.run(context);
 	} catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
 	      log.info("Error: " + e.getMessage());
-    }
+	}
   }
 
   @Override
