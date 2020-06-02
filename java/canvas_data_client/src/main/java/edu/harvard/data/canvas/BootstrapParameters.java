@@ -9,7 +9,7 @@ public class BootstrapParameters {
   private String configPathString;
   private Integer dumpSequence;
   private String table;
-  private boolean createPipeline;
+  private boolean createPipeline=true;
   private Map<String,String> rapidConfigDict;
   private boolean downloadOnly;
 
