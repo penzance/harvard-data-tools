@@ -149,11 +149,18 @@ implements RequestStreamHandler, RequestHandler<BootstrapParameters, String> {
       paths.add(AwsUtils.key(configPath, "large_phase_0.properties"));
       paths.add(AwsUtils.key(configPath, "large_emr.properties"));
     } else {
-      // Regular dump; we're OK with minimal hardware.
-      paths.add(AwsUtils.key(configPath, "tiny_phase_0.properties"));
-      paths.add(AwsUtils.key(configPath, "tiny_emr.properties"));
-    }
 
+      if (this.params.getRapidConfigDict().isEmpty()) {
+        // Regular dump; we're OK with minimal hardware.
+        paths.add(AwsUtils.key(configPath, "tiny_phase_0.properties"));
+        paths.add(AwsUtils.key(configPath, "tiny_emr.properties"));
+      } else {
+        // RAPID Dump; we may need custom hardware depending on data products. Specify in config.
+		paths.add(AwsUtils.key(configPath, config.getRapidInfraEc2Config()) );
+		paths.add(AwsUtils.key(configPath, config.getRapidInfraEmrConfig()) );
+      }
+    }
+    
     if (megadump) {
       final String subject = "*** WARNING: Dump " + dump.getSequence() + " is a megadump. ***";
       final String msg = "Redshift must be resized prior to update. Dump information at "
