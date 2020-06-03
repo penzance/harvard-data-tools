@@ -150,7 +150,7 @@ implements RequestStreamHandler, RequestHandler<BootstrapParameters, String> {
       paths.add(AwsUtils.key(configPath, "large_emr.properties"));
     } else {
 
-      if (this.params.getRapidConfigDict().isEmpty()) {
+      if (this.params.isRapidConfigDictEmpty()) {
         // Regular dump; we're OK with minimal hardware.
         paths.add(AwsUtils.key(configPath, "tiny_phase_0.properties"));
         paths.add(AwsUtils.key(configPath, "tiny_emr.properties"));
