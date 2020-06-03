@@ -98,6 +98,12 @@ public class BootstrapParameters {
 	return rapidConfigDict;
   }
 
+  public boolean isRapidConfigDictEmpty() {
+  	if ((this.rapidConfigDict == null) || (this.rapidConfigDict.isEmpty()))
+  	  return true;
+  	else return false;
+  }
+
   @Override
   public String toString() {
     return "BootstrapParams\n  ConfigPath: " + getConfigPathString()
