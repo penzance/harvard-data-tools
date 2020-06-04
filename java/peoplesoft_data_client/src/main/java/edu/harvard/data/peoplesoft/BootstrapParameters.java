@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 public class BootstrapParameters {
 	  private String configPathString;
 	  private boolean downloadOnly;
-	  private boolean createPipeline;
+	  private boolean createPipeline=true;
 	  private Map<String,String> rapidConfigDict;
 	  private String message;
 
@@ -30,21 +30,15 @@ public class BootstrapParameters {
 	  }
 
 	  public boolean getCreatePipeline() {
-	    try {
-		  if (this.getRapidConfigDict().containsKey("createPipeline")) {
-			 return Boolean.parseBoolean(this.getRapidConfigDict().get("createPipeline"));
-		  } else return true; // Set Default Pipeline setting here
-	    } catch (NullPointerException e) {
-	      return true;
-	    }
+		return createPipeline;
 	  }
 
 	  public void setDownloadOnly(final boolean downloadOnly) {
 	    this.downloadOnly = downloadOnly;
 	  }
 	  
-	  public void setCreatePipeline() {
-		this.createPipeline = getCreatePipeline();
+	  public void setCreatePipeline(final boolean createPipeline) {
+		this.createPipeline = createPipeline;
 	  }
 	  
 	  public void setRapidDictString( final Map<String,String> rapidConfigDict) {
