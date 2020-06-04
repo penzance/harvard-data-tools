@@ -8,6 +8,9 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,6 +27,8 @@ import edu.harvard.data.schema.extension.ExtensionSchema;
 import edu.harvard.data.schema.extension.ExtensionSchemaTable;
 
 public class MediasitesCodeGenerator extends CodeGenerator {
+
+  private static final Logger log = LogManager.getLogger();
 
   private static final int TRANFORMATION_PHASES = 2;
 
@@ -42,9 +47,10 @@ public class MediasitesCodeGenerator extends CodeGenerator {
   private final File gitDir;
 
   private final MediasitesDataConfig config;
+  private final BootstrapParameters bootstrapParams;
 
   public MediasitesCodeGenerator(final String schemaVersion, final File gitDir, final File codeDir,
-      final MediasitesDataConfig config, final String runId) throws FileNotFoundException {
+      final MediasitesDataConfig config, final String runId, BootstrapParameters bootstrapParams ) throws FileNotFoundException {
     super(config, codeDir, runId);
     this.config = config;
     if (!gitDir.exists() && gitDir.isDirectory()) {
@@ -52,6 +58,7 @@ public class MediasitesCodeGenerator extends CodeGenerator {
     }
     this.gitDir = gitDir;
     this.schemaVersion = schemaVersion;
+    this.bootstrapParams = bootstrapParams;
   }
 
   public static void main(final String[] args) throws IOException, DataConfigurationException,
@@ -65,12 +72,18 @@ public class MediasitesCodeGenerator extends CodeGenerator {
     final File gitDir = new File(args[2]);
     final File dir = new File(args[3]);
     final String runId = args[4];
+    final String bootstrapParamsString = args[5];
     if (!(gitDir.exists() && gitDir.isDirectory())) {
       throw new FileNotFoundException(gitDir.toString());
     }
     final MediasitesDataConfig config = MediasitesDataConfig
-        .parseInputFiles(MediasitesDataConfig.class, configFiles, false);
-    new MediasitesCodeGenerator(schemaVersion, gitDir, dir, config, runId).generate();
+        .parseInputFiles(MediasitesDataConfig.class, configFiles, false, bootstrapParamsString );
+        log.info(args[5]);
+        final BootstrapParameters bootstrapParams = new ObjectMapper().readValue(bootstrapParamsString,
+    	        BootstrapParameters.class);
+        log.info(bootstrapParams.getConfigPathString());
+        log.info(bootstrapParams.getRapidConfigDict());
+    new MediasitesCodeGenerator(schemaVersion, gitDir, dir, config, runId, bootstrapParams).generate();
   }
 
   @Override
@@ -89,6 +102,9 @@ public class MediasitesCodeGenerator extends CodeGenerator {
     spec.setMainIdentifier(IdentifierType.HUID);
     spec.setHiveScriptDir(new File(gitDir, "hive/mediasites"));
     spec.setConfig(config);
+    
+    // Set string for Bootstrap Rapid Code JSON requests
+    spec.setBootstrapRapidConfig(bootstrapParams.getRapidConfigDict());    
 
     // Set the four schema versions in the spec.
     final DataSchema schema0 = readSchema(schemaVersion);
