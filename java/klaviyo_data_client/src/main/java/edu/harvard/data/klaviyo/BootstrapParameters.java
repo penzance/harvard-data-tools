@@ -1,4 +1,5 @@
 package edu.harvard.data.klaviyo;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -80,6 +81,12 @@ public class BootstrapParameters {
 		return rapidConfigDict;
 	  }
 
+	  public boolean isRapidConfigDictEmpty() {
+		if ((this.rapidConfigDict == null) || (this.rapidConfigDict.isEmpty()))
+		  return true;
+		else return false;
+	  }
+	  
 	  public String getMessage() {
 	    return message;
 	  }

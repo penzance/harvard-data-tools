@@ -12,10 +12,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.amazonaws.services.lambda.runtime.*;
-//import com.amazonaws.services.lambda.runtime.Context;
-//import com.amazonaws.services.lambda.runtime.RequestHandler;
-//import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
+import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
+import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.s3.model.S3ObjectId;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -30,7 +29,7 @@ import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class KlaviyoPhase0Bootstrap extends Phase0Bootstrap
 implements RequestStreamHandler, RequestHandler<BootstrapParameters, String> {
-	
+
   private static final Logger log = LogManager.getLogger();
   private BootstrapParameters params;
 	   
@@ -77,8 +76,15 @@ implements RequestStreamHandler, RequestHandler<BootstrapParameters, String> {
   protected List<S3ObjectId> getInfrastructureConfigPaths() {
     final List<S3ObjectId> paths = new ArrayList<S3ObjectId>();
     final S3ObjectId configPath = AwsUtils.key(config.getCodeBucket(), "infrastructure");
-    paths.add(AwsUtils.key(configPath, "tiny_phase_0.properties"));
-    paths.add(AwsUtils.key(configPath, "tiny_emr_rapid.properties"));
+    if (this.params.isRapidConfigDictEmpty()) {
+        // Regular dump; we're OK with default minimal hardware.
+        paths.add(AwsUtils.key(configPath, "tiny_phase_0.properties"));
+        paths.add(AwsUtils.key(configPath, "tiny_emr.properties"));
+    } else {
+        // RAPID Dump; we may need custom hardware depending on data products. Specify in config.
+		paths.add(AwsUtils.key(configPath, config.getRapidInfraEc2Config()) );
+		paths.add(AwsUtils.key(configPath, config.getRapidInfraEmrConfig()) );
+    }
     return paths;
   }
 
