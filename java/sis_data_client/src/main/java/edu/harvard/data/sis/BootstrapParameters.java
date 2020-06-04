@@ -79,6 +79,12 @@ public class BootstrapParameters {
 	  public Map<String,String> getRapidConfigDict() {
 		return rapidConfigDict;
 	  }
+	  
+	  public boolean isRapidConfigDictEmpty() {
+		  	if ((this.rapidConfigDict == null) || (this.rapidConfigDict.isEmpty()))
+		  	  return true;
+		  	else return false;
+	  }	  
 
 	  public String getMessage() {
 	    return message;
