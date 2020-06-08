@@ -36,15 +36,17 @@ implements RequestStreamHandler, RequestHandler<BootstrapParameters, String> {
   // Main method for testing
   public static void main(final String[] args) 
 			      throws JsonParseException, JsonMappingException, IOException {
-		System.out.println(args[0]);
-		final BootstrapParameters params = new ObjectMapper().readValue(args[0],
+	log.info("Args: " + args.toString());
+	System.out.println(args[0]);
+	final BootstrapParameters params = new ObjectMapper().readValue(args[0],
 			        BootstrapParameters.class);
-		System.out.println(new LinksappPhase0Bootstrap().handleRequest(params, null));
+	System.out.println(new LinksappPhase0Bootstrap().handleRequest(params, null));
   }	
 
   @Override
   public String handleRequest(final BootstrapParameters params, final Context context) {
     try {
+		  log.info(params.getCreatePipeline());
       super.init(params.getConfigPathString(), LinksappDataConfig.class, params.getCreatePipeline() );
       super.run(context);
     } catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
@@ -74,8 +76,15 @@ implements RequestStreamHandler, RequestHandler<BootstrapParameters, String> {
   protected List<S3ObjectId> getInfrastructureConfigPaths() {
     final List<S3ObjectId> paths = new ArrayList<S3ObjectId>();
     final S3ObjectId configPath = AwsUtils.key(config.getCodeBucket(), "infrastructure");
-    paths.add(AwsUtils.key(configPath, "app_phase_0.properties"));
-    paths.add(AwsUtils.key(configPath, "app_emr.properties"));
+    if (this.params.isRapidConfigDictEmpty()) {
+        // Regular dump; we're OK with default minimal hardware.
+        paths.add(AwsUtils.key(configPath, "app_phase_0.properties"));
+        paths.add(AwsUtils.key(configPath, "app_emr.properties"));
+    } else {
+        // RAPID Dump; we may need custom hardware depending on data products. Specify in config.
+		paths.add(AwsUtils.key(configPath, config.getRapidInfraEc2Config()) );
+		paths.add(AwsUtils.key(configPath, config.getRapidInfraEmrConfig()) );
+    }
     return paths;
   }
 
