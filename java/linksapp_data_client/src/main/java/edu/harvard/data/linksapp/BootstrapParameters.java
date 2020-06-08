@@ -1,10 +1,12 @@
 package edu.harvard.data.linksapp;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
 public class BootstrapParameters {
 	  private String configPathString;
+	  private boolean downloadOnly;
 	  private boolean createPipeline=true;
 	  private Map<String,String> rapidConfigDict;
 	  private String message;
@@ -24,10 +26,18 @@ public class BootstrapParameters {
 	    this.configPathString = configPathString;
 	  }
 
+	  public boolean getDownloadOnly() {
+	    return downloadOnly;
+	  }
+
 	  public boolean getCreatePipeline() {
 		return createPipeline;
 	  }
 
+	  public void setDownloadOnly(final boolean downloadOnly) {
+	    this.downloadOnly = downloadOnly;
+	  }
+	  
 	  public void setCreatePipeline(final boolean createPipeline) {
 		this.createPipeline = createPipeline;
 	  }
@@ -71,6 +81,12 @@ public class BootstrapParameters {
 		return rapidConfigDict;
 	  }
 
+	  public boolean isRapidConfigDictEmpty() {
+		if ((this.rapidConfigDict == null) || (this.rapidConfigDict.isEmpty()))
+		  return true;
+		else return false;
+	  }
+	  
 	  public String getMessage() {
 	    return message;
 	  }
@@ -84,6 +100,7 @@ public class BootstrapParameters {
 	  public String toString() {
 	    return "BootstrapParams\n  ConfigPath: " + getConfigPathString()
 		+ "\n  createPipeline: " + getCreatePipeline()
+		+ "\n  downloadOnly: " + getDownloadOnly()
 		+ "\n  rapidConfigDict: " + getRapidConfigDictString();
 	  }
 
