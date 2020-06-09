@@ -66,7 +66,7 @@ implements RequestStreamHandler, RequestHandler<BootstrapParameters, String> {
       log.info(params.getRapidConfigDict());
       log.info(params.getCreatePipeline());
 	  super.init(params.getConfigPathString(), 
-	    		 LinksDataConfig.class, params.getCreatePipeline(), requestjson);
+	    		 ZoomDataConfig.class, params.getCreatePipeline(), requestjson);
 	  super.run(context);
 	} catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
 	      log.info("Error: " + e.getMessage());
