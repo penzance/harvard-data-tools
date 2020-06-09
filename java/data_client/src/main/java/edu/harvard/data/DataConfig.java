@@ -283,7 +283,6 @@ public class DataConfig {
         verify);
     this.ec2GitDir = "/home/" + getPhase0HomeDir() + "/harvard-data-tools";
     this.ec2CodeDir = "/home/" + getPhase0HomeDir() + "/code";
-    log.info("gitdir: " + this.ec2GitDir);
     
     //RAPID Optional Configuration START
     this.rapidGoogleCreds = getConfigParameter("rapid_google_creds", false);
