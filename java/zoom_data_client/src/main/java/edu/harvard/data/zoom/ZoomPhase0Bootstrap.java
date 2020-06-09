@@ -23,13 +23,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.harvard.data.AwsUtils;
 import edu.harvard.data.DataConfigurationException;
-import edu.harvard.data.pipeline.Phase0Bootstrap;
-import edu.harvard.data.schema.UnexpectedApiResponseException;
 import edu.harvard.data.zoom.BootstrapParameters;
 import edu.harvard.data.zoom.ZoomPhase0Bootstrap;
+import edu.harvard.data.pipeline.Phase0Bootstrap;
+import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class ZoomPhase0Bootstrap extends Phase0Bootstrap
-implements RequestHandler<BootstrapParameters, String> {
+implements RequestStreamHandler, RequestHandler<BootstrapParameters, String> {
 	
   private static final Logger log = LogManager.getLogger();
   private BootstrapParameters params;
@@ -55,6 +55,23 @@ implements RequestHandler<BootstrapParameters, String> {
 	}
 	    return "";
   }	
+
+  @Override
+  public void handleRequest(InputStream inputStream, OutputStream outputStream, final Context context) {
+	try {
+	  final String requestjson = IOUtils.toString(inputStream, "UTF-8");
+	  log.info("Params: " + requestjson);
+      this.params = new ObjectMapper().readValue(requestjson, BootstrapParameters.class);
+      log.info(params.getConfigPathString());
+      log.info(params.getRapidConfigDict());
+      log.info(params.getCreatePipeline());
+	  super.init(params.getConfigPathString(), 
+	    		 LinksDataConfig.class, params.getCreatePipeline(), requestjson);
+	  super.run(context);
+	} catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
+	      log.info("Error: " + e.getMessage());
+	}
+  }
   
   @Override
   protected List<S3ObjectId> getInfrastructureConfigPaths() {
@@ -69,6 +86,7 @@ implements RequestHandler<BootstrapParameters, String> {
 		paths.add(AwsUtils.key(configPath, config.getRapidInfraEc2Config()) );
 		paths.add(AwsUtils.key(configPath, config.getRapidInfraEmrConfig()) );
     }
+    
     return paths;
   }
 
