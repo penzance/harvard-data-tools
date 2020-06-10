@@ -42,15 +42,15 @@ def compile_java(code_dir):
 
 def clean_up_files():
     os.rename(
-        "{0}/target/mediasites_data_tools-1.0.0.jar".format(DATA_TOOLS_DIR),
+        "{0}/target/mediasites_data_tools-2.0.0.jar".format(DATA_TOOLS_DIR),
         "{0}/data_tools.jar".format(GENERATED_CODE_DIR)
     )
     shutil.rmtree("{0}/java".format(GENERATED_CODE_DIR))
 
 def run_generator():
     generator_classpath = "{0}:{1}:{2}".format(
-        "{0}/target/mediasites_data_client-1.0.0.jar".format(MEDIASITES_DATA_CLIENT_DIR),
-        "{0}/target/data_client-1.0.0.jar".format(DATA_CLIENT_DIR),
+        "{0}/target/mediasites_data_client-2.0.0.jar".format(MEDIASITES_DATA_CLIENT_DIR),
+        "{0}/target/data_client-2.0.0.jar".format(DATA_CLIENT_DIR),
         SCHEMA_JSON_DIR
     )
     main_class = "edu.harvard.data.mediasites.MediasitesCodeGenerator"
