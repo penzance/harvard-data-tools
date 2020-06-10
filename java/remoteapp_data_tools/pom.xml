@@ -6,23 +6,23 @@
 	<artifactId>remoteapp_data_tools</artifactId>
 	<name>remoteapp_data_tools</name>
 	<packaging>jar</packaging>
-	<version>1.0.0</version>
+	<version>2.0.0</version>
 	<dependencies>
 	
      <dependency>
       <groupId>edu.harvard</groupId>
       <artifactId>data_client</artifactId>
-      <version>1.0.0</version>
+      <version>2.0.0</version>
     </dependency>
      <dependency>
       <groupId>edu.harvard</groupId>
       <artifactId>remoteapp_data_client</artifactId>
-      <version>1.0.0</version>
+      <version>2.0.0</version>
     </dependency>
      <dependency>
       <groupId>edu.harvard</groupId>
       <artifactId>remoteapp_generated_code</artifactId>
-      <version>1.0.0</version>
+      <version>2.0.0</version>
       <optional>true</optional>
     </dependency>
 	
