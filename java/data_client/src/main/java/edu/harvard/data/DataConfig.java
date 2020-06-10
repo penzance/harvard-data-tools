@@ -9,7 +9,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
 
 import com.amazonaws.services.s3.model.S3ObjectId;
 
@@ -37,6 +44,8 @@ import edu.harvard.data.identity.IdentifierType;
 public class DataConfig {
 
   protected String paths;
+  protected Map<String, String> rapidConfig;
+  protected String requestjson;
 
   private final String gitTagOrBranch;
   private final String datasetName;
@@ -91,6 +100,7 @@ public class DataConfig {
   private final String completionSnsArn;
 
   private final String emrReleaseLabel;
+  private final String emrCustomAmi;
   private final String emrTerminateAfter;
   private final String emrMasterInstanceType;
   private final String emrMasterBidPrice;
@@ -104,6 +114,8 @@ public class DataConfig {
   private final String emrAvailabilityZoneGroup;
   private final String emrConfiguration;
 
+  private final String phase0HomeDir;
+  private final String phase0BootstrapScript;
   private final String phase0InstanceType;
   private final String phase0BidPrice;
   private final String phase0TerminateAfter;
@@ -128,6 +140,38 @@ public class DataConfig {
   private final String redshiftStagingDir;
   private final String hdfsBase;
   private final String hdfsVerifyBase;
+  private final String rapidScriptFile;
+  private final String rapidRuntime;
+  private final String rapidConfigFile;
+  private final String rapidRequestsDir;
+  private final String rapidCodeDir;
+  
+ 
+  //RAPID Optional Configuration START
+  private final String rapidGoogleCreds;
+  private final String rapidGoogleDir;
+  private final String rapidOutputDir;
+  private final String rapidAwsDefaultRegion;
+  private final String rapidGithubTokenName;
+  private final String rapidGithubBranch;
+  private final String rapidGithubUrl;
+  private final String rapidGithubRequestUrl;
+  private final String rapidGithubRequestBranch;
+  private final String rapidRsConfigKey;
+  private final String rapidRsConfigRegion;
+  private final String rapidRsConfigBucket;
+  private final String rapidCanvasConfigKey;
+  private final String rapidCanvasConfigRegion;
+  private final String rapidCanvasConfigBucket;
+  private final String rapidAwsDefaultAccessKeyUsername;
+  private final String rapidAwsDefaultAccessSecretKey;
+  private final String rapidAwsAssumeRoleArn;
+  private final String rapidAwsAssumeRoleSessionName;
+  private final String rapidAwsAssumeRoleDuration;
+  private final String rapidTestingEnv;
+  private final String rapidInfraEmr;
+  private final String rapidInfraEc2;
+  //RAPID Optional Configuration END
 
   protected String codeGeneratorScript;
   protected String phase0Class;
@@ -147,6 +191,11 @@ public class DataConfig {
     this.redshiftLoadScript = "s3_to_redshift_loader.sql";
     this.s3ToHdfsManifestFile = "s3_to_hdfs_manifest.gz";
     this.fullTextScriptFile = "full_text_copy.sh";
+    this.rapidScriptFile = "phase_3_rapid.sh";
+    this.rapidRuntime = "/runtime/main.py";
+    this.rapidConfigFile = "rapid_config.py";
+    this.rapidCodeDir = "/home/hadoop/rapid-code";
+    this.rapidRequestsDir = "/home/hadoop/rapid-requests";
     this.redshiftStagingDir = "redshift_staging";
     this.identityRedshiftSchema = "pii";
     this.emrCodeDir = "/home/hadoop/code";
@@ -154,8 +203,6 @@ public class DataConfig {
     this.fullTextDir = "/tmp/full_text";
     this.hdfsBase = "/phase_";
     this.hdfsVerifyBase = "/verify" + this.hdfsBase;
-    this.ec2GitDir = "/home/ec2-user/harvard-data-tools";
-    this.ec2CodeDir = "/home/ec2-user/code";
     this.phase0Class = Phase0.class.getCanonicalName();
 
     this.scratchDir = getConfigParameter("scratch_dir", verify);
@@ -210,6 +257,7 @@ public class DataConfig {
 
     this.emrMaximumRetries = getConfigParameter("emr_maximum_retries", verify);
     this.emrReleaseLabel = getConfigParameter("emr_release_label", verify);
+    this.emrCustomAmi = getConfigParameter("emr_custom_ami", false);
     this.emrTerminateAfter = getConfigParameter("emr_terminate_after", verify);
     this.emrMasterInstanceType = getConfigParameter("emr_master_instance_type", verify);
     this.emrCoreInstanceType = getConfigParameter("emr_core_instance_type", verify);
@@ -222,6 +270,8 @@ public class DataConfig {
     this.emrAvailabilityZoneGroup = getConfigParameter("emr_availability_zone_group", verify);
     this.emrConfiguration = getConfigParameter("emr_configuration", verify);
 
+    this.phase0HomeDir=getConfigParameter("phase_0_home_dir", false);
+    this.phase0BootstrapScript = getConfigParameter("phase_0_boostrap_script", false);  // set to false for testing
     this.phase0InstanceType = getConfigParameter("phase_0_instance_type", verify);
     this.phase0BidPrice = getConfigParameter("phase_0_bid_price", verify);
     this.phase0TerminateAfter = getConfigParameter("phase_0_terminate_after", verify);
@@ -231,6 +281,34 @@ public class DataConfig {
     this.phase0SecurityGroup = getConfigParameter("phase_0_security_group", verify);
     this.phase0AvailabilityZoneGroup = getConfigParameter("phase_0_availability_zone_group",
         verify);
+    this.ec2GitDir = "/home/" + getPhase0HomeDir() + "/harvard-data-tools";
+    this.ec2CodeDir = "/home/" + getPhase0HomeDir() + "/code";
+    
+    //RAPID Optional Configuration START
+    this.rapidGoogleCreds = getConfigParameter("rapid_google_creds", false);
+    this.rapidGoogleDir = getConfigParameter("rapid_google_dir", false);
+    this.rapidOutputDir = getConfigParameter("rapid_output_dir", false);
+    this.rapidAwsDefaultRegion = getConfigParameter("rapid_aws_default_region", false);
+    this.rapidGithubTokenName = getConfigParameter("rapid_github_token_name", false);
+    this.rapidGithubBranch = getConfigParameter("rapid_github_branch", false);
+    this.rapidGithubUrl = getConfigParameter("rapid_github_url", false);
+    this.rapidGithubRequestUrl = getConfigParameter("rapid_github_request_url", false);
+    this.rapidGithubRequestBranch = getConfigParameter("rapid_github_request_branch", false);
+    this.rapidRsConfigKey = getConfigParameter("rapid_rs_config_key", false);
+    this.rapidRsConfigRegion = getConfigParameter("rapid_rs_config_region", false);
+    this.rapidRsConfigBucket = getConfigParameter("rapid_rs_config_bucket", false);
+    this.rapidCanvasConfigKey = getConfigParameter("rapid_canvas_config_key", false);
+    this.rapidCanvasConfigRegion = getConfigParameter("rapid_canvas_config_region", false);
+    this.rapidCanvasConfigBucket = getConfigParameter("rapid_canvas_config_bucket", false);
+    this.rapidAwsDefaultAccessKeyUsername = getConfigParameter("rapid_aws_default_access_key_username", false);
+    this.rapidAwsDefaultAccessSecretKey = getConfigParameter("rapid_aws_default_access_secrect_key", false);
+    this.rapidAwsAssumeRoleArn = getConfigParameter("rapid_aws_assume_role_arn", false);
+    this.rapidAwsAssumeRoleSessionName = getConfigParameter("rapid_aws_assume_role_session_name", false);
+    this.rapidAwsAssumeRoleDuration = getConfigParameter("rapid_aws_assume_role_duration", false);
+    this.rapidTestingEnv = getConfigParameter("rapid_testing_env", false);
+    this.rapidInfraEmr = getConfigParameter("rapid_infra_emr_config", false);
+    this.rapidInfraEc2 = getConfigParameter("rapid_infra_ec2_config", false);
+    //RAPID Optional Configuration END
   }
 
   public static <T extends DataConfig> T parseInputFiles(final Class<T> cls,
@@ -267,6 +345,43 @@ public class DataConfig {
       }
     }
   }
+
+  public static <T extends DataConfig> T parseInputFiles(final Class<T> cls,
+	      final String configPathString, final boolean verify, final String requestjson)
+	          throws IOException, DataConfigurationException {
+	    final AwsUtils aws = new AwsUtils();
+	    final List<InputStream> streams = new ArrayList<InputStream>();
+	    try {
+	      for (final String file : configPathString.split("\\|")) {
+	        if (file.toLowerCase().startsWith("s3://")) {
+	          final S3ObjectId awsFile = AwsUtils.key(file);
+	          if (!aws.isFile(awsFile)) {
+	            throw new FileNotFoundException("Can't find configuration S3 key " + file);
+	          }
+	          streams.add(aws.getInputStream(awsFile, false));
+	        } else {
+	          final File f = new File(file);
+	          if (!f.exists() || f.isDirectory()) {
+	            throw new FileNotFoundException("Can't find configuration file " + f);
+	          }
+	          streams.add(new FileInputStream(file));
+	        }
+	      }
+	      final Constructor<T> constructor = cls.getConstructor(List.class, boolean.class);
+	      final T config = constructor.newInstance(streams, verify);
+	      config.paths = configPathString;
+	      config.requestjson = requestjson;
+	      return config;
+	    } catch (NoSuchMethodException | SecurityException | InstantiationException
+	        | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+	      throw new DataConfigurationException(e);
+	    } finally {
+	      for (final InputStream in : streams) {
+	        in.close();
+	      }
+	    }
+  }
+  
 
   protected Integer getIntConfigParameter(final String key, final boolean verify)
       throws DataConfigurationException {
@@ -318,9 +433,18 @@ public class DataConfig {
   public S3ObjectId getFullTextLocation() {
     return AwsUtils.key(fullTextBucket, datasetName);
   }
+  
+  public String getPhase0HomeDir() {
+	if ( this.phase0HomeDir != null ) return phase0HomeDir;
+	else return "ec2-user";
+  }
 
   public S3ObjectId getPhase0BootstrapScript() {
-    return AwsUtils.key(getCodeLocation(), "phase-0-bootstrap.sh");
+	if( phase0BootstrapScript != null) {
+      return AwsUtils.key(getCodeLocation(), phase0BootstrapScript );
+	} else {
+      return AwsUtils.key(getCodeLocation(), "phase-0-bootstrap.sh" );
+	}
   }
 
   public S3ObjectId getIndexFileS3Location(final String runId) {
@@ -421,6 +545,10 @@ public class DataConfig {
 
   public String getEmrReleaseLabel() {
     return emrReleaseLabel;
+  }
+  
+  public String getEmrCustomAmi() {
+	return emrCustomAmi;
   }
 
   public String getEmrTerminateAfter() {
@@ -565,6 +693,152 @@ public class DataConfig {
 
   public String getRedshiftStagingDir() {
     return redshiftStagingDir;
+  }
+  
+  public String getRapidScriptFile() {
+	return rapidScriptFile;
+  }
+  
+  public String getRapidRuntime() {
+	return rapidRuntime;
+	  
+  }
+  
+  public String getRapidConfigFile() {
+	return rapidConfigFile;
+  }
+  
+  public Map<String, String> getRapidConfig() {
+	return rapidConfig;
+  }
+  
+  @SuppressWarnings("unchecked")
+  public void setRapidConfig( final String rapidConfigDict) 
+		  throws JsonParseException, JsonMappingException, IOException {
+     Map<String, Map<String, String>> request = new ObjectMapper().readValue(rapidConfigDict, Map.class);
+     this.rapidConfig = request.get("rapidConfigDict");
+  }
+  
+  public boolean isRapidTransformExists() {
+	boolean rapidTransformApps=false;
+    Pattern rapidTransform = Pattern.compile("(^Apps/.*|^Reports/.*)");
+    if ( getRapidConfig() != null ) {
+      for( String v : getRapidConfig().values() ) {
+    	Matcher m = rapidTransform.matcher(v);
+      	if (m.find()) {
+      	  rapidTransformApps=true;
+      	  break;
+      	}
+      }
+    }
+    return rapidTransformApps;
+  }
+  
+  public String getRequestJson() {
+	return requestjson;
+  }
+
+  public String getRapidCodeDir() {
+    return rapidCodeDir;
+  }
+  
+  public String getRapidRequestsDir() {
+	return rapidRequestsDir;
+  }
+  
+  public String getRapidGoogleCreds() {
+	return rapidGoogleCreds;
+  }
+  
+  public String getRapidGoogleDir() {
+	return rapidGoogleDir;
+  }
+  
+  public String getRapidOutputDir() {
+	return rapidOutputDir;
+  }
+  
+  public String getRapidAwsDefaultRegion() {
+	return rapidAwsDefaultRegion;
+  }
+
+  public String getRapidGithubTokenName() {
+	return rapidGithubTokenName;
+  }
+
+  public String rapidGithubBranch() {
+	return rapidGithubBranch;
+  }
+
+  public String getRapidGithubBranch() {
+	return rapidGithubBranch;
+  }
+
+  public String getRapidGithubUrl() {
+	return rapidGithubUrl;
+  }
+
+  public String getRapidGithubRequestUrl() {
+	return rapidGithubRequestUrl;
+  }
+
+  public String getRapidGithubRequestBranch() {
+	return rapidGithubRequestBranch;
+  }
+
+  public String getRapidRsConfigKey() {
+	return rapidRsConfigKey;
+  }
+  
+  public String getRapidRsConfigRegion() {
+	return rapidRsConfigRegion;
+  }
+
+  public String getRapidRsConfigBucket() {
+	return rapidRsConfigBucket;
+  }
+  
+  public String getRapidCanvasConfigKey() {
+	return rapidCanvasConfigKey;
+  }
+  
+  public String getRapidCanvasConfigRegion() {
+	return rapidCanvasConfigRegion;
+  }
+  
+  public String getRapidCanvasConfigBucket() {
+	return rapidCanvasConfigBucket;
+  }
+  
+  public String getRapidAwsDefaultAccessKeyUsername() {
+	return rapidAwsDefaultAccessKeyUsername;
+  }
+  
+  public String getRapidAwsDefaultAccessSecretKey() {
+	return rapidAwsDefaultAccessSecretKey;
+  }
+  
+  public String getRapidAwsAssumeRoleArn() {
+	return rapidAwsAssumeRoleArn;
+  }
+  
+  public String getRapidAwsAssumeRoleSessionName() {
+    return rapidAwsAssumeRoleSessionName;
+  }
+
+  public String getRapidAwsAssumeRoleDuration() {
+	return rapidAwsAssumeRoleDuration;
+  }
+  public String getRapidTestingEnv() {
+    return rapidTestingEnv;
+  }
+  
+  public String getRapidInfraEmrConfig() {
+	return rapidInfraEmr;
+  }
+
+  public String getRapidInfraEc2Config() {
+	return rapidInfraEc2;
   }
 
   public String getPaths() {

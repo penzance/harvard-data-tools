@@ -84,6 +84,9 @@ public class PipelineFactory {
     obj.set("useOnDemandOnLastAttempt", "true");
     obj.set("keyPair", config.getKeypair());
     obj.set("releaseLabel", config.getEmrReleaseLabel());
+    if (config.getEmrCustomAmi() != null) {
+    	obj.set("customAmiId", config.getEmrCustomAmi());
+    }
     obj.set("applications", "zeppelin" );    
     obj.set("terminateAfter", config.getEmrTerminateAfter());
     obj.set("subnetId", config.getSubnetId());
@@ -110,6 +113,8 @@ public class PipelineFactory {
       listconfigobjects.add( testEmrHiveConfiguration() );
       listconfigobjects.add( testEmrHadoopConfiguration() );
       listconfigobjects.addAll( testEmrSparkConfiguration() );
+      listconfigobjects.add( testEmrCoreConfiguration() );
+      listconfigobjects.add( testEmrMapredConfiguration() );
       obj.set("configuration", listconfigobjects );
       //obj.set("ebsRootVolumeSize", "500" );
       //obj.set("masterEbsConfiguration", testMasterEbsConfig() );
@@ -153,6 +158,20 @@ public class PipelineFactory {
     obj.set("retryDelay", "2 Minutes");
     setStdOut(obj, id);
     return obj;
+  }
+  
+  public PipelineObjectBase getPythonShellActivity( final String id, final S3ObjectId script, 
+		  final List<String> args,
+	final PipelineObjectBase infrastructure) {
+	final PipelineObjectBase obj = new PipelineObjectBase(config, id, "ShellCommandActivity");
+	setupActivity(id, obj, infrastructure);
+	final String params = StringUtils.join(args, " ");
+	//final String cmd = "python /home/hadoop/code/rapid-code/runtime/main.py " + params;
+	final String cmd = "python " + params;
+	obj.set("command", cmd);
+	obj.set("retryDelay", "2 Minutes");
+	setStdOut(obj, id);
+	return obj;
   }
 
   public PipelineObjectBase getS3CopyActivity(final String id, final S3ObjectId src,
@@ -342,6 +361,29 @@ public class PipelineFactory {
 	  return obj;
   }
   
+  public PipelineObjectBase testEmrCoreConfiguration() {
+	  
+	  final PipelineObjectBase obj = new PipelineObjectBase(config, "coresite", "EmrConfiguration"); 
+
+	  obj.set("classification", "core-site" );
+	  obj.set("property", testCreateCoreConfigObjects() );
+	  
+	  allObjects.add(obj);
+	  return obj;
+  }
+  
+  public PipelineObjectBase testEmrMapredConfiguration() {
+	  
+	  final PipelineObjectBase obj = new PipelineObjectBase(config, "mapredsite", "EmrConfiguration"); 
+
+	  obj.set("classification", "mapred-site" );
+	  obj.set("property", testCreateMapredConfigObjects() );
+	  
+	  allObjects.add(obj);
+	  return obj;
+  }
+  
+  
   public PipelineObjectBase testEmrHadoopConfiguration() {
 	  
 	  final PipelineObjectBase obj = new PipelineObjectBase(config, "hadoopenv", "EmrConfiguration");
@@ -366,7 +408,7 @@ public class PipelineFactory {
 	  final PipelineObjectBase objcfg = new PipelineObjectBase(config, "spark", "EmrConfiguration");
 	  ArrayList<PipelineObjectBase> listconfigobjects = new ArrayList<PipelineObjectBase>();
 	  Map<String, String> sProperties = new HashMap<String,String>();
-	  sProperties.put("maximizeResourceAllocation", "true");
+	  sProperties.put("maximizeResourceAllocation", "false");
 	  for( final String sProperty: sProperties.keySet() ) {
 		  	listconfigobjects.add( testCreateEmrConfigObject(sProperty, sProperties.get( sProperty)));
 	  }
@@ -426,12 +468,25 @@ public class PipelineFactory {
   public ArrayList<PipelineObjectBase> testCreateSparkConfigObjects() {
 
       ArrayList<PipelineObjectBase> listconfigobjects = new ArrayList<PipelineObjectBase>();
+      
+      final PipelineObjectBase obj = new PipelineObjectBase(config, "SPARK_JAVA_HOME","Property");
+      obj.set("key", "JAVA_HOME");
+      obj.set("value", "/usr/lib/jvm/java-1.8.0");
+      allObjects.add(obj);
+      listconfigobjects.add( obj );
 
-	  final PipelineObjectBase obj = new PipelineObjectBase(config, "SPARK_JAVA_HOME", "Property"); 
-  	  obj.set("key", "JAVA_HOME");
-	  obj.set("value", "/usr/lib/jvm/java-1.8.0");
-	  allObjects.add(obj);
-	  listconfigobjects.add( obj );
+      final PipelineObjectBase obj2 = new PipelineObjectBase(config, "SPARK_LIBRARY_PATH","Property");
+      obj2.set("key", "SPARK_LIBRARY_PATH");
+      obj2.set("value", "$SPARK_LIBRARY_PATH:/usr/lib/hadoop-lzo/lib/native");
+      allObjects.add(obj2);
+      listconfigobjects.add( obj2 );
+
+      final PipelineObjectBase obj3 = new PipelineObjectBase(config, "SPARK_CLASSPATH","Property");
+      obj3.set("key", "SPARK_CLASSPATH");
+      obj3.set("value", "$SPARK_CLASSPATH:/usr/lib/hadoop-lzo/lib/hadoop-lzo-0.4.19.jar");
+      allObjects.add(obj3);
+      listconfigobjects.add( obj3 );
+
 	  return listconfigobjects;  	  
   }
   
@@ -447,6 +502,37 @@ public class PipelineFactory {
 	  }	 
 	  return listconfigobjects;  	  
   }
+  
+  public ArrayList<PipelineObjectBase> testCreateMapredConfigObjects() {
+
+	  ArrayList<PipelineObjectBase> listconfigobjects = new ArrayList<PipelineObjectBase>();
+	  
+	  // Create Properties
+	  Map<String, String> hProperties = new HashMap<String,String>();
+	  hProperties.put("mapreduce.map.output.compress", "true");
+	  hProperties.put("mapred.map.output.compression.codec", "com.hadoop.compression.lzo.LzoCodec");
+	  hProperties.put("mapred.child.env", "JAVA_LIBRARY_PATH=$JAVA_LIBRARY_PATH:/usr/lib/hadoop-lzo/lib/native");
+	  for( final String hProperty: hProperties.keySet() ) {
+	  	listconfigobjects.add( testCreateEmrConfigObject(hProperty, hProperties.get( hProperty)));
+	  }	 
+	  return listconfigobjects;
+  }
+  
+  
+  public ArrayList<PipelineObjectBase> testCreateCoreConfigObjects() {
+
+	  ArrayList<PipelineObjectBase> listconfigobjects = new ArrayList<PipelineObjectBase>();
+	  
+	  // Create Properties
+	  Map<String, String> hProperties = new HashMap<String,String>();
+	  hProperties.put("io.compression.codecs", "org.apache.hadoop.io.compress.GzipCodec,org.apache.hadoop.io.compress.DefaultCodec,org.apache.hadoop.io.compress.BZip2Codec,com.hadoop.compression.lzo.LzoCodec,com.hadoop.compression.lzo.LzopCodec");
+	  hProperties.put("io.compression.codec.lzo.class", "com.hadoop.compression.lzo.LzoCodec");
+	  for( final String hProperty: hProperties.keySet() ) {
+	  	listconfigobjects.add( testCreateEmrConfigObject(hProperty, hProperties.get( hProperty)));
+	  }	 
+	  return listconfigobjects;
+  }
+  
   
   public ArrayList<PipelineObjectBase> testCreateEmrConfigObjects() {
 

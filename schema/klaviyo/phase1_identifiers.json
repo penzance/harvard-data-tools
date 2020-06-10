@@ -1,0 +1,7 @@
+{
+	"Activities": {
+		"huid": ["HUID"],
+		"email": ["EmailAddress"],
+		"full_name": ["Other"]
+	}
+}

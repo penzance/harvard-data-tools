@@ -1,0 +1,8 @@
+{ 
+    "tables": {
+        "Activities": {
+            "key": "klaviyo_uuid",
+            "columns": ["url"]
+        }
+    }
+}

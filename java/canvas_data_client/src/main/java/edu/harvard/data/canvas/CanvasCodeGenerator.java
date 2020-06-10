@@ -6,16 +6,23 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.VerificationException;
 import edu.harvard.data.canvas.data_api.ApiClient;
 import edu.harvard.data.generator.CodeGenerator;
 import edu.harvard.data.generator.GenerationSpec;
 import edu.harvard.data.identity.IdentifierType;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.harvard.data.schema.DataSchema;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class CanvasCodeGenerator extends CodeGenerator {
+	
+  private static final Logger log = LogManager.getLogger();
 
   private static final int TRANFORMATION_PHASES = 2;
 
@@ -35,13 +42,15 @@ public class CanvasCodeGenerator extends CodeGenerator {
   private final String schemaVersion;
   private final File gitDir;
   private final CanvasDataConfig config;
+  private final BootstrapParameters bootstrapParams;
 
   public CanvasCodeGenerator(final String schemaVersion, final File gitDir, final File codeDir,
-      final CanvasDataConfig config, final String runId) throws FileNotFoundException {
+      final CanvasDataConfig config, final String runId, BootstrapParameters bootstrapParams ) throws FileNotFoundException {
     super(config, codeDir, runId);
     this.gitDir = gitDir;
     this.schemaVersion = schemaVersion;
     this.config = config;
+    this.bootstrapParams = bootstrapParams;
   }
 
   public static void main(final String[] args) throws IOException, DataConfigurationException,
@@ -55,12 +64,17 @@ public class CanvasCodeGenerator extends CodeGenerator {
     final File gitDir = new File(args[2]);
     final File dir = new File(args[3]);
     final String runId = args[4];
+    final String bootstrapParamsString = args[5];
     if (!(gitDir.exists() && gitDir.isDirectory())) {
       throw new FileNotFoundException(gitDir.toString());
     }
     final CanvasDataConfig config = CanvasDataConfig.parseInputFiles(CanvasDataConfig.class,
-        configFiles, false);
-    new CanvasCodeGenerator(schemaVersion, gitDir, dir, config, runId).generate();
+        configFiles, false, bootstrapParamsString );
+    final BootstrapParameters bootstrapParams = new ObjectMapper().readValue(bootstrapParamsString,
+	        BootstrapParameters.class);
+    log.info(bootstrapParams.getConfigPathString());
+    log.info(bootstrapParams.getRapidConfigDict());
+    new CanvasCodeGenerator(schemaVersion, gitDir, dir, config, runId, bootstrapParams ).generate();
   }
 
   @Override
@@ -80,6 +94,9 @@ public class CanvasCodeGenerator extends CodeGenerator {
     spec.setMainIdentifier(IdentifierType.CanvasDataID);
     spec.setHiveScriptDir(new File(gitDir, "hive/canvas"));
     spec.setConfig(config);
+    
+    // Set string for Bootstrap Rapid Code JSON requests
+    spec.setBootstrapRapidConfig(bootstrapParams.getRapidConfigDict());
 
     // Get the specified schema version (or fail if that version doesn't exist).
     final String host = config.getCanvasDataHost();

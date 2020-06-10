@@ -1,6 +1,8 @@
 package edu.harvard.data.canvas;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -8,9 +10,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.amazonaws.services.lambda.runtime.*;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.s3.model.S3ObjectId;
@@ -23,11 +27,13 @@ import edu.harvard.data.DataConfigurationException;
 import edu.harvard.data.DumpInfo;
 import edu.harvard.data.canvas.data_api.ApiClient;
 import edu.harvard.data.canvas.data_api.DataDump;
+import edu.harvard.data.canvas.CanvasDataConfig;
+import edu.harvard.data.canvas.BootstrapParameters;
 import edu.harvard.data.pipeline.Phase0Bootstrap;
 import edu.harvard.data.schema.UnexpectedApiResponseException;
 
 public class CanvasPhase0Bootstrap extends Phase0Bootstrap
-implements RequestHandler<BootstrapParameters, String> {
+implements RequestStreamHandler, RequestHandler<BootstrapParameters, String> {
 
   private DataDump dump;
   private BootstrapParameters params;
@@ -44,7 +50,7 @@ implements RequestHandler<BootstrapParameters, String> {
         BootstrapParameters.class);
     System.out.println(new CanvasPhase0Bootstrap().handleRequest(params, null));
   }
-
+  
   @Override
   public String handleRequest(final BootstrapParameters params, final Context context) {
     try {
@@ -59,13 +65,30 @@ implements RequestHandler<BootstrapParameters, String> {
   }
 
   @Override
+  public void handleRequest(InputStream inputStream, OutputStream outputStream, final Context context) {
+	try {
+	  final String requestjson = IOUtils.toString(inputStream, "UTF-8");
+	  log.info("Params: " + requestjson);
+      this.params = new ObjectMapper().readValue(requestjson, BootstrapParameters.class);
+      log.info(params.getConfigPathString());
+      log.info(params.getRapidConfigDict());
+      log.info(params.getCreatePipeline());
+	  super.init(params.getConfigPathString(), 
+	    		 CanvasDataConfig.class, params.getCreatePipeline(), requestjson);
+	  super.run(context);
+	} catch (IOException | DataConfigurationException | UnexpectedApiResponseException e) {
+	      log.info("Error: " + e.getMessage());
+	}
+  }
+
+  @Override
   protected void setup()
       throws IOException, DataConfigurationException, UnexpectedApiResponseException {
     final CanvasDataConfig canvasConfig = (CanvasDataConfig) config;
     final ApiClient api = new ApiClient(canvasConfig.getCanvasDataHost(),
         canvasConfig.getCanvasApiKey(), canvasConfig.getCanvasApiSecret());
     final List<String> args = new ArrayList<String>();
-    log.info(params);
+    log.info(params.toString());
     if (params.getDumpSequence() != null) {
       dump = api.getDump(params.getDumpSequence());
       args.add("DUMP:" + dump.getDumpId());
@@ -126,11 +149,18 @@ implements RequestHandler<BootstrapParameters, String> {
       paths.add(AwsUtils.key(configPath, "large_phase_0.properties"));
       paths.add(AwsUtils.key(configPath, "large_emr.properties"));
     } else {
-      // Regular dump; we're OK with minimal hardware.
-      paths.add(AwsUtils.key(configPath, "tiny_phase_0.properties"));
-      paths.add(AwsUtils.key(configPath, "tiny_emr.properties"));
-    }
 
+      if (this.params.isRapidConfigDictEmpty()) {
+        // Regular dump; we're OK with minimal hardware.
+        paths.add(AwsUtils.key(configPath, "tiny_phase_0.properties"));
+        paths.add(AwsUtils.key(configPath, "tiny_emr.properties"));
+      } else {
+        // RAPID Dump; we may need custom hardware depending on data products. Specify in config.
+		paths.add(AwsUtils.key(configPath, config.getRapidInfraEc2Config()) );
+		paths.add(AwsUtils.key(configPath, config.getRapidInfraEmrConfig()) );
+      }
+    }
+    
     if (megadump) {
       final String subject = "*** WARNING: Dump " + dump.getSequence() + " is a megadump. ***";
       final String msg = "Redshift must be resized prior to update. Dump information at "

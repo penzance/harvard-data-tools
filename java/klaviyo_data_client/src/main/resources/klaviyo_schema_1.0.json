@@ -1,0 +1,115 @@
+{ "tables": 
+  { "Activities": {
+      "columns" : [ 
+        {
+            "name": "klaviyo_uuid",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "klaviyo_datetime",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "klaviyo_timestamp",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "utc_runtime",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "email",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "klaviyo_person_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "huid",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "full_name",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "long_event_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "short_event_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "event_name",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "url",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "flow_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "message_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "campaign_name",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "subject",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "klaviyo_object",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        },
+        {
+            "name": "statistic_id",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": ""
+        }
+      ]
+    }
+  }
+}

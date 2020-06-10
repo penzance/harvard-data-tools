@@ -1,0 +1,16 @@
+{
+	"CourseCatalog": {
+		"ODS_I_INSTRUCTOR_ID": ["HUID"],
+		"ODS_I_INSTRUCTOR_EMAIL": ["EmailAddress"],
+		"ODS_I_INSTRUCTOR_NAME": ["Other"],
+		"ODS_INSTRUCTOR_LAST_FIRST": ["Other"],
+		"ODS_I_INSTRUCTOR_FIRST_NAME": ["NameFirst"],
+		"ODS_I_INSTRUCTOR_LAST_NAME": ["NameLast"],
+		"ODS_I_INSTRUCTOR_MIDDLE_NAME": ["Other"],
+		"ODS_I_INSTRUCTOR_NAME_PREFIX": ["Other"],
+		"ODS_I_INSTRUCTOR_NAME_SUFFIX": ["Other"]
+	},
+	"PrimeCourseEnroll": {
+		"EMPLID": ["HUID"]
+	}
+}

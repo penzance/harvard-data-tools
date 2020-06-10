@@ -26,12 +26,13 @@ public class Pipeline {
   private final PipelineObjectBase schedule;
   private final String schemaVersion;
   private final String runId;
+  private final String requestjson;
   
   private static final Logger log = LogManager.getLogger();
 
 
   public Pipeline(final String name, final DataConfig config, final String pipelineId,
-      final PipelineFactory factory, final String schemaVersion, final String runId)
+      final PipelineFactory factory, final String schemaVersion, final String runId, final String requestjson )
           throws JsonProcessingException {
     this.name = name;
     this.config = config;
@@ -39,6 +40,7 @@ public class Pipeline {
     this.factory = factory;
     this.schemaVersion = schemaVersion;
     this.runId = runId;
+    this.requestjson = requestjson;
     this.schedule = factory.getSchedule();
     this.redshift = factory.getRedshift();
     this.emr = createEmr();
@@ -68,6 +70,7 @@ public class Pipeline {
   private String emrBootstrapAction() {
     final S3ObjectId script = AwsUtils.key(config.getCodeBucket(), config.getGitTagOrBranch(),
         "emr_bootstrap.sh");
+    final String rapidjsondict_string = requestjson.replaceAll("\\s+","").replace("\"", "\\\"").replace(",", "\\\\,");
     final List<String> bootstrapParams = new ArrayList<String>();
     bootstrapParams.add(AwsUtils.uri(script));
     bootstrapParams.add(schemaVersion);
@@ -76,6 +79,8 @@ public class Pipeline {
     bootstrapParams.add(config.getPaths());
     bootstrapParams.add(runId);
     bootstrapParams.add(config.getEmrCodeDir());
+    bootstrapParams.add(rapidjsondict_string);
+    log.info("bootstrap params: " + bootstrapParams);
     return StringUtils.join(bootstrapParams, ",");
   }
 

@@ -3,6 +3,9 @@ package edu.harvard.data.generator;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import edu.harvard.data.DataConfig;
 import edu.harvard.data.identity.IdentifierType;
@@ -26,6 +29,7 @@ public class GenerationSpec {
   private File hiveScriptDir;
   private DataConfig config;
   private final String schemaVersion;
+  private Map<String,String> bootstrapRapidConfig;
 
   public GenerationSpec(final int transformationPhaseCount, final String schemaVersion) {
     this.schemaVersion = schemaVersion;
@@ -100,6 +104,29 @@ public class GenerationSpec {
 
   public void setConfig(final DataConfig config) {
     this.config = config;
+  }
+  
+  public void setBootstrapRapidConfig(final Map<String,String> bootstrapRapidConfig) {
+	this.bootstrapRapidConfig = bootstrapRapidConfig;
+  }
+  
+  public Map<String,String> getBootstrapRapidConfig() {
+	return bootstrapRapidConfig;
+  }
+  
+  public boolean isRapidTransformExists() {
+	  boolean rapidTransformApps=false;
+      Pattern rapidTransform = Pattern.compile("(^Apps/.*|^Reports/.*)");
+      if ( getBootstrapRapidConfig() != null ) {
+        for( String v : getBootstrapRapidConfig().values() ) {
+      	  Matcher m = rapidTransform.matcher(v);
+      	  if (m.find()) {
+      		  rapidTransformApps=true;
+      		  break;
+      	  }
+        }
+      }
+      return rapidTransformApps;
   }
 
   public DataConfig getConfig() {
