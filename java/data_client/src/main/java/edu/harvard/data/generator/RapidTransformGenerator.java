@@ -158,13 +158,16 @@ public class RapidTransformGenerator {
 		  // Run Rapid Code
 		  String setRapidTestingEnvString = " ";
 		  if (config.getRapidTestingEnv() != null) setRapidTestingEnvString = " --env " + config.getRapidTestingEnv() + " ";
+		  
+		  String setRapidRuntimeOptions = " ";
+		  if (config.getRapidRuntimeOptions() != null) setRapidRuntimeOptions = " " + config.getRapidRuntimeOptions() + " ";
 
 		  out.println();
 		  out.println("#Run RAPID Code\n"
 				    + "cd $RAPID_CODE_BASE\n"
 				    + "python runtime/main.py --clean-pipelines --runtime >> /var/log/rapid-transform.out 2>&1\n"
 				    + "python runtime/main.py --metadata --runtime >> /var/log/rapid-transform.out 2>&1\n"
-				    + "python runtime/main.py --data-requests --runtime >> /var/log/rapid-transform.out 2>&1\n"
+				    + "python runtime/main.py --data-requests --runtime" + setRapidRuntimeOptions + ">> /var/log/rapid-transform.out 2>&1\n"
 				    + "python runtime/main.py --alert --runtime >> /var/log/rapid-transform.out 2>&1\n"
 				    + "python testing/main.py --test --data-requests" + setRapidTestingEnvString + ">> /var/log/rapid-transform.out 2>&1\n");
 		  out.println();

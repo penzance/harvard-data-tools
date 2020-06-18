@@ -18,9 +18,6 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.amazonaws.services.s3.model.S3ObjectId;
 
 import edu.harvard.data.FormatLibrary.Format;
@@ -174,6 +171,7 @@ public class DataConfig {
   private final String rapidTestingEnv;
   private final String rapidInfraEmr;
   private final String rapidInfraEc2;
+  private final String rapidRuntimeOptions;
   //RAPID Optional Configuration END
 
   protected String codeGeneratorScript;
@@ -181,8 +179,6 @@ public class DataConfig {
   protected String codeManagerClass;
 
   private final Properties properties;
-  
-  private static final Logger log = LogManager.getLogger();
 
   public DataConfig(final List<? extends InputStream> streams, final boolean verify)
       throws IOException, DataConfigurationException {
@@ -288,7 +284,6 @@ public class DataConfig {
         verify);
     this.ec2GitDir = "/home/" + getPhase0HomeDir() + "/harvard-data-tools";
     this.ec2CodeDir = "/home/" + getPhase0HomeDir() + "/code";
-    log.info("gitdir: " + this.ec2GitDir);
     
     //RAPID Optional Configuration START
     this.rapidGoogleCreds = getConfigParameter("rapid_google_creds", false);
@@ -314,6 +309,7 @@ public class DataConfig {
     this.rapidTestingEnv = getConfigParameter("rapid_testing_env", false);
     this.rapidInfraEmr = getConfigParameter("rapid_infra_emr_config", false);
     this.rapidInfraEc2 = getConfigParameter("rapid_infra_ec2_config", false);
+    this.rapidRuntimeOptions = getConfigParameter("rapid_runtime_options", false);
     //RAPID Optional Configuration END
   }
 
@@ -845,6 +841,10 @@ public class DataConfig {
 
   public String getRapidInfraEc2Config() {
 	return rapidInfraEc2;
+  }
+  
+  public String getRapidRuntimeOptions() {
+	return rapidRuntimeOptions;
   }
 
   public String getPaths() {
