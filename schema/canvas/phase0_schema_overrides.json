@@ -50,7 +50,7 @@
         {
           "name" : "participation_type",
           "type": "enum",
-          "description" : "Possible values are 'invitee', 'attendee'."
+          "description" : "Possible values are 'invitee', 'attendee', 'initiator'."
         }
       ]
     },
