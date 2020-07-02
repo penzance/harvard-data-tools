@@ -853,6 +853,78 @@
 	    "type": "varchar",
 	    "length": 255,
 	    "description": "NULL for historical dataset."
+        },
+        {
+            "name": "ACADEMIC_PROGRAM_CD",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "Academic Program. examples: AB, MBA."
+        },
+        {
+            "name": "ACADEMIC_PROGRAM",
+	    "type": "varchar",
+	    "length": 512,
+	    "description": "Academic Program. examples: Bachelor of Arts, Master of Business Admnistration."
+        },
+        {
+            "name": "ACADEMIC_PLAN1_CD",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "Academic Plan 1. example: AB-CS"
+        },
+        {
+            "name": "ACADEMIC_PLAN1",
+	    "type": "varchar",
+	    "length": 512,
+	    "description": "."
+        },
+        {
+            "name": "ACADEMIC_SUBPLAN1_CD",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "Academic Sub Plan 1. example: BIO"
+        },
+        {
+            "name": "ACADEMIC_SUBPLAN1",
+	    "type": "varchar",
+	    "length": 512,
+	    "description": "Academic Sub Plan 1. example: Biostatistics"
+        },
+        {
+            "name": "ACADEMIC_SUBPLAN2_CD",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "Academic Sub Plan 2. example: HLITLAJ2"
+        },
+        {
+            "name": "ACADEMIC_SUBPLAN2",
+	    "type": "varchar",
+	    "length": 512,
+	    "description": "Academic Sub Plan 2. example: Hist and Lit: Latin Am Stud"
+        },
+        {
+            "name": "ACADEMIC_SUBPLAN3_CD",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "Academic Sub Plan 3. Not used."
+        },
+        {
+            "name": "ACADEMIC_SUBPLAN3",
+	    "type": "varchar",
+	    "length": 512,
+	    "description": "Academic Sub Plan 3. Not used."
+        },
+        {
+            "name": "ACADEMIC_SUBPLAN4_CD",
+	    "type": "varchar",
+	    "length": 255,
+	    "description": "Academic Sub Plan 4. Not used."
+        },
+        {
+            "name": "ACADEMIC_SUBPLAN4",
+	    "type": "varchar",
+	    "length": 512,
+	    "description": "Academic Sub Plan 4. Unot used."
         }
       ]
     }
