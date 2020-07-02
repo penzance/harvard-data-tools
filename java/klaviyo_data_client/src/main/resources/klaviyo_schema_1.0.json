@@ -70,7 +70,7 @@
         {
             "name": "url",
 	    "type": "varchar",
-	    "length": 255,
+	    "length": 65535,
 	    "description": ""
         },
         {
