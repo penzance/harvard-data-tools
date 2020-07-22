@@ -200,16 +200,21 @@ implements RequestStreamHandler, RequestHandler<BootstrapParameters, String> {
     final Date downloadStart = info.getDownloadStart();
     // Re-download any dump that was updated less than an hour before it was
     // downloaded before.
-    final Date conservativeStart = new Date(downloadStart.getTime() - (60 * 60 * 1000));
-    if (conservativeStart.before(candidate.getUpdatedAt())) {
-      log.info(
-          "Dump needs to be saved; previously downloaded less than an hour after it was last updated.");
-      info.resetDownloadAndVerify();
-      return true;
+    try {
+      final Date conservativeStart = new Date(downloadStart.getTime() - (60 * 60 * 1000));
+      if (conservativeStart.before(candidate.getUpdatedAt())) {
+        log.info(
+            "Dump needs to be saved; previously downloaded less than an hour after it was last updated.");
+        info.resetDownloadAndVerify();
+        return true;
+      }
+      log.info("Dump does not need to be saved; already exists at " + info.getBucket() + "/"
+          + info.getKey() + ".");
+      return false;
+    } catch( NullPointerException e)  {
+      log.info("Invalid dump; For instance, missing updated timestamp. Do not process.");
+      return false;
     }
-    log.info("Dump does not need to be saved; already exists at " + info.getBucket() + "/"
-        + info.getKey() + ".");
-    return false;
   }
 
 }
