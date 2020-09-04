@@ -216,7 +216,7 @@
         {
             "name": "ODS_I_CLASS_SECTION",
 	    "type": "varchar",
-	    "length": 2,
+	    "length": 10,
 	    "description": "A text field to identify different sections of a class within a term and session"
         },
         {
